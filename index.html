@@ -991,8 +991,63 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         </div>
       </div>
 
-      <h2 style="font-family:var(--font-head);font-size:20px;margin-bottom:16px;" class="anim-in anim-delay-3" data-i18n="recent-resumos">Resumos recentes</h2>
-      <div class="resumo-grid anim-in anim-delay-4" id="dash-recent-grid">
+      <!-- BANNER DE PAGAMENTO -->
+      <div class="payment-banner card anim-in anim-delay-3" style="margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+          <span style="font-size:16px;">💳</span>
+          <span style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);">Informações de Pagamento</span>
+        </div>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+          <!-- Coluna esquerda -->
+          <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:12px;">
+            <!-- Responsável -->
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:14px;">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👨‍⚕️</div>
+              <div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">Responsável</div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);">André Luiz Miranda Suzano</div>
+              </div>
+            </div>
+            <!-- Pagamento + Contato -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;">
+                <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Pagamento</div>
+                <div style="width:32px;height:2px;background:var(--accent);border-radius:2px;margin-bottom:12px;"></div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Chave Pix (CPF)</div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:12px;">18553943755</div>
+                <button class="btn btn-sm" id="pix-copy-btn" onclick="copyPix()" style="background:var(--accent);color:#fff;border:none;">📋 Copiar</button>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;">
+                <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Contato</div>
+                <div style="width:32px;height:2px;background:var(--teal);border-radius:2px;margin-bottom:12px;"></div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">WhatsApp</div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:12px;">27 99238-9129</div>
+                <a href="https://wa.me/5527992389129?text=Ol%C3%A1%2C%20Andr%C3%A9.%20Gostaria%20de%20solicitar%20a%20libera%C3%A7%C3%A3o%20do%20meu%20resumo.%20Segue%20em%20anexo%20o%20comprovante%20de%20pagamento%20via%20Pix." target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);text-decoration:none;display:inline-flex;">💬 Abrir WhatsApp →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna direita — Valor -->
+          <div style="flex:0 1 160px;background:var(--bg3);border:2px solid var(--accent);border-radius:var(--radius);padding:28px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);">Valor por resumo:</div>
+            <div style="font-size:36px;font-weight:700;color:var(--green);line-height:1.1;">R$<br>15,00</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Importante</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="font-size:13px;color:var(--text2);line-height:1.55;">⚠️ Não há devolutiva do valor após a liberação do resumo.</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.55;">‼️ Os resumos são feitos e atualizados de acordo com a aula e o livro da matéria em questão.</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.55;">❌ Não realize a venda dos resumos presentes na plataforma, pois isso se considera plágio.</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.55;">✍🏻 Para a liberação envie ao WhatsApp acima: foto do comprovante de pagamento · seu e-mail · o resumo que deseja adquirir.</div>
+        </div>
+      </div>
+
+      <h2 style="font-family:var(--font-head);font-size:20px;margin-bottom:16px;" class="anim-in anim-delay-4" data-i18n="recent-resumos">Resumos recentes</h2>
+      <div class="resumo-grid anim-in" id="dash-recent-grid">
         <div class="empty-state"><div class="spinner"></div></div>
       </div>
     </div>
@@ -1527,6 +1582,15 @@ async function doLogout() {
   state.user = null; state.profile = null; state.authToken = null;
   localStorage.removeItem('med_session');
   showScreen('auth');
+}
+
+function copyPix() {
+  navigator.clipboard.writeText('18553943755').then(() => {
+    const btn = document.getElementById('pix-copy-btn');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => { btn.innerHTML = '📋 Copiar'; }, 2000);
+    toast('Chave Pix copiada!', 'success');
+  }).catch(() => toast('Erro ao copiar.', 'error'));
 }
 
 /* ─────────────────────────────────────────────────────────
