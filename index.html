@@ -265,42 +265,143 @@
   /* ────────────────────────────────────────────────────── */
   /* SCREEN: AUTH                                           */
   /* ────────────────────────────────────────────────────── */
+  .auth-wrapper { width: 100%; max-width: 440px; position: relative; z-index: 2; }
+
+  /* ─── AUTH BACKGROUND ───────────────────────────────── */
   #screen-auth {
-    min-height: 100vh;
+    position: fixed; inset: 0;
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
-    position: relative; z-index: 1;
+    overflow: hidden;
+    background: #050a12;
   }
-  .auth-wrapper { width: 100%; max-width: 440px; }
-  .auth-logo { text-align: center; margin-bottom: 40px; }
-  .auth-logo .logo-text { font-size: 42px; }
-  .auth-logo .logo-sub { margin-top: 4px; }
+  .auth-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 15% 20%, #0a2a4a 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 85% 80%, #0a3a3a 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, #0d1a2e 0%, #050a12 100%);
+    overflow: hidden;
+  }
+  .auth-bg-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.25;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb1 { width:500px;height:500px; background:#1a4fd4; top:-100px; left:-100px; animation-delay:0s; }
+  .orb2 { width:400px;height:400px; background:#0ecfc8; bottom:-80px; right:-80px; animation-delay:-3s; }
+  .orb3 { width:300px;height:300px; background:#2d6ef7; top:40%; left:60%; animation-delay:-5s; }
+  .orb4 { width:250px;height:250px; background:#0a4a4a; top:20%; right:20%; animation-delay:-2s; }
+  .orb5 { width:350px;height:350px; background:#0d2d6e; bottom:10%; left:30%; animation-delay:-6s; }
+  @keyframes orbFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(30px,-20px) scale(1.05); }
+    66%      { transform: translate(-20px,30px) scale(0.95); }
+  }
+  .auth-bg-svg { position:absolute; inset:0; width:100%; height:100%; }
 
-  .auth-tabs { display: flex; gap: 4px; background: var(--bg3); border-radius: var(--radius); padding: 4px; margin-bottom: 28px; }
+  /* ─── AUTH SPARKLE ───────────────────────────────────── */
+  .auth-sparkle {
+    position: fixed; bottom: 32px; right: 32px;
+    font-size: 32px; color: rgba(255,255,255,0.25);
+    animation: sparklePulse 3s ease-in-out infinite;
+    z-index: 2; pointer-events: none;
+  }
+  @keyframes sparklePulse { 0%,100%{opacity:.2;transform:scale(1) rotate(0deg)} 50%{opacity:.6;transform:scale(1.2) rotate(15deg)} }
+
+  /* ─── AUTH LOGO ──────────────────────────────────────── */
+  .auth-logo { text-align: center; margin-bottom: 32px; }
+  .auth-logo-text { font-family: var(--font-head); font-size: 48px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .auth-logo-med  { background: linear-gradient(135deg, #4fc3f7, #0ecfc8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .auth-logo-res  { color: #fff; }
+  .auth-logo-sub  { font-size: 11px; font-weight: 700; letter-spacing: .22em; color: rgba(255,255,255,.45); text-transform: uppercase; }
+
+  /* ─── AUTH GLASS CARD ────────────────────────────────── */
+  .auth-glass-card {
+    background: rgba(10, 18, 35, 0.72);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 20px;
+    padding: 32px 36px;
+    box-shadow: 0 8px 64px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  /* ─── AUTH TABS ──────────────────────────────────────── */
+  .auth-tabs {
+    display: flex; gap: 0; margin-bottom: 28px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 4px;
+  }
   .auth-tab {
-    flex: 1; padding: 9px; border: none; border-radius: 9px;
-    background: transparent; color: var(--text3);
+    flex: 1; padding: 10px; border: none; border-radius: 8px;
+    background: transparent; color: rgba(255,255,255,0.45);
     font-family: var(--font-body); font-size: 14px; font-weight: 600;
     cursor: pointer; transition: var(--transition);
   }
-  .auth-tab.active { background: var(--accent); color: #fff; }
+  .auth-tab.active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px #2d6ef760; }
 
-  .auth-form { display: flex; flex-direction: column; gap: 18px; }
-  .auth-footer { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text3); }
-  .auth-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
-  .auth-link:hover { color: var(--teal); }
+  /* ─── AUTH INPUTS ────────────────────────────────────── */
+  .auth-input-wrap {
+    position: relative; display: flex; align-items: center;
+  }
+  .auth-input-icon {
+    position: absolute; left: 14px;
+    font-size: 16px; color: rgba(255,255,255,0.35);
+    pointer-events: none; user-select: none;
+  }
+  .auth-input-icon-r {
+    position: absolute; right: 14px;
+    font-size: 16px; color: rgba(255,255,255,0.25);
+    pointer-events: none; user-select: none;
+  }
+  .auth-glass-input {
+    width: 100%; padding: 13px 44px 13px 42px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius); color: #fff;
+    font-family: var(--font-body); font-size: 15px;
+    outline: none; transition: var(--transition);
+  }
+  .auth-glass-input:focus { border-color: var(--accent); background: rgba(45,110,247,0.12); box-shadow: 0 0 0 3px rgba(45,110,247,0.2); }
+  .auth-glass-input::placeholder { color: rgba(255,255,255,0.28); }
+
+  /* ─── AUTH SUBMIT BUTTON ─────────────────────────────── */
+  .btn-auth-submit {
+    width: 100%; padding: 14px;
+    background: linear-gradient(90deg, #2d6ef7 0%, #f05252 100%);
+    border: none; border-radius: var(--radius);
+    color: #fff; font-family: var(--font-body); font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: var(--transition);
+    box-shadow: 0 4px 24px rgba(45,110,247,0.4);
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-auth-submit:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 8px 32px rgba(45,110,247,0.5); }
+  .btn-auth-submit:active { transform: translateY(0); }
+  .btn-auth-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  /* ─── AUTH FOOTER ────────────────────────────────────── */
+  .auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.4); }
+  .auth-link { color: #4fc3f7; cursor: pointer; text-decoration: underline; }
+  .auth-link:hover { color: #0ecfc8; }
+
+  /* ─── FORM LABEL override for auth ──────────────────── */
+  .auth-glass-card .form-label { color: rgba(255,255,255,0.55); font-size: 11px; letter-spacing: .12em; }
+  .auth-glass-card .form-group { gap: 8px; }
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
 
   /* ─── LANG TOGGLE on auth ───────────────────────────── */
   .lang-toggle-auth {
     position: fixed; top: 20px; right: 20px;
     display: flex; gap: 6px; align-items: center;
-    background: var(--bg3); border: 1px solid var(--border);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 99px; padding: 4px 6px;
-    z-index: 100;
+    z-index: 100; backdrop-filter: blur(8px);
   }
   .lang-btn {
     padding: 5px 14px; border-radius: 99px; border: none;
-    background: transparent; color: var(--text3);
+    background: transparent; color: rgba(255,255,255,0.5);
     font-size: 13px; font-weight: 700; cursor: pointer;
     transition: var(--transition); letter-spacing: .04em;
   }
@@ -840,18 +941,63 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
      AUTH SCREEN
 ══════════════════════════════════════════════════════════ -->
 <div id="screen-auth" class="hidden">
+
+  <!-- Fundo médico animado -->
+  <div class="auth-bg">
+    <div class="auth-bg-orb orb1"></div>
+    <div class="auth-bg-orb orb2"></div>
+    <div class="auth-bg-orb orb3"></div>
+    <div class="auth-bg-orb orb4"></div>
+    <div class="auth-bg-orb orb5"></div>
+    <!-- Rede neural decorativa -->
+    <svg class="auth-bg-svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <g opacity="0.13" stroke="#4fc3f7" stroke-width="1" fill="none">
+        <circle cx="200" cy="150" r="60"/><circle cx="200" cy="150" r="12" fill="#4fc3f7" stroke="none"/>
+        <circle cx="450" cy="80"  r="45"/><circle cx="450" cy="80"  r="9"  fill="#0ecfc8" stroke="none"/>
+        <circle cx="700" cy="200" r="70"/><circle cx="700" cy="200" r="14" fill="#4fc3f7" stroke="none"/>
+        <circle cx="950" cy="100" r="50"/><circle cx="950" cy="100" r="10" fill="#0ecfc8" stroke="none"/>
+        <circle cx="1100" cy="350" r="55"/><circle cx="1100" cy="350" r="11" fill="#4fc3f7" stroke="none"/>
+        <circle cx="150"  cy="500" r="65"/><circle cx="150"  cy="500" r="13" fill="#0ecfc8" stroke="none"/>
+        <circle cx="400"  cy="600" r="40"/><circle cx="400"  cy="600" r="8"  fill="#4fc3f7" stroke="none"/>
+        <circle cx="800"  cy="650" r="75"/><circle cx="800"  cy="650" r="15" fill="#0ecfc8" stroke="none"/>
+        <circle cx="1050" cy="580" r="45"/><circle cx="1050" cy="580" r="9"  fill="#4fc3f7" stroke="none"/>
+        <circle cx="600"  cy="400" r="50"/><circle cx="600"  cy="400" r="10" fill="#0ecfc8" stroke="none"/>
+        <line x1="200" y1="150" x2="450" y2="80"/>
+        <line x1="450" y1="80"  x2="700" y2="200"/>
+        <line x1="700" y1="200" x2="950" y2="100"/>
+        <line x1="950" y1="100" x2="1100" y2="350"/>
+        <line x1="200" y1="150" x2="150" y2="500"/>
+        <line x1="150" y1="500" x2="400" y2="600"/>
+        <line x1="400" y1="600" x2="800" y2="650"/>
+        <line x1="800" y1="650" x2="1050" y2="580"/>
+        <line x1="1050" y1="580" x2="1100" y2="350"/>
+        <line x1="700" y1="200" x2="600" y2="400"/>
+        <line x1="600" y1="400" x2="800" y2="650"/>
+        <line x1="600" y1="400" x2="400" y2="600"/>
+        <line x1="200" y1="150" x2="600" y2="400"/>
+        <line x1="450" y1="80"  x2="600" y2="400"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Lang toggle -->
   <div class="lang-toggle-auth">
     <button class="lang-btn active" onclick="setLang('pt')">PT</button>
     <button class="lang-btn" onclick="setLang('es')">ES</button>
   </div>
 
+  <!-- Estrela decorativa -->
+  <div class="auth-sparkle">✦</div>
+
   <div class="auth-wrapper anim-in">
+    <!-- Logo -->
     <div class="auth-logo">
-      <div class="logo-text">MedResúmenes</div>
-      <div class="logo-sub" id="auth-tagline">Plataforma Acadêmica de Medicina</div>
+      <div class="auth-logo-text"><span class="auth-logo-med">Med</span><span class="auth-logo-res">Resúmenes</span></div>
+      <div class="auth-logo-sub" id="auth-tagline">PLATAFORMA ACADÊMICA DE MEDICINA</div>
     </div>
 
-    <div class="card card-elevated">
+    <!-- Card glassmorphism -->
+    <div class="auth-glass-card">
       <div class="auth-tabs">
         <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')" data-i18n="login">Entrar</button>
         <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')" data-i18n="register">Cadastrar</button>
@@ -860,14 +1006,22 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
       <!-- LOGIN -->
       <div id="form-login" class="auth-form">
         <div class="form-group">
-          <label class="form-label" data-i18n="email">E-mail</label>
-          <input class="form-input" id="login-email" type="email" placeholder="seu@email.com" />
+          <label class="form-label" data-i18n="email">E-MAIL</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">♡</span>
+            <input class="auth-glass-input" id="login-email" type="email" placeholder="seu@email.com" />
+            <span class="auth-input-icon-r">🩺</span>
+          </div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="password">Senha</label>
-          <input class="form-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+          <label class="form-label" data-i18n="password">SENHA</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">☤</span>
+            <input class="auth-glass-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+            <span class="auth-input-icon-r">⚕</span>
+          </div>
         </div>
-        <button class="btn btn-primary btn-lg w-full" id="btn-login" onclick="doLogin()">
+        <button class="btn-auth-submit" id="btn-login" onclick="doLogin()">
           <span data-i18n="enter">Entrar</span>
         </button>
         <div class="auth-footer">
@@ -879,18 +1033,27 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
       <!-- REGISTER -->
       <div id="form-register" class="auth-form hidden">
         <div class="form-group">
-          <label class="form-label" data-i18n="full-name">Nome completo</label>
-          <input class="form-input" id="reg-name" type="text" placeholder="André..." />
+          <label class="form-label" data-i18n="full-name">NOME COMPLETO</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">👤</span>
+            <input class="auth-glass-input" id="reg-name" type="text" placeholder="André..." />
+          </div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="email">E-mail</label>
-          <input class="form-input" id="reg-email" type="email" placeholder="seu@email.com" />
+          <label class="form-label" data-i18n="email">E-MAIL</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">♡</span>
+            <input class="auth-glass-input" id="reg-email" type="email" placeholder="seu@email.com" />
+          </div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="password">Senha</label>
-          <input class="form-input" id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" />
+          <label class="form-label" data-i18n="password">SENHA</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">☤</span>
+            <input class="auth-glass-input" id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" />
+          </div>
         </div>
-        <button class="btn btn-primary btn-lg w-full" id="btn-register" onclick="doRegister()">
+        <button class="btn-auth-submit" id="btn-register" onclick="doRegister()">
           <span data-i18n="request-access">Solicitar Acesso</span>
         </button>
         <div class="auth-footer" data-i18n="pending-note">
