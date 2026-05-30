@@ -1723,7 +1723,18 @@ function openResumo(id) {
   document.getElementById('viewer-badges').innerHTML = `
     <span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span>
     <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>`;
-  document.getElementById('viewer-body').innerHTML = r.content;
+
+  const viewerBody = document.getElementById('viewer-body');
+  viewerBody.innerHTML = r.content;
+
+  // Reexecuta scripts injetados via innerHTML (necessário para quizzes e interatividade funcionarem)
+  viewerBody.querySelectorAll('script').forEach(oldScript => {
+    const newScript = document.createElement('script');
+    [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
+    newScript.textContent = oldScript.textContent;
+    oldScript.parentNode.replaceChild(newScript, oldScript);
+  });
+
   document.getElementById('viewer-breadcrumb').innerHTML = `
     <a onclick="showPage('resumos')">${t('nav-resumos')}</a>
     <span>›</span>
@@ -2100,3 +2111,4 @@ init();
 </script>
 </body>
 </html>
+
