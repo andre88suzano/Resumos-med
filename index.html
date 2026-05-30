@@ -766,64 +766,36 @@
     .sidebar:not(.collapsed) { transform: translateX(0); }
     .sidebar-toggle { display: none; }
     .main-content { margin-left: 0; }
-    .main-content.sidebar-open { margin-left: 0; } /* no mobile não desloca */
+    .main-content.sidebar-open { margin-left: 0; }
     .sidebar-arrow.open { left: 260px; }
-    .page { padding: 20px 16px; }
-    .topbar { padding: 0 16px; }
+    .page { padding: 12px 8px; }
+    .topbar { padding: 0 12px; }
     .topbar .search-box { display: none; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
     .resumo-grid { grid-template-columns: 1fr; }
-    .viewer-body { padding: 16px; }
 
-    /* ── Forçar layout do conteúdo injetado a coluna única ── */
-    .viewer-body * {
-      max-width: 100% !important;
-      min-width: unset !important;
-      box-sizing: border-box !important;
+    /* Viewer: sem padding, conteúdo escala com zoom */
+    #page-viewer { padding: 8px 4px; }
+    .viewer-body {
+      padding: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: transparent;
+      border: none;
     }
-    /* Flex e grid internos do HTML do resumo → empilhar */
-    .viewer-body [style*="display: flex"],
-    .viewer-body [style*="display:flex"],
-    .viewer-body [style*="display: grid"],
-    .viewer-body [style*="display:grid"] {
-      flex-direction: column !important;
-      grid-template-columns: 1fr !important;
-      width: 100% !important;
+    /* Wrapper que escala o conteúdo do resumo para caber na tela */
+    #viewer-scale-wrapper {
+      width: 100%;
+      overflow-x: hidden;
     }
-    /* Colunas com largura fixa → full width */
-    .viewer-body [style*="width: "],
-    .viewer-body [style*="width:"] {
-      width: 100% !important;
-      min-width: unset !important;
-      max-width: 100% !important;
-    }
-    /* Fontes grandes demais no mobile */
-    .viewer-body h1, .viewer-body [style*="font-size: 4"],
-    .viewer-body [style*="font-size: 3"] {
-      font-size: 22px !important;
-      line-height: 1.3 !important;
-    }
-    /* Padding interno excessivo */
-    .viewer-body [style*="padding: 4"],
-    .viewer-body [style*="padding: 3"] {
-      padding: 16px !important;
-    }
-    /* Tabelas → scroll horizontal */
-    .viewer-body table {
-      display: block !important;
-      overflow-x: auto !important;
-      width: 100% !important;
-    }
-    /* Imagens */
-    .viewer-body img {
-      width: 100% !important;
-      height: auto !important;
+    #viewer-scale-inner {
+      width: 100%;
+      transform-origin: top left;
     }
   }
 
   @media (max-width: 480px) {
     .stat-grid { grid-template-columns: 1fr; }
-    .viewer-body { padding: 12px; font-size: 14px; }
   }
 
   /* ─── ANIMATIONS ────────────────────────────────────── */
@@ -1376,7 +1348,11 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
           ← <span data-i18n="back">Voltar</span>
         </button>
       </div>
-      <div class="viewer-body" id="viewer-body"></div>
+      <div class="viewer-body" id="viewer-body">
+        <div id="viewer-scale-wrapper">
+          <div id="viewer-scale-inner"></div>
+        </div>
+      </div>
     </div>
 
     <!-- ── PAGE: MEU PERFIL ────────────────────────── -->
@@ -2211,16 +2187,18 @@ function expandSidebar() {
 function openResumo(id) {
   const r = state.resumos.find(x => x.id === id);
   if (!r) return;
+
   document.getElementById('viewer-title').textContent = r.title;
   document.getElementById('viewer-badges').innerHTML = `
     <span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span>
     <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>`;
 
-  const viewerBody = document.getElementById('viewer-body');
-  viewerBody.innerHTML = r.content;
+  // Injeta conteúdo no inner wrapper (preserva layout original)
+  const inner = document.getElementById('viewer-scale-inner');
+  inner.innerHTML = r.content;
 
-  // Reexecuta scripts injetados via innerHTML (necessário para quizzes e interatividade funcionarem)
-  viewerBody.querySelectorAll('script').forEach(oldScript => {
+  // Reexecuta scripts (quizzes, interatividade, acordeões)
+  inner.querySelectorAll('script').forEach(oldScript => {
     const newScript = document.createElement('script');
     [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
     newScript.textContent = oldScript.textContent;
@@ -2236,6 +2214,33 @@ function openResumo(id) {
 
   collapseSidebar();
   showPage('viewer');
+
+  // Aplica zoom proporcional no mobile para o conteúdo caber sem quebrar
+  requestAnimationFrame(() => applyViewerZoom());
+}
+
+function applyViewerZoom() {
+  const inner   = document.getElementById('viewer-scale-inner');
+  const wrapper = document.getElementById('viewer-scale-wrapper');
+  if (!inner || !wrapper) return;
+
+  // Reset para medir largura natural
+  inner.style.transform = '';
+  inner.style.width = '';
+
+  const naturalW  = inner.scrollWidth;
+  const availableW = wrapper.clientWidth;
+
+  if (naturalW > availableW && availableW > 0) {
+    const scale = availableW / naturalW;
+    inner.style.transformOrigin = 'top left';
+    inner.style.transform = `scale(${scale})`;
+    inner.style.width = `${naturalW}px`;
+    wrapper.style.height = `${inner.scrollHeight * scale}px`;
+  } else {
+    inner.style.width = '100%';
+    wrapper.style.height = '';
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2636,6 +2641,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(m => m.classList.add('hidden'));
   }
+});
+
+// Recalcular zoom ao girar tela
+window.addEventListener('resize', () => {
+  if (state.currentPage === 'viewer') applyViewerZoom();
 });
 
 init();
