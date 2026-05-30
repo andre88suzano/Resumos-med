@@ -512,26 +512,45 @@
   .logout-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; padding: 4px; border-radius: 6px; transition: var(--transition); }
   .logout-btn:hover { color: var(--red); background: var(--red-dim); }
 
-  /* ─── SIDEBAR TOGGLE (mobile) ───────────────────────── */
-  .sidebar-toggle {
-    display: none;
-    position: fixed; top: 16px; left: 16px;
+  /* ─── SIDEBAR TOGGLE ────────────────────────────────── */
+  .sidebar-toggle { display: none; } /* antigo — desativado */
+
+  /* Setinha fixa na borda esquerda */
+  .sidebar-arrow {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
     z-index: 300;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px;
-    cursor: pointer; font-size: 20px; color: var(--text);
-    box-shadow: var(--shadow);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    width: 20px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    transition: var(--transition);
+    box-shadow: 3px 0 12px #00000040;
   }
+  .sidebar-arrow:hover { background: var(--accent); color: #fff; border-color: var(--accent); width: 24px; }
+  .sidebar-arrow .arrow-icon { transition: transform var(--transition); }
+  .sidebar-arrow.open .arrow-icon { transform: rotate(180deg); }
+  /* Quando sidebar aberta, move a setinha */
+  .sidebar-arrow.open { left: 260px; }
 
   /* ─── MAIN CONTENT ──────────────────────────────────── */
   .main-content {
-    flex: 1; margin-left: 260px;
+    flex: 1;
+    margin-left: 0; /* fechada por padrão */
     transition: margin var(--transition);
     min-height: 100vh;
     min-width: 0;
     overflow-x: hidden;
   }
-  .main-content.expanded { margin-left: 0; }
+  .main-content.sidebar-open { margin-left: 260px; }
 
   /* ─── TOPBAR ────────────────────────────────────────── */
   .topbar {
@@ -744,9 +763,11 @@
   /* ─── RESPONSIVE ────────────────────────────────────── */
   @media (max-width: 768px) {
     .sidebar { transform: translateX(-260px); }
-    .sidebar.open { transform: translateX(0); }
-    .sidebar-toggle { display: flex; }
+    .sidebar:not(.collapsed) { transform: translateX(0); }
+    .sidebar-toggle { display: none; }
     .main-content { margin-left: 0; }
+    .main-content.sidebar-open { margin-left: 0; } /* no mobile não desloca */
+    .sidebar-arrow.open { left: 260px; }
     .page { padding: 20px 16px; }
     .topbar { padding: 0 16px; }
     .topbar .search-box { display: none; }
@@ -1125,11 +1146,16 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
 ══════════════════════════════════════════════════════════ -->
 <div id="screen-app" class="hidden">
 
-  <!-- SIDEBAR OVERLAY (mobile) -->
+  <!-- SIDEBAR OVERLAY -->
   <div id="sidebar-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:#00000060;z-index:150;"></div>
 
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
+  <!-- SETINHA DE ABRIR/FECHAR SIDEBAR -->
+  <div class="sidebar-arrow" id="sidebar-arrow" onclick="toggleSidebar()">
+    <span class="arrow-icon">›</span>
+  </div>
+
+  <!-- SIDEBAR — fechada por padrão -->
+  <nav class="sidebar collapsed" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <span>Med</span><span style="color:var(--text2)">Resúmenes</span>
@@ -2473,15 +2499,37 @@ async function updatePassword() {
    SIDEBAR
 ───────────────────────────────────────────────────────── */
 function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebar-overlay');
-  const isOpen = sb.classList.contains('open');
-  sb.classList.toggle('open', !isOpen);
-  ov.style.display = isOpen ? 'none' : 'block';
+  const sb    = document.getElementById('sidebar');
+  const mc    = document.getElementById('main-content');
+  const arrow = document.getElementById('sidebar-arrow');
+  const ov    = document.getElementById('sidebar-overlay');
+  const isOpen = !sb.classList.contains('collapsed');
+
+  if (isOpen) {
+    // Fechar
+    sb.classList.add('collapsed');
+    mc.classList.remove('sidebar-open');
+    arrow.classList.remove('open');
+    ov.style.display = 'none';
+  } else {
+    // Abrir
+    sb.classList.remove('collapsed');
+    mc.classList.add('sidebar-open');
+    arrow.classList.add('open');
+    // No mobile mostra overlay
+    if (window.innerWidth <= 768) ov.style.display = 'block';
+  }
 }
+
 function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').style.display = 'none';
+  const sb    = document.getElementById('sidebar');
+  const mc    = document.getElementById('main-content');
+  const arrow = document.getElementById('sidebar-arrow');
+  const ov    = document.getElementById('sidebar-overlay');
+  sb.classList.add('collapsed');
+  mc.classList.remove('sidebar-open');
+  arrow.classList.remove('open');
+  ov.style.display = 'none';
 }
 
 /* ─────────────────────────────────────────────────────────
