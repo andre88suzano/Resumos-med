@@ -1969,7 +1969,7 @@ function initApp() {
     : `<span class="badge badge-blue">🎓 ${t('student')}</span>`;
   document.getElementById('sidebar-role-label').textContent = p.is_admin ? t('sidebar-role-admin') : t('sidebar-role-student');
   document.getElementById('nav-admin').classList.toggle('hidden', !p.is_admin);
-  document.getElementById('stat-card-users').style.display = p.is_admin ? '' : 'none';
+  // stat-card-users removido — admin-only cards gerenciados por renderDashboard
 
   showScreen('app');
   showPage('dashboard');
