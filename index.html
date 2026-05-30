@@ -2198,13 +2198,59 @@ function openResumo(id) {
     <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>`;
 
   // Renderiza o HTML do resumo num iframe isolado
-  // Scripts, CSS e interatividade funcionam 100% sem conflito
   const iframe = document.getElementById('viewer-iframe');
 
   // Limpa URL anterior
   if (iframe._blobUrl) { URL.revokeObjectURL(iframe._blobUrl); iframe._blobUrl = null; }
 
-  const blob = new Blob([r.content], { type: 'text/html; charset=utf-8' });
+  // Injeta CSS responsivo no HTML para garantir que caiba no celular
+  const mobileFix = `
+<style id="__med-mobile-fix__">
+@media (max-width: 820px) {
+  /* Empilha qualquer layout flex/grid em coluna */
+  .layout, .app-layout, .page-layout, body > div {
+    flex-direction: column !important;
+    display: block !important;
+  }
+  /* Esconde sidebars de navegação interna */
+  .sidebar, .nav-sidebar, .left-panel, [class*="sidebar"], [id*="sidebar"] {
+    display: none !important;
+  }
+  /* Conteúdo principal ocupa tudo */
+  .main, .content, .main-content, [class*="main"], [class*="content"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: unset !important;
+    padding: 12px 10px !important;
+    margin: 0 !important;
+  }
+  /* Remove largura mínima de qualquer elemento */
+  *, *::before, *::after {
+    min-width: unset !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  /* Tabelas com scroll horizontal */
+  table { display: block !important; overflow-x: auto !important; width: 100% !important; }
+  /* Grids viram coluna única */
+  [style*="grid-template-columns"], [class*="grid"], [class*="card-grid"] {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+  }
+  img { width: 100% !important; height: auto !important; }
+  body { overflow-x: hidden !important; }
+}
+</style>`;
+
+  // Insere o fix antes do </head> ou no início do body
+  let html = r.content;
+  if (html.includes('</head>')) {
+    html = html.replace('</head>', mobileFix + '</head>');
+  } else {
+    html = mobileFix + html;
+  }
+
+  const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   iframe._blobUrl = url;
   iframe.src = url;
