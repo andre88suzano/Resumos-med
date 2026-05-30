@@ -1764,6 +1764,10 @@ function switchAuthTab(tab) {
   document.getElementById('tab-register').classList.toggle('active', tab !== 'login');
 }
 
+function genToken() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
@@ -1774,10 +1778,53 @@ async function doLogin() {
     if (!ok || !data.access_token) { toast(data?.error_description || (currentLang==='pt'?'Credenciais inválidas.':'Credenciales inválidas.'),'error'); return; }
     state.authToken = data.access_token;
     state.user = data.user;
+
+    // Verificar se há outro dispositivo ativo
+    const { data: profileData } = await SB.select('approved_users', `user_id=eq.${data.user.id}&select=active_token,approved,is_admin`);
+    const profile = Array.isArray(profileData) ? profileData[0] : null;
+
+    if (profile?.active_token) {
+      const localToken = localStorage.getItem('med_device_token');
+      if (localToken !== profile.active_token) {
+        // Outro dispositivo está ativo — perguntar se quer forçar
+        setLoading('btn-login', false);
+        showForceLoginModal(data.access_token, data.user);
+        return;
+      }
+    }
+
+    await activateDevice(data.user.id);
     localStorage.setItem('med_session', JSON.stringify({ token: data.access_token, user: data.user }));
     await loadUserProfile();
   } catch(e) { toast(e.message,'error'); }
   finally { setLoading('btn-login', false); }
+}
+
+async function activateDevice(userId) {
+  const token = genToken();
+  localStorage.setItem('med_device_token', token);
+  await SB.update('approved_users', { active_token: token }, `user_id=eq.${userId}`);
+  state.deviceToken = token;
+}
+
+function showForceLoginModal(accessToken, user) {
+  const msg = currentLang === 'pt'
+    ? 'Sua conta já está aberta em outro dispositivo. Deseja desconectá-lo e entrar aqui?'
+    : 'Tu cuenta está abierta en otro dispositivo. ¿Deseas desconectarlo e ingresar aquí?';
+
+  openConfirm(
+    currentLang === 'pt' ? '⚠️ Outro dispositivo ativo' : '⚠️ Otro dispositivo activo',
+    msg,
+    async () => {
+      state.authToken = accessToken;
+      state.user = user;
+      await activateDevice(user.id);
+      localStorage.setItem('med_session', JSON.stringify({ token: accessToken, user }));
+      await loadUserProfile();
+    }
+  );
+  // Botão cancelar também faz logout
+  document.getElementById('btn-confirm-ok').textContent = currentLang === 'pt' ? 'Sim, entrar aqui' : 'Sí, ingresar aquí';
 }
 
 async function doRegister() {
@@ -1803,9 +1850,16 @@ async function doRegister() {
 }
 
 async function doLogout() {
-  try { await SB.signOut(); } catch {}
-  state.user = null; state.profile = null; state.authToken = null;
+  try {
+    if (state.user) {
+      // Limpa o token ativo para liberar outro dispositivo entrar
+      await SB.update('approved_users', { active_token: null }, `user_id=eq.${state.user.id}`);
+    }
+    await SB.signOut();
+  } catch {}
+  state.user = null; state.profile = null; state.authToken = null; state.deviceToken = null;
   localStorage.removeItem('med_session');
+  localStorage.removeItem('med_device_token');
   showScreen('auth');
 }
 
@@ -2442,11 +2496,26 @@ async function init() {
     try {
       const { token, user } = JSON.parse(sess);
       state.authToken = token; state.user = user;
-      // Verify token is still valid
       const { data, ok } = await SB.select('approved_users', `user_id=eq.${user.id}&select=*`);
       if (ok && Array.isArray(data) && data[0]) {
         state.profile = data[0];
         if (state.profile.approved || state.profile.is_admin) {
+          // Verificar se este dispositivo ainda é o ativo
+          const localToken = localStorage.getItem('med_device_token');
+          if (!state.profile.is_admin && state.profile.active_token && localToken !== state.profile.active_token) {
+            // Outro dispositivo tomou a sessão
+            state.authToken = null; state.user = null; state.profile = null;
+            localStorage.removeItem('med_session');
+            localStorage.removeItem('med_device_token');
+            document.getElementById('screen-loading').classList.add('hidden');
+            showScreen('auth');
+            toast(currentLang==='pt'
+              ? '⚠️ Sua sessão foi encerrada pois a conta foi acessada em outro dispositivo.'
+              : '⚠️ Tu sesión fue cerrada porque la cuenta fue accedida en otro dispositivo.', 'error');
+            return;
+          }
+          // Renovar token do dispositivo
+          if (!state.profile.is_admin) await activateDevice(user.id);
           initApp();
           document.getElementById('screen-loading').classList.add('hidden');
           return;
