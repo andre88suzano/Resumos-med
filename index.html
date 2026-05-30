@@ -1923,12 +1923,27 @@ function renderCurrentPage() {
 ───────────────────────────────────────────────────────── */
 function renderDashboard() {
   const p = state.profile;
+  const isAdmin = p.is_admin;
+
   document.getElementById('dash-welcome').textContent = `${t('dash-welcome-prefix')} ${p.name || p.email}! 👋`;
   document.getElementById('dash-sub').textContent = t('dash-sub');
-  document.getElementById('stat-total-resumos').textContent = state.resumos.length;
-  document.getElementById('stat-my-access').textContent = state.profile.is_admin ? state.resumos.length : state.myAccess.length;
-  if (state.profile.is_admin) document.getElementById('stat-total-users').textContent = state.users.length;
 
+  // Stat cards — apenas admin vê
+  const statGrid = document.querySelector('.stat-grid');
+  if (statGrid) statGrid.style.display = isAdmin ? '' : 'none';
+
+  if (isAdmin) {
+    document.getElementById('stat-total-resumos').textContent = state.resumos.length;
+    document.getElementById('stat-my-access').textContent = state.resumos.length;
+    document.getElementById('stat-total-users').textContent = state.users.length;
+    document.getElementById('stat-card-users').style.display = '';
+  }
+
+  // Banner de pagamento — todos veem
+  const paymentBanner = document.querySelector('.payment-banner');
+  if (paymentBanner) paymentBanner.style.display = '';
+
+  // Resumos recentes — todos veem
   const recent = state.resumos.slice(0, 6);
   const grid = document.getElementById('dash-recent-grid');
   if (!recent.length) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>${t('no-resumos-found')}</h3></div>`; return; }
