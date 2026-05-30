@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genética Médica — Resumen Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c14;
+    --surface: #111420;
+    --surface2: #181c2e;
+    --cyan: #00f5d4;
+    --purple: #9b5de5;
+    --blue: #4cc9f0;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --border: rgba(0,245,212,0.15);
+    --card-bg: rgba(17,20,32,0.95);
+    --accent: #f72585;
+    --yellow: #fee440;
+    --green: #06d6a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* TOP GRADIENT BAR */
+  .top-bar {
+    height: 5px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--blue), var(--accent));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* HERO */
+  .hero {
+    background: radial-gradient(ellipse at 20% 50%, rgba(155,93,229,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(0,245,212,0.12) 0%, transparent 50%),
+                var(--surface);
+    padding: 60px 40px 50px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,245,212,0.03) 39px, rgba(0,245,212,0.03) 40px);
+    pointer-events: none;
+  }
+
+  /* COURSE BADGE */
+  .course-badge {
+    display: inline-block;
+    background: rgba(0,245,212,0.08);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  /* PERSONAL BRAND BLOCK */
+  .brand-block {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(10,12,20,0.85);
+    border: 1.5px solid rgba(0,245,212,0.4);
+    box-shadow: 0 0 30px rgba(0,245,212,0.12), 0 0 60px rgba(155,93,229,0.08), inset 0 0 20px rgba(0,245,212,0.03);
+    border-radius: 6px;
+    padding: 20px 36px 16px;
+    margin: 0 auto 28px;
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+  }
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(18px, 4vw, 28px);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 60%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  .brand-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #5a6478;
+    letter-spacing: 4px;
+    margin-top: 6px;
+  }
+
+  /* MAIN TITLE */
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(22px, 5vw, 38px);
+    color: var(--text);
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* CONTAINER */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* CHAPTER CARD */
+  .chapter {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 36px;
+    overflow: hidden;
+    position: relative;
+  }
+  .chapter::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--cyan), var(--purple));
+  }
+
+  .chapter-header {
+    padding: 22px 28px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .chapter-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    background: rgba(0,245,212,0.08);
+    border: 1px solid rgba(0,245,212,0.2);
+    padding: 4px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin-top: 3px;
+  }
+  .chapter-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .chapter-source {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .chapter-body {
+    padding: 24px 28px;
+  }
+
+  /* SECTIONS */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  p { margin-bottom: 12px; color: #c8d3e0; }
+
+  /* LISTS */
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { color: #c8d3e0; margin-bottom: 5px; }
+  li strong { color: var(--text); }
+
+  /* HIGHLIGHT BOX */
+  .highlight {
+    background: rgba(0,245,212,0.05);
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 5px 5px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .highlight.purple { border-color: var(--purple); background: rgba(155,93,229,0.06); }
+  .highlight.yellow { border-color: var(--yellow); background: rgba(254,228,64,0.05); }
+  .highlight.red { border-color: var(--accent); background: rgba(247,37,133,0.06); }
+  .highlight.green { border-color: var(--green); background: rgba(6,214,160,0.06); }
+
+  .highlight-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .highlight.purple .highlight-label { color: var(--purple); }
+  .highlight.yellow .highlight-label { color: var(--yellow); }
+  .highlight.red .highlight-label { color: var(--accent); }
+  .highlight.green .highlight-label { color: var(--green); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr { background: rgba(0,245,212,0.08); }
+  th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #c8d3e0;
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* EXTRA TAG */
+  .extra-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 2px solid transparent;
+    border-image: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent) 1;
+    margin: 50px 0 40px;
+  }
+
+  /* QUIZ SECTION */
+  .quiz-header {
+    background: radial-gradient(ellipse at 30% 0%, rgba(155,93,229,0.2), transparent 60%),
+                radial-gradient(ellipse at 70% 100%, rgba(0,245,212,0.1), transparent 50%),
+                var(--surface2);
+    border: 1px solid rgba(155,93,229,0.3);
+    border-radius: 8px;
+    padding: 36px 32px;
+    text-align: center;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-header::before {
+    content: '[ QUESTIONÁRIO ]';
+    position: absolute;
+    top: 16px; left: 50%; transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: rgba(155,93,229,0.5);
+  }
+  .quiz-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(20px, 4vw, 30px);
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 16px;
+  }
+  .quiz-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-top: 8px;
+  }
+
+  /* QUESTION CARDS */
+  .question-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .question-card:hover { border-color: rgba(155,93,229,0.35); }
+
+  .question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    position: relative;
+  }
+  .q-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    background: rgba(155,93,229,0.1);
+    border: 1px solid rgba(155,93,229,0.25);
+    padding: 4px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    min-width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .q-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .q-toggle {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.3s, color 0.2s;
+    margin-top: 2px;
+  }
+
+  .answer-panel {
+    display: none;
+    padding: 0 22px 18px 88px;
+  }
+  .answer-panel.open { display: block; }
+  .answer-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .answer-text {
+    font-size: 14px;
+    color: #a8b8cc;
+    line-height: 1.65;
+    border-left: 2px solid var(--green);
+    padding-left: 12px;
+  }
+
+  .q-toggle.rotated { transform: rotate(180deg); color: var(--purple); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  footer span { color: var(--cyan); }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .chapter-header { flex-direction: column; gap: 8px; }
+    .answer-panel { padding-left: 22px; }
+    .hero { padding: 40px 20px 36px; }
+    .chapter-body, .chapter-header { padding: 18px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="course-badge">Universidad Central del Paraguay · Genética Médica · 3.º Semestre</div>
+
+  <div class="brand-block">
+    <div class="brand-name">André Luiz Miranda Suzano</div>
+    <div class="brand-sub">3H</div>
+  </div>
+
+  <h1 class="hero-title">Genética Médica — Resumen Completo</h1>
+  <p class="hero-subtitle">Clases 9 · 10 (Herencias Ligadas al Sexo) · 11 · 12 · Incompatibilidades ABO &amp; RH</p>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════
+     CLASE 9 — DEFECTOS CONGÉNITOS Y TERATOLOGÍA
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">CLASE 09</div>
+    </div>
+    <div>
+      <div class="chapter-title">Defectos Congénitos y Teratología</div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 16</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="section-title">Definición</div>
+    <p>Un <strong>defecto congénito</strong> es toda anormalidad de estructura anatómica visible al examen clínico del recién nacido, o que se hace patente después del nacimiento al evidenciarse el defecto funcional de un órgano interno anatómicamente comprometido.</p>
+
+    <div class="section-title">Clasificación por Magnitud</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Descripción</th><th>Frecuencia</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Mayores</strong></td><td>Compromiso funcional importante, consecuencias médicas, estéticas y sociales. Requieren atención temprana.</td><td>2–3%</td></tr>
+          <tr><td><strong>Menores</strong></td><td>Crecimiento desproporcionado de una parte anatómica, sin relevancia médica ni social significativa.</td><td>~15%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Clasificación por Mecanismo Causal</div>
+    <div class="highlight">
+      <div class="highlight-label">Malformación</div>
+      Defecto en la formación de un tejido debido a <strong>anomalías genéticas</strong> que afectan genes implicados en el desarrollo embriofetal. Ejemplo: labio leporino.
+    </div>
+    <div class="highlight purple">
+      <div class="highlight-label">Deformidad</div>
+      Efecto de <strong>fuerzas físicas inusuales</strong> sobre tejidos genéticamente bien formados. Ejemplo: pie bot por oligohidramnios.
+    </div>
+    <div class="highlight yellow">
+      <div class="highlight-label">Disrupción</div>
+      Alteraciones morfológicas causadas por <strong>ruptura de tejidos o redes vasculares</strong> previamente bien formados. Ejemplo: banda amniótica.
+    </div>
+
+    <div class="section-title">Teratología</div>
+    <p>Un <strong>teratógeno</strong> es cualquier agente capaz de producir una anormalidad (defecto congénito) en el desarrollo embriofetal.</p>
+
+    <div class="highlight green">
+      <div class="highlight-label">Indicadores de teratogenicidad</div>
+      <ul>
+        <li>Infertilidad</li>
+        <li>Abortos espontáneos</li>
+        <li>Muerte fetal</li>
+        <li>Defectos congénitos estructurales</li>
+        <li>Alteraciones del Sistema Nervioso Central (SNC)</li>
+        <li>Crecimiento intrauterino restringido (CIUR)</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Factores que Determinan el Efecto Teratogénico</div>
+    <ul>
+      <li><strong>Momento de exposición</strong> — el período de mayor vulnerabilidad es la organogénesis (semanas 3–8)</li>
+      <li><strong>Tiempo de exposición</strong> — mayor duración implica mayor riesgo</li>
+      <li><strong>Dosis</strong> — relación dosis-efecto siempre presente</li>
+      <li><strong>Susceptibilidad fetal</strong> — variación genética individual del embrión</li>
+      <li><strong>Susceptibilidad materna</strong> — metabolismo y respuesta inmune materna</li>
+    </ul>
+
+    <div class="section-title">Clasificación de Teratógenos</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Origen</th><th>Subtipo</th><th>Ejemplos</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3"><strong>Exógenos</strong></td><td>Biológicos</td><td>Virus (rubéola, CMV, TORCH), bacterias, parásitos (toxoplasma)</td></tr>
+          <tr><td>Químicos</td><td>Alcohol (SAF), talidomida, ácido retinoico, antiepilépticos</td></tr>
+          <tr><td>Físicos</td><td>Radiaciones ionizantes, calor excesivo</td></tr>
+          <tr><td><strong>Endógenos</strong></td><td>Metabólicos</td><td>Diabetes materna, fenilcetonuria materna no tratada</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CLASE 10 — HERENCIAS LIGADAS AL SEXO
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">CLASE 10</div>
+    </div>
+    <div>
+      <div class="chapter-title">Herencias Ligadas al Sexo</div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 8 · Thompson & Thompson Caps. 5–7</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="highlight red">
+      <div class="highlight-label">Nota de contenido</div>
+      De la Clase 10 se incluye exclusivamente la sección de <strong>herencias ligadas al sexo</strong> (dominante y recesiva ligadas al cromosoma X), por indicación del usuario.
+    </div>
+
+    <div class="section-title">1 · Herencia Dominante Ligada al X</div>
+    <p>El gen causante se localiza en el <strong>cromosoma X</strong> y su alelo es dominante — basta una copia del alelo patológico para expresar el fenotipo.</p>
+
+    <div class="highlight">
+      <div class="highlight-label">Características del patrón</div>
+      <ol>
+        <li>Un <strong>hombre afectado</strong> no transmite el carácter a sus hijos varones (les pasa su Y), pero sí lo transmite al <strong>100% de sus hijas</strong>.</li>
+        <li>Se observa un <strong>mayor número de mujeres afectadas</strong> que de varones en el árbol genealógico.</li>
+        <li>Las <strong>mujeres afectadas</strong> tienen un <strong>50% de probabilidad</strong> de transmitir el carácter a su descendencia, independientemente del sexo.</li>
+      </ol>
+    </div>
+
+    <div class="highlight yellow">
+      <div class="highlight-label">Ejemplos clínicos</div>
+      <ul>
+        <li>Síndrome de Rett (MECP2)</li>
+        <li>Raquitismo hipofosfatémico (XLH)</li>
+        <li>Incontinentia pigmenti</li>
+      </ul>
+    </div>
+
+    <div class="section-title">2 · Herencia Recesiva Ligada al X</div>
+    <p>El gen patológico está en el <strong>cromosoma X</strong> y su alelo es recesivo. Las mujeres necesitan dos copias del alelo para expresar la enfermedad; los varones, al tener un solo X, expresan la enfermedad con una sola copia.</p>
+
+    <div class="highlight">
+      <div class="highlight-label">Características del patrón</div>
+      <ol>
+        <li>La <strong>enfermedad afecta con mayor frecuencia a los hombres</strong> que a las mujeres.</li>
+        <li>El <strong>hombre afectado no transmite el carácter a sus hijos varones</strong> (hereda el Y del padre).</li>
+        <li>El hombre afectado transmite el alelo patológico al <strong>100% de sus hijas</strong>, que serán <strong>portadoras sanas</strong>.</li>
+        <li>Las portadoras transmiten el carácter al <strong>50% de sus hijos varones</strong> (afectados) y al <strong>50% de sus hijas</strong> (portadoras).</li>
+      </ol>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Enfermedad</th><th>Gen / Locus</th><th>Manifestación principal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Distrofia Muscular de Duchenne (DMD)</strong></td><td>DMD — Xp21.2</td><td>Debilidad muscular progresiva, pérdida de deambulación ~12 años, miocardiopatía</td></tr>
+          <tr><td>Hemofilia A</td><td>F8 — Xq28</td><td>Deficiencia de factor VIII, sangrado prolongado</td></tr>
+          <tr><td>Hemofilia B</td><td>F9 — Xq27.1</td><td>Deficiencia de factor IX</td></tr>
+          <tr><td>Daltonismo (rojo-verde)</td><td>OPN1LW/OPN1MW — Xq28</td><td>Dificultad para distinguir rojo y verde</td></tr>
+          <tr><td>Síndrome X frágil</td><td>FMR1 — Xq27.3</td><td>Discapacidad intelectual, rasgos autistas</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight green">
+      <div class="highlight-label">Concepto clave — Inactivación del X (Lyon)</div>
+      En las mujeres portadoras, uno de los dos cromosomas X se inactiva aleatoriamente en cada célula somática (corpúsculo de Barr). Si, por azar, se inactiva preferentemente el X normal, la mujer portadora puede manifestar síntomas leves (<em>portadora sintomática</em>).
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CLASE 11 — DIAGNÓSTICO PRENATAL
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">CLASE 11</div>
+    </div>
+    <div>
+      <div class="chapter-title">Diagnóstico Prenatal</div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 20</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="section-title">Definición y Objetivos</div>
+    <p>El <strong>diagnóstico prenatal</strong> es el conjunto de técnicas médicas utilizadas para detectar anomalías genéticas, estructurales o metabólicas en el feto antes del nacimiento.</p>
+    <ul>
+      <li>Informar a los padres sobre la salud fetal con la mayor precisión posible</li>
+      <li>Permitir la toma de decisiones reproductivas informadas</li>
+      <li>Preparar un manejo neonatal temprano cuando sea necesario</li>
+    </ul>
+
+    <div class="section-title">Indicaciones</div>
+    <ul>
+      <li>Edad materna avanzada (&gt;35 años) — riesgo elevado de aneuploidías</li>
+      <li>Antecedente de hijo con cromosomopatía (ej. síndrome de Down)</li>
+      <li>Padres portadores de enfermedades genéticas (fibrosis quística, hemofilia, etc.)</li>
+      <li>Hallazgos anormales en ecografía de tamizaje</li>
+      <li>Historia familiar de defectos del tubo neural</li>
+    </ul>
+
+    <div class="section-title">Métodos No Invasivos</div>
+    <div class="highlight">
+      <div class="highlight-label">Ecografía obstétrica</div>
+      <ul>
+        <li><strong>1.er trimestre:</strong> Translucencia nucal (marcador de aneuploidías), longitud cefalocaudal, número de fetos</li>
+        <li><strong>2.do trimestre:</strong> Anatomía fetal detallada, marcadores de malformaciones, posición placentaria</li>
+        <li><strong>3D/4D:</strong> Evaluación estructural avanzada (labio leporino, mano en garra, siameses)</li>
+      </ul>
+    </div>
+    <div class="highlight purple">
+      <div class="highlight-label">Screening bioquímico (sangre materna)</div>
+      <ul>
+        <li><strong>1.er trimestre:</strong> PAPP-A + β-hCG libre</li>
+        <li><strong>2.do trimestre (Triple/Cuádruple test):</strong> AFP, β-hCG, estriol no conjugado ± inhibina A</li>
+      </ul>
+    </div>
+    <div class="highlight yellow">
+      <div class="highlight-label">NIPT / PANORAMA — ADN fetal libre en sangre materna</div>
+      Analiza fragmentos de ADN fetal circulante en plasma materno. Alta sensibilidad para trisomías 21, 18 y 13, y anomalías de cromosomas sexuales. <strong>Es un test de screening, no diagnóstico</strong> — resultados positivos requieren confirmación invasiva.
+    </div>
+
+    <div class="section-title">Métodos Invasivos</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Técnica</th><th>Semana</th><th>Muestra</th><th>Riesgo de aborto</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Amniocentesis</strong></td><td>15–20</td><td>Líquido amniótico (células fetales en cultivo)</td><td>~0.1–0.3%</td></tr>
+          <tr><td><strong>Biopsia de vellosidades coriónicas (CVS)</strong></td><td>10–13</td><td>Tejido placentario (citotrofoblasto)</td><td>~0.5–1%</td></tr>
+          <tr><td><strong>Cordocentesis</strong></td><td>&gt;18</td><td>Sangre fetal de vena umbilical</td><td>~1–2%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Permiten: <strong>cariotipo, FISH, microarrays comparativos de hibridación genómica (aCGH), estudios moleculares y bioquímicos.</strong></p>
+
+    <div class="highlight green">
+      <div class="highlight-label">Estudios obtenidos de líquido amniótico</div>
+      <ul>
+        <li>Cariotipo fetal (madurez, sexo, aberraciones cromosómicas)</li>
+        <li>Marcadores bioquímicos de defectos del tubo neural (AFP)</li>
+        <li>Estudios genéticos moleculares</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Asesoramiento Genético Prenatal</div>
+    <p>Proceso de comunicación que aborda:</p>
+    <ol>
+      <li>Recolección de historia clínica y familiar (genograma)</li>
+      <li>Estimación de riesgos (empíricos, mendelianos, multifactoriales)</li>
+      <li>Explicación de pruebas disponibles: beneficios, límites y riesgos</li>
+      <li>Análisis de resultados y pronóstico</li>
+      <li>Apoyo psicosocial y respeto por la autonomía reproductiva</li>
+    </ol>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CLASE 12 — SÍNDROME DE JACOBS (47,XYY)
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">CLASE 12</div>
+    </div>
+    <div>
+      <div class="chapter-title">Síndrome de Jacobs — 47,XYY</div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 17</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="section-title">Definición y Epidemiología</div>
+    <p>El <strong>síndrome 47,XYY</strong> (también llamado síndrome de Jacobs o "síndrome del supermacho") es una aneuploidía de los cromosomas sexuales en que un varón presenta un cromosoma Y adicional.</p>
+    <ul>
+      <li><strong>Cariotipo:</strong> 47,XYY</li>
+      <li><strong>Prevalencia:</strong> ~1/1.000 recién nacidos varones</li>
+      <li><strong>Origen:</strong> No disyunción en la segunda división meiótica paterna (meiosis II) o mitosis post-cigótica</li>
+      <li>Con frecuencia <strong>no se diagnostica</strong> clínicamente por la ausencia de rasgos físicos marcados</li>
+    </ul>
+
+    <div class="section-title">Características Fenotípicas</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rasgo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Estatura elevada</strong></td><td>Única característica constante y universalmente presente (&gt;182 cm frecuente)</td></tr>
+          <tr><td><strong>Coeficiente intelectual</strong></td><td>Generalmente 10–15 puntos por debajo del promedio familiar</td></tr>
+          <tr><td><strong>Conducta</strong></td><td>Dificultades leves: TDAH, trastornos de atención, conductas externalizantes</td></tr>
+          <tr><td><strong>Fertilidad</strong></td><td>Frecuente azoospermia u oligospermia; espermatogénesis comprometida</td></tr>
+          <tr><td><strong>Acné</strong></td><td>Presente con mayor frecuencia que en la población general</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">El Mito del "Gen Criminal"</div>
+    <p>En las décadas de 1960–70, estudios preliminares postularon una vinculación entre el cariotipo 47,XYY y conducta antisocial o criminal. Este concepto fue ampliamente difundido pero <strong>nunca alcanzó significación estadística</strong> robusta.</p>
+    <div class="highlight red">
+      <div class="highlight-label">Consenso científico actual</div>
+      Los genetistas y forenses contemporáneos coinciden en que <strong>los genes no determinan el comportamiento criminal</strong>. Los factores sociales, ambientales y educativos tienen un peso mucho mayor. La investigación actual se centra en las vulnerabilidades neuroconductuales reales del síndrome: TDAH, trastornos de aprendizaje y dificultades de regulación emocional.
+    </div>
+
+    <div class="section-title">Bases Genéticas de la Conducta (Perspectiva Actual)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Gen</th><th>Ubicación</th><th>Relevancia</th></tr></thead>
+        <tbody>
+          <tr><td><strong>MAOA</strong> ("gen guerrero")</td><td>Cromosoma X</td><td>Polimorfismos de baja actividad asociados a mayor impulsividad en varones</td></tr>
+          <tr><td><strong>SRY</strong></td><td>Cromosoma Y (único)</td><td>Implicado en desarrollo testicular y modulación de catecolaminas</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Nota clave: el gen relacionado con mayor agresividad (<em>MAOA</em>) se ubica en el <strong>cromosoma X</strong> — presente en todos los varones — no en el Y adicional.</p>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     EXTRA 1 — INCOMPATIBILIDAD ABO
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">EXTRA</div>
+    </div>
+    <div>
+      <div class="chapter-title">Incompatibilidad ABO <span class="extra-tag">Emery</span></div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 8 (Herencia y Grupos Sanguíneos)</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="section-title">Sistema ABO — Genética</div>
+    <p>El sistema ABO está determinado por un gen localizado en el <strong>cromosoma 9 (9q34.2)</strong> con tres alelos principales: <strong>I<sup>A</sup>, I<sup>B</sup> e i</strong>. I<sup>A</sup> e I<sup>B</sup> son codominantes entre sí y ambos dominantes sobre i.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Genotipo</th><th>Grupo sanguíneo</th><th>Antígeno en hematíe</th><th>Anticuerpo en plasma</th></tr></thead>
+        <tbody>
+          <tr><td>I<sup>A</sup>I<sup>A</sup> o I<sup>A</sup>i</td><td><strong>A</strong></td><td>A</td><td>Anti-B</td></tr>
+          <tr><td>I<sup>B</sup>I<sup>B</sup> o I<sup>B</sup>i</td><td><strong>B</strong></td><td>B</td><td>Anti-A</td></tr>
+          <tr><td>I<sup>A</sup>I<sup>B</sup></td><td><strong>AB</strong></td><td>A y B</td><td>Ninguno</td></tr>
+          <tr><td>ii</td><td><strong>O</strong></td><td>Ninguno (antígeno H)</td><td>Anti-A y Anti-B</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Mecanismo de la Incompatibilidad ABO Materno-Fetal</div>
+    <p>La incompatibilidad ABO ocurre cuando la madre posee anticuerpos naturales (IgM o IgG) contra antígenos del sistema ABO presentes en los eritrocitos fetales. El escenario más frecuente es <strong>madre O con feto A o B</strong>.</p>
+
+    <div class="highlight">
+      <div class="highlight-label">Secuencia fisiopatológica</div>
+      <ol>
+        <li>El feto hereda del padre un alelo I<sup>A</sup> o I<sup>B</sup> ausente en la madre (grupo O)</li>
+        <li>Los anticuerpos <strong>IgG anti-A o anti-B maternos</strong> cruzan la placenta (la IgG es la única inmunoglobulina que atraviesa placenta)</li>
+        <li>Los anticuerpos se unen a los eritrocitos fetales → <strong>hemólisis extravascular</strong> mediada por el sistema reticuloendotelial</li>
+        <li>Resultado: <strong>Enfermedad Hemolítica del Recién Nacido (EHRN)</strong> por ABO</li>
+      </ol>
+    </div>
+
+    <div class="section-title">Características Clínicas</div>
+    <div class="highlight green">
+      <div class="highlight-label">Datos clínicos importantes</div>
+      <ul>
+        <li>Generalmente <strong>más leve</strong> que la incompatibilidad Rh</li>
+        <li>Puede ocurrir en el <strong>primer embarazo</strong> (los anticuerpos anti-A y anti-B son "naturales", no requieren sensibilización previa)</li>
+        <li><strong>Ictericia neonatal</strong> en las primeras 24 horas (principal manifestación)</li>
+        <li>Anemia hemolítica de grado variable</li>
+        <li><strong>Test de Coombs directo positivo</strong> (débil/moderado) en el recién nacido</li>
+        <li>Riesgo de <strong>kernícterus</strong> si la hiperbilirrubinemia no se trata</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Diagnóstico y Tratamiento</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspecto</th><th>Detalle</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Diagnóstico prenatal</strong></td><td>Tipaje ABO de la madre; si es O, valorar titulación de anticuerpos anti-A/B</td></tr>
+          <tr><td><strong>Diagnóstico neonatal</strong></td><td>Test de Coombs directo, bilirrubina sérica total y fraccionada, hemograma</td></tr>
+          <tr><td><strong>Tratamiento</strong></td><td>Fototerapia (primera línea); exsanguinotransfusión en casos severos; inmunoglobulina IV en casos refractarios</td></tr>
+          <tr><td><strong>Prevención</strong></td><td>No requiere profilaxis con inmunoglobulina anti-D (es diferente del sistema Rh)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     EXTRA 2 — INCOMPATIBILIDAD RH
+     ═══════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div>
+      <div class="chapter-num">EXTRA</div>
+    </div>
+    <div>
+      <div class="chapter-title">Incompatibilidad del Factor Rh <span class="extra-tag">Emery</span></div>
+      <div class="chapter-source">Ref: Emery — Elementos de Genética Médica, 15.ª ed. · Cap. 8</div>
+    </div>
+  </div>
+  <div class="chapter-body">
+
+    <div class="section-title">Sistema Rh — Genética</div>
+    <p>El sistema Rh es el más complejo y clínicamente relevante después del ABO. El antígeno D (el más inmunogénico) es codificado por el gen <strong>RHD</strong> en el cromosoma <strong>1p36.11</strong>. Su ausencia (deleción del gen RHD) define el fenotipo <strong>Rh negativo</strong>.</p>
+    <div class="highlight">
+      <div class="highlight-label">Genética simplificada</div>
+      <ul>
+        <li><strong>Rh positivo (D+):</strong> Presencia del gen RHD funcional — genotipo DD (homocigoto) o Dd (heterocigoto)</li>
+        <li><strong>Rh negativo (D-):</strong> Deleción o inactivación del gen RHD — genotipo dd</li>
+        <li>El alelo D es <strong>dominante</strong> sobre d</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Fisiopatología de la Isoinmunización Rh</div>
+    <div class="highlight red">
+      <div class="highlight-label">Mecanismo de sensibilización</div>
+      <ol>
+        <li><strong>Madre Rh– × feto Rh+</strong> → eritrocitos fetales Rh+ entran en circulación materna (hemorragia fetomaterna)</li>
+        <li><strong>Primera exposición:</strong> la madre produce principalmente <strong>IgM anti-D</strong> (no atraviesa placenta) — primer embarazo generalmente no afectado</li>
+        <li><strong>Segunda exposición</strong> (embarazo ulterior o transfusión incompatible): <strong>respuesta anamnésica</strong> → producción masiva de <strong>IgG anti-D</strong></li>
+        <li>La IgG anti-D <strong>atraviesa placenta</strong> → se une a eritrocitos fetales Rh+ → hemólisis → <strong>Eritroblastosis fetal</strong> / EHRN severa</li>
+      </ol>
+    </div>
+
+    <div class="section-title">Momentos de Hemorragia Fetomaterna (Riesgo de Sensibilización)</div>
+    <ul>
+      <li>Parto (mayor riesgo — hemorragia significativa)</li>
+      <li>Amniocentesis, CVS, cordocentesis</li>
+      <li>Aborto espontáneo o terapéutico</li>
+      <li>Trauma abdominal</li>
+      <li>Versión cefálica externa</li>
+      <li>Embarazo ectópico</li>
+    </ul>
+
+    <div class="section-title">Espectro Clínico — Eritroblastosis Fetal</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Gravedad</th><th>Cuadro clínico</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Leve</strong></td><td>Anemia compensada, ictericia neonatal manejable con fototerapia</td></tr>
+          <tr><td><strong>Moderada</strong></td><td>Hiperbilirrubinemia severa, riesgo de kernícterus (encefalopatía bilirrubínica)</td></tr>
+          <tr><td><strong>Severa</strong></td><td><strong>Hydrops fetalis:</strong> anemia fetal grave → insuficiencia cardíaca → edema generalizado, ascitis, derrame pleural y pericárdico → muerte fetal intrauterina si no se trata</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Diagnóstico</div>
+    <div class="highlight purple">
+      <div class="highlight-label">Seguimiento prenatal</div>
+      <ul>
+        <li>Tipaje Rh materno en el 1.er control prenatal</li>
+        <li>Si Rh–: Test de Coombs indirecto (búsqueda de anticuerpos anti-D en sangre materna)</li>
+        <li>Si Coombs indirecto positivo: titulación seriada de anti-D; si título ≥1:16 → ecografía Doppler de arteria cerebral media fetal (pico de velocidad sistólica elevado = anemia fetal)</li>
+        <li>Amniocentesis para medir densidad óptica de bilirrubina (zona de Liley) si necesario</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Tratamiento y Profilaxis</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Medida</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Profilaxis — Inmunoglobulina anti-D (RhoGAM)</strong></td><td>300 μg IM a las 28 semanas de gestación y dentro de las 72 horas postparto (si RN Rh+). También tras cualquier evento de riesgo de hemorragia fetomaterna. <em>Mecanismo: destruye eritrocitos Rh+ fetales en circulación materna antes de la sensibilización.</em></td></tr>
+          <tr><td><strong>Transfusión intrauterina</strong></td><td>Indicada en anemia fetal severa (por cordocentesis). Transfusión de sangre O Rh– irradiada a la vena umbilical.</td></tr>
+          <tr><td><strong>Parto anticipado</strong></td><td>Si la madurez pulmonar lo permite, inducción del parto para tratar al RN ex útero</td></tr>
+          <tr><td><strong>Tratamiento neonatal</strong></td><td>Fototerapia intensiva; exsanguinotransfusión en casos severos; inmunoglobulina IV</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight green">
+      <div class="highlight-label">Diferencia clave — ABO vs Rh</div>
+      <ul>
+        <li><strong>ABO:</strong> puede afectar el 1.er embarazo (anticuerpos naturales IgG preexistentes) — suele ser leve</li>
+        <li><strong>Rh:</strong> raramente afecta el 1.er embarazo (requiere sensibilización previa) — puede ser muy severo. La profilaxis con inmunoglobulina anti-D es altamente efectiva.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     DIVISOR
+     ═══════════════════════════════════════════════════ -->
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════
+     QUIZ HEADER
+     ═══════════════════════════════════════════════════ -->
+<div class="quiz-header">
+  <div class="quiz-title">Questionário de Avaliação</div>
+  <div class="quiz-subtitle">30 preguntas · Clique para revelar la respuesta</div>
+</div>
+
+<!-- QUESTIONS -->
+<div id="quiz">
+
+  <!-- Q1 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 01</div>
+      <div class="q-text">¿Cuál es la definición de defecto congénito según la teratología médica?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Toda anormalidad de estructura anatómica visible al examen clínico del recién nacido, o que se hace patente después del nacimiento al evidenciarse el defecto funcional de un órgano interno anatómicamente comprometido.</div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 02</div>
+      <div class="q-text">¿Cuál es la diferencia entre malformación, deformidad y disrupción?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text"><strong>Malformación:</strong> defecto genético en la formación del tejido (el tejido nunca se formó correctamente). <strong>Deformidad:</strong> fuerzas mecánicas inusuales sobre tejidos genéticamente normales (el tejido se formó bien pero fue deformado). <strong>Disrupción:</strong> ruptura de tejidos o vasos previamente bien formados por un factor externo (el tejido se formó correctamente y fue destruido).</div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 03</div>
+      <div class="q-text">¿Cuál es el período de mayor susceptibilidad teratogénica y por qué?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Las semanas 3 a 8 de gestación (período embrionario / organogénesis). Durante esta ventana, los órganos principales están en proceso activo de diferenciación celular. Cualquier agente que interfiera con este proceso puede causar malformaciones estructurales irreversibles.</div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 04</div>
+      <div class="q-text">Menciona al menos 4 indicadores de teratogenicidad.</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Infertilidad, abortos espontáneos, muerte fetal, defectos congénitos estructurales, alteraciones del SNC y crecimiento intrauterino restringido (CIUR).</div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 05</div>
+      <div class="q-text">Clasifica los teratógenos según su naturaleza y da un ejemplo de cada tipo.</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text"><strong>Biológicos:</strong> virus de la rubéola. <strong>Químicos:</strong> talidomida, alcohol etílico. <strong>Físicos:</strong> radiaciones ionizantes. <strong>Endógenos:</strong> hiperglucemia materna en diabetes no controlada.</div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 06</div>
+      <div class="q-text">¿Cuáles son las características del patrón de herencia dominante ligada al X?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">1) Un hombre afectado no transmite el carácter a sus hijos varones, pero sí al 100% de sus hijas. 2) Hay más mujeres afectadas que varones en el árbol genealógico. 3) Las mujeres afectadas transmiten el carácter al 50% de su descendencia, sin importar el sexo.</div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 07</div>
+      <div class="q-text">En la herencia recesiva ligada al X, ¿por qué los varones se afectan con mayor frecuencia que las mujeres?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Porque los varones son hemicigotos para el cromosoma X (tienen un solo X). Con una sola copia del alelo patológico, expresan la enfermedad. Las mujeres, al tener dos cromosomas X, necesitan dos copias del alelo recesivo para expresarla — una sola copia las hace portadoras sanas.</div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 08</div>
+      <div class="q-text">Describe el patrón de transmisión del varón afectado con herencia recesiva ligada al X.</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El varón afectado NO transmite el alelo patológico a sus hijos varones (les pasa el cromosoma Y). SÍ transmite el alelo al 100% de sus hijas, que serán portadoras sanas. Estas portadoras transmiten el alelo al 50% de sus hijos varones (afectados) y al 50% de sus hijas (portadoras).</div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 09</div>
+      <div class="q-text">¿Qué es la inactivación del X (Lyonización) y cómo puede afectar a una portadora?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Es la inactivación aleatoria de uno de los dos cromosomas X en cada célula somática femenina, formando el corpúsculo de Barr. Si por azar se inactiva preferentemente el X normal, la mujer portadora puede expresar síntomas leves de la enfermedad (portadora sintomática), como debilidad muscular leve en portadoras de DMD.</div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 10</div>
+      <div class="q-text">¿Cuál es el locus del gen DMD y cuál es la manifestación clínica principal de la Distrofia Muscular de Duchenne?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El gen DMD se localiza en Xp21.2. La manifestación principal es debilidad muscular proximal progresiva con inicio en la infancia, pérdida de la deambulación alrededor de los 12 años, y miocardiopatía dilatada. Es la miopatía hereditaria más frecuente en varones.</div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 11</div>
+      <div class="q-text">¿Qué es el NIPT y cuáles son sus limitaciones como método de diagnóstico prenatal?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El NIPT (Non-Invasive Prenatal Testing) analiza fragmentos de ADN fetal libre circulante en el plasma materno. Tiene alta sensibilidad para trisomías 21, 18, 13 y anomalías de cromosomas sexuales. Su principal limitación es que es un test de SCREENING, no diagnóstico: un resultado positivo debe confirmarse con un método invasivo (amniocentesis o CVS). No detecta todas las anomalías genéticas.</div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 12</div>
+      <div class="q-text">Compara amniocentesis, CVS y cordocentesis en cuanto a semana de realización, muestra y riesgo de aborto.</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text"><strong>Amniocentesis:</strong> semanas 15–20, muestra líquido amniótico (células fetales), riesgo ~0.1–0.3%. <strong>CVS:</strong> semanas 10–13, muestra tejido placentario (citotrofoblasto), riesgo ~0.5–1%. <strong>Cordocentesis:</strong> &gt;18 semanas, muestra sangre de vena umbilical, riesgo ~1–2%.</div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 13</div>
+      <div class="q-text">¿Cuáles son las indicaciones del diagnóstico prenatal?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Edad materna >35 años, antecedente de hijo con cromosomopatía, padres portadores de enfermedades genéticas monogénicas (fibrosis quística, hemofilia, etc.), hallazgos anormales en ecografía de tamizaje, y antecedentes familiares de defectos del tubo neural.</div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 14</div>
+      <div class="q-text">¿En qué consiste el asesoramiento genético prenatal y cuáles son sus pasos?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Es un proceso de comunicación que ayuda a las familias a comprender y adaptarse a una condición genética. Pasos: 1) recolección de historia clínica y genograma; 2) estimación de riesgos (mendelianos, empíricos, multifactoriales); 3) explicación de pruebas disponibles con sus límites y riesgos; 4) análisis de resultados y pronóstico; 5) apoyo psicosocial y respeto a la autonomía reproductiva.</div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 15</div>
+      <div class="q-text">¿Cuál es el cariotipo del Síndrome de Jacobs y cuál es su origen meiótico?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Cariotipo 47,XYY. Origen: no disyunción durante la segunda división meiótica en la espermatogénesis paterna (meiosis II), produciendo espermatozoides YY que fertilizan un ovocito X normal. También puede originarse por mitosis post-cigótica.</div>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 16</div>
+      <div class="q-text">¿Cuál es la única característica fenotípica constante del síndrome 47,XYY y cuál es su prevalencia?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">La estatura elevada es la única característica universalmente presente. La prevalencia es de aproximadamente 1 en cada 1.000 recién nacidos varones. Muchos casos no se diagnostican porque el fenotipo puede ser muy sutil.</div>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 17</div>
+      <div class="q-text">¿Por qué el "mito del gen criminal" asociado al síndrome 47,XYY fue desacreditado científicamente?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Porque los estudios de los años 60–70 nunca alcanzaron significación estadística robusta. El consenso actual establece que los genes no determinan el comportamiento criminal: los factores ambientales, educativos y sociales tienen un peso mucho mayor. Además, el gen más asociado con impulsividad (MAOA) está en el cromosoma X, no en el Y adicional.</div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 18</div>
+      <div class="q-text">¿En qué cromosoma y locus se localiza el gen del sistema ABO? ¿Cuáles son sus tres alelos principales y su relación de dominancia?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El gen ABO se localiza en el cromosoma 9 (9q34.2). Sus tres alelos son I<sup>A</sup>, I<sup>B</sup> e i. I<sup>A</sup> e I<sup>B</sup> son codominantes entre sí y ambos son dominantes sobre i (recesivo).</div>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 19</div>
+      <div class="q-text">¿Cuál es el escenario de incompatibilidad ABO más frecuente y por qué puede afectar al primer embarazo?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El escenario más frecuente es madre del grupo O con feto de grupo A o B. Puede afectar el primer embarazo porque los anticuerpos anti-A y anti-B son "naturales" (producidos sin sensibilización previa a eritrocitos ajenos): la madre O ya posee IgG anti-A y anti-B de manera constitutiva, a diferencia del sistema Rh que requiere sensibilización.</div>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 20</div>
+      <div class="q-text">¿Cuál es la manifestación clínica principal de la EHRN por ABO y cuál es su tratamiento de primera línea?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">La manifestación principal es la ictericia neonatal en las primeras 24 horas de vida, causada por hemólisis de eritrocitos fetales mediada por anticuerpos maternos IgG anti-A o anti-B. El tratamiento de primera línea es la fototerapia. En casos severos se indica exsanguinotransfusión para prevenir kernícterus.</div>
+    </div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 21</div>
+      <div class="q-text">¿Cuál es el gen responsable del antígeno D del sistema Rh y en qué cromosoma se localiza?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El antígeno D es codificado por el gen <strong>RHD</strong>, localizado en el cromosoma 1 (1p36.11). La ausencia del antígeno D (fenotipo Rh negativo) se debe a la deleción o inactivación del gen RHD. El gen alélico RHCE codifica los antígenos C, c, E y e.</div>
+    </div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 22</div>
+      <div class="q-text">Explica el mecanismo de isoinmunización Rh paso a paso.</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">1) Madre Rh– gestando feto Rh+ (gen RHD heredado del padre). 2) Eritrocitos fetales Rh+ entran en circulación materna (hemorragia fetomaterna, principalmente en el parto). 3) La madre produce IgM anti-D (no cruza placenta) — primer embarazo raramente afectado. 4) En un embarazo posterior con feto Rh+, la respuesta anamnésica produce grandes cantidades de IgG anti-D. 5) La IgG anti-D cruza la placenta, se une a eritrocitos fetales → hemólisis → eritroblastosis fetal / EHRN severa.</div>
+    </div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 23</div>
+      <div class="q-text">¿Qué es el hydrops fetalis y en qué contexto clínico aparece?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">El hydrops fetalis es la forma más grave de eritroblastosis fetal. Se produce por anemia fetal severa que genera insuficiencia cardíaca de alto gasto, con acumulación de líquido en múltiples cavidades: edema generalizado, ascitis, derrame pleural y pericárdico. Sin tratamiento (transfusión intrauterina), conduce a muerte fetal intrauterina.</div>
+    </div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 24</div>
+      <div class="q-text">¿Cuándo y cómo se administra la profilaxis con inmunoglobulina anti-D (RhoGAM)?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Se administra 300 μg IM en dos momentos clave: 1) A las <strong>28 semanas de gestación</strong> (profilaxis prenatal rutinaria); 2) Dentro de las <strong>72 horas postparto</strong> si el recién nacido es Rh+. También se indica tras cualquier evento con riesgo de hemorragia fetomaterna (amniocentesis, CVS, aborto, trauma abdominal). El mecanismo consiste en destruir los eritrocitos Rh+ fetales circulantes antes de que desencadenen una respuesta inmune materna.</div>
+    </div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 25</div>
+      <div class="q-text">¿Qué diferencia fundamental existe entre la incompatibilidad ABO y la Rh en cuanto a su comportamiento en el primer embarazo?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">La incompatibilidad ABO <strong>puede afectar el primer embarazo</strong> porque los anticuerpos anti-A y anti-B son naturales (preformados, no requieren sensibilización previa). La incompatibilidad Rh <strong>raramente afecta el primer embarazo</strong> porque los anticuerpos anti-D solo se producen tras sensibilización con eritrocitos Rh+ fetales; generalmente es necesaria una exposición previa (embarazo anterior o transfusión) para que aparezcan IgG en cantidad suficiente.</div>
+    </div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 26</div>
+      <div class="q-text">¿Cuál es la translucencia nucal y por qué es relevante en el diagnóstico prenatal?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">La translucencia nucal es la acumulación de líquido en la región posterior del cuello fetal, medida ecográficamente entre las semanas 11 y 14 de gestación. Un aumento por encima del percentil 95 para la longitud cefalocaudal es un marcador de aneuploidías (especialmente trisomía 21), cardiopatías congénitas y otras anomalías estructurales. Es el principal marcador ecográfico del primer trimestre.</div>
+    </div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 27</div>
+      <div class="q-text">¿Qué estudios se pueden realizar con el líquido amniótico obtenido en una amniocentesis?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Estudios citológicos (cariotipo, determinación de sexo, aberraciones cromosómicas), estudios bioquímicos (alfafetoproteína para defectos del tubo neural, enzimas para errores congénitos del metabolismo), y estudios moleculares (análisis de mutaciones específicas, microarrays de hibridación genómica comparativa).</div>
+    </div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 28</div>
+      <div class="q-text">¿Qué es la cordocentesis y qué diagnósticos permite realizar?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">La cordocentesis (o funiculocentesis) es la punción guiada por ecografía de la vena umbilical para obtener sangre fetal. Se realiza a partir de la semana 18. Permite diagnosticar hemoglobinopatías, hemofilias, errores congénitos del metabolismo, infecciones fetales e isoinmunización Rh. También permite realizar transfusiones intrauterinas o administrar medicamentos directamente al feto.</div>
+    </div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 29</div>
+      <div class="q-text">¿Cómo se monitoriza la anemia fetal en embarazos con incompatibilidad Rh confirmada?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text">Mediante ecografía Doppler de la arteria cerebral media fetal (MCA-PSV — pico de velocidad sistólica). En anemia fetal, la sangre se vuelve más diluida, aumentando la velocidad de flujo (hemodinamia compensatoria). Un pico de velocidad sistólica MCA >1.5 MoM indica anemia fetal moderada a severa y es indicación de cordocentesis diagnóstica y posible transfusión intrauterina. También puede usarse la amniocentesis con medición de la densidad óptica en la zona de Liley.</div>
+    </div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="question-card">
+    <div class="question-header" onclick="toggle(this)">
+      <div class="q-num">Q 30</div>
+      <div class="q-text">Integración clínica: Una madre del grupo O, Rh negativo, está en su segundo embarazo. En el primero tuvo un parto normal sin profilaxis. ¿Qué riesgos enfrenta el segundo feto y qué medidas tomar?</div>
+      <div class="q-toggle">▾</div>
+    </div>
+    <div class="answer-panel">
+      <div class="answer-label">Respuesta</div>
+      <div class="answer-text"><strong>Riesgos:</strong> Si el segundo feto es Rh+ (heredó el alelo D del padre), la madre ya está sensibilizada del primer embarazo — producirá IgG anti-D en respuesta anamnésica, que cruzarán la placenta y causarán EHRN por Rh, potencialmente grave (hydrops fetalis). También puede haber incompatibilidad ABO si el feto es A o B. <strong>Medidas:</strong> Determinar grupo y Rh del padre; test de Coombs indirecto materno seriado; si positivo, titular anticuerpos anti-D; monitoreo Doppler de arteria cerebral media fetal; considerar cordocentesis y transfusión intrauterina si se confirma anemia severa. Planificar parto en centro con UCIN disponible.</div>
+    </div>
+  </div>
+
+</div><!-- end quiz -->
+
+</div><!-- end container -->
+
+<footer>
+  <p>Elaborado por <span>André Luiz Miranda Suzano</span> · 3H · Universidad Central del Paraguay</p>
+  <p style="margin-top:6px;">Referencia principal: Emery — Elementos de Genética Médica, 15.ª ed. · Turnpenny & Ellard</p>
+</footer>
+
+<script>
+function toggle(header) {
+  const panel = header.nextElementSibling;
+  const icon = header.querySelector('.q-toggle');
+  const isOpen = panel.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.answer-panel').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.q-toggle').forEach(i => i.classList.remove('rotated'));
+
+  if (!isOpen) {
+    panel.classList.add('open');
+    icon.classList.add('rotated');
+    // Smooth scroll
+    setTimeout(() => header.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bacilos Gram Negativos — Microbiología Médica</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161d;
+    --surface2: #1a1e28;
+    --border: #252a38;
+    --accent: #c8a96e;
+    --accent2: #7eb8d4;
+    --accent3: #e07b6a;
+    --accent4: #6abf8a;
+    --text: #e8e4dc;
+    --text-muted: #8a8a9a;
+    --text-dim: #5a5a6a;
+    --red: #e07b6a;
+    --green: #6abf8a;
+    --blue: #7eb8d4;
+    --gold: #c8a96e;
+    --purple: #a07bd4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ─── HEADER ─── */
+  .hero {
+    background: linear-gradient(135deg, #0d0f14 0%, #131a2a 50%, #0d0f14 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(200,169,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(200,169,110,0.3);
+    padding: 4px 16px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+    line-height: 1.1;
+  }
+  .hero h1 span { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .hero-meta span {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.08em;
+  }
+  .hero-meta strong { color: var(--accent2); }
+
+  /* ─── NAV ─── */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,15,20,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar { display: none; }
+  .nav-inner {
+    display: inline-flex;
+    gap: 0;
+    min-width: 100%;
+  }
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 18px;
+    font-size: 0.72rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-item:hover { color: var(--gold); border-bottom-color: var(--gold); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0.4; }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+  .intro-section { padding: 3rem 0 1rem; }
+  .gram-neg-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .gram-neg-intro h2 {
+    color: var(--accent2);
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.8rem;
+  }
+  .gram-neg-intro p { color: var(--text-muted); font-size: 0.93rem; }
+
+  /* ─── ORGANISM CARD ─── */
+  .organism-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .organism-card:hover { border-color: rgba(200,169,110,0.25); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.4rem 1.8rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-number {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    opacity: 0.7;
+    min-width: 28px;
+  }
+  .card-header h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+    flex: 1;
+  }
+  .card-header h2 span {
+    font-style: normal;
+    font-size: 0.72rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .card-tag {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tag-enterobac { background: rgba(126,184,212,0.12); color: var(--blue); border: 1px solid rgba(126,184,212,0.2); }
+  .tag-nonferment { background: rgba(160,123,212,0.12); color: var(--purple); border: 1px solid rgba(160,123,212,0.2); }
+  .tag-fastidious { background: rgba(200,169,110,0.12); color: var(--gold); border: 1px solid rgba(200,169,110,0.2); }
+  .tag-helical { background: rgba(106,191,138,0.12); color: var(--green); border: 1px solid rgba(106,191,138,0.2); }
+
+  .card-toggle {
+    color: var(--gold);
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+  }
+  .card-toggle.open { transform: rotate(180deg); }
+
+  .card-body {
+    padding: 1.8rem;
+    display: none;
+  }
+  .card-body.open { display: block; }
+
+  /* ─── SECTIONS INSIDE CARD ─── */
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+  @media (max-width: 700px) { .section-grid { grid-template-columns: 1fr; } }
+  .section-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  @media (max-width: 800px) { .section-grid-3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .section-grid-3 { grid-template-columns: 1fr; } }
+
+  .info-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+  }
+  .info-block.full { grid-column: 1 / -1; }
+  .block-title {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .block-icon {
+    font-size: 0.9rem;
+  }
+
+  /* ─── LISTS ─── */
+  ul.item-list {
+    list-style: none;
+    padding: 0;
+  }
+  ul.item-list li {
+    padding: 3px 0 3px 16px;
+    position: relative;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  ul.item-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 1rem;
+  }
+  ul.item-list li strong { color: var(--text); }
+
+  /* ─── CLINICAL BOX ─── */
+  .clinical-box {
+    background: rgba(224,123,106,0.06);
+    border: 1px solid rgba(224,123,106,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .clinical-box .block-title { color: var(--red); }
+  .clinical-box .block-title::after { background: rgba(224,123,106,0.2); }
+
+  .treatment-box {
+    background: rgba(106,191,138,0.05);
+    border: 1px solid rgba(106,191,138,0.18);
+    border-left: 3px solid var(--green);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .treatment-box .block-title { color: var(--green); }
+  .treatment-box .block-title::after { background: rgba(106,191,138,0.2); }
+
+  .virulence-box {
+    background: rgba(160,123,212,0.05);
+    border: 1px solid rgba(160,123,212,0.18);
+    border-left: 3px solid var(--purple);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .virulence-box .block-title { color: var(--purple); }
+  .virulence-box .block-title::after { background: rgba(160,123,212,0.2); }
+
+  .transmission-box {
+    background: rgba(126,184,212,0.05);
+    border: 1px solid rgba(126,184,212,0.18);
+    border-left: 3px solid var(--blue);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .transmission-box .block-title { color: var(--blue); }
+  .transmission-box .block-title::after { background: rgba(126,184,212,0.2); }
+
+  /* ─── PILL TAGS ─── */
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .pill {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+  .pill-red { background: rgba(224,123,106,0.12); color: var(--red); border: 1px solid rgba(224,123,106,0.25); }
+  .pill-green { background: rgba(106,191,138,0.12); color: var(--green); border: 1px solid rgba(106,191,138,0.25); }
+  .pill-blue { background: rgba(126,184,212,0.12); color: var(--blue); border: 1px solid rgba(126,184,212,0.25); }
+  .pill-gold { background: rgba(200,169,110,0.12); color: var(--gold); border: 1px solid rgba(200,169,110,0.25); }
+  .pill-purple { background: rgba(160,123,212,0.12); color: var(--purple); border: 1px solid rgba(160,123,212,0.25); }
+
+  /* ─── ALERT BOX ─── */
+  .alert-box {
+    background: rgba(200,169,110,0.07);
+    border: 1px solid rgba(200,169,110,0.25);
+    border-radius: 4px;
+    padding: 0.9rem 1.2rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--gold);
+  }
+  .alert-box b { display: block; margin-bottom: 3px; font-family: 'Courier New', monospace; font-size: 0.7rem; letter-spacing: 0.1em; }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(37,42,56,0.6);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-style: italic; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── SECTION DIVIDER ─── */
+  .section-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 3rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::before, .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── SUMMARY TABLE ─── */
+  .summary-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .summary-section h2 {
+    font-size: 1.1rem;
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ─── EXAM TIPS ─── */
+  .exam-tips {
+    background: var(--surface);
+    border: 1px solid rgba(200,169,110,0.2);
+    border-radius: 6px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .exam-tips h2 {
+    font-size: 1rem;
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .exam-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .exam-item:last-child { border-bottom: none; }
+  .exam-num {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    min-width: 24px;
+    opacity: 0.7;
+    padding-top: 2px;
+  }
+  .exam-item p { color: var(--text-muted); }
+  .exam-item p strong { color: var(--text); }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    margin-top: 4rem;
+  }
+  .footer p {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    line-height: 2;
+  }
+  .footer p span { color: var(--gold); }
+
+  /* ─── SCROLL REVEAL ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .organism-card { animation: fadeUp 0.4s ease both; }
+  .organism-card:nth-child(1) { animation-delay: 0.05s; }
+  .organism-card:nth-child(2) { animation-delay: 0.10s; }
+  .organism-card:nth-child(3) { animation-delay: 0.15s; }
+  .organism-card:nth-child(4) { animation-delay: 0.20s; }
+  .organism-card:nth-child(5) { animation-delay: 0.25s; }
+  .organism-card:nth-child(6) { animation-delay: 0.30s; }
+  .organism-card:nth-child(7) { animation-delay: 0.35s; }
+  .organism-card:nth-child(8) { animation-delay: 0.40s; }
+  .organism-card:nth-child(9) { animation-delay: 0.45s; }
+  .organism-card:nth-child(10) { animation-delay: 0.50s; }
+
+  p.body-text { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
+  p.body-text + p.body-text { margin-top: 0.5rem; }
+
+  .risk-group {
+    background: rgba(224,123,106,0.05);
+    border: 1px solid rgba(224,123,106,0.15);
+    border-radius: 3px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 0.86rem;
+  }
+  .risk-group b { color: var(--red); font-family: 'Courier New', monospace; font-size: 0.75rem; letter-spacing: 0.08em; display: block; margin-bottom: 3px; }
+  .risk-group span { color: var(--text-muted); }
+
+  .drug-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .drug {
+    background: rgba(106,191,138,0.08);
+    border: 1px solid rgba(106,191,138,0.2);
+    color: var(--green);
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+  .drug.alt {
+    background: rgba(126,184,212,0.08);
+    border-color: rgba(126,184,212,0.2);
+    color: var(--blue);
+  }
+
+  .toxin-item {
+    background: rgba(160,123,212,0.06);
+    border-left: 2px solid var(--purple);
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 0 3px 3px 0;
+    font-size: 0.87rem;
+  }
+  .toxin-item b { color: var(--purple); font-family: 'Courier New', monospace; font-size: 0.76rem; letter-spacing: 0.05em; }
+  .toxin-item span { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  .expand-all-btn {
+    background: transparent;
+    border: 1px solid rgba(200,169,110,0.3);
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 8px 20px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .expand-all-btn:hover { background: rgba(200,169,110,0.1); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">Microbiología Médica · Jawetz, Melnick & Adelberg (Lange)</div>
+  <h1>Bacilos <span>Gram Negativos</span></h1>
+  <p class="hero-sub">Características · Transmisión · Virulencia · Cuadro Clínico · Tratamiento</p>
+  <div class="hero-meta">
+    <span>Fuente: <strong>Lange Microbiology (Jawetz)</strong></span>
+    <span>Organismos: <strong>10</strong></span>
+    <span>Semestre: <strong>3° · UCP-PJC</strong></span>
+    <span>Área: <strong>Microbiología</strong></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ NAV ═══════════════════════════════════ -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a class="nav-item" href="#klebsiella-g"><span class="nav-dot"></span>K. granulomatis</a>
+    <a class="nav-item" href="#klebsiella-p"><span class="nav-dot"></span>K. pneumoniae</a>
+    <a class="nav-item" href="#pseudomonas"><span class="nav-dot"></span>P. aeruginosa</a>
+    <a class="nav-item" href="#ecoli"><span class="nav-dot"></span>E. coli</a>
+    <a class="nav-item" href="#salmonella"><span class="nav-dot"></span>Salmonella spp.</a>
+    <a class="nav-item" href="#shigella"><span class="nav-dot"></span>Shigella spp.</a>
+    <a class="nav-item" href="#h-influenzae"><span class="nav-dot"></span>H. influenzae</a>
+    <a class="nav-item" href="#h-ducreyi"><span class="nav-dot"></span>H. ducreyi</a>
+    <a class="nav-item" href="#helicobacter"><span class="nav-dot"></span>H. pylori</a>
+    <a class="nav-item" href="#campylobacter"><span class="nav-dot"></span>C. jejuni</a>
+    <a class="nav-item" href="#tabla-resumen"><span class="nav-dot"></span>Tabla-Resumen</a>
+    <a class="nav-item" href="#examtips"><span class="nav-dot"></span>Tips de Examen</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ CONTAINER ═══════════════════════════════════ -->
+<div class="container">
+
+  <!-- INTRO -->
+  <div class="intro-section">
+    <div class="gram-neg-intro">
+      <h2>⚗ Características Generales de los Bacilos Gram Negativos</h2>
+      <p>Los bacilos Gram negativos poseen una pared celular con una membrana externa que contiene <strong>lipopolisacárido (LPS)</strong>, también llamado endotoxina, responsable de la mayoría de los efectos sistémicos graves (fiebre, hipotensión, CID, shock séptico). Tienen una capa de peptidoglucano delgada entre la membrana interna y externa. El espacio entre ambas membranas se denomina <strong>espacio periplásmico</strong>. Se tiñen de <strong>rosado/rojo</strong> con la tinción de Gram.</p>
+    </div>
+    <button class="expand-all-btn" onclick="toggleAll()">▼ Expandir todos los organismos</button>
+  </div>
+
+  <!-- ═══ 01. KLEBSIELLA GRANULOMATIS ═══ -->
+  <div class="organism-card" id="klebsiella-g">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">01</span>
+      <h2>Klebsiella granulomatis <span>Granuloma inguinal (Donovanosis)</span></h2>
+      <span class="card-tag tag-enterobac">Enterobacteriaceae</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <!-- CARACTERÍSTICAS -->
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>intracelular obligado</strong> (vive dentro de macrófagos)</li>
+            <li>Anteriormente llamado <strong>Calymmatobacterium granulomatis</strong></li>
+            <li>No crece en medios de cultivo ordinarios (difícil de cultivar in vitro)</li>
+            <li>Se identifica por <strong>Cuerpos de Donovan</strong>: organismos encapsulados en macrófagos teñidos con Giemsa o Wright</li>
+            <li>No forma esporas; aerobio facultativo</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Sexual:</strong> contacto sexual directo (principal vía)</li>
+            <li><strong>Baja transmisibilidad</strong>; requiere exposición repetida</li>
+            <li>Posible transmisión por contacto con heces (discutido)</li>
+            <li>Incubación: <strong>1–12 semanas</strong></li>
+            <li>Prevalente en regiones tropicales y subtropicales (India, Papua Nueva Guinea, África subsahariana)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Capacidad intracelular</b><span>Sobrevive y se multiplica dentro de los macrófagos tisulares, evadiendo la respuesta inmune inicial</span></div>
+        <div class="toxin-item"><b>Cápsula</b><span>Cápsula polisacárida que contribuye a la evasión fagocítica</span></div>
+        <div class="toxin-item"><b>LPS (endotoxina)</b><span>Lipopolisacárido en membrana externa, contribuye a inflamación crónica</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico — Donovanosis (Granuloma Inguinal)</div>
+        <div class="risk-group"><b>POBLACIÓN GENERAL (Adultos sexualmente activos)</b><span>Úlceras genitales progresivas, indoloras, de bordes elevados ("en carne viva"), sin adenopatía regional. Lesión granulomatosa altamente vascular que sangra fácilmente al tacto.</span></div>
+        <div class="risk-group"><b>COMPLICACIONES</b><span>Destrucción tisular extensa si no se trata · Pseudobubo (linfedema inguinal por fibrosis, NO adenopatía real) · Formación de fístulas · Elefantiasis genital · Carcinoma escamocelular (complicación tardía rara)</span></div>
+        <div class="risk-group"><b>GRUPOS DE RIESGO</b><span>Hombres que tienen sexo con hombres (HSH) · Múltiples parejas sexuales · Coinfección con VIH (agrava evolución)</span></div>
+        <p class="body-text" style="margin-top:0.5rem;">Localización: pene, vulva, área perianal. Variantes clínicas: ulcerovegetante (más común), hipertrófica, necrótica, esclerótica.</p>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Primera línea:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Azitromicina 1g/semana VO (≥3 sem)</span>
+          <span class="drug">Doxiciclina 100mg c/12h VO (≥3 sem)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.7rem;"><strong>Alternativas:</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Eritromicina 500mg c/6h (≥3 sem)</span>
+          <span class="drug alt">Trimetoprim-Sulfametoxazol (TMP-SMX)</span>
+          <span class="drug alt">Ciprofloxacina 750mg c/12h</span>
+        </div>
+        <div class="alert-box" style="margin-top:0.8rem;"><b>⚠ NOTA CLÍNICA</b>Tratar hasta cicatrización completa (puede requerir ≥21 días). En embarazadas: eritromicina o azitromicina (evitar doxiciclina). Agregar aminoglucósido (gentamicina) en coinfección VIH.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 02. KLEBSIELLA PNEUMONIAE ═══ -->
+  <div class="organism-card" id="klebsiella-p">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">02</span>
+      <h2>Klebsiella pneumoniae <span>Infecciones pulmonares e infecciones nosocomiales</span></h2>
+      <span class="card-tag tag-enterobac">Enterobacteriaceae</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>no móvil</strong></li>
+            <li>Fermentador de lactosa (colonias mucoides en MacConkey)</li>
+            <li>Cápsula <strong>grande y prominente</strong> — característica clave</li>
+            <li>Produce colonias muy viscosas ("hilo mucoso")</li>
+            <li>Oxidasa negativa, catalasa positiva</li>
+            <li>Forma parte de la flora intestinal normal (1–5% de la población sana)</li>
+            <li>Principal causa de <strong>neumonía Gram negativa adquirida en la comunidad</strong> en ciertas poblaciones</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Endógena:</strong> flora intestinal propia del paciente (aspiración)</li>
+            <li><strong>Nosocomial:</strong> manos del personal de salud, equipos contaminados</li>
+            <li><strong>Aspiración</strong> de secreciones bucofaríngeas (vía más común en neumonía)</li>
+            <li>Catéteres urinarios, ventilación mecánica, catéteres venosos centrales</li>
+            <li>Incubación: <strong>1–3 días</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Cápsula polisacárida (antígeno K)</b><span>Inhibe la fagocitosis y la activación del complemento. Es el principal factor de virulencia. Más de 80 serotipos (K1, K2 más virulentos)</span></div>
+        <div class="toxin-item"><b>Endotoxina LPS (antígeno O)</b><span>Activa la cascada de sepsis. Contribuye a fiebre, shock y CID</span></div>
+        <div class="toxin-item"><b>Sideróforos (aerobactina, enterobactina)</b><span>Captan hierro del huésped para el crecimiento bacteriano</span></div>
+        <div class="toxin-item"><b>Adhesinas y fimbriae</b><span>Permiten adherencia a células epiteliales del tracto urinario y respiratorio</span></div>
+        <div class="toxin-item"><b>β-lactamasas de espectro extendido (BLEE)</b><span>Resistencia a cefalosporinas y penicilinas. Emergencia crítica en el ámbito hospitalario</span></div>
+        <div class="toxin-item"><b>Carbapenemasas (KPC)</b><span>Resistencia a carbapenémicos. Klebsiella resistente a carbapenémicos (KRC) — urgencia sanitaria global</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>NEUMONÍA LOBAR CLÁSICA (Alcohólicos, diabéticos, EPOC, desnutridos)</b><span>Inicio brusco · Fiebre alta, escalofríos · Esputo gelatinoso "en jalea de grosella" (esputo herrumbroso, abundante) · Consolidación en lóbulos superiores con tendencia a necrosis y formación de abscesos · Mortalidad elevada (25–50% sin tratamiento)</span></div>
+        <div class="risk-group"><b>INFECCIÓN URINARIA NOSOCOMIAL (Hospitalizados, sonda vesical)</b><span>Segundo patógeno más frecuente en ITU nosocomial · Bacteriuria sintomática o asintomática · Riesgo de bacteriemia secundaria</span></div>
+        <div class="risk-group"><b>SEPSIS / BACTERIEMIA (Inmunocomprometidos, neonatos)</b><span>Shock séptico · Coagulación intravascular diseminada (CID) · Falla multiorgánica</span></div>
+        <div class="risk-group"><b>OTRAS PRESENTACIONES</b><span>Meningitis neonatal · Endoftalmitis (cepa hipermucoviscosa K1/K2 en Asia) · Infección de herida quirúrgica · Absceso hepático piogénico (asociado a cepa K1/K2)</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Cepas sensibles:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Cefalosporinas 3ª gen (cefotaxima, ceftriaxona)</span>
+          <span class="drug">Ampicilina-sulbactam</span>
+          <span class="drug">Fluoroquinolonas (ciprofloxacina)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.7rem;"><strong>Cepas BLEE:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Carbapenémicos (imipenem, meropenem, ertapenem)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.7rem;"><strong>Cepas KRC (resistentes a carbapenémicos):</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Colistina + meropenem</span>
+          <span class="drug alt">Ceftazidima-avibactam</span>
+          <span class="drug alt">Ceftolozano-tazobactam</span>
+        </div>
+        <div class="alert-box"><b>⚠ PUNTO CRÍTICO</b>Siempre guiar tratamiento con antibiograma. K. pneumoniae BLEE y KRC son emergencias sanitarias con opciones terapéuticas muy limitadas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 03. PSEUDOMONAS AERUGINOSA ═══ -->
+  <div class="organism-card" id="pseudomonas">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">03</span>
+      <h2>Pseudomonas aeruginosa <span>Patógeno oportunista par excellence</span></h2>
+      <span class="card-tag tag-nonferment">No-fermentador</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>aerobio estricto</strong>, móvil (flagelo polar)</li>
+            <li><strong>No fermenta lactosa</strong> (no-fermentador)</li>
+            <li>Oxidasa <strong>positiva</strong> (diferenciador clave de Enterobacteriaceae)</li>
+            <li>Produce pigmentos: <strong>piocianina</strong> (azul-verde) y <strong>pioverdina</strong> (amarillo-verde fluorescente)</li>
+            <li>Olor característico a uva/maíz (por 2-aminoacetofenona)</li>
+            <li>Crece en condiciones adversas: agua destilada, antisépticos diluidos, etc.</li>
+            <li>Resistencia intrínseca a múltiples antibióticos</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li>Ubicuo en el ambiente: agua, suelo, plantas, equipos médicos</li>
+            <li>Reservorios hospitalarios: respiradores, nebulizadores, piscinas, duchas</li>
+            <li><strong>Nosocomial</strong> por excelencia: manos del personal, equipos contaminados</li>
+            <li>Inhalación (pacientes con VM) · Heridas abiertas · Quemados</li>
+            <li>Inoculación directa en ojos (por lentes de contacto)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Exotoxina A</b><span>Inhibe la síntesis proteica (igual mecanismo que la toxina diftérica pero en sentido inverso) mediante ADP-ribosilación del EF-2. Es el factor de virulencia más importante.</span></div>
+        <div class="toxin-item"><b>Exoenzima S y T (sistema de secreción tipo III)</b><span>Inyectadas directamente en la célula hospedera. Inhiben la fagocitosis y destruyen el citoesqueleto celular.</span></div>
+        <div class="toxin-item"><b>Elastasa (LasB) y Proteasa alcalina</b><span>Destruyen tejidos, degradan inmunoglobulinas (IgG, IgA), complemento y fibronectina. Causan hemorragias y necrosis tisular.</span></div>
+        <div class="toxin-item"><b>Piocianina</b><span>Genera radicales libres de oxígeno, inhibe el transporte ciliar y el sistema inmune</span></div>
+        <div class="toxin-item"><b>Alginato (biofilm)</b><span>Matriz mucosa que forma biofilm. Clave en infecciones crónicas de pacientes con fibrosis quística. Impide la penetración de antibióticos y opsonización.</span></div>
+        <div class="toxin-item"><b>Flagelos y Pili tipo IV</b><span>Adherencia y motilidad. Los pili permiten adherencia a células epiteliales respiratorias.</span></div>
+        <div class="toxin-item"><b>LPS</b><span>Endotoxina lipopolisacárida con antígeno O; contribuye a sepsis</span></div>
+        <div class="toxin-item"><b>Multirresistencia intrínseca</b><span>Membrana externa con baja permeabilidad · Bombas de eflujo (MexAB-OprM) · β-lactamasas constitutivas · Inactivación de aminoglucósidos</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>FIBROSIS QUÍSTICA (Principal causa de mortalidad)</b><span>Colonización crónica de la vía aérea con cepas mucoides (alginato+) · Destrucción pulmonar progresiva · Exacerbaciones repetidas · Prácticamente imposible erradicar</span></div>
+        <div class="risk-group"><b>QUEMADOS (Infección de heridas)</b><span>Sepsis en quemaduras extensas · Colonización de escara · Vasculitis cutánea → Ectima gangrenoso (lesiones necróticas negras con halo eritematoso, PATOGNOMÓNICO de Pseudomonas en inmunocomprometidos)</span></div>
+        <div class="risk-group"><b>NEUTROPÉNICOS / ONCOLÓGICOS</b><span>Bacteriemia grave · Ectima gangrenoso · Mortalidad muy elevada (≥50%). Es una emergencia infecciosa.</span></div>
+        <div class="risk-group"><b>PACIENTES CON VM (Neumonía asociada a ventilación)</b><span>Neumonía nosocomial grave · Infiltrados bilaterales · Alta mortalidad atribuible</span></div>
+        <div class="risk-group"><b>OTITIS EXTERNA MALIGNA (Diabéticos ancianos)</b><span>Otitis externa invasiva · Destrucción de cartílago y hueso del conducto auditivo · Parálisis facial (por extensión) · Alta mortalidad si no se trata</span></div>
+        <div class="risk-group"><b>OTRAS</b><span>Foliculitis del bañista (piscinas contaminadas) · Queratitis (usuarios de lentes de contacto) · Endocarditis (UDIV) · Meningitis (post-neuroquirúrgica)</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text" style="margin-bottom:0.5rem;"><strong>Infecciones graves:</strong> Terapia combinada (sinergia y prevención de resistencia)</p>
+        <div class="drug-row">
+          <span class="drug">Piperacilina-tazobactam</span>
+          <span class="drug">Ceftazidima</span>
+          <span class="drug">Cefepima</span>
+          <span class="drug">Imipenem / Meropenem</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;">Combinados con:</p>
+        <div class="drug-row">
+          <span class="drug alt">Aminoglucósido (amikacina, tobramicina)</span>
+          <span class="drug alt">Ciprofloxacina (única quinolona con actividad real)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Infecciones MDR/XDR:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Colistina (polimixina E)</span>
+          <span class="drug">Ceftolozano-tazobactam</span>
+          <span class="drug">Ceftazidima-avibactam</span>
+        </div>
+        <div class="alert-box"><b>⚠ PUNTO CRÍTICO</b>Nunca monoterapia en infecciones graves. Pseudomonas puede desarrollar resistencia durante el tratamiento. Guiar con antibiograma.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 04. ESCHERICHIA COLI ═══ -->
+  <div class="organism-card" id="ecoli">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">04</span>
+      <h2>Escherichia coli <span>Enterobacteria más versátil — múltiples patotipos</span></h2>
+      <span class="card-tag tag-enterobac">Enterobacteriaceae</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>móvil</strong> (flagelos perítricos), anaerobio facultativo</li>
+            <li><strong>Fermenta lactosa</strong> (colonias rosas en MacConkey) — diferenciador de Salmonella y Shigella</li>
+            <li>Oxidasa negativa; produce gas e indol (positivo)</li>
+            <li>Habitante normal del intestino grueso humano (flora comensal)</li>
+            <li>Serotipificación: Antígeno O (somático), H (flagelar), K (capsular)</li>
+            <li>Múltiples patotipos con mecanismos de virulencia distintos</li>
+            <li>En medios selectivos (agar EMB): colonias con <strong>brillo metálico verde</strong></li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Fecal-oral:</strong> agua y alimentos contaminados (carnes crudas, vegetales, lácteos no pasteurizados)</li>
+            <li><strong>Endógena:</strong> flora intestinal propia (ITU por migración)</li>
+            <li>Contacto persona a persona (guarderías, hospitales)</li>
+            <li>Transmisión perinatal (E. coli K1: meningitis neonatal)</li>
+            <li>Manos no lavadas (fómites)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia — por Patotipo</div>
+        <div class="toxin-item"><b>ETEC — Enterotoxigénica: Toxina termolábil (LT) + Termoestable (ST)</b><span>LT: activa adenilato ciclasa → ↑AMPc → diarrea secretora (similar al cólera). ST: activa guanilato ciclasa → ↑GMPc → diarrea secretora. Causa "Diarrea del viajero".</span></div>
+        <div class="toxin-item"><b>EHEC — Enterohemorrágica: Toxina Shiga (Stx1, Stx2)</b><span>Inhibe síntesis proteica en ribosomas 60S. Daño endotelial → diarrea sanguinolenta → Síndrome Urémico Hemolítico (SUH). Serotipo O157:H7 el más importante.</span></div>
+        <div class="toxin-item"><b>EPEC — Enteropatogénica: Proteína intimina + sistema de secreción tipo III</b><span>Produce lesiones A/E (attaching and effacing): destruye microvellosidades sin invadir célula. Diarrea acuosa en lactantes.</span></div>
+        <div class="toxin-item"><b>EIEC — Enteroinvasiva: Invasinas (similar a Shigella)</b><span>Invasión de la mucosa colónica → disentería. Produce plasmidio de invasividad.</span></div>
+        <div class="toxin-item"><b>Fimbriae P y tipo 1 (Uropatógenas)</b><span>Adherencia a uroepitelio. Fimbriae P se une al antígeno P del grupo sanguíneo (pielonefritis).</span></div>
+        <div class="toxin-item"><b>α-hemolisina (HlyA)</b><span>Toxina formadora de poros en células del huésped. Importante en cepas uropatógenas.</span></div>
+        <div class="toxin-item"><b>Cápsula K1 (Polisialosil)</b><span>Resistencia a la fagocitosis y al complemento. Crucial en meningitis neonatal y sepsis.</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico por Patotipo</div>
+        <div class="risk-group"><b>ETEC — Diarrea del viajero (adultos viajando a países en desarrollo)</b><span>Diarrea acuosa profusa, no sanguinolenta · Cólicos abdominales · Autolimitada (3–5 días) · Sin fiebre significativa</span></div>
+        <div class="risk-group"><b>EHEC O157:H7 — Niños y adultos (carne molida mal cocida, leche cruda)</b><span>Diarrea sanguinolenta (sin pus) · Cólicos severos · Progresión a SUH en 5–10%: anemia hemolítica microangiopática + trombocitopenia + insuficiencia renal aguda. Es la principal causa de IRA pediátrica en países desarrollados.</span></div>
+        <div class="risk-group"><b>EPEC — Lactantes y niños (países en desarrollo)</b><span>Diarrea acuosa persistente · Vómitos · Deshidratación · Puede ser grave y mortal en neonatos</span></div>
+        <div class="risk-group"><b>UPEC — Mujeres jóvenes, embarazadas, ancianos, hospitalizados</b><span>ITU baja (cistitis): disuria, polaquiuria, hematuria. ITU alta (pielonefritis): fiebre, escalofríos, dolor lumbar, náuseas. Bacteriemia secundaria.</span></div>
+        <div class="risk-group"><b>NEONATAL — Recién nacidos (vertical)</b><span>Meningitis neonatal (cepas K1) · Sepsis neonatal · Alta mortalidad (15–40%) y secuelas neurológicas</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>ITU no complicada:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Nitrofurantoína (5 días)</span>
+          <span class="drug">Fosfomicina (dosis única)</span>
+          <span class="drug">TMP-SMX (si sensible)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Pielonefritis / Bacteriemia:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Ciprofloxacina VO/IV</span>
+          <span class="drug">Ceftriaxona IV</span>
+          <span class="drug">Carbapenémicos (si BLEE)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Meningitis neonatal:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Ampicilina + Gentamicina (empírico)</span>
+          <span class="drug alt">Cefotaxima (definitivo)</span>
+        </div>
+        <div class="alert-box"><b>⚠ CONTRAINDICACIÓN CRÍTICA</b>EHEC: NO usar antibióticos ni antidiarreicos. Los antibióticos aumentan la liberación de toxina Shiga → mayor riesgo de SUH. Tratamiento: soporte hídrico + hemodiálisis si necesario.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 05. SALMONELLA ═══ -->
+  <div class="organism-card" id="salmonella">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">05</span>
+      <h2>Salmonella spp. <span>Fiebre entérica e intoxicación alimentaria</span></h2>
+      <span class="card-tag tag-enterobac">Enterobacteriaceae</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>móvil</strong> (flagelos perítricos), anaerobio facultativo</li>
+            <li><strong>No fermenta lactosa</strong> (colonias incoloras en MacConkey)</li>
+            <li>Produce H₂S (en agar TSI: centro negro)</li>
+            <li>Serotipificación: Antígenos O (somático), H (flagelo), Vi (cápsula — solo en Typhi y Paratyphi)</li>
+            <li>Dos especies principales: <em>S. enterica</em> y <em>S. bongori</em></li>
+            <li>Serotipos más importantes: Typhi, Paratyphi A/B/C, Typhimurium, Enteritidis</li>
+            <li>Reservorio: humanos (Typhi), animales (Typhimurium, Enteritidis)</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Fecal-oral:</strong> agua y alimentos contaminados</li>
+            <li>Huevos, aves de corral, leche no pasteurizada, carne (no Typhi)</li>
+            <li>Para <em>Typhi:</em> SOLO humanos como reservorio (agua y alimentos contaminados con heces humanas)</li>
+            <li>Portadores crónicos: vesícula biliar (Typhi)</li>
+            <li>Reptiles como mascotas (tortugas, iguanas) — Typhimurium</li>
+            <li>Incubación: <strong>6–48h</strong> (gastroenteritis) / <strong>7–14 días</strong> (fiebre tifoidea)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Invasinas (SPI-1, SPI-2 — Islas de Patogenicidad)</b><span>Sistema de secreción tipo III. SPI-1: invasión de enterocitos. SPI-2: supervivencia intracelular en macrófagos. Clave para fiebre tifoidea.</span></div>
+        <div class="toxin-item"><b>Antígeno Vi (cápsula)</b><span>Inhibe fagocitosis y activación del complemento. Presente en S. Typhi y Paratyphi C. Objetivo de la vacuna polisacárida Vi.</span></div>
+        <div class="toxin-item"><b>LPS (antígeno O)</b><span>Endotoxina → fiebre, hipotensión. Contribuye a manifestaciones sistémicas de la fiebre tifoidea.</span></div>
+        <div class="toxin-item"><b>Supervivencia intracelular en macrófagos</b><span>Inhibe la fusión fagosoma-lisosoma. Permite diseminación hematógena y afectación sistémica.</span></div>
+        <div class="toxin-item"><b>Enterotoxina</b><span>Similar a la toxina colérica; contribuye a diarrea secretora en gastroenteritis</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>GASTROENTERITIS / SALMONELOSIS (S. Typhimurium, Enteritidis — población general)</b><span>Náuseas, vómitos, diarrea acuosa o con sangre · Fiebre moderada · Cólicos · Autolimitada 3–7 días · Raramente grave en sanos</span></div>
+        <div class="risk-group"><b>FIEBRE TIFOIDEA (S. Typhi — regiones endémicas, viajeros)</b><span>Semana 1: fiebre escalonada, cefalea, malestar, bradicardia relativa (pulso-temperatura disociados) · Semana 2: "Escalera de Wunderlich" — fiebre alta sostenida, manchas rosadas (roséola tífica), esplenomegalia, lengua saburral · Semana 3: diarrea en "puré de guisantes", perforación intestinal (ileon), hemorragia digestiva ⚠ · Semana 4: resolución o complicaciones</span></div>
+        <div class="risk-group"><b>GRUPOS DE RIESGO PARA BACTERIEMIA (Anemia falciforme, inmunocomprometidos, <5 años, >65 años)</b><span>Bacteriemia sin foco claro · Osteomielitis (clásico en anemia falciforme) · Artritis séptica · Absceso focal</span></div>
+        <div class="risk-group"><b>PORTADORES CRÓNICOS</b><span>Excreción en heces >1 año post-infección · Vesícula biliar como reservorio (litiasis asociada) · Trabajadores de alimentos: riesgo epidémico</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Gastroenteritis:</strong> Hidratación oral (antibióticos NO indicados en inmunocompetentes — prolongan el estado portador)</p>
+        <p class="body-text" style="margin-top:0.5rem;"><strong>Fiebre Tifoidea (Bacteriémica):</strong></p>
+        <div class="drug-row">
+          <span class="drug">Ceftriaxona IV (primera línea en hospitalizado)</span>
+          <span class="drug">Ciprofloxacina (si sensible)</span>
+          <span class="drug">Azitromicina VO</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Portadores crónicos:</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Ciprofloxacina 4 semanas</span>
+          <span class="drug alt">Colecistectomía (si litiasis)</span>
+        </div>
+        <div class="alert-box"><b>⚠ PREVENCIÓN</b>Vacunas disponibles: Vi polisacárida (parenteral, ≥2 años) y Ty21a (oral atenuada, ≥6 años). Solo para S. Typhi.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 06. SHIGELLA ═══ -->
+  <div class="organism-card" id="shigella">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">06</span>
+      <h2>Shigella spp. <span>Disentería bacilar — Invasiva por definición</span></h2>
+      <span class="card-tag tag-enterobac">Enterobacteriaceae</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, <strong>inmóvil</strong> (sin flagelos — diferencia con Salmonella)</li>
+            <li><strong>No fermenta lactosa</strong>; no produce H₂S</li>
+            <li>4 serogrupos: <strong>A</strong> (dysenteriae) · <strong>B</strong> (flexneri) · <strong>C</strong> (boydii) · <strong>D</strong> (sonnei)</li>
+            <li>Dosis infectante extremadamente baja: <strong>10–200 bacterias</strong> (vs. millones para Salmonella)</li>
+            <li>Reservorio exclusivamente humano</li>
+            <li>Patógeno intracelular (invade colonocitos)</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Fecal-oral</strong> — vía más importante</li>
+            <li>Las "5 F": <strong>F</strong>eces → <strong>F</strong>ingers → <strong>F</strong>lies → <strong>F</strong>ood → <strong>F</strong>eces</li>
+            <li>Agua contaminada (brotes epidémicos)</li>
+            <li>Contacto directo persona-persona (guarderías, cárceles, cuarteles)</li>
+            <li>Baja dosis infectante = alta contagiosidad</li>
+            <li>Incubación: <strong>1–3 días</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Toxina Shiga (Shiga Toxin 1 — S. dysenteriae)</b><span>Inhibe síntesis proteica al inactivar el ribosoma 60S (corta ARN ribosomal 28S). Causa daño vascular intestinal → sangre en heces. Puede causar SUH (igual que EHEC).</span></div>
+        <div class="toxin-item"><b>Invasinas (Plasmidio de invasividad 220 kb)</b><span>Sistema de secreción tipo III: inyecta proteínas IpaB, IpaC, IpaD en células M del epitelio colónico. Invasión y acantosis de epitelio intestinal.</span></div>
+        <div class="toxin-item"><b>Motilidad intracelular (IcsA/VirG)</b><span>Polimeriza actina de la célula hospedadora para desplazarse de célula en célula sin salir al extracelular. Evade opsonización y anticuerpos.</span></div>
+        <div class="toxin-item"><b>LPS</b><span>Endotoxina → fiebre. El LPS de Shigella es particularmente potente en activar inflamación colónica.</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico — Disentería Bacilar</div>
+        <div class="risk-group"><b>FASE INICIAL (24–48h)</b><span>Diarrea acuosa · Fiebre alta (39–40°C) · Cólicos intensos</span></div>
+        <div class="risk-group"><b>FASE DISENTÉRICA (días 2–5)</b><span>Heces con sangre, moco y pus (disentería verdadera) · Tenesmo rectal intenso · Deposiciones frecuentes de pequeño volumen · En niños: convulsiones febriles</span></div>
+        <div class="risk-group"><b>GRUPOS DE RIESGO</b><span>Niños 1–5 años (más graves) · Desnutridos · VIH/SIDA · Residentes de zonas de hacinamiento</span></div>
+        <div class="risk-group"><b>COMPLICACIONES GRAVES</b><span>SUH (Síndrome Urémico Hemolítico) — S. dysenteriae · Prolapso rectal (niños) · Megacolon tóxico · Bacteriemia (raro, más en desnutridos) · Artritis reactiva (síndrome de Reiter post-infección S. flexneri)</span></div>
+        <div class="risk-group"><b>POR SEROGRUPO</b><span>S. sonnei (D): más leve, más frecuente en países desarrollados · S. flexneri (B): más común en países en desarrollo · S. dysenteriae (A): el más grave — epidemias masivas, toxina Shiga 1</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Antibióticos acortan la duración y reducen la diseminación:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Ciprofloxacina 500mg c/12h VO × 3 días</span>
+          <span class="drug">Azitromicina 500mg/día × 3 días</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Niños:</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Azitromicina (primera línea pediátrica)</span>
+          <span class="drug alt">Ceftriaxona IV (casos graves)</span>
+        </div>
+        <div class="alert-box"><b>⚠ NOTA</b>NO usar antidiarreicos (loperamida) — contraindican en disentería porque inhiben el aclaramiento bacteriano del colon. Hidratación fundamental.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 07. HAEMOPHILUS INFLUENZAE ═══ -->
+  <div class="organism-card" id="h-influenzae">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">07</span>
+      <h2>Haemophilus influenzae <span>Patógeno respiratorio — antes la principal causa de meningitis pediátrica</span></h2>
+      <span class="card-tag tag-fastidious">Fastidioso</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Cocobacilo Gram negativo, pleomórfico, <strong>no esporulado, inmóvil</strong></li>
+            <li>Aerobio facultativo, <strong>fastidioso</strong> (requiere factores X y V)</li>
+            <li><strong>Factor X:</strong> hemina (protoporfirina) · <strong>Factor V:</strong> NAD</li>
+            <li>Crece en agar chocolate (cococolonias transparentes) — NO en agar sangre ordinario</li>
+            <li>Fenómeno de satelitismo: crece junto a colonias de <em>S. aureus</em> que liberan NAD</li>
+            <li>6 serotipos capsulares (a–f); serotipo <strong>b (Hib)</strong> el más virulento</li>
+            <li>Cepas no tipables (sin cápsula): más frecuentes en infecciones localizadas de adultos</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li>Exclusivamente humano (no hay reservorio animal)</li>
+            <li><strong>Gotas respiratorias</strong> y contacto con secreciones respiratorias</li>
+            <li>Coloniza nasofaringe (10–80% de población sana)</li>
+            <li>Puede diseminarse hematógenamente desde nasofaringe</li>
+            <li>Incubación: <strong>2–4 días</strong></li>
+            <li>Vacuna Hib ha reducido drásticamente la incidencia de infección invasiva</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Cápsula de polirribosil-ribitol fosfato (PRP) — Tipo b</b><span>Factor de virulencia más importante. Inhibe la fagocitosis. Permite invasión sanguínea y diseminación al SNC. Objetivo de la vacuna Hib conjugada.</span></div>
+        <div class="toxin-item"><b>IgA proteasa</b><span>Degrada IgA secretora en mucosas respiratorias → facilita colonización y evasión de la inmunidad local</span></div>
+        <div class="toxin-item"><b>Fimbriae y adhesinas (HMW1, HMW2)</b><span>Adherencia al epitelio respiratorio. Clave en cepas no tipables para EPOC e infecciones del oído.</span></div>
+        <div class="toxin-item"><b>LPS (lipooligosacárido)</b><span>Activa inflamación. En meningitis: contribuye al edema cerebral y daño neurológico.</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>MENINGITIS BACTERIANA (Niños 2 meses–5 años, no vacunados — Hib)</b><span>Fiebre, cefalea, rigidez de nuca, alteración del sensorio · Signos de Kernig y Brudzinski · Fontanela abombada (lactantes) · Antes la causa #1 de meningitis pediátrica bacteriana</span></div>
+        <div class="risk-group"><b>EPIGLOTITIS AGUDA (Niños 2–7 años — Hib ⚠ EMERGENCIA)</b><span>"Signo del pulgar" en Rx lateral de cuello · Estridor inspiratorio · Babeo · Disfagia · Posición en trípode · Voz amortiguada ("de papa caliente") · NUNCA examinar orofaringe sin equipo de intubación listo (riesgo de paro respiratorio)</span></div>
+        <div class="risk-group"><b>NEUMONÍA (Adultos con EPOC, ancianos, asinados — cepas no tipables)</b><span>Principal causa de exacerbación bacteriana de EPOC · Bronconeumonía · Puede causar otitis media y sinusitis crónica</span></div>
+        <div class="risk-group"><b>ARTRITIS SÉPTICA / CELULITIS (Niños < 2 años)</b><span>Artritis de grandes articulaciones · Celulitis de tono azulado (clásicamente periorbitaria)</span></div>
+        <div class="risk-group"><b>FACTORES DE RIESGO PARA ENFERMEDAD INVASIVA</b><span>Asplenia funcional o anatómica · Inmunodeficiencia humoral · No vacunados · Anemia falciforme</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Meningitis / Infección invasiva:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Ceftriaxona IV (primera línea)</span>
+          <span class="drug">Cefotaxima IV</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Infecciones no invasivas (otitis, sinusitis, EPOC):</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Amoxicilina-clavulanato</span>
+          <span class="drug alt">Azitromicina</span>
+          <span class="drug alt">TMP-SMX (si sensible)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Profilaxis en contactos:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Rifampicina × 4 días (para eliminar portadores)</span>
+        </div>
+        <div class="alert-box"><b>⚠ VACUNA Hib</b>Vacuna conjugada PRP-T o PRP-OMP: parte del esquema de vacunación infantil universal. Ha eliminado prácticamente la enfermedad invasiva por Hib en países con alta cobertura.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 08. HAEMOPHILUS DUCREYI ═══ -->
+  <div class="organism-card" id="h-ducreyi">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">08</span>
+      <h2>Haemophilus ducreyi <span>Chancro blando (Chancroide)</span></h2>
+      <span class="card-tag tag-fastidious">Fastidioso</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Cocobacilo Gram negativo, pequeño, inmóvil, anaerobio facultativo</li>
+            <li>Extremadamente <strong>fastidioso</strong>: requiere factor X (hemina), no el factor V</li>
+            <li>Tinción: se dispone en "cadenas de peces" o "cardúmen" (grupos paralelos)</li>
+            <li>Cultivo difícil: agar chocolate con isovitalex o agar Mueller-Hinton + sangre de caballo</li>
+            <li>Causa una ITS ulcerativa</li>
+            <li>Más prevalente en África subsahariana, partes de Asia y América Latina</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Exclusivamente sexual</strong> — contacto directo con úlceras</li>
+            <li>Alta transmisibilidad por contacto con secreción de úlcera o bubón</li>
+            <li>Incubación: <strong>1–14 días</strong> (promedio 4–7 días)</li>
+            <li>Co-factor de transmisión del VIH (aumenta 3–5x el riesgo de adquisición)</li>
+            <li>Más frecuente en trabajadores/as sexuales</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Citotoxina distensiva (CDT)</b><span>Inhibe la división celular del epitelio y del sistema inmune. Contribuye a la destrucción tisular y la formación de úlcera.</span></div>
+        <div class="toxin-item"><b>LPS</b><span>Endotoxina de membrana; activa inflamación local intensa</span></div>
+        <div class="toxin-item"><b>Proteínas de superficie</b><span>Facilitan la adherencia e invasión superficial del epitelio genital</span></div>
+        <div class="toxin-item"><b>Evasión inmune</b><span>Inhibe la apoptosis de macrófagos, permitiendo persistencia intracelular</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico — Chancroide</div>
+        <div class="risk-group"><b>LESIÓN PRIMARIA (Clásica)</b><span>Pápula eritematosa → pústula → úlcera dolorosa (a diferencia del chancro sifilítico que es indoloro) · Bordes irregulares, socavados, blandos ("chancro blando") · Base purulenta, friable · Puede ser múltiple · Localización: genitales externos</span></div>
+        <div class="risk-group"><b>ADENOPATÍA REGIONAL (Bubón inguinal)</b><span>En 50% de los casos · Unilateral · Dolorosa, fluctuante · Puede fistulizar espontáneamente ("pseudobubón" en un solo ganglio, diferente al de LGV que tiene múltiples ganglios)</span></div>
+        <div class="risk-group"><b>COMPLICACIONES</b><span>Fimosis o parafimosis (por edema) · Superinfección bacteriana · Co-infección VIH (potenciación mutua) · Destrucción genital si no se trata</span></div>
+        <div class="risk-group"><b>DIAGNÓSTICO DIFERENCIAL CRÍTICO</b><span>Sífilis (úlcera indolora, indurada) · Herpes genital (múltiples, vesiculosas, dolorosas) · LGV (úlcera transitoria + adenopatía multiganglionar)</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <div class="drug-row">
+          <span class="drug">Azitromicina 1g VO (dosis única)</span>
+          <span class="drug">Ceftriaxona 250mg IM (dosis única)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Alternativas:</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Ciprofloxacina 500mg c/12h × 3 días</span>
+          <span class="drug alt">Eritromicina 500mg c/8h × 7 días</span>
+        </div>
+        <div class="alert-box"><b>⚠ NOTA</b>Tratar también a las parejas sexuales. Drenar bulbones fluctuantes si es necesario (aspiración con aguja — evitar incisión abierta). Descartar coinfección con sífilis, VIH, herpes.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 09. HELICOBACTER PYLORI ═══ -->
+  <div class="organism-card" id="helicobacter">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">09</span>
+      <h2>Helicobacter pylori <span>Primera causa de úlcera péptica y cáncer gástrico</span></h2>
+      <span class="card-tag tag-helical">Helical/Microaerófilo</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo <strong>curvo/espiral</strong>, con <strong>flagelos unipolares</strong> (4–6 flagelos en un polo)</li>
+            <li><strong>Microaerófilo</strong> (requiere 5–10% O₂ — no crece en aerobiosis ni anaerobiosis estricta)</li>
+            <li>Oxidasa positiva · Catalasa positiva · <strong>Ureasa positiva</strong> (propiedad más importante)</li>
+            <li>Vive en la capa de moco gástrico y sobre las células epiteliales gástricas</li>
+            <li>Infecta a >50% de la población mundial (>70% en países en desarrollo)</li>
+            <li>Clasificado como carcinógeno tipo I por la OMS</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Fecal-oral</strong> (principal en países en desarrollo)</li>
+            <li><strong>Oral-oral</strong> (vómito — especialmente en niños)</li>
+            <li>Agua contaminada</li>
+            <li>Transmisión intrafamiliar — importante en la infancia</li>
+            <li>Adquisición principalmente en la <strong>infancia</strong></li>
+            <li>Incubación: no bien definida (puede colonizar por décadas asintomáticamente)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Ureasa</b><span>Hidroliza urea → NH₃ + CO₂. El amoniaco neutraliza el ácido gástrico alrededor de la bacteria (microambiente alcalino) y daña directamente las células epiteliales. Base del test de urea diagnóstico.</span></div>
+        <div class="toxin-item"><b>CagA (gen A asociado a citotoxina)</b><span>Inyectado vía sistema de secreción tipo IV en células epiteliales gástricas. Altera señalización intracelular → proliferación celular aberrante. Fuertemente asociado a úlcera péptica y carcinoma gástrico.</span></div>
+        <div class="toxin-item"><b>VacA (citotoxina vacuolizante)</b><span>Produce vacuolización de las células epiteliales, altera la permeabilidad de la mucosa. Promueve apoptosis y daño tisular.</span></div>
+        <div class="toxin-item"><b>BabA (adhesina de unión a Lewis b)</b><span>Se une al antígeno sanguíneo Lewis b del epitelio gástrico → adherencia íntima. Cepas positivas BabA+CagA+ tienen mayor virulencia.</span></div>
+        <div class="toxin-item"><b>Flagelos + Motilidad</b><span>Permite penetrar el moco gástrico viscoso y alcanzar el epitelio subyacente</span></div>
+        <div class="toxin-item"><b>LPS inusual</b><span>Mimetismo molecular con antígenos Lewis del huésped → evasión del sistema inmune</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>GASTRITIS CRÓNICA ACTIVA (La mayoría de los infectados)</b><span>Asintomática o síntomas dispépticos leves · Inflamación crónica de la mucosa gástrica (predominio antral)</span></div>
+        <div class="risk-group"><b>ÚLCERA PÉPTICA (10–15% de infectados)</b><span>Úlcera duodenal: dolor epigástrico que mejora con comida · Úlcera gástrica: dolor que empeora con comida · Pirosis, náuseas, hematemesis · H. pylori responsable del 90% de úlceras duodenales y 75% de gástricas</span></div>
+        <div class="risk-group"><b>ADENOCARCINOMA GÁSTRICO (1–2% tras infección crónica)</b><span>Progresión: gastritis crónica → metaplasia intestinal → displasia → carcinoma (Cascada de Correa) · Segundo cáncer más mortal del mundo</span></div>
+        <div class="risk-group"><b>LINFOMA MALT GÁSTRICO (Raro pero importante)</b><span>Linfoma de tejido linfoide asociado a mucosa · En estadios iniciales: puede curar SOLO con erradicación de H. pylori (sin quimio)</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento — Terapia de Erradicación</div>
+        <p class="body-text"><strong>Triple terapia clásica (14 días):</strong></p>
+        <div class="drug-row">
+          <span class="drug">IBP (omeprazol 20mg c/12h)</span>
+          <span class="drug">Claritromicina 500mg c/12h</span>
+          <span class="drug">Amoxicilina 1g c/12h</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Terapia cuádruple (si resistencia a claritromicina o fracaso previo):</strong></p>
+        <div class="drug-row">
+          <span class="drug">IBP + Bismuto + Metronidazol + Tetraciclina × 10–14 días</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Confirmación de erradicación:</strong> Test de aliento con urea-C13 (≥4 semanas post-tratamiento)</p>
+        <div class="alert-box"><b>⚠ DIAGNÓSTICO</b>Métodos: Test rápido de ureasa (endoscopia) · Histología · Cultivo · Test de aliento C13 (no invasivo, gold standard) · Antígeno fecal · Serología (no confirma infección activa).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 10. CAMPYLOBACTER JEJUNI ═══ -->
+  <div class="organism-card" id="campylobacter">
+    <div class="card-header" onclick="toggleCard(this)">
+      <span class="card-number">10</span>
+      <h2>Campylobacter jejuni <span>Principal causa de diarrea bacteriana en países desarrollados</span></h2>
+      <span class="card-tag tag-helical">Helical/Microaerófilo</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="section-grid">
+        <div class="info-block">
+          <div class="block-title"><span class="block-icon">🔬</span>Características Generales</div>
+          <ul class="item-list">
+            <li>Bacilo Gram negativo, curvo/espiral (en "S" o "ala de gaviota"), móvil (flagelo polar)</li>
+            <li><strong>Microaerófilo</strong> (requiere 5% O₂ y 10% CO₂)</li>
+            <li>Oxidasa <strong>positiva</strong> · Catalasa positiva</li>
+            <li>Termofílico: crece a 42°C pero no a 25°C (temperatura de incubación diagnóstica)</li>
+            <li>No fermenta carbohidratos</li>
+            <li>Principal reservorio: aves de corral (especialmente pollos)</li>
+            <li>Causa más frecuente de diarrea bacteriana en EE.UU., Europa y Australia</li>
+          </ul>
+        </div>
+        <div class="transmission-box">
+          <div class="block-title"><span class="block-icon">🔄</span>Transmisión</div>
+          <ul class="item-list">
+            <li><strong>Ingesta de pollo mal cocido</strong> (vía más común)</li>
+            <li>Leche no pasteurizada, agua no tratada</li>
+            <li>Contacto con animales (aves, ganado, mascotas)</li>
+            <li>Fecal-oral (persona-persona poco frecuente en adultos)</li>
+            <li>Dosis infectante relativamente baja: <strong>~500 bacterias</strong></li>
+            <li>Incubación: <strong>2–5 días</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="virulence-box">
+        <div class="block-title"><span class="block-icon">⚠</span>Factores de Virulencia</div>
+        <div class="toxin-item"><b>Toxina distensible citoletal (CDT)</b><span>Bloquea el ciclo celular en fase G2/M → apoptosis de células intestinales. Contribuye a la inflamación de la mucosa.</span></div>
+        <div class="toxin-item"><b>Flagelos + Motilidad</b><span>Esenciales para colonización: permiten penetrar el moco intestinal y adherirse al epitelio. La motilidad sacacorchos es clave para la invasión.</span></div>
+        <div class="toxin-item"><b>Invasinas</b><span>Permiten invasión de enterocitos del íleon y colon → diarrea inflamatoria con sangre y pus</span></div>
+        <div class="toxin-item"><b>LPS con estructura similar a gangliósidos humanos</b><span>Mimetismo molecular → síndrome de Guillain-Barré (GBS) postinfeccioso. El sistema inmune genera anticuerpos anti-LPS que atacan los gangliósidos GM1 del nervio periférico.</span></div>
+        <div class="toxin-item"><b>Proteínas de la membrana externa (PorA, etc.)</b><span>Adherencia, resistencia al suero y evasión del complemento</span></div>
+      </div>
+
+      <div class="clinical-box">
+        <div class="block-title"><span class="block-icon">🏥</span>Cuadro Clínico</div>
+        <div class="risk-group"><b>ENTEROCOLITIS AGUDA (Forma más común)</b><span>Pródromo: fiebre, cefalea, mialgia (12–48h antes de la diarrea) · Diarrea acuosa que puede volverse sanguinolenta · Cólicos abdominales intensos (puede simular apendicitis) · Autolimitada 5–7 días · Ausencia de vómitos prominentes</span></div>
+        <div class="risk-group"><b>GRUPOS DE RIESGO PARA FORMAS GRAVES</b><span>Inmunocomprometidos (VIH, hipogammaglobulinemia) → diarrea crónica prolongada, bacteriemia</span></div>
+        <div class="risk-group"><b>SÍNDROME DE GUILLAIN-BARRÉ (1–3 semanas post-infección)</b><span>La complicación postinfecciosa más grave e importante · Polineuropatía desmielinizante ascendente · Parálisis flácida ascendente · Riesgo de falla respiratoria · Campylobacter es la causa más frecuente de GBS poste-infeccioso (~30% de casos de GBS)</span></div>
+        <div class="risk-group"><b>OTRAS COMPLICACIONES POSTINFECCIOSAS</b><span>Artritis reactiva (síndrome de Reiter) · Eritema nodoso · Uveítis · Mielitis transversa</span></div>
+      </div>
+
+      <div class="treatment-box">
+        <div class="block-title"><span class="block-icon">💊</span>Tratamiento</div>
+        <p class="body-text"><strong>Casos leves-moderados:</strong> Autolimitado — solo hidratación y soporte</p>
+        <p class="body-text" style="margin-top:0.5rem;"><strong>Casos graves, febriles o inmunocomprometidos:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Azitromicina 500mg/día × 3 días (primera línea)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Alternativas:</strong></p>
+        <div class="drug-row">
+          <span class="drug alt">Eritromicina 500mg c/12h × 5 días</span>
+          <span class="drug alt">Ciprofloxacina (creciente resistencia — verificar antibiograma)</span>
+        </div>
+        <p class="body-text" style="margin-top:0.6rem;"><strong>Bacteriemia:</strong></p>
+        <div class="drug-row">
+          <span class="drug">Aminoglucósido + Imipenem</span>
+        </div>
+        <div class="alert-box"><b>⚠ PUNTO DE EXAMEN</b>Campylobacter + diarrea → pensar en GBS como complicación tardía. Resistencia a fluoroquinolonas en aumento (especialmente en países con uso veterinario de quinolonas).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TABLA RESUMEN ═══════════════════ -->
+  <div class="section-label">Tabla Comparativa Maestra</div>
+
+  <div class="summary-section" id="tabla-resumen">
+    <h2>📊 Tabla-Resumen Comparativa — Bacilos Gram Negativos</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Microorganismo</th>
+            <th>Movilidad</th>
+            <th>Lactosa</th>
+            <th>Patología Principal</th>
+            <th>Factor Virulencia Clave</th>
+            <th>Transmisión</th>
+            <th>Tto. Primera Línea</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>K. granulomatis</td>
+            <td>Inmóvil</td>
+            <td>–</td>
+            <td>Donovanosis (úlcera genital)</td>
+            <td>Intracelular; cuerpos de Donovan</td>
+            <td>Sexual</td>
+            <td>Azitromicina / Doxiciclina</td>
+          </tr>
+          <tr>
+            <td>K. pneumoniae</td>
+            <td>Inmóvil</td>
+            <td>+ (mucoide)</td>
+            <td>Neumonía, ITU, sepsis</td>
+            <td>Cápsula polisacárida, BLEE, KPC</td>
+            <td>Endógena, nosocomial</td>
+            <td>Carbapenémicos (BLEE)</td>
+          </tr>
+          <tr>
+            <td>P. aeruginosa</td>
+            <td>Móvil (polar)</td>
+            <td>– (no ferment.)</td>
+            <td>Sepsis oportunista, fibrosis quística, quemados</td>
+            <td>Exotoxina A; Elastasa; Biofilm</td>
+            <td>Nosocomial, ambiental</td>
+            <td>Pip-tazo + Amikacina</td>
+          </tr>
+          <tr>
+            <td>E. coli</td>
+            <td>Móvil (perítrico)</td>
+            <td>+</td>
+            <td>ITU, diarreas (múltiples), meningitis neonatal, sepsis</td>
+            <td>Según patotipo: LT/ST, Stx, intimina</td>
+            <td>Fecal-oral; endógena</td>
+            <td>Según localización/patotipo</td>
+          </tr>
+          <tr>
+            <td>Salmonella spp.</td>
+            <td>Móvil (perítrico)</td>
+            <td>– (H₂S +)</td>
+            <td>Gastroenteritis, fiebre tifoidea</td>
+            <td>SPI-1/SPI-2; antígeno Vi; intracelular</td>
+            <td>Fecal-oral; alimentos</td>
+            <td>Ceftriaxona / Ciprofloxacina</td>
+          </tr>
+          <tr>
+            <td>Shigella spp.</td>
+            <td>Inmóvil</td>
+            <td>–</td>
+            <td>Disentería bacilar</td>
+            <td>Toxina Shiga; invasinas; motilidad actina</td>
+            <td>Fecal-oral (muy baja dosis)</td>
+            <td>Ciprofloxacina / Azitromicina</td>
+          </tr>
+          <tr>
+            <td>H. influenzae</td>
+            <td>Inmóvil</td>
+            <td>–</td>
+            <td>Meningitis (Hib), epiglotitis, neumonía</td>
+            <td>Cápsula PRP (Hib); IgA proteasa</td>
+            <td>Gotas respiratorias</td>
+            <td>Ceftriaxona IV</td>
+          </tr>
+          <tr>
+            <td>H. ducreyi</td>
+            <td>Inmóvil</td>
+            <td>–</td>
+            <td>Chancroide (úlcera genital dolorosa)</td>
+            <td>CDT; LPS</td>
+            <td>Sexual (úlcera)</td>
+            <td>Azitromicina / Ceftriaxona IM</td>
+          </tr>
+          <tr>
+            <td>H. pylori</td>
+            <td>Móvil (polar)</td>
+            <td>–</td>
+            <td>Gastritis, úlcera péptica, cáncer gástrico</td>
+            <td>Ureasa; CagA; VacA</td>
+            <td>Fecal-oral; oral-oral</td>
+            <td>IBP + Claritro + Amoxicilina × 14d</td>
+          </tr>
+          <tr>
+            <td>C. jejuni</td>
+            <td>Móvil (polar)</td>
+            <td>–</td>
+            <td>Diarrea bacteriana, GBS post-infeccioso</td>
+            <td>CDT; LPS (mimetismo gangliósidos); flagelo</td>
+            <td>Pollo mal cocido; leche cruda</td>
+            <td>Azitromicina × 3 días</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ EXAM TIPS ═══════════════════ -->
+  <div class="section-label">Para el Examen</div>
+
+  <div class="exam-tips" id="examtips">
+    <h2>🎯 Puntos de Examen — Trampas Clásicas y Asociaciones Clave</h2>
+
+    <div class="exam-item">
+      <span class="exam-num">01</span>
+      <p><strong>Cuerpos de Donovan</strong> = K. granulomatis dentro de macrófagos. Si la pregunta muestra macrófagos con bacterias encapsuladas intracelulares en una úlcera genital crónica indolora → Donovanosis.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">02</span>
+      <p><strong>K. pneumoniae</strong>: esputo "jalea de grosella" en alcohólico + colonias mucoides en MacConkey = diagnóstico. No olvidar el riesgo de BLEE y KPC en el ámbito hospitalario.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">03</span>
+      <p><strong>P. aeruginosa</strong>: Oxidasa POSITIVA + no fermenta lactosa + pigmento azul-verde + resistencia múltiple. Ectima gangrenoso en neutropénico = emergencia por Pseudomonas hasta demostrar lo contrario.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">04</span>
+      <p><strong>E. coli EHEC O157:H7</strong>: diarrea sanguinolenta + SUH en niños. NUNCA dar antibióticos. Causa la principal IRA pediátrica en países desarrollados.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">05</span>
+      <p><strong>Salmonella Typhi</strong>: bradicardia relativa (disociación pulso-temperatura) + roséola tífica + esputo "puré de guisantes" en la 3ª semana. Única Salmonella sin reservorio animal.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">06</span>
+      <p><strong>Shigella vs. EIEC</strong>: ambas causan disentería, ambas invaden, ambas son inmóviles (Shigella) vs. móvil (EIEC). La diferencia: Shigella tiene toxina Shiga, EIEC no. La Shigella tiene dosis infectante bajísima (200 bacterias).</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">07</span>
+      <p><strong>H. influenzae</strong>: Requiere factores X+V → crece en agar chocolate, no en agar sangre. Epiglotitis = NUNCA examinar la garganta sin tener intubación lista. La vacuna Hib eliminó la meningitis por este germen en niños vacunados.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">08</span>
+      <p><strong>H. ducreyi vs. Treponema pallidum</strong>: Chancroide = úlcera DOLOROSA, blanda, borde irregular. Sífilis = úlcera INDOLORA, dura (indurada), borde limpio. Las dos pueden coexistir.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">09</span>
+      <p><strong>H. pylori</strong>: Ureasa POSITIVA es su propiedad diagnóstica más importante. CagA+ = mayor riesgo de cáncer. Linfoma MALT temprano → puede curar solo con erradicación antibiótica (sin quimioterapia).</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">10</span>
+      <p><strong>C. jejuni y GBS</strong>: diarrea seguida 1–3 semanas después de debilidad ascendente → pensar en Guillain-Barré. El mimetismo molecular LPS/gangliósido GM1 es el mecanismo. Es la causa más frecuente de GBS post-infeccioso.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">11</span>
+      <p><strong>Microaerófilos</strong> de la lista: H. pylori y C. jejuni. Ambos Gram negativos curvos, oxidasa+, no fermentadores. Se diferencian: H. pylori → ureasa+ (estómago). C. jejuni → termofílico a 42°C (intestino).</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">12</span>
+      <p><strong>Anemia falciforme + osteomielitis</strong>: pensar en Salmonella (no en Staphylococcus, que es lo más frecuente en la población general). La combinación anemia falciforme + bacteriemia = Salmonella hasta que se pruebe lo contrario en exámenes.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">13</span>
+      <p><strong>Colonias en "alas de gaviota"</strong> en tinción = C. jejuni. Colonias en "cardumen de peces" = H. ducreyi. "Doble zona de hemólisis" = no aplica aquí, pero recordar la morfología característica de cada uno.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">14</span>
+      <p><strong>NO usar antibióticos en:</strong> Gastroenteritis por Salmonella (portadores) y enteritis por EHEC (libera más toxina). Sí usar en: Shigella, Fiebre tifoidea, Campylobacter grave, H. pylori.</p>
+    </div>
+    <div class="exam-item">
+      <span class="exam-num">15</span>
+      <p><strong>Exotoxina A de P. aeruginosa</strong> = mismo mecanismo que toxina diftérica (inhibición de EF-2 por ADP-ribosilación). Diferencia: la toxina diftérica actúa en todas las células eucariotas; la de Pseudomonas tiene mayor tropismo hepático/pulmonar.</p>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<footer class="footer">
+  <p>Fuente primaria: <span>Jawetz, Melnick & Adelberg's Medical Microbiology</span> (Lange) · Murray, Rosenthal & Pfaller — Medical Microbiology</p>
+  <p>Elaborado para <span>André</span> · 3er Semestre · Universidad Central del Paraguay — Filial Pedro Juan Caballero</p>
+  <p style="margin-top:0.5rem; color: #3a3a4a;">Material académico de estudio · Para uso educativo</p>
+</footer>
+
+<script>
+  function toggleCard(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.card-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+  }
+
+  let allOpen = false;
+  function toggleAll() {
+    allOpen = !allOpen;
+    document.querySelectorAll('.card-body').forEach(b => b.classList.toggle('open', allOpen));
+    document.querySelectorAll('.card-toggle').forEach(t => t.classList.toggle('open', allOpen));
+    document.querySelector('.expand-all-btn').textContent = allOpen
+      ? '▲ Contraer todos los organismos'
+      : '▼ Expandir todos los organismos';
+  }
+
+  // Smooth scroll
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        // Auto-open card
+        const body = target.querySelector('.card-body');
+        const toggle = target.querySelector('.card-toggle');
+        if (body && !body.classList.contains('open')) {
+          body.classList.add('open');
+          if (toggle) toggle.classList.add('open');
+        }
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genética Médica — Resumen Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d14;
+    --surface: #13151f;
+    --surface2: #1a1d2e;
+    --border: #1f2336;
+    --cyan: #00e5ff;
+    --purple: #a855f7;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --purple-dim: rgba(168,85,247,0.12);
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --sidebar-w: 280px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  /* SIDEBAR */
+  #sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .sidebar-header {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(168,85,247,0.05));
+  }
+  .sidebar-logo { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.7; }
+  .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: var(--text); text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.3; }
+  .sidebar-subtitle { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; }
+  nav { flex: 1; padding: 12px 0; }
+  .nav-section { padding: 8px 16px 4px; font-family: 'Space Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 16px;
+    cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s;
+    text-decoration: none; color: var(--text); opacity: 0.65; font-size: 13px;
+  }
+  .nav-item:hover { opacity: 1; background: var(--cyan-dim); }
+  .nav-item.active { border-left-color: var(--cyan); background: var(--cyan-dim); opacity: 1; color: var(--cyan); font-weight: 600; }
+  .nav-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--purple); min-width: 18px; }
+  .nav-quiz {
+    margin: 12px 16px; background: linear-gradient(135deg, var(--purple-dim), var(--cyan-dim));
+    border: 1px solid var(--purple); border-radius: 8px; padding: 10px 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--purple); transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-quiz:hover { filter: brightness(1.2); transform: translateY(-1px); }
+  /* MAIN */
+  #main { margin-left: var(--sidebar-w); flex: 1; max-width: calc(100vw - var(--sidebar-w)); }
+  .top-strip { height: 4px; background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan)); background-size: 200%; animation: shimmer 3s linear infinite; }
+  @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+  /* BRAND BADGE */
+  .brand-badge { margin: 36px auto 0; max-width: 900px; padding: 0 40px; }
+  .brand-card {
+    display: inline-flex; flex-direction: column; align-items: flex-start;
+    background: var(--surface2); border: 1px solid var(--cyan); border-radius: 12px;
+    padding: 14px 22px 12px; box-shadow: 0 0 24px rgba(0,229,255,0.12); position: relative; overflow: hidden;
+  }
+  .brand-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+  .brand-name {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; text-transform: uppercase; letter-spacing: 0.08em;
+    background: linear-gradient(90deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .brand-code { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.18em; margin-top: 2px; }
+  /* HERO */
+  .hero { padding: 28px 40px 48px; max-width: 900px; margin: 0 auto; }
+  .course-tag {
+    display: inline-block; background: var(--cyan-dim); border: 1px solid var(--cyan);
+    border-radius: 4px; padding: 3px 10px; font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 18px;
+  }
+  .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .hero h1 span { background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-meta { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+  /* SECTIONS */
+  .content-section { padding: 48px 40px; max-width: 900px; margin: 0 auto; border-top: 1px solid var(--border); scroll-margin-top: 24px; }
+  .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .section-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--purple); background: var(--purple-dim); border: 1px solid var(--purple); border-radius: 4px; padding: 4px 8px; white-space: nowrap; margin-top: 4px; }
+  .section-header-text h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .section-header-text p { font-size: 13px; color: var(--muted); font-style: italic; }
+  /* CARDS */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .card-grid.col3 { grid-template-columns: repeat(3, 1fr); }
+  .card-grid.col1 { grid-template-columns: 1fr; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; transition: border-color 0.2s, box-shadow 0.2s; }
+  .card:hover { border-color: var(--cyan); box-shadow: 0 0 16px rgba(0,229,255,0.08); }
+  .card.c-cyan { border-left: 3px solid var(--cyan); }
+  .card.c-purple { border-left: 3px solid var(--purple); }
+  .card.c-green { border-left: 3px solid var(--green); }
+  .card.c-amber { border-left: 3px solid var(--amber); }
+  .card.c-red { border-left: 3px solid var(--red); }
+  .card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; color: var(--cyan); }
+  .card.c-purple h3 { color: var(--purple); }
+  .card.c-green h3 { color: var(--green); }
+  .card.c-amber h3 { color: var(--amber); }
+  .card.c-red h3 { color: var(--red); }
+  .card p, .card li { font-size: 13.5px; color: #94a3b8; line-height: 1.65; }
+  .card ul { padding-left: 16px; }
+  .card ul li { margin-bottom: 4px; }
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 28px; margin: 20px 0; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--cyan), var(--purple)); }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); border: 2px solid var(--bg); }
+  .timeline-year { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--cyan); margin-bottom: 2px; }
+  .timeline-text { font-size: 13.5px; color: #94a3b8; }
+  /* CONCEPT LIST */
+  .concept-list { margin: 16px 0; }
+  .concept-item { display: flex; gap: 12px; padding: 12px 16px; border-radius: 8px; margin-bottom: 6px; background: var(--surface); border: 1px solid var(--border); align-items: flex-start; }
+  .concept-term { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--cyan); min-width: 140px; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 1px; }
+  .concept-def { font-size: 13.5px; color: #94a3b8; line-height: 1.55; }
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  .data-table th { background: var(--surface2); padding: 10px 14px; text-align: left; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cyan); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: #94a3b8; }
+  .data-table tr:hover td { background: var(--surface2); }
+  /* CALLOUT */
+  .callout { background: var(--cyan-dim); border-left: 3px solid var(--cyan); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; color: #94a3b8; }
+  .callout strong { color: var(--cyan); }
+  .callout.purple { background: var(--purple-dim); border-left-color: var(--purple); }
+  .callout.purple strong { color: var(--purple); }
+  /* PILL */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .pill-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan); }
+  .pill-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid var(--purple); }
+  .pill-amber { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid var(--amber); }
+  /* SUB HEADING */
+  .sub-heading { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); margin: 28px 0 12px; display: flex; align-items: center; gap: 10px; }
+  .sub-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  /* QUIZ */
+  #quiz-section { padding: 48px 40px 80px; max-width: 900px; margin: 0 auto; border-top: 1px solid var(--border); scroll-margin-top: 24px; }
+  .quiz-header { text-align: center; margin-bottom: 40px; }
+  .quiz-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; text-transform: uppercase; letter-spacing: 0.06em; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+  .quiz-header p { color: var(--muted); font-size: 14px; }
+  .progress-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 100px; height: 6px; margin: 20px 0; overflow: hidden; }
+  #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius: 100px; transition: width 0.4s ease; }
+  .quiz-question { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+  .quiz-question.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .q-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.1em; }
+  .q-counter { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+  .q-text { font-size: 16px; font-weight: 500; margin-bottom: 20px; color: var(--text); line-height: 1.5; }
+  .q-options { display: flex; flex-direction: column; gap: 10px; }
+  .q-option { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; cursor: pointer; font-size: 14px; color: #94a3b8; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+  .q-option:hover:not(.locked) { border-color: var(--cyan); color: var(--text); background: var(--cyan-dim); }
+  .q-option.correct { border-color: var(--green); background: rgba(16,185,129,0.1); color: var(--green); }
+  .q-option.wrong { border-color: var(--red); background: rgba(239,68,68,0.1); color: var(--red); }
+  .q-option.locked { cursor: not-allowed; }
+  .opt-key { font-family: 'Space Mono', monospace; font-size: 10px; width: 22px; height: 22px; border-radius: 4px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; }
+  .q-feedback { display: none; margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; }
+  .q-feedback.show { display: block; }
+  .q-feedback.ok { background: rgba(16,185,129,0.1); border: 1px solid var(--green); color: var(--green); }
+  .q-feedback.nope { background: rgba(239,68,68,0.1); border: 1px solid var(--red); color: #94a3b8; }
+  .q-feedback .exp { color: #94a3b8; margin-top: 6px; font-size: 13px; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .btn { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #0b0d14; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+  .btn-ghost:disabled { opacity: 0.3; cursor: not-allowed; }
+  #score-card { display: none; text-align: center; padding: 48px 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-top: 20px; }
+  #score-card.show { display: block; animation: fadeIn 0.5s ease; }
+  .score-ring { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--cyan) 0%, var(--border) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; position: relative; }
+  .score-ring::before { content: ''; position: absolute; width: 76px; height: 76px; border-radius: 50%; background: var(--surface); }
+  .score-num { position: relative; z-index: 1; font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--cyan); }
+  .score-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; text-transform: uppercase; margin-bottom: 8px; }
+  .score-msg { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .score-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .score-stat-num { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--cyan); }
+  .score-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  #retry-btn { background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #0b0d14; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; padding: 14px 32px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s; }
+  #retry-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+  #menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; cursor: pointer; color: var(--cyan); font-size: 18px; }
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    #sidebar.open { transform: translateX(0); }
+    #main { margin-left: 0; max-width: 100vw; padding-top: 50px; }
+    #menu-toggle { display: block; }
+    .card-grid { grid-template-columns: 1fr; }
+    .card-grid.col3 { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: 1fr; }
+    .hero { padding: 20px 20px 36px; }
+    .content-section, #quiz-section { padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Universidad Central del Paraguay</div>
+    <div class="sidebar-title">Genética Médica</div>
+    <div class="sidebar-subtitle">Dr. Roberto Ottoni · 8 clases</div>
+  </div>
+  <nav>
+    <div class="nav-section">Contenido</div>
+    <a class="nav-item" href="#c1" onclick="navClick(this)"><span class="nav-num">01</span> Introducción e Historia</a>
+    <a class="nav-item" href="#c2" onclick="navClick(this)"><span class="nav-num">02</span> Material Genético y Mendel</a>
+    <a class="nav-item" href="#c3" onclick="navClick(this)"><span class="nav-num">03</span> ADN, Cromosomas y Cariotipo</a>
+    <a class="nav-item" href="#c4" onclick="navClick(this)"><span class="nav-num">04</span> Errores Innatos del Metabolismo</a>
+    <a class="nav-item" href="#c5" onclick="navClick(this)"><span class="nav-num">05</span> Tipificación Sanguínea</a>
+    <a class="nav-item" href="#c6" onclick="navClick(this)"><span class="nav-num">06</span> Hemoglobinopatías</a>
+    <a class="nav-item" href="#c7" onclick="navClick(this)"><span class="nav-num">07</span> Aberraciones Numéricas</a>
+    <a class="nav-item" href="#c8" onclick="navClick(this)"><span class="nav-num">08</span> Aberraciones Estructurales</a>
+    <div class="nav-section" style="margin-top:12px;">Evaluación</div>
+    <a class="nav-quiz" href="#quiz-section" onclick="navClick(this)">⚡ Cuestionario Final</a>
+  </nav>
+</aside>
+<main id="main">
+  <div class="top-strip"></div>
+  <div class="brand-badge">
+    <div class="brand-card">
+      <div class="brand-name">André Luiz Miranda Suzano</div>
+      <div class="brand-code">3H</div>
+    </div>
+  </div>
+  <div class="hero">
+    <div class="course-tag">Genética Médica · Resumen Completo</div>
+    <h1>Genética Médica<br><span>Resumen Integral</span></h1>
+    <p class="hero-meta">Dr. Roberto Ottoni · 8 clases · Universidad Central del Paraguay</p>
+  </div>
+
+  <!-- CLASE 1 -->
+  <section class="content-section" id="c1">
+    <div class="section-header">
+      <div class="section-num">CLASE 01</div>
+      <div class="section-header-text">
+        <h2>Introducción e Historia de la Genética</h2>
+        <p>Origen del pensamiento genético y conceptos fundamentales</p>
+      </div>
+    </div>
+    <div class="callout"><strong>Definición:</strong> La Genética Médica es la rama de la Biología que estudia la herencia y los métodos mediante los cuales las características pasan de una generación a otra.</div>
+    <div class="sub-heading">Línea del tiempo histórica</div>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-year">460–370 a.C.</div><div class="timeline-text"><strong>Hipócrates:</strong> "Semillas" producidas en distintas partes del cuerpo transmitidas en la concepción.</div></div>
+      <div class="timeline-item"><div class="timeline-year">384–322 a.C.</div><div class="timeline-text"><strong>Aristóteles:</strong> Mezcla del semen masculino con fluido femenino en la concepción.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1684</div><div class="timeline-text"><strong>Leeuwenhoek:</strong> Describe espermatozoides. Propone la teoría de los "homúnculos".</div></div>
+      <div class="timeline-item"><div class="timeline-year">1866</div><div class="timeline-text"><strong>Gregor Mendel:</strong> Padre de la genética. Descubre las leyes básicas de la herencia y el papel de los genes.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1869</div><div class="timeline-text"><strong>Friedrich Miescher:</strong> Descubre la nucleína (ADN) en núcleos de células animales.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1905</div><div class="timeline-text"><strong>William Bateson:</strong> Acuña el término "genética".</div></div>
+      <div class="timeline-item"><div class="timeline-year">1909</div><div class="timeline-text"><strong>Wilhelm Johannsen:</strong> Introduce los términos <em>gen</em>, <em>genotipo</em> y <em>fenotipo</em>.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1982</div><div class="timeline-text">Primer ratón transgénico. Eli Lilly produce insulina por ADN recombinante.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1996</div><div class="timeline-text"><strong>Ian Wilmut:</strong> Primera oveja clonada: "Dolly".</div></div>
+      <div class="timeline-item"><div class="timeline-year">2001</div><div class="timeline-text">Primer borrador del Genoma Humano. Inicio de la era postgenómica.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2010</div><div class="timeline-text"><strong>Craig Venter:</strong> Primera "célula sintética" creada artificialmente.</div></div>
+    </div>
+    <div class="sub-heading">Conceptos Básicos</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-term">Fenotipo</div><div class="concept-def">Características observables del genotipo, influenciadas también por el ambiente.</div></div>
+      <div class="concept-item"><div class="concept-term">Genotipo</div><div class="concept-def">Conjunto de genes de un organismo.</div></div>
+      <div class="concept-item"><div class="concept-term">Gen</div><div class="concept-def">Segmento específico de ADN responsable de una característica. Unidad funcional de la herencia.</div></div>
+      <div class="concept-item"><div class="concept-term">Alelo</div><div class="concept-def">Formas alternativas de un gen en el mismo locus. Término acuñado por William Bateson.</div></div>
+      <div class="concept-item"><div class="concept-term">Locus</div><div class="concept-def">Lugar específico de un gen en un cromosoma.</div></div>
+      <div class="concept-item"><div class="concept-term">Homocigoto</div><div class="concept-def">Organismo con alelos iguales (AA o aa). También llamado raza pura.</div></div>
+      <div class="concept-item"><div class="concept-term">Heterocigoto</div><div class="concept-def">Organismo con dos alelos diferentes (Aa). El alelo dominante se expresa.</div></div>
+      <div class="concept-item"><div class="concept-term">Cariotipo</div><div class="concept-def">Representación física del conjunto de cromosomas de una especie, clasificados por tamaño, posición del centrómero y patrón de bandas.</div></div>
+    </div>
+  </section>
+
+  <!-- CLASE 2 -->
+  <section class="content-section" id="c2">
+    <div class="section-header">
+      <div class="section-num">CLASE 02</div>
+      <div class="section-header-text">
+        <h2>Material Genético y Leyes de Mendel</h2>
+        <p>ADN, variabilidad genética y principios hereditarios</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card c-cyan">
+        <h3>El Material Genético</h3>
+        <ul>
+          <li>En eucariotas, almacenado en el núcleo celular</li>
+          <li>Casi siempre es <strong>ADN</strong>; el primero fue probablemente ARN</li>
+          <li>La doble cadena del ADN permite corregir mutaciones</li>
+          <li>Tres nucleótidos forman un <strong>codón</strong> → aminoácido (Traducción)</li>
+        </ul>
+      </div>
+      <div class="card c-purple">
+        <h3>Variabilidad Genética</h3>
+        <ul>
+          <li>Variaciones en el material genético de una misma especie</li>
+          <li>Más variación = mayor ritmo evolutivo (Teorema de Fisher)</li>
+          <li>Fuentes: <strong>Mutaciones</strong> y <strong>Recombinación sexual</strong></li>
+          <li>23 pares de cromosomas → 8,4 millones de combinaciones posibles</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sub-heading">Leyes de Mendel</div>
+    <div class="card-grid">
+      <div class="card c-green">
+        <h3>1.ª Ley — Segregación</h3>
+        <p>Los miembros de un par de alelos se <strong>separan en los gametos</strong>. Cuando se cruzan dos homocigóticos, todos los hijos de F1 son iguales.</p>
+      </div>
+      <div class="card c-amber">
+        <h3>2.ª Ley — Transmisión Independiente</h3>
+        <p>Los miembros de diferentes pares de alelos se transmiten <strong>independientemente y al azar</strong>. En F2: 75% dominante, 25% recesivo.</p>
+      </div>
+    </div>
+    <div class="callout purple"><strong>Terminología esencial:</strong> AA = homocigótico dominante · aa = homocigótico recesivo · Aa = heterocigótico</div>
+  </section>
+
+  <!-- CLASE 3 -->
+  <section class="content-section" id="c3">
+    <div class="section-header">
+      <div class="section-num">CLASE 03</div>
+      <div class="section-header-text">
+        <h2>ADN, Cromosomas y Cariotipo</h2>
+        <p>Estructura cromosómica, clasificación y árbol genealógico</p>
+      </div>
+    </div>
+    <div class="sub-heading">Estructura Cromosómica</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-term">Centrómero</div><div class="concept-def">Constricción primaria. Divide el cromosoma en brazo corto (p) y brazo largo (q). Responsable del movimiento cromosómico en la división celular.</div></div>
+      <div class="concept-item"><div class="concept-term">Telómero</div><div class="concept-def">Extremo del cromosoma. Preserva la integridad estructural y sella las terminaciones.</div></div>
+      <div class="concept-item"><div class="concept-term">Cromátidas hermanas</div><div class="concept-def">Las dos hebras de un cromosoma duplicado, unidas por el centrómero.</div></div>
+    </div>
+    <div class="sub-heading">Clasificación Morfológica</div>
+    <div class="card-grid col3">
+      <div class="card c-cyan"><h3>Metacéntrico</h3><p>Centrómero central. Brazos prácticamente iguales.</p></div>
+      <div class="card c-purple"><h3>Submetacéntrico</h3><p>Centrómero en posición intermedia. Brazos desiguales.</p></div>
+      <div class="card c-amber"><h3>Acrocéntrico</h3><p>Centrómero terminal. Puede presentar <em>satélites</em> con genes para ARN ribosomal.</p></div>
+    </div>
+    <div class="sub-heading">Grupos Cromosómicos</div>
+    <table class="data-table">
+      <thead><tr><th>Grupo</th><th>Cromosomas</th><th>Morfología</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>1–3</td><td>Metacéntricos grandes</td></tr>
+        <tr><td>B</td><td>4–5</td><td>Submetacéntricos grandes</td></tr>
+        <tr><td>C</td><td>6–12 + X</td><td>Submetacéntricos medianos</td></tr>
+        <tr><td>D</td><td>13–15</td><td>Acrocéntricos grandes (con satélites)</td></tr>
+        <tr><td>E</td><td>16–18</td><td>Metacéntricos/Submetacéntricos pequeños</td></tr>
+        <tr><td>F</td><td>19–20</td><td>Metacéntricos pequeños</td></tr>
+        <tr><td>G</td><td>21–22 + Y</td><td>Acrocéntricos pequeños</td></tr>
+        <tr><td>H (Sexuales)</td><td>XX / XY</td><td>Cromosomas sexuales</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>Cariotipo normal:</strong> 46 cromosomas (23 pares). Antes de la década de 1950 se creía erróneamente que eran 48.</div>
+    <div class="sub-heading">Heredograma (Árbol Genético)</div>
+    <div class="card c-cyan">
+      <h3>Herramienta esencial en genética médica</h3>
+      <p>Representación gráfica que mapea la salud familiar hasta el tercer grado. Permite identificar patrones de herencia (dominante, recesiva, ligada al sexo), calcular riesgos de enfermedades genéticas y orientar el asesoramiento genético.</p>
+    </div>
+  </section>
+
+  <!-- CLASE 4 -->
+  <section class="content-section" id="c4">
+    <div class="section-header">
+      <div class="section-num">CLASE 04</div>
+      <div class="section-header-text">
+        <h2>Errores Innatos del Metabolismo (EIM)</h2>
+        <p>Enfermedades genéticas por defectos enzimáticos específicos</p>
+      </div>
+    </div>
+    <div class="callout"><strong>Principio (Beadle &amp; Tatum):</strong> Un gen → Una enzima. Garrod introdujo la noción de individualidad química que condujo a las metabolicopatías congénitas.</div>
+    <div class="card-grid">
+      <div class="card c-cyan">
+        <h3>Características Generales</h3>
+        <ul>
+          <li>Enfermedades <strong>monogénicas</strong></li>
+          <li>Herencia <strong>autosómica recesiva</strong> en la mayoría</li>
+          <li>Más de 500 enfermedades descritas</li>
+          <li>Incidencia: ~1/1.000 recién nacidos</li>
+          <li>"Enfermedades raras tratables"</li>
+        </ul>
+      </div>
+      <div class="card c-purple">
+        <h3>Formas de Presentación</h3>
+        <ul>
+          <li><strong>Agudos neonatales:</strong> vómitos, letargia, coma, convulsiones</li>
+          <li><strong>Agudos recurrentes tardíos:</strong> por estrés metabólico</li>
+          <li><strong>Crónicos progresivos:</strong> retraso psicomotor</li>
+          <li><strong>Permanentes específicos:</strong> miocardiopatía, cataratas</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sub-heading">Fenilcetonuria (PKU)</div>
+    <div class="card-grid">
+      <div class="card c-green">
+        <h3>Genética y Fisiopatología</h3>
+        <ul>
+          <li>Gen: <strong>PAH</strong> — Cromosoma 12</li>
+          <li>Herencia: autosómica recesiva</li>
+          <li>Deficiencia de <strong>fenilalanina hidroxilasa</strong></li>
+          <li>Acumulación tóxica de fenilalanina</li>
+          <li>Incidencia: 1/10.000–1/15.000 RN</li>
+        </ul>
+      </div>
+      <div class="card c-amber">
+        <h3>Clínica (sin tratamiento)</h3>
+        <ul>
+          <li>RN normal al nacer</li>
+          <li>Discapacidad intelectual progresiva</li>
+          <li>Microcefalia, convulsiones</li>
+          <li>Olor a "ratón" en orina/piel</li>
+          <li>Hipopigmentación (piel clara, ojos azules), eczema</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Diagnóstico:</strong> Prueba del talón entre 3°–5° día de vida. <strong>Tratamiento:</strong> Dieta sin fenilalanina + fórmula especial de por vida. Sapropterina (respondedores a BH4).</div>
+    <div class="sub-heading">Homocistinuria</div>
+    <div class="card-grid">
+      <div class="card c-cyan">
+        <h3>Genética</h3>
+        <ul>
+          <li>Gen: <strong>CBS</strong> — Cromosoma 21q22.3</li>
+          <li>Deficiencia de <strong>cistationina beta-sintasa</strong></li>
+          <li>Acumulación de homocisteína y metionina</li>
+          <li>Frecuencia: 1/200.000–1/335.000 RN</li>
+        </ul>
+      </div>
+      <div class="card c-red">
+        <h3>Manifestaciones</h3>
+        <ul>
+          <li>Luxación del cristalino (ectopia lentis)</li>
+          <li>Aracnodactilia, escoliosis, osteoporosis</li>
+          <li><strong>Riesgo tromboembólico</strong> (principal morbimortalidad)</li>
+          <li>Discapacidad intelectual variable</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sub-heading">Galactosemia</div>
+    <div class="card-grid">
+      <div class="card c-purple">
+        <h3>Genética</h3>
+        <ul>
+          <li>Gen: <strong>GALT</strong> — Cromosoma 9p13</li>
+          <li>Herencia: autosómica recesiva</li>
+          <li>Incapacidad de convertir galactosa en glucosa</li>
+          <li>Incidencia: 1/50.000–1/60.000 RN</li>
+        </ul>
+      </div>
+      <div class="card c-amber">
+        <h3>Clínica y Complicaciones</h3>
+        <ul>
+          <li>Vómitos, ictericia, cataratas, hepatomegalia</li>
+          <li>Sepsis neonatal por <em>E. coli</em></li>
+          <li>A largo plazo: <strong>insuficiencia ovárica prematura</strong> (&gt;80%)</li>
+          <li>Déficit cognitivo, osteoporosis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Tratamiento:</strong> Suspensión INMEDIATA de lactancia materna. Dieta sin galactosa de por vida. Suplementos de calcio y vitamina D.</div>
+  </section>
+
+  <!-- CLASE 5 -->
+  <section class="content-section" id="c5">
+    <div class="section-header">
+      <div class="section-num">CLASE 05</div>
+      <div class="section-header-text">
+        <h2>Tipificación Sanguínea</h2>
+        <p>Sistema ABO y Factor Rh — herencia y determinación</p>
+      </div>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Genotipo</th><th>Fenotipo</th><th>Tipo de Alelo</th></tr></thead>
+      <tbody>
+        <tr><td>AO / AA</td><td>Tipo A</td><td><span class="pill pill-cyan">Dominante</span></td></tr>
+        <tr><td>BO / BB</td><td>Tipo B</td><td><span class="pill pill-cyan">Dominante</span></td></tr>
+        <tr><td>AB</td><td>Tipo AB</td><td><span class="pill pill-purple">Codominante</span></td></tr>
+        <tr><td>OO</td><td>Tipo O</td><td><span class="pill pill-amber">Recesivo</span></td></tr>
+        <tr><td>DD / Dd</td><td>Rh +</td><td><span class="pill pill-cyan">Dominante</span></td></tr>
+        <tr><td>dd</td><td>Rh −</td><td><span class="pill pill-amber">Recesivo</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>Prueba de tipificación:</strong> Anti-A (azul) · Anti-B (amarillo) · Anti-D (transparente). La aglutinación indica presencia del antígeno correspondiente en la membrana del glóbulo rojo.</div>
+    <div class="sub-heading">Ejemplos de Cruce</div>
+    <div class="card-grid">
+      <div class="card c-cyan"><h3>A+ (AODd) × AB– (ABdd)</h3><p>Descendencia posible: <strong>A+, AB+, A–, B–</strong></p></div>
+      <div class="card c-purple"><h3>A– (AOdd) × B+ het. (BODD)</h3><p>Descendencia posible: <strong>AB+, A+, B+, O+</strong></p></div>
+      <div class="card c-amber"><h3>O– (OOdd) × B+ hom. (BODD)</h3><p>Descendencia posible: <strong>B+, O+</strong> (igual proporción)</p></div>
+    </div>
+  </section>
+
+  <!-- CLASE 6 -->
+  <section class="content-section" id="c6">
+    <div class="section-header">
+      <div class="section-num">CLASE 06</div>
+      <div class="section-header-text">
+        <h2>Hemoglobinopatías</h2>
+        <p>Anemia falciforme y talasemias — fisiopatología y clínica</p>
+      </div>
+    </div>
+    <div class="card c-cyan">
+      <h3>Hemoglobina (Hb) — Concepto</h3>
+      <p>Proteína transportadora de O₂. 4 subunidades: 2α + 2β. Genes de cadenas <strong>α en cromosoma 16</strong>; cadenas <strong>β en cromosoma 11</strong>. La HbA predomina en adultos.</p>
+    </div>
+    <div class="card-grid" style="margin-top:16px;">
+      <div class="card c-purple"><h3>Variantes Estructurales (Cualitativo)</h3><p>Alteración en la secuencia de aminoácidos de la globina. Reduce la capacidad de transportar O₂. Ejemplo: <strong>Anemia Falciforme (HbS)</strong></p></div>
+      <div class="card c-amber"><h3>Talasemias (Cuantitativo)</h3><p>Pérdida de una o más cadenas de globina. Estructura normal, producción insuficiente. Tipos: <strong>Alfa-talasemia</strong> y <strong>Beta-talasemia</strong></p></div>
+    </div>
+    <div class="sub-heading">Anemia Falciforme</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-term">Mutación</div><div class="concept-def">Sustitución puntual: <strong>Ácido glutámico → Valina</strong> en posición 6 de cadena β-globina → produce HbS en lugar de HbA.</div></div>
+      <div class="concept-item"><div class="concept-term">Fisiopatología</div><div class="concept-def">En condiciones de bajo O₂, HbS deforma el glóbulo rojo en "hoz" o media luna, obstruyendo vasos.</div></div>
+      <div class="concept-item"><div class="concept-term">Herencia</div><div class="concept-def">Autosómica recesiva. HbSS = enfermedad; HbAS = portador asintomático (rasgo falciforme).</div></div>
+      <div class="concept-item"><div class="concept-term">Epidemiología</div><div class="concept-def">Mayor frecuencia en África ecuatorial. Incidencia: 1:600 nacidos.</div></div>
+    </div>
+    <div class="card-grid">
+      <div class="card c-red">
+        <h3>Cuadro Clínico</h3>
+        <ul>
+          <li>Anemia hemolítica crónica (fatiga, palidez)</li>
+          <li>Crisis vaso-oclusivas (dolor, dactilitis)</li>
+          <li>Infartos: bazo, riñón, cerebro (ACV)</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <h3>Tratamiento</h3>
+        <ul>
+          <li>Ácido fólico, analgésicos, transfusiones</li>
+          <li><strong>Hidroxiurea:</strong> aumenta HbF fetal</li>
+          <li>Profilaxis con penicilina en niños</li>
+          <li><strong>Curativo:</strong> Trasplante de médula ósea</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Diagnóstico clave:</strong> Electroforesis de hemoglobina. En anemia falciforme: HbS predominante, ausencia de HbA.</div>
+    <div class="sub-heading">Talasemias — Cuadro Comparativo</div>
+    <table class="data-table">
+      <thead><tr><th>Genes mutados</th><th>Denominación</th><th>Cuadro Clínico</th></tr></thead>
+      <tbody>
+        <tr><td>1 gen α</td><td>Portador Silente</td><td>Asintomático</td></tr>
+        <tr><td>2 genes α</td><td>Rasgo Talasémico</td><td>Anemia microcítica leve</td></tr>
+        <tr><td>3 genes α</td><td>Enfermedad Hb H</td><td>Anemia hemolítica moderada/grave, esplenomegalia</td></tr>
+        <tr><td>4 genes α</td><td>Hidropesía fetal</td><td>Incompatible con la vida</td></tr>
+        <tr><td>1 gen β</td><td>Beta-talasemia Menor</td><td>Asintomático o anemia leve</td></tr>
+        <tr><td>2 genes β (graves)</td><td>Beta-talasemia Mayor (Cooley)</td><td>Anemia grave, deformidades óseas, transfusión-dependiente</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- CLASE 7 -->
+  <section class="content-section" id="c7">
+    <div class="section-header">
+      <div class="section-num">CLASE 07</div>
+      <div class="section-header-text">
+        <h2>Aberraciones Cromosómicas Numéricas</h2>
+        <p>Poliploidías, aneuploidías y principales síndromes</p>
+      </div>
+    </div>
+    <div class="callout"><strong>Definición:</strong> Cuando un complemento cromosómico presenta cualquier número de cromosomas distinto de 46. Causas: errores en la división celular, radiación o agentes químicos.</div>
+    <div class="card-grid">
+      <div class="card c-cyan">
+        <h3>Poliploidías (Euploidías)</h3>
+        <ul>
+          <li><strong>Triploidía (3n):</strong> 69 cromosomas. Causa: dispermia o fallos meióticos.</li>
+          <li><strong>Tetraploidía (4n):</strong> 92 cromosomas. Causa: fallo en división temprana del cigoto.</li>
+        </ul>
+      </div>
+      <div class="card c-purple">
+        <h3>Aneuploidías</h3>
+        <p>Número de cromosomas no es múltiplo exacto del haploide.</p>
+        <ul style="margin-top:8px">
+          <li><strong>Trisomías:</strong> 47 cromosomas (+1)</li>
+          <li><strong>Monosomías:</strong> 45 cromosomas (−1)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sub-heading">Principales Síndromes</div>
+    <table class="data-table">
+      <thead><tr><th>Síndrome</th><th>Cariotipo</th><th>Características principales</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Down</strong></td><td>Trisomía 21 (47,+21)</td><td>Discapacidad intelectual, hipotonicidad, facies característica, cardiopatías congénitas</td></tr>
+        <tr><td><strong>Edwards</strong></td><td>Trisomía 18 (47,+18)</td><td>Malformaciones múltiples, puño cerrado típico, alta mortalidad neonatal</td></tr>
+        <tr><td><strong>Patau</strong></td><td>Trisomía 13 (47,+13)</td><td>Holoprosencefalia, polidactilia, labio/paladar hendido, supervivencia &lt;1 año</td></tr>
+        <tr><td><strong>Turner</strong></td><td>Monosomía X (45,X)</td><td>Mujeres: baja talla, cuello alado, amenorrea, infertilidad</td></tr>
+        <tr><td><strong>Klinefelter</strong></td><td>47,XXY</td><td>Hombres: ginecomastia, hipogonadismo, infertilidad, talla alta</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- CLASE 8 -->
+  <section class="content-section" id="c8">
+    <div class="section-header">
+      <div class="section-num">CLASE 08</div>
+      <div class="section-header-text">
+        <h2>Aberraciones Cromosómicas Estructurales</h2>
+        <p>Reordenamientos por ruptura cromosómica: balanceadas y no balanceadas</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card c-cyan"><h3>Balanceadas</h3><p>Se mantiene el complemento normal (sin pérdida ni ganancia de material). Ej: Inversiones, Translocaciones recíprocas, Translocaciones robertsonianas.</p></div>
+      <div class="card c-red"><h3>No Balanceadas</h3><p>Existe pérdida o ganancia de material genético. Ej: Deleciones, Duplicaciones, Isocromosomas.</p></div>
+    </div>
+    <div class="sub-heading">Aberraciones Balanceadas</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-term">Inversión Paracéntrica</div><div class="concept-def">Las dos rupturas ocurren en el <strong>mismo brazo</strong>. El fragmento invertido NO incluye el centrómero.</div></div>
+      <div class="concept-item"><div class="concept-term">Inversión Pericéntrica</div><div class="concept-def">Una ruptura en cada brazo. El fragmento invertido <strong>incluye el centrómero</strong>.</div></div>
+      <div class="concept-item"><div class="concept-term">Translocación Recíproca</div><div class="concept-def">Intercambio de segmentos entre cromosomas NO homólogos.</div></div>
+      <div class="concept-item"><div class="concept-term">Translocación Robertsoniana</div><div class="concept-def">Ruptura a nivel del centrómero en dos cromosomas acrocéntricos → fusión de brazos largos. Resultado: 45 cromosomas. Relacionada con Síndrome de Down familiar.</div></div>
+    </div>
+    <div class="callout purple"><strong>Manifestaciones de balanceadas:</strong> Infertilidad · Abortos espontáneos a repetición · Hijos malformados · Muerte neonatal en la descendencia.</div>
+    <div class="sub-heading">Aberraciones No Balanceadas</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-term">Deleción Terminal</div><div class="concept-def">Pérdida del segmento en el extremo del cromosoma.</div></div>
+      <div class="concept-item"><div class="concept-term">Deleción Intersticial</div><div class="concept-def">Pérdida interna a lo largo de uno de los brazos del cromosoma.</div></div>
+      <div class="concept-item"><div class="concept-term">Deleción en Anillo</div><div class="concept-def">Dos rupturas terminales → extremos se unen formando estructura circular.</div></div>
+      <div class="concept-item"><div class="concept-term">Duplicación (dup)</div><div class="concept-def">Un segmento cromosómico se encuentra repetido. Material genético extra.</div></div>
+      <div class="concept-item"><div class="concept-term">Isocromosoma (i)</div><div class="concept-def">Se pierde un brazo y el otro se duplica. El cromosoma tiene dos copias del mismo brazo.</div></div>
+    </div>
+    <div class="callout"><strong>Ejemplo clínico:</strong> Síndrome Cri du Chat = del(5p). Llanto agudo similar al maullido, microcefalia, discapacidad intelectual.</div>
+    <div class="callout"><strong>Manifestaciones de no balanceadas:</strong> Alteraciones anatómicas · Alteraciones en el crecimiento y desarrollo · Alteraciones neurológicas.</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz-section">
+    <div class="quiz-header">
+      <div class="course-tag">Evaluación Final</div>
+      <h2>Cuestionario de Genética Médica</h2>
+      <p>20 preguntas de opción múltiple · Pon a prueba tu conocimiento</p>
+      <div class="progress-bar-wrap"><div id="progress-bar"></div></div>
+      <p id="progress-text" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px;">Pregunta <span id="q-current">1</span> de 20</p>
+    </div>
+    <div id="quiz-container"></div>
+    <div class="quiz-nav" id="quiz-nav">
+      <button class="btn btn-ghost" id="prev-btn" onclick="prevQ()" disabled>← Anterior</button>
+      <button class="btn btn-primary" id="next-btn" onclick="nextQ()" disabled>Siguiente →</button>
+    </div>
+    <div id="score-card">
+      <div class="score-ring"><div class="score-num" id="score-pct">—%</div></div>
+      <div class="score-title" id="score-title">Resultado</div>
+      <p class="score-msg" id="score-msg"></p>
+      <div class="score-grid">
+        <div class="score-stat"><div class="score-stat-num" id="s-correct">—</div><div class="score-stat-label">Correctas</div></div>
+        <div class="score-stat"><div class="score-stat-num" id="s-wrong">—</div><div class="score-stat-label">Incorrectas</div></div>
+        <div class="score-stat"><div class="score-stat-num">20</div><div class="score-stat-label">Total</div></div>
+      </div>
+      <button id="retry-btn" onclick="resetQuiz()">↺ Reintentar</button>
+    </div>
+  </section>
+</main>
+
+<script>
+function navClick(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+// Scroll spy
+const sectionIds = ['c1','c2','c3','c4','c5','c6','c7','c8','quiz-section'];
+window.addEventListener('scroll', () => {
+  let current = '';
+  sectionIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 100) current = id;
+  });
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(n => n.classList.remove('active'));
+  const idx = sectionIds.indexOf(current);
+  if (idx >= 0 && navItems[idx]) navItems[idx].classList.add('active');
+});
+
+// Quiz
+const questions = [
+  { topic:'Clase 1 — Historia', q:'¿Quién acuñó por primera vez el término "genética" en 1905?', opts:['Gregor Mendel','Wilhelm Johannsen','William Bateson','Thomas Hunt Morgan'], ans:2, exp:'William Bateson (1905) fue quien usó el término "genética" para designar "la ciencia dedicada al estudio de la herencia y de la variación".' },
+  { topic:'Clase 1 — Conceptos', q:'¿Cómo se denomina el lugar específico que ocupa un gen en un cromosoma?', opts:['Alelo','Locus','Centrómero','Telómero'], ans:1, exp:'El locus es el lugar específico que ocupa un gen en un cromosoma. Los alelos son las formas alternativas del gen que pueden ocupar el mismo locus.' },
+  { topic:'Clase 2 — Material genético', q:'¿Cuántas combinaciones diferentes puede producir cada par de los 23 cromosomas humanos?', opts:['1 millón','4,2 millones','8,4 millones','23 millones'], ans:2, exp:'Cada par de los 23 cromosomas puede generar 8,4 millones de combinaciones, lo que explica la enorme variabilidad en la reproducción sexual.' },
+  { topic:'Clase 2 — Mendel', q:'¿Qué establece la Primera Ley de Mendel (Ley de la Segregación)?', opts:['Los caracteres se mezclan en la descendencia','Los alelos de un par se separan en los gametos','Los genes de diferentes pares se transmiten juntos','El alelo dominante elimina al recesivo definitivamente'], ans:1, exp:'La Primera Ley establece que los miembros de un par de alelos se separan en los gametos, y cada gameto lleva solo uno de los dos alelos del par.' },
+  { topic:'Clase 3 — Cromosomas', q:'¿Qué tipo morfológico de cromosoma tiene el centrómero en posición terminal y puede presentar satélites?', opts:['Metacéntrico','Submetacéntrico','Acrocéntrico','Telocéntrico'], ans:2, exp:'Los cromosomas acrocéntricos tienen el centrómero en posición terminal. Algunos presentan satélites con genes para ARN ribosomal.' },
+  { topic:'Clase 3 — Cariotipo', q:'¿Cuál es el número correcto de cromosomas en una célula humana somática normal?', opts:['44','46','48','23'], ans:1, exp:'El número correcto de cromosomas en células somáticas humanas es 46 (23 pares). Antes de los años 50 se creía erróneamente que eran 48.' },
+  { topic:'Clase 4 — EIM', q:'¿Qué enzima está deficiente en la Fenilcetonuria (PKU)?', opts:['Cistationina beta-sintasa','Galactosa-1-fosfato uridiltransferasa','Fenilalanina hidroxilasa','Glucosa-6-fosfato deshidrogenasa'], ans:2, exp:'En la PKU hay deficiencia de fenilalanina hidroxilasa, que convierte la fenilalanina en tirosina. Sin esta enzima, la fenilalanina se acumula y causa daño neurológico.' },
+  { topic:'Clase 4 — EIM', q:'¿Cuál es la característica clínica más peligrosa de la Homocistinuria?', opts:['Cataratas congénitas','Riesgo tromboembólico elevado','Discapacidad intelectual grave','Hemólisis crónica'], ans:1, exp:'El riesgo tromboembólico es la principal causa de morbilidad y mortalidad en la Homocistinuria. Los pacientes pueden formar coágulos en cualquier vaso.' },
+  { topic:'Clase 4 — EIM', q:'¿Cuál es la complicación crónica más frecuente en mujeres con Galactosemia tratada?', opts:['Cataratas','Hepatocarcinoma','Insuficiencia ovárica prematura','Nefritis crónica'], ans:2, exp:'Más del 80% de las mujeres con Galactosemia desarrollan insuficiencia ovárica prematura a largo plazo, incluso con tratamiento dietético adecuado.' },
+  { topic:'Clase 5 — Grupos sanguíneos', q:'¿Qué tipo de herencia presentan los alelos A y B del sistema ABO entre sí?', opts:['A es dominante sobre B','B es dominante sobre A','Codominancia','Ambos son recesivos'], ans:2, exp:'Los alelos A y B son codominantes: cuando un individuo tiene genotipo AB, expresa ambos antígenos en la superficie del glóbulo rojo.' },
+  { topic:'Clase 5 — Grupos sanguíneos', q:'Una muestra aglutina con Anti-A y Anti-D, pero NO con Anti-B. ¿Cuál es el tipo de sangre?', opts:['AB positivo','B positivo','A positivo','O negativo'], ans:2, exp:'La aglutinación con Anti-A indica antígeno A (grupo A) y con Anti-D indica Rh positivo. Sin aglutinación con Anti-B. Tipo: A positivo.' },
+  { topic:'Clase 6 — Hemoglobinopatías', q:'¿Cuál es la mutación molecular responsable de la Anemia Falciforme?', opts:['Deleción de un gen de globina α','Sustitución de ácido glutámico por valina en cadena β-globina','Duplicación del gen HBB','Inserción en la cadena α-globina'], ans:1, exp:'La anemia falciforme se produce por una sustitución puntual que cambia ácido glutámico por valina en la posición 6 de la cadena β-globina, produciendo HbS.' },
+  { topic:'Clase 6 — Hemoglobinopatías', q:'¿En cuál cromosoma se localizan los genes que codifican las cadenas α de la hemoglobina?', opts:['Cromosoma 11','Cromosoma 16','Cromosoma 21','Cromosoma 6'], ans:1, exp:'Los genes de las cadenas α de la hemoglobina están en el cromosoma 16. Los genes de cadenas β están en el cromosoma 11.' },
+  { topic:'Clase 6 — Talasemias', q:'¿Qué cuadro clínico presenta la deleción de los 4 genes de alfa-globina?', opts:['Portador silente asintomático','Anemia leve microcítica','Anemia hemolítica moderada','Hidropesía fetal, incompatible con la vida'], ans:3, exp:'La deleción de los 4 genes de alfa-globina produce alfa-talasemia mayor (Hidropesía fetal), incompatible con la vida extrauterina.' },
+  { topic:'Clase 7 — Aberraciones numéricas', q:'¿Cuál de los siguientes síndromes corresponde a la Trisomía 18?', opts:['Síndrome de Down','Síndrome de Edwards','Síndrome de Patau','Síndrome de Turner'], ans:1, exp:'El Síndrome de Edwards corresponde a la Trisomía 18 (47,+18). Se caracteriza por malformaciones múltiples, puño cerrado y alta mortalidad neonatal.' },
+  { topic:'Clase 7 — Aberraciones numéricas', q:'¿Cuál es el cariotipo del Síndrome de Klinefelter?', opts:['45,X','47,XXY','47,+21','69,XXY'], ans:1, exp:'El Síndrome de Klinefelter tiene el cariotipo 47,XXY. Afecta solo a hombres y se caracteriza por ginecomastia, hipogonadismo e infertilidad.' },
+  { topic:'Clase 8 — Aberraciones estructurales', q:'¿Qué diferencia a una inversión pericéntrica de una paracéntrica?', opts:['La pericéntrica afecta solo el brazo corto','La pericéntrica incluye el centrómero en el fragmento invertido','La paracéntrica incluye el centrómero','La pericéntrica ocurre solo en autosomas'], ans:1, exp:'La inversión pericéntrica tiene una ruptura en cada brazo, por lo que el fragmento invertido incluye el centrómero. En la paracéntrica, ambas rupturas son en el mismo brazo.' },
+  { topic:'Clase 8 — Aberraciones estructurales', q:'¿Qué es una Translocación Robertsoniana?', opts:['Intercambio de segmentos entre cromosomas no homólogos','Pérdida de un segmento terminal','Fusión de brazos largos de dos cromosomas acrocéntricos resultando en 45 cromosomas','Duplicación de un segmento cromosómico'], ans:2, exp:'La Translocación Robertsoniana resulta de la ruptura a nivel del centrómero de dos cromosomas acrocéntricos con fusión de sus brazos largos. El resultado es 45 cromosomas.' },
+  { topic:'Clase 8 — Aberraciones estructurales', q:'¿Qué síndrome resulta de la deleción del brazo corto del cromosoma 5?', opts:['Síndrome de Williams','Síndrome Cri du Chat','Síndrome de Di George','Síndrome de Angelman'], ans:1, exp:'El Síndrome Cri du Chat resulta de la del(5p). Se caracteriza por llanto agudo similar al maullido, microcefalia y discapacidad intelectual.' },
+  { topic:'Integración', q:'¿Cuál es la ÚNICA opción curativa disponible para Anemia Falciforme y Talasemias graves?', opts:['Hidroxiurea','Transfusiones sanguíneas periódicas','Trasplante de médula ósea','Quelación de hierro'], ans:2, exp:'El trasplante de médula ósea (células madre hematopoyéticas) es la única opción curativa disponible. Las demás son soporte o manejo de complicaciones.' }
+];
+
+let current = 0;
+let answers = new Array(20).fill(null);
+let scores = new Array(20).fill(null);
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-question' + (i === 0 ? ' active' : '');
+    div.id = 'q_' + i;
+    div.innerHTML = `
+      <div class="q-header">
+        <span class="q-tag">${q.topic}</span>
+        <span class="q-counter">${i+1} / 20</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o,j) => `<div class="q-option" id="opt_${i}_${j}" onclick="selectAnswer(${i},${j})"><span class="opt-key">${['A','B','C','D'][j]}</span><span>${o}</span></div>`).join('')}
+      </div>
+      <div class="q-feedback" id="fb_${i}">
+        <div id="fb_text_${i}"></div>
+        <div class="exp" id="fb_exp_${i}"></div>
+      </div>`;
+    container.appendChild(div);
+  });
+  updateNav();
+}
+
+function selectAnswer(qIdx, optIdx) {
+  if (answers[qIdx] !== null) return;
+  answers[qIdx] = optIdx;
+  const correct = questions[qIdx].ans;
+  scores[qIdx] = optIdx === correct;
+  for (let j = 0; j < 4; j++) {
+    const opt = document.getElementById('opt_' + qIdx + '_' + j);
+    opt.classList.add('locked');
+    if (j === correct) opt.classList.add('correct');
+    if (j === optIdx && optIdx !== correct) opt.classList.add('wrong');
+  }
+  const fb = document.getElementById('fb_' + qIdx);
+  fb.classList.add('show');
+  if (optIdx === correct) {
+    fb.classList.add('ok');
+    document.getElementById('fb_text_' + qIdx).textContent = '✓ ¡Correcto!';
+  } else {
+    fb.classList.add('nope');
+    document.getElementById('fb_text_' + qIdx).textContent = '✗ Incorrecto. Respuesta correcta: ' + ['A','B','C','D'][correct] + ') ' + questions[qIdx].opts[correct];
+  }
+  document.getElementById('fb_exp_' + qIdx).textContent = questions[qIdx].exp;
+  updateNav();
+}
+
+function updateNav() {
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').disabled = answers[current] === null;
+  document.getElementById('next-btn').textContent = (current === 19 && answers[current] !== null) ? 'Ver Resultado →' : 'Siguiente →';
+  document.getElementById('q-current').textContent = current + 1;
+  const pct = ((current + (answers[current] !== null ? 1 : 0)) / 20) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function nextQ() {
+  if (current === 19) { showScore(); return; }
+  document.getElementById('q_' + current).classList.remove('active');
+  current++;
+  document.getElementById('q_' + current).classList.add('active');
+  updateNav();
+}
+
+function prevQ() {
+  document.getElementById('q_' + current).classList.remove('active');
+  current--;
+  document.getElementById('q_' + current).classList.add('active');
+  updateNav();
+}
+
+function showScore() {
+  document.getElementById('quiz-container').style.display = 'none';
+  document.getElementById('quiz-nav').style.display = 'none';
+  document.getElementById('progress-text').style.display = 'none';
+  const correct = scores.filter(Boolean).length;
+  const pct = Math.round((correct / 20) * 100);
+  const sc = document.getElementById('score-card');
+  sc.classList.add('show');
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('s-correct').textContent = correct;
+  document.getElementById('s-wrong').textContent = 20 - correct;
+  const deg = (correct / 20) * 360;
+  document.querySelector('.score-ring').style.background = `conic-gradient(var(--cyan) 0deg ${deg}deg, var(--purple) ${deg}deg ${Math.min(deg+20,360)}deg, var(--border) ${Math.min(deg+20,360)}deg 360deg)`;
+  let title, msg;
+  if (pct >= 90) { title = '¡Excelente!'; msg = 'Dominio sobresaliente de la Genética Médica. ¡Bien merecido, André!'; }
+  else if (pct >= 75) { title = '¡Muy bien!'; msg = 'Sólido conocimiento. Repasa los temas fallados y estarás perfecto.'; }
+  else if (pct >= 60) { title = 'Buen intento'; msg = 'Base razonable. Refuerza los conceptos de menor puntaje.'; }
+  else { title = 'A repasar'; msg = 'Vuelve al resumen, consolida los conceptos y vuelve a intentarlo.'; }
+  document.getElementById('score-title').textContent = title;
+  document.getElementById('score-msg').textContent = msg;
+}
+
+function resetQuiz() {
+  current = 0;
+  answers = new Array(20).fill(null);
+  scores = new Array(20).fill(null);
+  document.getElementById('score-card').classList.remove('show');
+  document.getElementById('quiz-container').style.display = '';
+  document.getElementById('quiz-nav').style.display = '';
+  document.getElementById('progress-text').style.display = '';
+  buildQuiz();
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

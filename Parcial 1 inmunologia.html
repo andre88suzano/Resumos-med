@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inmunología – Resumen Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: #12122a;
+    color: #1a1a2e;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  .page { max-width: 500px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0d2b5e 0%, #1a1a5e 100%);
+    border-radius: 20px;
+    padding: 22px 24px 18px;
+    margin-bottom: 22px;
+    color: white;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .header-icon { font-size: 24px; }
+  .header h1 { font-family: 'Nunito', sans-serif; font-size: 23px; font-weight: 900; letter-spacing: -0.5px; }
+  .header .subtitle { font-size: 12px; opacity: 0.65; margin-left: 34px; }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    font-size: 11px;
+    padding: 3px 10px;
+    margin-left: 34px;
+    margin-top: 8px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11.5px;
+    font-weight: 900;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #8892c8;
+    margin: 26px 0 10px 4px;
+  }
+
+  /* ── BASE CARD ── */
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    border-left: 5px solid #ccc;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+  .card-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #0d1b3e;
+  }
+  .card-body { font-size: 13px; line-height: 1.6; color: #3d4460; }
+  .card-body ul { padding-left: 16px; margin-top: 5px; }
+  .card-body li { margin-bottom: 3px; }
+  .card-body strong { color: #0d1b3e; font-weight: 700; }
+  .card-body em { color: #555; font-style: normal; font-size: 12px; }
+
+  /* color variants */
+  .c-blue   { border-color: #3d8ef0; background: #f0f6ff; }
+  .c-green  { border-color: #43b87c; background: #f0fbf5; }
+  .c-orange { border-color: #f0932b; background: #fff8f0; }
+  .c-purple { border-color: #8e44ad; background: #faf5ff; }
+  .c-red    { border-color: #e74c3c; background: #fff5f5; }
+  .c-teal   { border-color: #16a085; background: #f0fdf9; }
+  .c-pink   { border-color: #e91e8c; background: #fff0f8; }
+  .c-indigo { border-color: #5c6bc0; background: #f3f4ff; }
+  .c-yellow { border-color: #d4ac0d; background: #fffde7; }
+  .c-gray   { border-color: #7f8c8d; background: #f7f8f8; }
+  .c-navy   { border-color: #1a3a6c; background: #f0f3fa; }
+
+  /* ── HIGHLIGHT DEF ── */
+  .def-card {
+    background: #e9f1ff;
+    border-left: 5px solid #3d8ef0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .def-card p { font-size: 13.5px; line-height: 1.65; color: #0d1b3e; }
+  .def-card strong { color: #1a3a8c; }
+
+  /* ── COMPARE TWO COLUMNS ── */
+  .compare {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+  .compare-header { display: grid; grid-template-columns: 1fr 1fr; }
+  .compare-header div {
+    padding: 10px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 12.5px;
+    color: white;
+    text-align: center;
+  }
+  .compare-header .left  { background: #3d8ef0; }
+  .compare-header .right { background: #43b87c; }
+  .compare-header .left-red  { background: #e74c3c; }
+  .compare-header .right-purple { background: #8e44ad; }
+  .compare-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .compare-col {
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: #3d4460;
+    line-height: 1.55;
+    border-top: 1px solid #eee;
+  }
+  .compare-col:first-child { border-right: 1px solid #eee; }
+  .compare-col ul { padding-left: 14px; }
+  .compare-col li { margin-bottom: 3px; }
+  .compare-col strong { color: #0d1b3e; font-weight: 700; }
+
+  /* ── TABLE ── */
+  .table-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+  .table-card table { width: 100%; border-collapse: collapse; }
+  .table-card th {
+    background: #0d2b5e;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  .table-card td {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: #3d4460;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .table-card tr:last-child td { border-bottom: none; }
+  .table-card tr:nth-child(even) td { background: #f6f8ff; }
+  .table-card .note { font-size: 11px; color: #888; font-style: italic; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin: 2px 2px 2px 0;
+  }
+  .badge-blue   { background: #dbeeff; color: #1a5faf; }
+  .badge-green  { background: #d5f5e3; color: #1d6e44; }
+  .badge-orange { background: #fde5c0; color: #a04000; }
+  .badge-purple { background: #ead9f7; color: #6c2fa0; }
+  .badge-red    { background: #fde0dc; color: #9b1e13; }
+  .badge-teal   { background: #d1f5ec; color: #0e6655; }
+  .badge-gray   { background: #eaecef; color: #4a4a4a; }
+
+  /* ── ARROW ROW ── */
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 12.5px;
+    color: #3d4460;
+    padding: 5px 0;
+  }
+  .arrow-row .box {
+    background: white;
+    border: 1.5px solid #dde3f5;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0d1b3e;
+    white-space: nowrap;
+  }
+  .arrow { font-size: 14px; color: #7c8db5; }
+
+  /* ── MINI NOTE ── */
+  .mini-note {
+    background: rgba(255,255,255,0.06);
+    border-left: 3px solid #8892c8;
+    border-radius: 0 8px 8px 0;
+    padding: 8px 12px;
+    margin: 6px 0;
+    font-size: 12px;
+    color: #c0c8e8;
+    font-style: italic;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0 12px; }
+
+  /* animations */
+  .card, .compare, .table-card, .def-card {
+    animation: fadeUp 0.35s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══════════════ MARCA PESSOAL ═══════════════ -->
+  <div style="
+    background: #0e0e22;
+    border: 1.5px solid rgba(0,230,230,0.45);
+    border-radius: 16px;
+    padding: 16px 20px 14px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 18px rgba(0,230,230,0.18);
+  ">
+    <!-- faixa gradiente topo -->
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00e5ff,#a855f7,#00e5ff);"></div>
+    <!-- badge curso -->
+    <div style="
+      font-family:'Space Mono',monospace;
+      font-size:10px;
+      color:#6b7db3;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    ">🎓 Medicina · 3° Semestre · UCP</div>
+    <!-- nome -->
+    <div style="
+      font-family:'Syne',sans-serif;
+      font-weight:800;
+      font-size:19px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      background:linear-gradient(90deg,#00e5ff,#a855f7);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      line-height:1.1;
+      margin-bottom:6px;
+    ">André Luiz Miranda Suzano</div>
+    <!-- 3H -->
+    <div style="
+      font-family:'Space Mono',monospace;
+      font-size:11px;
+      color:#4a5580;
+      letter-spacing:4px;
+    ">3H</div>
+  </div>
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <div class="header">
+    <div class="header-top">
+      <span class="header-icon">🛡️</span>
+      <h1>Inmunología</h1>
+    </div>
+    <p class="subtitle">Resumen completo · Sistemas Innato y Adaptativo</p>
+    <div class="date-badge">📅 10/02/26 → 10/03/26</div>
+  </div>
+
+  <!-- ═══════════════ CAP 1 – INTRODUCCIÓN ═══════════════ -->
+  <div class="section-label">📌 Cap. 1 – Introducción</div>
+
+  <div class="def-card">
+    <p>El <strong>sistema inmune</strong> defiende contra: sustancias extrañas, microbios, células dañadas y células tumorales.<br>
+    Se comunica mediante <strong>quimiotaxis</strong> → comunicación por señales químicas.</p>
+  </div>
+
+  <div class="compare">
+    <div class="compare-header">
+      <div class="left">S. Innato</div>
+      <div class="right">S. Adaptativo (Adquirido)</div>
+    </div>
+    <div class="compare-body">
+      <div class="compare-col">
+        <ul>
+          <li>Nace con él</li>
+          <li>Respuesta: <strong>0–12 hs</strong></li>
+          <li>Inespecífico</li>
+          <li>Reconoce <strong>PAMP</strong> (patógenos) y <strong>DAMP</strong> (daño)</li>
+          <li>Baja diversidad celular</li>
+          <li><em>Los macrófagos poseen memoria residual</em></li>
+          <li>Evita producir células autoinmunes</li>
+          <li><strong>Activa</strong> el sistema adaptativo</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <ul>
+          <li>Adquirido individualmente</li>
+          <li>Respuesta: <strong>días</strong></li>
+          <li>Específico</li>
+          <li>Reconoce antígenos + sustancia específica</li>
+          <li>Alta diversidad celular</li>
+          <li><strong>Posee memoria</strong></li>
+          <li>Evita producir células autoinmunes</li>
+          <li>El innato lo <strong>potencia</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card c-navy">
+    <div class="card-title">Difteria (ejemplo Cap. 1)</div>
+    <div class="card-body">
+      Causada por <strong>Corynebacterium diphtheriae</strong> → produce <strong>toxina</strong> → tetano → la toxina. Vacuna: <strong>DTP</strong>. También vacuna contra la toxina (toxoide).
+    </div>
+  </div>
+
+  <!-- ═══════════════ CAP 2 – CÉLULAS DEL SISTEMA INMUNE ═══════════════ -->
+  <div class="section-label">🔬 Cap. 2 – Células del Sistema Inmune</div>
+
+  <div class="def-card">
+    <p>Células de defensa = <strong>Glóbulos blancos / Serie blanca / Leucocitos</strong>.<br>
+    También llamados: células de defensa o células del sistema inmunitario.</p>
+  </div>
+
+  <!-- Tabla de leucocitos -->
+  <div class="table-card">
+    <table>
+      <tr>
+        <th>Célula</th>
+        <th>Nº medio /mm³</th>
+        <th>Límites normales</th>
+      </tr>
+      <tr><td><strong>Leucocitos totales</strong></td><td>7.400</td><td>4.500–11.000/mm³</td></tr>
+      <tr><td>Neutrófilos</td><td>4.400</td><td>40–60% <span class="note">→ Infección: 60%+</span></td></tr>
+      <tr><td>Eosinófilos</td><td>200</td><td>1–4% <span class="note">→ Verme/Alergia: 8–20%</span></td></tr>
+      <tr><td>Basófilos</td><td>40</td><td>&lt;1% <span class="note">VIH: 12%–400/mm³</span></td></tr>
+      <tr><td>Linfocitos</td><td>2.500</td><td>20–40% <span class="note">→ Infección viral: 50–60%+</span></td></tr>
+      <tr><td>Monocitos (MØ)</td><td>300</td><td>2–8% <span class="note">→ Inflamación crónica: >10%</span></td></tr>
+    </table>
+  </div>
+
+  <!-- NEUTRÓFILOS -->
+  <div class="card c-blue">
+    <div class="card-title">🔵 Neutrófilos — Fagocitos Polimorfonucleares (PMN)</div>
+    <div class="card-body">
+      Mayor cantidad de leucocitos. Producen pus. <strong>Vida: 48 hs.</strong> Capacidad: corta y rápida.<br>
+      <ul>
+        <li>Reclutamiento por medio de <strong>citocinas</strong></li>
+        <li>Reconocimiento: <strong>PAMP</strong> y <strong>DAMP</strong></li>
+        <li>Activación → Ingesta → Destrucción</li>
+        <li><strong>NET (Red Neutrofílica):</strong> aislamiento de la infección</li>
+        <li>Sin apoptosis (No)</li>
+      </ul>
+      <br>
+      <strong>Diapédesis:</strong> fagosoma o vacuola digestiva = digestión + lisosoma
+    </div>
+  </div>
+
+  <!-- MACRÓFAGOS -->
+  <div class="card c-orange">
+    <div class="card-title">🟠 Macrófagos / MØ — Fagocitos Mononucleares</div>
+    <div class="card-body">
+      <strong>Origen:</strong> Médula → Hígado Fetal → Higado, Bazo, Saco vitelino.<br>
+      <strong>Vida:</strong> semanas / años. Capacidad: larga y prolongada. El proceso de digestión es más lento.<br><br>
+      <strong>Tipos:</strong>
+      <ul>
+        <li><strong>Macrófagos circulantes</strong> (monocitos)</li>
+        <li><strong>Macrófagos residentes</strong> (ej.: células de Kupffer en hígado)</li>
+      </ul>
+      <br>
+      <strong>Funciones:</strong>
+      <ul>
+        <li>Defensa del organismo, destrucción de microbios</li>
+        <li>Ingestión de células muertas</li>
+        <li>Amplificación en respuestas inmunológicas con reclutamiento</li>
+        <li>Sirven como <strong>APCs</strong> para el linfocito T → antigen present cells</li>
+        <li>Limpia el local infectado, evita que la infección aumente</li>
+      </ul>
+      <br>
+      <strong>Vías de activación:</strong>
+      <ul>
+        <li><strong>M1 / Clásica:</strong> fagocitación → destrucción de invasores → posee antígeno</li>
+        <li><strong>M2 / Alternativa:</strong> reparación y reestructuración → fibrosis y angiogénesis (tumores) → respuesta exagerada → pueden fusionarse → <strong>células gigantes (gigantocitos)</strong></li>
+      </ul>
+      <br>
+      <span class="badge badge-orange">Reminentes: activación de componente↑ → tejido</span><br>
+      <span class="badge badge-red">Explosión del macrófago → lesión tisular (del tejido)</span>
+    </div>
+  </div>
+
+  <!-- MASTOCITOS -->
+  <div class="card c-red">
+    <div class="card-title">🔴 Mastocitos → Células Fijas (no circulantes)</div>
+    <div class="card-body">
+      Repletos de: <strong>histamina</strong>, <strong>eotaxina</strong> y <strong>mucus</strong>. Encontrados en los tejidos.<br>
+      Efectos: vasodilatador, vasopermeabilidad.<br>
+      <ul>
+        <li>→ Infecciones parasitarias y alergias (Pruritoismo)</li>
+        <li><strong>Choque anafiláctico:</strong> explosión de los mastocitos → Apí (picadura de abeja)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- BASÓFILOS -->
+  <div class="card c-purple">
+    <div class="card-title">🟣 Basófilos → Granulocitos</div>
+    <div class="card-body">
+      Circulante. Receptores de <strong>IgE</strong>. Precursores de los mastocitos (menor concentración).
+    </div>
+  </div>
+
+  <!-- EOSINÓFILOS -->
+  <div class="card c-green">
+    <div class="card-title">🟢 Eosinófilos</div>
+    <div class="card-body">
+      Reaccionan contra <strong>parásitos</strong> y enfermedades alérgicas.<br>
+      Contienen enzimas lesivas para las membranas celulares de los parásitos <strong>helmintos</strong>.<br>
+      <ul>
+        <li>Desgranulación</li>
+        <li>Fagocítico / Limitados / Ineficaz</li>
+        <li>Son células mononucleares</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- NK -->
+  <div class="card c-teal">
+    <div class="card-title">🩵 NK – Natural Killer</div>
+    <div class="card-body">
+      No realizan fagocitosis. <strong>Matan células alteradas</strong> por la liberación de <strong>perforinas</strong>.<br>
+      Control de calidad del sistema inmune.<br>
+      <em>→ Personas trasplantadas son inmunosuprimidas para evitar rechazo</em>
+    </div>
+  </div>
+
+  <!-- APCs -->
+  <div class="card c-indigo">
+    <div class="card-title">🔷 APCs – Células Presentadoras de Antígenos</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Innato → MØ</strong></li>
+        <li><strong>Células dendríticas</strong> → presentan el antígeno</li>
+      </ul>
+      Adaptativo:
+      <ul>
+        <li><strong>LB:</strong> producen anticuerpos</li>
+        <li><strong>LT:</strong> guían la respuesta → Maduro / Inmature / Virgen (naive)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CÉLULAS DENDRÍTICAS -->
+  <div class="card c-indigo">
+    <div class="card-title">🔷 Células Dendríticas</div>
+    <div class="card-body">
+      No realizan fagocitosis sola, estimulan macrófagos o hacerlo. Son el <strong>vínculo del sistema innato al adaptativo</strong>.<br>
+      <strong>Tipos:</strong>
+      <ul>
+        <li><strong>Clásica:</strong> presenta antígeno</li>
+        <li><strong>Plasmocitoide:</strong> respuesta antiviral</li>
+        <li><strong>Inflamatoria:</strong> inflamación</li>
+        <li><strong>Langerhans:</strong> protección de la piel</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INFLAMACIÓN ═══════════════ -->
+  <div class="section-label">🔥 Sistema Innato – Inflamación</div>
+
+  <div class="def-card">
+    <p><strong>Inflamación</strong> = principal estrategia del sistema innato = mecanismo de defensa.<br>
+    <strong>Chemas/reclutan</strong> las células de defensa → <strong>Cambio de comportamiento</strong><br>
+    <strong>Diapédesis:</strong> las células migran para los tejidos (para dentro del tejido)</p>
+  </div>
+
+  <div class="card c-blue">
+    <div class="card-title">Respuesta Casi Inmediata (S. Innato)</div>
+    <div class="card-body">
+      <ul>
+        <li>Microbios</li>
+        <li>Células dañadas</li>
+        <li>Las respuestas innatas son prácticamente idénticas</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ADHESIÓN LEUCOCITARIA ═══════════════ -->
+  <div class="section-label">🔗 Adhesión Leucocitaria (10/03/26)</div>
+
+  <div class="card c-navy">
+    <div class="card-title">Circulación y migración de leucocitos</div>
+    <div class="card-body">
+      <ul>
+        <li>Leucocitos: médula (línea mieloide) → foco de infección</li>
+        <li>Linfocitos: linfonodos → foco de infección</li>
+        <li>Linfocitos efectores → linfonodos secundarios → mucosas</li>
+      </ul>
+      <br>
+      <strong>Alojamiento:</strong> cel. naciendo<br>
+      <strong>Migración:</strong> ...<br>
+      <strong>Recirculación:</strong> es la migración de los linfocitos para una zona antigénica (+ antígenos)
+    </div>
+  </div>
+
+  <div class="card c-blue">
+    <div class="card-title">Células del Sistema Innato vs. Adaptativo</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Células del sist. innato:</strong> "nace y ya comienza a trabajar"</li>
+        <li><strong>Células del sist. adaptativo:</strong> células nacen, migran y recirculan en busca de antígenos</li>
+      </ul>
+      <br>
+      <span class="badge badge-red">Examen: Inflamación = reclutamiento de las células de defensa</span>
+    </div>
+  </div>
+
+  <div class="card c-teal">
+    <div class="card-title">Moléculas de Adhesión: Selectinas, Integrinas y Quimiocinas</div>
+    <div class="card-body">
+      Ayudan y habilitan la <strong>diapédesis</strong> (rolabilidad). Moléculas de adhesión celular (PIECS) → la célula migra para dentro del tejido.<br><br>
+      <strong>Tipos de selectinas:</strong>
+      <ul>
+        <li><strong>L-selectina (CD62L):</strong> se expresa por leucocitos</li>
+        <li><strong>P-selectina (CD62P):</strong> se expresa por plaquetas</li>
+        <li><strong>E-selectina (CD62E):</strong> se expresa por células endoteliales</li>
+      </ul>
+      <br>
+      <strong>Quimiocinas</strong> → quimioatrayentes para las células del sist. inmunitario
+    </div>
+  </div>
+
+  <div class="card c-green">
+    <div class="card-title">Migración de neutrófilos y monocitos</div>
+    <div class="card-body">
+      <ul>
+        <li>Llegan primero (1º cantidad)</li>
+        <li>El reclutamiento puede durar días</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LINFOCITO B ═══════════════ -->
+  <div class="section-label">🧬 Linfocito B – Inmunidad Humoral</div>
+
+  <div class="card c-green">
+    <div class="card-title">Linfocito B → Médula → Linfonodos → Plasmoblastos</div>
+    <div class="card-body">
+      <strong>L.B virgen:</strong> inmature, naive (no activado)<br><br>
+      <strong>Respuesta primaria:</strong> <span class="badge badge-blue">IgM</span><br>
+      <strong>Respuesta secundaria:</strong> <span class="badge badge-green">IgG</span><br><br>
+      <ul>
+        <li><strong>LB de memoria</strong> → 6 meses (½ vida)</li>
+        <li><strong>Plasmoblasto vida corta</strong> → mucosas (<strong>IgA</strong>)</li>
+        <li><strong>Plasmoblasto vida larga</strong> → 10 años (½ vida) → corriente sanguínea (<strong>IgG</strong>)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- INMUNOGLOBULINAS -->
+  <div class="section-label">💉 Inmunoglobulinas (= Anticuerpos)</div>
+
+  <div class="table-card">
+    <table>
+      <tr><th>Ig</th><th>Características</th></tr>
+      <tr><td><strong>IgA</strong></td><td>Mucosas (leche materna, saliva, lágrimas)</td></tr>
+      <tr><td><strong>IgG</strong></td><td>Más abundante en sangre. Respuesta secundaria. Memoria</td></tr>
+      <tr><td><strong>IgM</strong></td><td>Respuesta primaria. Primera en aparecer</td></tr>
+      <tr><td><strong>IgD</strong></td><td>Receptor de linfocito B virgen</td></tr>
+      <tr><td><strong>IgE</strong></td><td>Alergias, parásitos. Receptores en mastocitos y basófilos</td></tr>
+    </table>
+  </div>
+
+  <div class="card c-yellow">
+    <div class="card-title">IgG e IgA → Recen nacidos</div>
+    <div class="card-body">
+      <strong>IgG:</strong> transplacentaria (durante el embarazo) → leche materna<br>
+      <strong>IgA:</strong> leche materna (calostro)<br>
+      Proteínas (examen) → Inmunoglobulinas (lo mismo que anticuerpos)
+    </div>
+  </div>
+
+  <!-- ═══════════════ LINFOCITO T ═══════════════ -->
+  <div class="section-label">🧬 Linfocito T – Inmunidad Celular</div>
+
+  <div class="card c-blue">
+    <div class="card-title">Linfocito T → Timo (guía la respuesta)</div>
+    <div class="card-body">
+      Inmunidad celular → Linfocito T → Célula CD4:<br>
+      <ul>
+        <li>Intracelular</li>
+        <li><strong>TCD8:</strong> citotóxico → mata las cels. alteradas</li>
+        <li><strong>TCD4:</strong> helper → guía la respuesta inmune → madura</li>
+      </ul>
+      <br>
+      <strong>Linfocito T CD4 → se diferencia en:</strong>
+      <ul>
+        <li><span class="badge badge-blue">Th1</span> → Bacterias / Virus</li>
+        <li><span class="badge badge-green">Th2</span> → Helmintos / Alergias</li>
+        <li><span class="badge badge-orange">Th17</span> → Hongos</li>
+      </ul>
+      <br>
+      <strong>ILC – Células linfocíticas innatas:</strong>
+      <ul>
+        <li><strong>ILC-1:</strong> Bacterias + Virus</li>
+        <li><strong>ILC-2:</strong> Helmintos / Alergias</li>
+        <li><strong>ILC-3:</strong> Hongos</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INMUNIDAD ACTIVA vs PASIVA ═══════════════ -->
+  <div class="section-label">🔄 Tipos de Inmunidad</div>
+
+  <div class="compare">
+    <div class="compare-header">
+      <div class="left">Activa (Permanente)</div>
+      <div class="right">Pasiva (Temporaria)</div>
+    </div>
+    <div class="compare-body">
+      <div class="compare-col">
+        <ul>
+          <li><strong>Natural:</strong> enfermedades</li>
+          <li><strong>Artificial:</strong> vacunas</li>
+          <li>Produce los anticuerpos y medicinea</li>
+          <li><strong>Específica</strong></li>
+          <li><strong>Posee memoria</strong></li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <ul>
+          <li><strong>Natural:</strong> leche materna / transplacentaria</li>
+          <li><strong>Artificial:</strong> suero antiofídico</li>
+          <li>Recibe los anticuerpos y libero</li>
+          <li><strong>Específica</strong></li>
+          <li><strong>No posee memoria</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ S. COMPLEMENTO ═══════════════ -->
+  <div class="section-label">🧪 Sistema Complemento</div>
+
+  <div class="def-card">
+    <p><strong>S. Complemento</strong> → son proteínas plasmáticas producidas en el hígado. Activan y amplifican la respuesta inmune.</p>
+  </div>
+
+  <div class="card c-teal">
+    <div class="card-title">Vías de activación</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Vía Clásica:</strong> depende de anticuerpos (IgG/IgM)</li>
+        <li><strong>Vía Alternativa:</strong> independiente → proteínas plasmáticas adentran la bacteria</li>
+        <li><strong>Vía Lectina:</strong> depende de la manosa → presente en bacterias y hongos</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card c-orange">
+    <div class="card-title">Proteína C3 → C3a y C3b</div>
+    <div class="card-body">
+      Después el hígado libera la proteína C3:<br>
+      <ul>
+        <li><strong>C3a:</strong> inflamación → Marcar bacteria</li>
+        <li><strong>C3b:</strong> opsonización → engrosamiento de la bacteria → Opsogen</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card c-red">
+    <div class="card-title">Proteína C5 → C5a y C5b</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>C5a:</strong> inflamación → dirige M.O (mata)</li>
+        <li><strong>C5b:</strong> complejo de ataque a la membrana → ocasiona una desregulación de la osmosis</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TLR ═══════════════ -->
+  <div class="section-label">📡 TLR – Toll Like Receptors (10/03/26)</div>
+
+  <div class="def-card">
+    <p><strong>S. Innato → Rápido.</strong> Toll like receptors (TLR) → reconocen los PAMP y DAMP. Receptores de membrana (externos) e intracelulares.</p>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <tr>
+        <th>TLR</th>
+        <th>Reconoce</th>
+        <th>Localización</th>
+      </tr>
+      <tr><td>TLR 1, 2, 6</td><td>Bacterias gram+</td><td>Membrana (externos)</td></tr>
+      <tr><td>TLR 4</td><td>Bacterias gram–</td><td>Membrana (externos)</td></tr>
+      <tr><td>TLR 5</td><td>Flagelos</td><td>Membrana (externos)</td></tr>
+      <tr><td>TLR 6</td><td>Bacterias gram+</td><td>Membrana (externos)</td></tr>
+      <tr><td>TLR 3, 7, 8</td><td>Virus</td><td>Intracelulares</td></tr>
+      <tr><td>TLR 9</td><td>Virus y bacterias</td><td>Intracelulares</td></tr>
+    </table>
+  </div>
+
+  <!-- GRAM + vs GRAM - -->
+  <div class="card c-navy">
+    <div class="card-title">Gram(+) vs Gram(–)</div>
+    <div class="card-body">
+      <strong>Gram(+):</strong> Peptidoglicano (pared gruesa) → TLR 1, 2, 6<br>
+      <strong>Gram(–):</strong> LPS (lipopolisacárido) → TLR 4<br><br>
+      <em>Diagrama de la pared:</em>
+      <ul>
+        <li>Gram(+): Polipeptidoglicano / / / / / / → Bacteria ■■■■■■■■</li>
+        <li>Gram(–): ↕ capa externa + LPS + peptidoglicano fino → Bacteria ■■■■■■■■ / / / / / / / / ■■■■■■■■■</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INMUNIDAD ADAPTATIVA ═══════════════ -->
+  <div class="section-label">⚙️ Inmunidad Adaptativa – Especificidad</div>
+
+  <div class="card c-indigo">
+    <div class="card-title">Especificidad y Diversidad</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Determinantes o epítopos:</strong> es la zona más antigénica → antígeno más fuerte</li>
+        <li><strong>Selección clonal:</strong> multiplicaciones de células de defensa (enfermedades que existen o no)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="compare-header">
+      <div class="left">Inmunidad Humoral</div>
+      <div class="right">Inmunidad Celular</div>
+    </div>
+    <div class="compare-body">
+      <div class="compare-col">
+        <strong>Linfocito B</strong><br>
+        Extracelular (plasma)<br>
+        Produce anticuerpos
+      </div>
+      <div class="compare-col">
+        <strong>Linfocito T → TCD8</strong><br>
+        Mata las cels. alteradas<br>
+        <strong>Linfocito T → Célula CD4</strong><br>
+        Intracelular
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ S. INNATO vs. S. ADAPTATIVO – TABLA COMPLETA ═══════════════ -->
+  <div class="section-label">📊 S. Innato × S. Adaptativo – Comparativa completa</div>
+
+  <div class="compare">
+    <div class="compare-header">
+      <div class="left">S. Innato</div>
+      <div class="right">S. Adaptativo</div>
+    </div>
+    <div class="compare-body">
+      <div class="compare-col">
+        <ul>
+          <li>Inespecífico</li>
+          <li>PAMP → Patógenos</li>
+          <li>DAMP → Daño → moléculas</li>
+          <li>Baja diversidad (células)</li>
+          <li>Los macrófagos poseen memoria (residente)</li>
+          <li>Evitan producir células autoinmunes</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <ul>
+          <li>Específico</li>
+          <li>Reconocimiento de antígenos + sustancia específica</li>
+          <li>Alta diversidad (células)</li>
+          <li>Posee memoria</li>
+          <li>Evitan producir células autoinmunes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ COMUNICACIÓN ═══════════════ -->
+  <div class="section-label">📣 Comunicación del Sistema Inmune</div>
+
+  <div class="card c-yellow">
+    <div class="card-title">Quimiotaxis</div>
+    <div class="card-body">
+      El sistema inmune se comunica por <strong>quimiotaxis</strong> → comunicación por señales químicas.<br>
+      <strong>Quimiocinas</strong> → quimioatrayentes para las células del sist. inmunitario.<br>
+      Las selectinas, integrinas y quimiocinas son químicos que ayudan a reclutar leucocitos.
+    </div>
+  </div>
+
+  <!-- ═══════════════ VACUNAS ═══════════════ -->
+  <div class="section-label">💊 Vacunas</div>
+
+  <div class="card c-green">
+    <div class="card-title">Vacunas – Conceptos clave</div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Toxoide:</strong> toxina modificada sin virulencia → estimula inmunidad</li>
+        <li><strong>DTP:</strong> difteria, tétano, pertussis</li>
+        <li>Vacuna → <strong>Inmunidad activa artificial</strong> → produce anticuerpos → posee memoria → específica</li>
+        <li>Suero antiofídico → <strong>Inmunidad pasiva artificial</strong> → no posee memoria</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

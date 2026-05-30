@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genética Médica — Resumen Completo | André | UCP-PJC</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2430;
+    --border: #30363d;
+    --accent1: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --accent5: #ffa657;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --gold: #e3b341;
+    --red-soft: #ff7b72;
+    --teal: #39d353;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .master-header {
+    background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .master-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(88,166,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,0.12);
+    border: 1px solid rgba(88,166,255,0.3);
+    color: var(--accent1);
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.35rem 1.2rem;
+    border-radius: 50px;
+    margin-bottom: 1.4rem;
+  }
+  .master-header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .master-header h1 span { color: var(--accent1); }
+  .master-header .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+  .meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+  .meta-pill {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .meta-pill strong { color: var(--text); }
+
+  /* ─── NAV ─── */
+  .toc-nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .toc-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .toc-nav a:hover {
+    color: var(--accent1);
+    border-color: rgba(88,166,255,0.3);
+    background: rgba(88,166,255,0.07);
+  }
+
+  /* ─── LAYOUT ─── */
+  .content-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem;
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-block {
+    margin-bottom: 4rem;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-number {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .n1 { background: rgba(88,166,255,0.15); color: var(--accent1); border: 1px solid rgba(88,166,255,0.3); }
+  .n2 { background: rgba(63,185,80,0.15); color: var(--accent2); border: 1px solid rgba(63,185,80,0.3); }
+  .n3 { background: rgba(210,168,255,0.15); color: var(--accent4); border: 1px solid rgba(210,168,255,0.3); }
+  .section-title h2 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-title .section-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  /* ─── SUBSECTIONS ─── */
+  .subsection {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .subsection-header {
+    padding: 1rem 1.4rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .subsection-header .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-blue { background: var(--accent1); }
+  .dot-green { background: var(--accent2); }
+  .dot-purple { background: var(--accent4); }
+  .dot-orange { background: var(--accent5); }
+  .dot-red { background: var(--red-soft); }
+  .subsection-body {
+    padding: 1.3rem 1.4rem;
+  }
+  p { margin-bottom: 0.9rem; color: var(--text); font-size: 0.96rem; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ─── FEATURE LIST ─── */
+  .feature-list {
+    list-style: none;
+    padding: 0;
+  }
+  .feature-list li {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 0.94rem;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list li::before {
+    content: '→';
+    color: var(--accent1);
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  /* ─── ALERT BOXES ─── */
+  .alert {
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    margin: 1.2rem 0;
+    border-left: 4px solid;
+    font-size: 0.93rem;
+  }
+  .alert-blue {
+    background: rgba(88,166,255,0.08);
+    border-color: var(--accent1);
+  }
+  .alert-green {
+    background: rgba(63,185,80,0.08);
+    border-color: var(--accent2);
+  }
+  .alert-orange {
+    background: rgba(255,166,87,0.08);
+    border-color: var(--accent5);
+  }
+  .alert-red {
+    background: rgba(255,123,114,0.08);
+    border-color: var(--red-soft);
+  }
+  .alert-purple {
+    background: rgba(210,168,255,0.08);
+    border-color: var(--accent4);
+  }
+  .alert-gold {
+    background: rgba(227,179,65,0.08);
+    border-color: var(--gold);
+  }
+  .alert strong {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+  .alert-blue strong { color: var(--accent1); }
+  .alert-green strong { color: var(--accent2); }
+  .alert-orange strong { color: var(--accent5); }
+  .alert-red strong { color: var(--red-soft); }
+  .alert-purple strong { color: var(--accent4); }
+  .alert-gold strong { color: var(--gold); }
+
+  /* ─── PROBABILITY CARDS ─── */
+  .prob-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .prob-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .prob-number {
+    font-size: 2.4rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.3rem;
+  }
+  .prob-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── TABLES ─── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin: 1.2rem 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  thead tr {
+    background: var(--bg3);
+  }
+  th {
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    font-family: 'Courier New', monospace;
+    font-size: 0.77rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(48,54,61,0.3); }
+  .td-highlight { color: var(--accent1); font-weight: 600; }
+  .td-green { color: var(--accent2); font-weight: 600; }
+  .td-orange { color: var(--accent5); font-weight: 600; }
+  .td-purple { color: var(--accent4); font-weight: 600; }
+  .td-red { color: var(--red-soft); font-weight: 600; }
+
+  /* ─── TAG PILLS ─── */
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    margin: 0.15rem;
+  }
+  .tag-blue { background: rgba(88,166,255,0.15); color: var(--accent1); }
+  .tag-green { background: rgba(63,185,80,0.15); color: var(--accent2); }
+  .tag-orange { background: rgba(255,166,87,0.15); color: var(--accent5); }
+  .tag-purple { background: rgba(210,168,255,0.15); color: var(--accent4); }
+  .tag-red { background: rgba(255,123,114,0.15); color: var(--red-soft); }
+  .tag-gold { background: rgba(227,179,65,0.15); color: var(--gold); }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 1.2rem 0;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    flex: 1;
+    min-width: 130px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 1rem 0.9rem;
+    text-align: center;
+    position: relative;
+    font-size: 0.82rem;
+  }
+  .flow-step:first-child { border-radius: 10px 0 0 10px; }
+  .flow-step:last-child { border-radius: 0 10px 10px 0; }
+  .flow-step .step-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .flow-step .step-name {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+  }
+  .flow-step .step-desc {
+    color: var(--text-muted);
+    font-size: 0.73rem;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--accent1);
+    font-size: 1.2rem;
+    padding: 0 0.3rem;
+  }
+
+  /* ─── TWO COLUMN ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ─── EXAM TRAPS ─── */
+  .trap-item {
+    background: rgba(255,123,114,0.05);
+    border: 1px solid rgba(255,123,114,0.2);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.91rem;
+  }
+  .trap-item strong {
+    color: var(--red-soft);
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  /* ─── GENE LOCUS BADGE ─── */
+  .locus {
+    display: inline-block;
+    background: rgba(227,179,65,0.1);
+    border: 1px solid rgba(227,179,65,0.3);
+    color: var(--gold);
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+  }
+
+  /* ─── PUNNETT SQUARE ─── */
+  .punnett {
+    display: inline-grid;
+    grid-template-columns: auto auto auto;
+    gap: 2px;
+    background: var(--border);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    margin: 0.7rem 0;
+  }
+  .punnett div {
+    background: var(--bg2);
+    padding: 0.55rem 1rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  .punnett .ph { background: var(--bg3); color: var(--text-muted); font-size: 0.78rem; }
+  .punnett .affected { background: rgba(255,123,114,0.15); color: var(--red-soft); }
+  .punnett .carrier { background: rgba(255,166,87,0.12); color: var(--accent5); }
+  .punnett .normal { background: rgba(63,185,80,0.1); color: var(--accent2); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 3rem 0;
+  }
+
+  /* ─── BIBLIOGRAPHY ─── */
+  .biblio {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  .biblio h3 {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  .biblio-item {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 0.87rem;
+    color: var(--text-muted);
+  }
+  .biblio-item:last-child { border-bottom: none; }
+  .biblio-item strong { color: var(--accent1); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section-block {
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: white; color: black; }
+    .toc-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════ -->
+<header class="master-header">
+  <div class="badge">Genética Médica · 3er Semestre · UCP-PJC</div>
+  <h1>Genética <span>Médica</span></h1>
+  <p class="subtitle">Clases 9, 10 y 11 — Resumen Académico Premium</p>
+  <div class="meta-row">
+    <div class="meta-pill"><strong>Docente:</strong> Dr. Roberto Ottoni</div>
+    <div class="meta-pill"><strong>Base:</strong> Emery & Thompson & Thompson</div>
+    <div class="meta-pill"><strong>Estudiante:</strong> André · 3er Sem.</div>
+    <div class="meta-pill"><strong>Temas:</strong> Herencia · Defectos Congénitos · Diagnóstico Prenatal</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     NAVEGACIÓN
+══════════════════════════════════════════════════ -->
+<nav class="toc-nav">
+  <a href="#clase9">Clase 9 · Defectos Congénitos</a>
+  <a href="#clase10">Clase 10 · Patrones de Herencia</a>
+  <a href="#clase11">Clase 11 · Diagnóstico Prenatal</a>
+  <a href="#tabla-comp">Tabla Comparativa</a>
+  <a href="#trampas">Puntos de Examen</a>
+  <a href="#biblio">Bibliografía</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     CONTENIDO
+══════════════════════════════════════════════════ -->
+<main class="content-wrapper">
+
+<!-- ══════════════════════════════════════
+     CLASE 9: DEFECTOS CONGÉNITOS
+══════════════════════════════════════ -->
+<section class="section-block" id="clase9">
+  <div class="section-title">
+    <div class="section-number n1">09</div>
+    <div>
+      <h2 style="color:var(--accent1);">Defectos Congénitos y Teratología</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">Malformación · Deformidad · Disrupción · Teratógenos</p>
+    </div>
+    <span class="section-label">Clase 9</span>
+  </div>
+
+  <!-- Definición -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-blue"></div>
+      1. Definición y Concepto
+    </div>
+    <div class="subsection-body">
+      <p>Un <strong>defecto congénito</strong> es toda anormalidad de estructura anatómica visible al examen clínico del recién nacido, o posterior al nacimiento cuando se hace patente el defecto funcional de un órgano interno afectado anatómicamente.</p>
+      <div class="alert alert-blue">
+        <strong>📚 Emery — Perspectiva Epidemiológica</strong>
+        Los defectos congénitos afectan aproximadamente al 2–3% de los recién nacidos vivos si se consideran solo los mayores, y hasta un 7–10% si se incluyen los menores descubiertos en los primeros años de vida. Representan la segunda causa de mortalidad neonatal en países desarrollados (Turnpenny & Ellard, Emery Elementos de Genética Médica, 15ª ed., Cap. 16).
+      </div>
+    </div>
+  </div>
+
+  <!-- Clasificación por magnitud -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-green"></div>
+      2. Clasificación por Magnitud
+    </div>
+    <div class="subsection-body">
+      <div class="two-col">
+        <div class="alert alert-red">
+          <strong>⚠ Defectos Mayores</strong>
+          Compromiso funcional importante para la vida. Consecuencias médicas, estéticas y sociales significativas. Requieren atención médica temprana.
+          <br><br>
+          <span class="tag tag-red">Frecuencia: 2–3%</span>
+          <br><br>
+          <em style="color:var(--text-muted);font-size:0.85rem;">Ej.: cardiopatías congénitas, labio leporino + paladar hendido, meningomielocele, polidactilia grave.</em>
+        </div>
+        <div class="alert alert-green">
+          <strong>✓ Defectos Menores</strong>
+          Defectos estructurales relativamente frecuentes. Crecimiento desproporcionado de una parte anatómica. Sin relevancia médica o social significativa por sí solos.
+          <br><br>
+          <span class="tag tag-green">Frecuencia: ~15%</span>
+          <br><br>
+          <em style="color:var(--text-muted);font-size:0.85rem;">Ej.: apéndices preauriculares, clinodactilia del 5.º dedo, manchas mongólicas.</em>
+        </div>
+      </div>
+      <div class="alert alert-orange">
+        <strong>💡 Regla Clínica de Emery</strong>
+        La presencia de 3 o más defectos menores en un neonato aumenta significativamente la probabilidad de encontrar un defecto mayor asociado (hasta un 90% según algunas series). Es una señal de alerta para buscar activamente anomalías sistémicas.
+      </div>
+    </div>
+  </div>
+
+  <!-- Clasificación por efecto causal -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-purple"></div>
+      3. Clasificación por Efecto Causal (Tipos Patogénicos)
+    </div>
+    <div class="subsection-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Mecanismo</th>
+              <th>Tejido afectado</th>
+              <th>Ejemplo clásico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-highlight">Malformación</td>
+              <td>Defecto intrínseco del desarrollo por alteración genética. El gen mutado afecta el proceso morfogenético.</td>
+              <td>Tejido genéticamente anormal desde el inicio</td>
+              <td>Polidactilia, labio leporino no sindrómico, defectos del tubo neural</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Deformidad</td>
+              <td>Fuerzas mecánicas inusuales sobre tejidos genéticamente normales. El ambiente intrauterino es adverso.</td>
+              <td>Tejido normal deformado por presión/restricción</td>
+              <td>Pie equinovaro postural, plagiocefalia posicional, luxación de cadera por oligohidramnios</td>
+            </tr>
+            <tr>
+              <td class="td-red">Disrupción</td>
+              <td>Ruptura o interferencia en tejidos y vasos sanguíneos previamente bien formados. Causa adquirida post-organogénesis.</td>
+              <td>Tejido normal destruido/interrumpido</td>
+              <td>Sindáctilia por bridas amnióticas (secuencia de banda amniótica), amputaciones intrauterinas</td>
+            </tr>
+            <tr>
+              <td class="td-purple">Displasia</td>
+              <td>Organización anormal de células en tejidos, que resulta en estructura y función anormales. (Complemento de Emery)</td>
+              <td>Histoarquitectura anormal</td>
+              <td>Acondroplasia (displasia ósea), displasias ectodérmicas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-purple">
+        <strong>📖 Emery — Concepto de "Secuencia" vs "Síndrome"</strong>
+        <strong>Secuencia:</strong> un único defecto primario que desencadena una cascada de anomalías secundarias (ej.: secuencia de Potter: oligohidramnios → restricción → hipoplasia pulmonar + facies comprimida + malposición de extremidades). <br>
+        <strong>Síndrome:</strong> múltiples anomalías con una etiología única reconocida (ej.: síndrome de Down, síndrome de Marfán).
+      </div>
+    </div>
+  </div>
+
+  <!-- Teratógenos -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-orange"></div>
+      4. Teratología — Agentes Teratógenos
+    </div>
+    <div class="subsection-body">
+      <p>Un <strong>teratógeno</strong> es cualquier agente que produce una anormalidad (defecto congénito) en el desarrollo embriofetal. El estudio de los teratógenos y sus mecanismos se denomina <em>teratología</em>.</p>
+
+      <div class="alert alert-gold">
+        <strong>📚 Principios de Wilson (Emery, Cap. 16)</strong>
+        1. La susceptibilidad al teratógeno depende del genotipo del embrión y de su interacción con factores ambientales. <br>
+        2. La susceptibilidad varía según el estadio del desarrollo (período crítico de organogénesis: semanas 3–8). <br>
+        3. Los teratógenos actúan mediante mecanismos específicos. <br>
+        4. Las manifestaciones son muerte, malformación, retardo del crecimiento o alteración funcional. <br>
+        5. El acceso del agente al embrión depende de la naturaleza del mismo. <br>
+        6. La dosis-respuesta es variable.
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.2rem 0 0.8rem;font-family:'Courier New',monospace;">Indicadores de teratogenicidad</h4>
+      <ul class="feature-list">
+        <li>Infertilidad (incapacidad de concebir)</li>
+        <li>Abortos espontáneos (pérdida antes de semana 20)</li>
+        <li>Muerte fetal (a partir de semana 20)</li>
+        <li>Defectos congénitos estructurales</li>
+        <li>Alteraciones del Sistema Nervioso Central (cognición, conducta)</li>
+        <li>Crecimiento Intrauterino Retardado (CIUR)</li>
+      </ul>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.2rem 0 0.8rem;font-family:'Courier New',monospace;">Factores determinantes del efecto teratogénico</h4>
+      <div class="prob-grid">
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent1);font-size:1.5rem;">⏱</div>
+          <div class="prob-label">Momento de exposición</div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Período crítico: sem. 3–8 (organogénesis)</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent2);font-size:1.5rem;">📅</div>
+          <div class="prob-label">Duración de exposición</div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Exposición crónica vs. aguda</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent5);font-size:1.5rem;">💊</div>
+          <div class="prob-label">Dosis</div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Relación dosis-respuesta</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent4);font-size:1.5rem;">🧬</div>
+          <div class="prob-label">Susceptibilidad fetal</div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Genotipo del embrión</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--red-soft);font-size:1.5rem;">👩</div>
+          <div class="prob-label">Susceptibilidad materna</div>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Metabolismo materno del agente</p>
+        </div>
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.5rem 0 0.8rem;font-family:'Courier New',monospace;">Clasificación de Teratógenos Exógenos</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Subtipo</th>
+              <th>Ejemplos relevantes</th>
+              <th>Efecto típico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="3" style="vertical-align:middle;"><span class="tag tag-red">Biológicos</span></td>
+              <td>Virus</td>
+              <td>Rubeola, CMV, VHS, Zika, VIH, Varicela-zóster</td>
+              <td>Malformaciones cardíacas, microcefalia, coriorretinitis, cataratas (rubeola)</td>
+            </tr>
+            <tr>
+              <td>Bacterias</td>
+              <td>Treponema pallidum (sífilis congénita), Listeria</td>
+              <td>Hidrocefalia, sordera, huesos de Hutchinson</td>
+            </tr>
+            <tr>
+              <td>Parásitos</td>
+              <td>Toxoplasma gondii</td>
+              <td>Tríada de Sabin: coriorretinitis + calcificaciones + hidrocefalia</td>
+            </tr>
+            <tr>
+              <td rowspan="3" style="vertical-align:middle;"><span class="tag tag-orange">Químicos</span></td>
+              <td>Químicos ambientales</td>
+              <td>Mercurio, plomo, pesticidas organofosforados, PCBs</td>
+              <td>Neurotoxicidad, CIUR, alteraciones cognitivas</td>
+            </tr>
+            <tr>
+              <td>Drogas no prescriptivas</td>
+              <td>Alcohol (síndrome alcohólico fetal), tabaco, cocaína, heroína</td>
+              <td>SAF: microcefalia, fisuras palpebrales cortas, filtrum liso, retraso mental</td>
+            </tr>
+            <tr>
+              <td>Drogas prescriptas</td>
+              <td>Talidomida, ácido valproico, isotretinoína, warfarina, metotrexato, fenitoína</td>
+              <td>Focomelia (talidomida), defectos del tubo neural (valproico), embriopatía retinoidea</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-purple">Físicos</span></td>
+              <td>Radiaciones ionizantes / Calor</td>
+              <td>Rayos X, radiación gamma; hipertermia materna (fiebre &gt;39°C)</td>
+              <td>Microcefalia, CIUR, aborto, neoplasias; defectos del SNC por hipertermia</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-orange">
+        <strong>🔬 Síndrome Alcohólico Fetal (Emery) — El teratógeno más prevalente</strong>
+        El alcohol es la causa más frecuente de retraso mental no genético prevenible. No existe dosis segura conocida durante el embarazo. Criterios diagnósticos: <em>(1) rasgos faciales característicos + (2) CIUR + (3) anomalías del SNC + (4) exposición prenatal confirmada.</em> Afecta al 1–2% de los neonatos en poblaciones consumidoras.
+      </div>
+
+      <div class="alert alert-red">
+        <strong>⚠ Teratógenos Endógenos (Complemento de Emery)</strong>
+        También existen teratógenos de origen interno: diabetes mellitus materna descompensada (cardiopatías congénitas, sacro agenesia), fenilcetonuria materna no tratada (microcefalia, cardiopatías), hipotiroidismo materno. El control metabólico materno es esencial en el período periconcepcional.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════
+     CLASE 10: PATRONES DE HERENCIA
+══════════════════════════════════════ -->
+<section class="section-block" id="clase10">
+  <div class="section-title">
+    <div class="section-number n2">10</div>
+    <div>
+      <h2 style="color:var(--accent2);">Patrones de Herencia Mendeliana</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">Autosómica Dominante · Autosómica Recesiva · Ligada al X</p>
+    </div>
+    <span class="section-label">Clase 10</span>
+  </div>
+
+  <!-- Introducción -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-green"></div>
+      Introducción — La Genética Mendeliana
+    </div>
+    <div class="subsection-body">
+      <p>La <strong>herencia mendeliana</strong> describe la transmisión de rasgos controlados por un único locus génico (herencia monogénica), siguiendo las leyes de segregación e independencia de Mendel. El análisis del patrón de herencia en un árbol genealógico (pedigrí) permite determinar el modo de transmisión y calcular el riesgo de recurrencia en una familia.</p>
+      <div class="alert alert-green">
+        <strong>📚 Emery — Importancia Clínica</strong>
+        Se conocen más de 7.000 enfermedades monogénicas descritas en el catálogo OMIM (Online Mendelian Inheritance in Man). Los patrones básicos son: autosómico dominante (AD), autosómico recesivo (AR), ligado al X dominante (XD), ligado al X recesivo (XR) y ligado al Y (holándrico). El reconocimiento del patrón tiene implicaciones directas para el asesoramiento genético.
+      </div>
+    </div>
+  </div>
+
+  <!-- AD -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-blue"></div>
+      1. Herencia Autosómica Dominante (AD)
+    </div>
+    <div class="subsection-body">
+      <div class="alert alert-blue">
+        <strong>Definición</strong>
+        Un solo alelo mutado (heterocigoto) es suficiente para expresar el fenotipo. El gen afectado se localiza en un autosoma (cromosomas 1–22). La mayoría de las proteínas afectadas son estructurales, receptoras o reguladoras de dominancia negativa.
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.7rem;font-family:'Courier New',monospace;">Características diagnósticas del pedigrí AD</h4>
+      <ul class="feature-list">
+        <li>El carácter aparece en <strong>cada generación</strong> (transmisión vertical continua).</li>
+        <li>Cada individuo afectado tiene <strong>al menos un progenitor afectado</strong>.</li>
+        <li>De padres sanos → hijos sanos (salvo mutación de novo).</li>
+        <li>La transmisión es <strong>independiente del sexo</strong>: hombres y mujeres afectados en igual proporción.</li>
+        <li>Cualquier hijo de un progenitor afectado (Aa × aa) tiene un <strong>50% de riesgo</strong> de heredar el alelo dominante.</li>
+      </ul>
+
+      <div class="two-col">
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Probabilidades (Aa × aa)</h4>
+          <div class="punnett">
+            <div class="ph"></div><div class="ph">A</div><div class="ph">a</div>
+            <div class="ph">a</div><div class="affected">Aa</div><div class="normal">aa</div>
+            <div class="ph">a</div><div class="affected">Aa</div><div class="normal">aa</div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">
+            <span class="tag tag-red">50%</span> Afectados (Aa) &nbsp;
+            <span class="tag tag-green">50%</span> Sanos (aa)
+          </p>
+        </div>
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Conceptos clave adicionales (Emery)</h4>
+          <ul class="feature-list" style="font-size:0.86rem;">
+            <li><strong>Penetrancia:</strong> Proporción de portadores del genotipo que expresan el fenotipo. AD puede ser incompleta (ej.: polidactilia).</li>
+            <li><strong>Expresividad variable:</strong> El mismo genotipo produce fenotipos de diferente gravedad (ej.: NF1).</li>
+            <li><strong>Mutación de novo:</strong> Padres sanos → hijo afectado. Riesgo para siguientes hijos = población general.</li>
+            <li><strong>Anticipación:</strong> La enfermedad se manifiesta más precozmente y con mayor gravedad en generaciones sucesivas (ej.: distrofia miotónica).</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.3rem 0 0.8rem;font-family:'Courier New',monospace;">Enfermedades AD relevantes</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Enfermedad</th><th>Locus</th><th>Gen / Proteína afectada</th><th>Manifestación principal</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-highlight">Acondroplasia</td>
+              <td><span class="locus">4p16.3</span></td>
+              <td>FGFR3 (receptor del factor de crecimiento fibroblástico 3)</td>
+              <td>Talla baja desproporcionada, macrocefalia, hipoplasia mediofacial, miembros rizomélicos</td>
+            </tr>
+            <tr>
+              <td class="td-highlight">Síndrome de Marfán</td>
+              <td><span class="locus">15q21.1</span></td>
+              <td>FBN1 (fibrilina-1, glicoproteína de la matriz extracelular)</td>
+              <td>Talla alta, aracnodactilia, escoliosis, ectopia del cristalino, dilatación de aorta ascendente</td>
+            </tr>
+            <tr>
+              <td>Enfermedad de Huntington</td>
+              <td><span class="locus">4p16.3</span></td>
+              <td>HTT (huntingtina), expansión CAG</td>
+              <td>Corea, demencia progresiva, inicio en edad media. Anticipación.</td>
+            </tr>
+            <tr>
+              <td>Neurofibromatosis tipo 1</td>
+              <td><span class="locus">17q11.2</span></td>
+              <td>NF1 (neurofibromina)</td>
+              <td>Manchas café-au-lait, neurofibromas, nódulos de Lisch, alta expresividad variable</td>
+            </tr>
+            <tr>
+              <td>Hipercolesterolemia familiar</td>
+              <td><span class="locus">19p13.2</span></td>
+              <td>LDLR (receptor LDL)</td>
+              <td>LDL muy elevado, xantomas tendinosos, enfermedad coronaria prematura</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD Ligado al X -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-purple"></div>
+      2. Herencia Dominante Ligada al X (XD)
+    </div>
+    <div class="subsection-body">
+      <p>El gen mutado se localiza en el <strong>cromosoma X</strong> y el alelo mutado domina sobre el normal. Tanto hombres (XᴬY) como mujeres (XᴬX ó XᴬXᴬ) se ven afectados, aunque la expresión en mujeres suele ser más leve por la presencia del alelo normal en el segundo X (inactivación de X variable — lyonización).</p>
+
+      <ul class="feature-list">
+        <li>Un <strong>hombre afectado no transmite el carácter a sus hijos varones</strong> (les hereda el Y), pero sí a <strong>todas sus hijas</strong> (les hereda el X mutado).</li>
+        <li>Se observa un <strong>mayor número de mujeres afectadas</strong> que de varones (por ser XX, tienen doble oportunidad de recibir el alelo).</li>
+        <li>Las mujeres afectadas (heterocigotas XᴬX) tienen un <strong>50% de probabilidad</strong> de transmitir el carácter a su descendencia, independientemente del sexo del hijo.</li>
+        <li><strong>Letales en varones:</strong> algunas condiciones XD son letales en el feto masculino, resultando en exceso de niñas afectadas y abortos masculinos (ej.: Incontinentia pigmenti).</li>
+      </ul>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Enfermedad XD</th><th>Gen</th><th>Manifestación</th><th>Nota</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-purple">Raquitismo hipofosfatémico ligado al X</td>
+              <td>PHEX</td>
+              <td>Deformidades óseas en varo, talla baja, fosfatemia baja</td>
+              <td>Mujeres afectadas más leve</td>
+            </tr>
+            <tr>
+              <td class="td-purple">Incontinentia Pigmenti</td>
+              <td>IKBKG (NEMO)</td>
+              <td>Lesiones cutáneas en 4 estadios, anomalías dentales, SNC</td>
+              <td>Letal en varones hemicigotos</td>
+            </tr>
+            <tr>
+              <td class="td-purple">Síndrome de Rett</td>
+              <td>MECP2</td>
+              <td>Regresión del desarrollo, movimientos mano-boca, apraxia marcha</td>
+              <td>Casi exclusivo en niñas; letal en varones</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AR -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-orange"></div>
+      3. Herencia Autosómica Recesiva (AR)
+    </div>
+    <div class="subsection-body">
+      <div class="alert alert-orange">
+        <strong>Definición</strong>
+        Se requieren <strong>dos copias del alelo mutado</strong> (homocigoto aa) para expresar el fenotipo. Los heterocigotos (Aa) son <em>portadores sanos</em>. El gen está en un autosoma. Los portadores no se detectan clínicamente, solo molecularmente.
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.7rem;font-family:'Courier New',monospace;">Características diagnósticas del pedigrí AR</h4>
+      <ul class="feature-list">
+        <li>Los padres de los afectados son generalmente <strong>sanos, pero portadores</strong> (Aa × Aa).</li>
+        <li>Los enfermos aparecen con más frecuencia entre <strong>hermanos</strong> del sujeto afectado (misma generación — patrón horizontal).</li>
+        <li>Se afectan por igual <strong>varones y mujeres</strong>.</li>
+        <li>La <strong>consanguinidad</strong> entre los padres es un factor de riesgo importante (incrementa la probabilidad de que ambos sean portadores del mismo alelo raro).</li>
+        <li>Las parejas de portadores tienen <strong>25% de probabilidad</strong> de tener hijos afectados en cada embarazo.</li>
+      </ul>
+
+      <div class="two-col">
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Cruce portadores (Aa × Aa)</h4>
+          <div class="punnett">
+            <div class="ph"></div><div class="ph">A</div><div class="ph">a</div>
+            <div class="ph">A</div><div class="normal">AA</div><div class="carrier">Aa</div>
+            <div class="ph">a</div><div class="carrier">Aa</div><div class="affected">aa</div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">
+            <span class="tag tag-green">25%</span> Normal (AA) &nbsp;
+            <span class="tag tag-orange">50%</span> Portador (Aa) &nbsp;
+            <span class="tag tag-red">25%</span> Afectado (aa)
+          </p>
+        </div>
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Relación con enzimas (Emery)</h4>
+          <p style="font-size:0.87rem;">La mayoría de las enfermedades AR involucran deficiencias enzimáticas. El portador tiene ~50% de actividad enzimática, suficiente para una función normal. Solo el homocigoto (aa) llega al umbral de déficit funcional.</p>
+          <p style="font-size:0.87rem;color:var(--text-muted);">Esto explica por qué la herencia enzimática es casi siempre recesiva: las enzimas tienen "reserva" funcional.</p>
+        </div>
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.3rem 0 0.8rem;font-family:'Courier New',monospace;">Enfermedades AR relevantes</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Enfermedad</th><th>Locus</th><th>Defecto molecular</th><th>Manifestación principal</th><th>Prevalencia</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-orange">Fenilcetonuria (PKU)</td>
+              <td><span class="locus">12q22-q24.1</span></td>
+              <td>Déficit de fenilalanina hidroxilasa (PAH)</td>
+              <td>Retraso mental, piel clara, olor a "ratón", convulsiones si no tratada</td>
+              <td>1/10.000 RN</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Fibrosis Quística</td>
+              <td><span class="locus">7q31.2</span></td>
+              <td>CFTR (canal de cloruro) — mutación F508del más frecuente</td>
+              <td>Enfermedad pulmonar obstructiva, insuficiencia pancreática exocrina, infertilidad masculina</td>
+              <td>1/2.500 RN (caucásicos)</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Galactosemia clásica</td>
+              <td><span class="locus">9p13.3</span></td>
+              <td>Déficit de GALT (galactosa-1-fosfato uridiltransferasa)</td>
+              <td>Ictericia, cirrosis, cataratas, sepsis neonatal por E. coli, retraso cognitivo</td>
+              <td>1/60.000</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Enfermedad de Wilson</td>
+              <td><span class="locus">13q14.3</span></td>
+              <td>ATP7B (ATPasa transportadora de cobre)</td>
+              <td>Cirrosis hepática, anillo de Kayser-Fleischer, trastornos neuropsiquiátricos</td>
+              <td>1/30.000</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Atrofia muscular espinal (AME)</td>
+              <td><span class="locus">5q13.2</span></td>
+              <td>SMN1 (proteína de supervivencia neurona motora)</td>
+              <td>Degeneración de motoneurona anterior, debilidad muscular progresiva</td>
+              <td>1/10.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-gold">
+        <strong>💡 Efecto Fundador y Deriva Genética (Emery)</strong>
+        Algunas enfermedades AR son muy prevalentes en poblaciones específicas por efecto fundador: <em>Anemia de células falciformes</em> en poblaciones africanas (confiere ventaja heterocigota contra malaria), <em>Enfermedad de Tay-Sachs</em> en judíos askenazí, <em>Fibrosis quística</em> en caucásicos de Europa del norte. Estas frecuencias elevadas tienen explicación evolutiva.
+      </div>
+    </div>
+  </div>
+
+  <!-- XR -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-red"></div>
+      4. Herencia Recesiva Ligada al X (XR)
+    </div>
+    <div class="subsection-body">
+      <p>El gen mutado se localiza en el <strong>cromosoma X</strong> y el alelo mutado es recesivo. Los varones (<strong>hemicigotos</strong> XᵃY) expresan siempre la enfermedad porque no tienen un segundo X que compense. Las mujeres (XᴬXᵃ) son <em>portadoras sanas</em> en la mayoría de los casos.</p>
+
+      <ul class="feature-list">
+        <li>La <strong>enfermedad la padecen principalmente los hombres</strong> (hemicigotos: un solo alelo X mutado es suficiente para expresar).</li>
+        <li>El hombre afectado <strong>no transmite el carácter a sus hijos varones</strong> (les hereda el Y, no el X). Transmite el X mutado al 100% de sus hijas, que serán <em>portadoras obligadas</em>.</li>
+        <li>La madre portadora (XᴬXᵃ) transmite el X mutado al <strong>50% de sus hijos varones</strong> (afectados) y al 50% de sus hijas (portadoras).</li>
+        <li>Las mujeres se afectan raramente: solo si son <strong>homocigotas</strong> (XᵃXᵃ) — hija de hombre afectado y madre portadora — o si hay lyonización desfavorable.</li>
+      </ul>
+
+      <div class="alert alert-blue">
+        <strong>📖 Lyonización (Inactivación del X) — Emery, Cap. 6</strong>
+        En cada célula somática femenina, uno de los dos cromosomas X se inactiva aleatoriamente formando la <em>cromatina de Barr</em> (corpúsculo de Barr). Si por azar se inactiva mayoritariamente el X normal, la mujer portadora puede expresar la enfermedad (portadora "sintomática" o "manifesting carrier"). Ejemplos: algunas portadoras de DMD con miopatía leve; portadoras de hemofilia A con niveles bajos de factor VIII.
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Enfermedad XR</th><th>Locus</th><th>Defecto</th><th>Manifestación</th><th>Frecuencia en varones</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-red">Distrofia Muscular Duchenne (DMD)</td>
+              <td><span class="locus">Xp21.2</span></td>
+              <td>Distrofina (ausente). Grandes deleciones génicas.</td>
+              <td>Debilidad muscular progresiva desde ~5 años, pseudohipertrofia gemelar, CK muy elevada, cardiopatía, muerte ~20-30 años</td>
+              <td>1/3.500</td>
+            </tr>
+            <tr>
+              <td class="td-red">Hemofilia A</td>
+              <td><span class="locus">Xq28</span></td>
+              <td>Factor VIII (coagulación)</td>
+              <td>Hemorragias en articulaciones (hemartrosis), músculo, mucosas</td>
+              <td>1/5.000</td>
+            </tr>
+            <tr>
+              <td class="td-red">Hemofilia B (Christmas)</td>
+              <td><span class="locus">Xq27.1</span></td>
+              <td>Factor IX (coagulación)</td>
+              <td>Similar a Hemofilia A, clínica indistinguible</td>
+              <td>1/30.000</td>
+            </tr>
+            <tr>
+              <td class="td-red">Daltonismo (rojo-verde)</td>
+              <td><span class="locus">Xq28</span></td>
+              <td>Opsinas de conos</td>
+              <td>Incapacidad de distinguir rojo/verde</td>
+              <td>8% varones caucásicos</td>
+            </tr>
+            <tr>
+              <td class="td-red">Síndrome de X Frágil</td>
+              <td><span class="locus">Xq27.3</span></td>
+              <td>FMR1 — expansión CGG. Anticipación. Herencia semi-dominante.</td>
+              <td>Retraso mental más frecuente de causa hereditaria. Macroorquidia, facies larga, orejas prominentes.</td>
+              <td>1/4.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-red">
+        <strong>⚠ DMD vs BMD — Distinción Clínica Importante (Emery)</strong>
+        <strong>Duchenne:</strong> deleción desplaza el marco de lectura → proteína distrofina truncada no funcional → ausente. Inicio: 3-5 años, pérdida de la marcha antes de los 13 años. <br>
+        <strong>Becker:</strong> deleción mantiene el marco de lectura → distrofina truncada pero parcialmente funcional → reducida. Inicio: más tardío (&gt;16 años), evolución más benigna, marcha conservada hasta adultez.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla comparativa patrones -->
+  <div class="subsection" id="tabla-comp">
+    <div class="subsection-header">
+      <div class="dot dot-blue"></div>
+      5. Tabla Comparativa — Todos los Patrones de Herencia
+    </div>
+    <div class="subsection-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Característica</th>
+              <th style="color:var(--accent1)">AD</th>
+              <th style="color:var(--accent2)">AR</th>
+              <th style="color:var(--accent4)">XD</th>
+              <th style="color:var(--red-soft)">XR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alelos necesarios para expresar</td>
+              <td class="td-highlight">1 (heterocigoto basta)</td>
+              <td class="td-green">2 (homocigoto aa)</td>
+              <td class="td-purple">1 en X (hombre) / 1 en X (mujer)</td>
+              <td class="td-red">1 en varones / 2 en mujeres</td>
+            </tr>
+            <tr>
+              <td>Localización del gen</td>
+              <td>Autosoma (1–22)</td>
+              <td>Autosoma (1–22)</td>
+              <td>Cromosoma X</td>
+              <td>Cromosoma X</td>
+            </tr>
+            <tr>
+              <td>¿Salta generaciones?</td>
+              <td class="td-highlight">NO (transmisión vertical)</td>
+              <td class="td-green">SÍ (padres portadores sanos)</td>
+              <td class="td-purple">NO (usualmente)</td>
+              <td class="td-red">SÍ (portadoras asintomáticas)</td>
+            </tr>
+            <tr>
+              <td>Sexo más afectado</td>
+              <td>Igual (M=F)</td>
+              <td>Igual (M=F)</td>
+              <td>Más mujeres (tienen 2 X)</td>
+              <td>Principalmente varones</td>
+            </tr>
+            <tr>
+              <td>Padre afectado → hijos varones</td>
+              <td class="td-highlight">50% afectados</td>
+              <td class="td-green">0% afectados (todos portadores o sanos)</td>
+              <td class="td-purple">0% afectados (les da Y)</td>
+              <td class="td-red">0% afectados (les da Y)</td>
+            </tr>
+            <tr>
+              <td>Padre afectado → hijas</td>
+              <td class="td-highlight">50% afectadas</td>
+              <td class="td-green">100% portadoras (si madre sana)</td>
+              <td class="td-purple">100% afectadas</td>
+              <td class="td-red">100% portadoras obligadas</td>
+            </tr>
+            <tr>
+              <td>Consanguinidad como factor de riesgo</td>
+              <td>No significativo</td>
+              <td class="td-green">SÍ, muy importante</td>
+              <td>No significativo</td>
+              <td>No significativo</td>
+            </tr>
+            <tr>
+              <td>Riesgo para hijos de pareja portador × sano</td>
+              <td>50%</td>
+              <td>0% (todos portadores o sanos fenotípicamente)</td>
+              <td>Variable</td>
+              <td>50% varones afectados / 50% hijas portadoras</td>
+            </tr>
+            <tr>
+              <td>Ejemplo clásico</td>
+              <td>Acondroplasia, Marfán, Huntington</td>
+              <td>PKU, Fibrosis Quística, AME</td>
+              <td>Raquitismo hipofosfatémico X</td>
+              <td>Hemofilia A/B, DMD, Daltonismo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════
+     CLASE 11: DIAGNÓSTICO PRENATAL
+══════════════════════════════════════ -->
+<section class="section-block" id="clase11">
+  <div class="section-title">
+    <div class="section-number n3">11</div>
+    <div>
+      <h2 style="color:var(--accent4);">Diagnóstico Prenatal</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">Métodos No Invasivos · Invasivos · Asesoramiento Genético</p>
+    </div>
+    <span class="section-label">Clase 11</span>
+  </div>
+
+  <!-- Definición -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-purple"></div>
+      1. Definición y Objetivos
+    </div>
+    <div class="subsection-body">
+      <p>El <strong>diagnóstico prenatal (DP)</strong> es el conjunto de técnicas médicas utilizadas para detectar anomalías genéticas, estructurales o metabólicas en el feto durante la gestación, con el fin de proporcionar información precisa a los padres y al equipo médico antes del nacimiento.</p>
+
+      <div class="prob-grid">
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent4);font-size:1.3rem;">👨‍👩‍👦</div>
+          <div class="prob-label">Objetivo 1</div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;">Informar a los padres sobre la salud fetal y el pronóstico</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent1);font-size:1.3rem;">🤝</div>
+          <div class="prob-label">Objetivo 2</div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;">Permitir la toma de decisiones informadas y autónomas</p>
+        </div>
+        <div class="prob-card">
+          <div class="prob-number" style="color:var(--accent2);font-size:1.3rem;">🏥</div>
+          <div class="prob-label">Objetivo 3</div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;">Preparar manejo neonatal temprano si es necesario (cirugía, equipo especializado)</p>
+        </div>
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.3rem 0 0.7rem;font-family:'Courier New',monospace;">Indicaciones del Diagnóstico Prenatal</h4>
+      <ul class="feature-list">
+        <li><strong>Edad materna avanzada (&gt;35 años):</strong> aumenta el riesgo de no disyunción meiótica → aneuploidías (Trisomía 21, 18, 13)</li>
+        <li><strong>Antecedente de hijo con cromosomopatía</strong> (ej.: Síndrome de Down previo)</li>
+        <li><strong>Padres portadores de enfermedades genéticas</strong> (fibrosis quística, hemofilia, distrofia muscular, etc.)</li>
+        <li><strong>Hallazgos anormales en ecografía</strong> (translucencia nucal aumentada, marcadores morfológicos)</li>
+        <li><strong>Historia familiar de defectos del tubo neural</strong> (anencefalia, espina bífida)</li>
+        <li><strong>Exposición a teratógenos</strong> conocidos durante el embarazo</li>
+        <li><strong>Screening bioquímico alterado</strong> (PAPP-A, beta-hCG, alfafetoproteína fuera de rango)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Métodos No Invasivos -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-green"></div>
+      2. Métodos No Invasivos
+    </div>
+    <div class="subsection-body">
+      <div class="alert alert-green">
+        <strong>Concepto clave</strong>
+        Los métodos no invasivos son técnicas de <em>screening</em> (tamizaje) — no diagnósticas por sí solas. Un resultado alterado requiere confirmación mediante métodos invasivos. Su ventaja es el riesgo nulo o mínimo para el feto.
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.2rem 0 0.7rem;font-family:'Courier New',monospace;">2a. Ecografía Obstétrica</h4>
+      <p>Utiliza ondas sonoras de alta frecuencia (no ionizantes, sin daño demostrado para madre ni feto) convertidas en imágenes del feto, placenta y líquido amniótico.</p>
+
+      <div class="two-col">
+        <div class="alert alert-blue" style="margin:0;">
+          <strong>🔵 1er Trimestre (sem. 11–14)</strong>
+          <ul style="margin-top:0.5rem;padding-left:1.2rem;font-size:0.88rem;">
+            <li><strong>Translucencia nucal (TN):</strong> marcador principal de aneuploidías. TN &gt;3mm asociada a Trisomía 21, 18, 13, Turner, otras.</li>
+            <li>Longitud cefalocaudal (LCC) → edad gestacional</li>
+            <li>Hueso nasal (ausencia → Trisomía 21)</li>
+            <li>Ductus venoso, regurgitación tricuspídea</li>
+            <li>Diagnóstico de embarazo (saco gestacional, embrión, latido)</li>
+            <li>Número de fetos, corionicidad en gemelos</li>
+          </ul>
+        </div>
+        <div class="alert alert-purple" style="margin:0;">
+          <strong>🟣 2do Trimestre (sem. 18–22)</strong>
+          <ul style="margin-top:0.5rem;padding-left:1.2rem;font-size:0.88rem;">
+            <li>Anatomía fetal completa (ecografía morfológica estructural)</li>
+            <li>Marcadores "blandos" de aneuploidías: foco hiperecogénico cardíaco, pielectasia renal, intestino hiperecogénico, fémur corto</li>
+            <li>Sexo fetal (relevante en enfermedades ligadas al X)</li>
+            <li>Posición placentaria (placenta previa)</li>
+            <li>Diámetro biparietal, longitud del fémur → edad gestacional</li>
+            <li>Movimientos fetales, respiración fetal</li>
+            <li>Detección de siameses (toracópagos, onfalópagos), amelia, meromelia, hidrocefalia, cardiopatías congénitas, labio leporino</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.5rem 0 0.7rem;font-family:'Courier New',monospace;">2b. Screening Bioquímico Materno</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Marcador</th><th>Trimestre</th><th>T21 (Down)</th><th>T18 (Edwards)</th><th>Defecto tubo neural</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PAPP-A (proteína plasmática A asociada al embarazo)</td>
+              <td>1er</td>
+              <td class="td-red">↓ Disminuida</td>
+              <td class="td-red">↓ Disminuida</td>
+              <td>Normal</td>
+            </tr>
+            <tr>
+              <td>β-hCG libre</td>
+              <td>1er / 2do</td>
+              <td class="td-orange">↑ Elevada</td>
+              <td class="td-red">↓ Disminuida</td>
+              <td>Normal</td>
+            </tr>
+            <tr>
+              <td>AFP (Alfa-fetoproteína)</td>
+              <td>2do</td>
+              <td class="td-red">↓ Disminuida</td>
+              <td class="td-red">↓ Disminuida</td>
+              <td class="td-orange">↑↑ Muy elevada</td>
+            </tr>
+            <tr>
+              <td>Estriol no conjugado (uE3)</td>
+              <td>2do</td>
+              <td class="td-red">↓ Disminuido</td>
+              <td class="td-red">↓ Disminuido</td>
+              <td>Normal</td>
+            </tr>
+            <tr>
+              <td>Inhibina A</td>
+              <td>2do</td>
+              <td class="td-orange">↑ Elevada</td>
+              <td>Normal/↓</td>
+              <td>Normal</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:0.83rem;color:var(--text-muted);">La combinación TN + PAPP-A + β-hCG ("Triple test combinado de 1er trimestre") detecta ~85–90% de los casos de Trisomía 21 con tasa de falsos positivos del 5%.</p>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.5rem 0 0.7rem;font-family:'Courier New',monospace;">2c. Prueba Prenatal No Invasiva (NIPT / PANORAMA)</h4>
+      <div class="alert alert-purple">
+        <strong>ADN Fetal Libre en Plasma Materno (cfDNA)</strong>
+        A partir de la semana 9–10, fragmentos de ADN placentario (trofoblasto) circulan en el plasma materno. Representan aprox. el 5–15% del ADN total en sangre materna. La NIPT analiza estos fragmentos mediante secuenciación masiva paralela.
+        <br><br>
+        <strong>Capacidad de detección:</strong><br>
+        <span class="tag tag-purple">Trisomía 21</span> <span class="tag tag-purple">Trisomía 18</span> <span class="tag tag-purple">Trisomía 13</span> <span class="tag tag-purple">Monosomía X (Turner)</span> <span class="tag tag-purple">47,XXY (Klinefelter)</span>
+        <br><br>
+        <strong>Sensibilidad:</strong> &gt;99% para T21 | <strong>Especificidad:</strong> &gt;99.8%<br>
+        <strong>⚠ CRÍTICO:</strong> La NIPT es un <em>test de screening</em>, NO diagnóstico. Un resultado positivo DEBE confirmarse con amniocentesis o CVS. Un falso positivo puede ocurrir por mosaicismo confinado a la placenta.
+      </div>
+    </div>
+  </div>
+
+  <!-- Métodos Invasivos -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-red"></div>
+      3. Métodos Invasivos — Técnicas Diagnósticas Definitivas
+    </div>
+    <div class="subsection-body">
+      <div class="alert alert-orange">
+        <strong>Indicación de métodos invasivos</strong>
+        Se realizan cuando: (1) el riesgo calculado de aneuploidía es &gt;1/150–1/300, (2) hay antecedente familiar de enfermedad genética diagnosticable molecularmente, (3) el resultado del NIPT es positivo. Permiten obtener material genético fetal para cariotipo convencional, FISH, microarrays de CGH, estudios moleculares específicos y bioquímica fetal.
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Técnica</th>
+              <th>Semana óptima</th>
+              <th>Riesgo de aborto</th>
+              <th>Muestra</th>
+              <th>Ventajas</th>
+              <th>Limitaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-highlight">Amniocentesis</td>
+              <td>15–20 sem</td>
+              <td><span class="tag tag-green">~0.1–0.3%</span></td>
+              <td>Líquido amniótico (células fetales descamadas: amniocitos)</td>
+              <td>Riesgo más bajo. Mayor volumen de muestra. Permite AFP en líquido.</td>
+              <td>Resultados en 2–3 semanas (cultivo celular). No se puede antes de sem. 14–15.</td>
+            </tr>
+            <tr>
+              <td class="td-orange">Biopsia de Vellosidades Coriónicas (CVS)</td>
+              <td>10–13 sem</td>
+              <td><span class="tag tag-orange">~0.5–1%</span></td>
+              <td>Tejido placentario (citotrofoblasto fetal)</td>
+              <td>Más precoz (1er trimestre). Resultados más rápidos (diagnóstico BQ y genético directo sin cultivo).</td>
+              <td>Mayor riesgo. Mosaicismo confinado a placenta puede ser fuente de error.</td>
+            </tr>
+            <tr>
+              <td class="td-red">Cordocentesis (Funiculocentesis)</td>
+              <td>&gt;18 sem</td>
+              <td><span class="tag tag-red">~1–2%</span></td>
+              <td>Sangre fetal de la vena umbilical (guiada por eco)</td>
+              <td>Diagnóstico rápido (linfocitos fetales en mitosis directas: 48–72h). Permite transfusión intrauterina.</td>
+              <td>Mayor riesgo. Técnicamente más difícil. Solo justificable en indicaciones precisas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Estudios realizados con muestras invasivas</h4>
+          <ul class="feature-list" style="font-size:0.86rem;">
+            <li><strong>Cariotipo convencional:</strong> detección de aneuploidías, translocaciones, inversiones, deleciones grandes</li>
+            <li><strong>FISH (Hibridación in situ fluorescente):</strong> resultado rápido para trisomías 13, 18, 21 y cromosomas sexuales</li>
+            <li><strong>Microarray de CGH:</strong> detección de microdelecion / microduplicaciones (&gt;50 kb)</li>
+            <li><strong>PCR y secuenciación génica:</strong> diagnóstico de enfermedades monogénicas específicas (CF, DMD, etc.)</li>
+            <li><strong>Estudios enzimáticos:</strong> errores congénitos del metabolismo</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;margin:1rem 0 0.6rem;font-family:'Courier New',monospace;">Complicaciones de la Amniocentesis (Emery)</h4>
+          <ul class="feature-list" style="font-size:0.86rem;">
+            <li>Punción de placenta y/o desprendimiento</li>
+            <li>Hemorragias amnióticas (sangre en líquido)</li>
+            <li>Punción del feto (excepcional con eco-guía)</li>
+            <li>Punción del cordón umbilical</li>
+            <li>Punción de vejiga materna o intestino materno</li>
+            <li>Aborto espontáneo post-procedimiento</li>
+            <li>Infección (corioamnionitis) — rara</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step">
+          <span class="step-icon">🩺</span>
+          <div class="step-name">Screening inicial</div>
+          <div class="step-desc">TN + PAPP-A + β-hCG. Sem 11–14</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">🔬</span>
+          <div class="step-name">NIPT (si disponible)</div>
+          <div class="step-desc">cfDNA. Alta sens. Sem 9+</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">⚠️</span>
+          <div class="step-name">¿Riesgo elevado?</div>
+          <div class="step-desc">&gt;1:150 o NIPT+</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">🧬</span>
+          <div class="step-name">CVS (sem 10–13)</div>
+          <div class="step-desc">ó Amniocentesis (sem 15+)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">📋</span>
+          <div class="step-name">Diagnóstico definitivo</div>
+          <div class="step-desc">Cariotipo, FISH, microarray, molecular</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Asesoramiento genético -->
+  <div class="subsection">
+    <div class="subsection-header">
+      <div class="dot dot-blue"></div>
+      4. Asesoramiento Genético Prenatal
+    </div>
+    <div class="subsection-body">
+      <p>El <strong>asesoramiento genético</strong> es un proceso de comunicación y educación que proporciona a individuos y familias información sobre: la naturaleza de la condición genética en cuestión, el riesgo de recurrencia, las opciones de diagnóstico disponibles, las opciones reproductivas, y el apoyo psicosocial necesario.</p>
+
+      <div class="alert alert-blue">
+        <strong>📚 Emery — Principios del Asesoramiento Genético</strong>
+        El asesoramiento genético moderno es <strong>no directivo</strong>: el objetivo no es influir en la decisión de la familia sino proporcionar información completa, precisa y comprensible para que puedan tomar decisiones autónomas e informadas, consistentes con sus valores personales, religiosos y culturales.
+      </div>
+
+      <h4 style="color:var(--text-muted);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:1.2rem 0 0.7rem;font-family:'Courier New',monospace;">Pasos del Asesoramiento Genético (Emery)</h4>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="step-icon">🗂</span>
+          <div class="step-name">Historia clínica y familiar</div>
+          <div class="step-desc">Construcción del genograma (3 generaciones mínimo)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">📊</span>
+          <div class="step-name">Estimación de riesgos</div>
+          <div class="step-desc">Empíricos, mendelianos, multifactoriales</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">🔭</span>
+          <div class="step-name">Explicar pruebas</div>
+          <div class="step-desc">Beneficios, límites, riesgos de cada técnica</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">📋</span>
+          <div class="step-name">Análisis de resultados</div>
+          <div class="step-desc">Interpretación en contexto familiar</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-icon">🤲</span>
+          <div class="step-name">Apoyo psicosocial</div>
+          <div class="step-desc">Autonomía, acompañamiento, recursos</div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:1.2rem;">
+        <div class="alert alert-green" style="margin:0;">
+          <strong>Tipos de Riesgo en Asesoramiento</strong>
+          <ul style="padding-left:1.2rem;font-size:0.87rem;margin-top:0.4rem;">
+            <li><strong>Riesgo mendeliano:</strong> calculado por las leyes de Mendel (ej.: 25% AR)</li>
+            <li><strong>Riesgo empírico:</strong> basado en estudios poblacionales (enfermedades multifactoriales)</li>
+            <li><strong>Riesgo basal:</strong> riesgo de la población general (~3% de defectos mayores)</li>
+          </ul>
+        </div>
+        <div class="alert alert-purple" style="margin:0;">
+          <strong>Opciones Reproductivas Post-diagnóstico</strong>
+          <ul style="padding-left:1.2rem;font-size:0.87rem;margin-top:0.4rem;">
+            <li>Continuar el embarazo (con o sin preparación para manejo especializado)</li>
+            <li>Interrupción del embarazo (donde legalmente permisible)</li>
+            <li>Diagnóstico genético preimplantacional (DGP/PGT) en próximos embarazos</li>
+            <li>Adopción / donación de gametos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════
+     PUNTOS DE EXAMEN
+══════════════════════════════════════ -->
+<section class="section-block" id="trampas">
+  <div class="section-title">
+    <div class="section-number" style="background:rgba(227,179,65,0.15);color:var(--gold);border:1px solid rgba(227,179,65,0.3);">⚠</div>
+    <div>
+      <h2 style="color:var(--gold);">Puntos de Examen y Trampas Clásicas</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">Errores frecuentes en MCQ y casos clínicos</p>
+    </div>
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #1 — AD vs Mutación de Novo</strong>
+    Si en un pedigrí ambos padres son sanos y el hijo tiene una enfermedad AD, NO descartes AD. Puede ser una mutación de novo (nueva mutación germinal). En Acondroplasia, el 80% de los casos son mutaciones de novo en el gen FGFR3. El riesgo para hermanos del paciente es bajo (riesgo de mosaicismo germinal de los padres: ~5%).
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #2 — XR: padre afectado NO transmite a hijos varones</strong>
+    Error clásico: "Si el padre tiene hemofilia, ¿cuál es el riesgo para sus hijos varones?" Respuesta: 0% — el padre le da el Y al hijo varón, nunca el X. Todos sus hijos varones son sanos. El 100% de sus hijas son portadoras obligadas.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #3 — NIPT no es diagnóstico</strong>
+    Un resultado de NIPT positivo para Trisomía 21 NO confirma el diagnóstico. Es una prueba de screening (tamizaje) con alta sensibilidad pero que requiere confirmación mediante cariotipo fetal (amniocentesis o CVS). Un resultado positivo con NIPT sin confirmar no es base suficiente para tomar decisiones irreversibles.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #4 — Malformación ≠ Deformidad ≠ Disrupción</strong>
+    Diferenciar: <em>Malformación</em> = error intrínseco del desarrollo (genético). <em>Deformidad</em> = fuerzas mecánicas sobre tejido normal (pie equinovaro postural). <em>Disrupción</em> = destrucción de tejido previamente normal (banda amniótica). En el examen, la clave es la secuencia temporal y el mecanismo.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #5 — AR: 25% afectados de cada embarazo, no acumulativo</strong>
+    "Una pareja portadora ya tuvo un hijo afectado, ¿cuál es el riesgo para el próximo hijo?" Respuesta: 25% — el riesgo es independiente en cada concepción. No cambia porque ya tuvieron un hijo afectado (no hay "compensación"). Cada embrión tiene el mismo 25%.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #6 — Consanguinidad → siempre pensar AR</strong>
+    Ante un pedigrí con padres consanguíneos (primos, tíos-sobrinos), la enfermedad en los hijos es casi siempre AR. La consanguinidad aumenta la probabilidad de que ambos progenitores compartan alelos raros idénticos por descendencia (IBD). Si el examinador menciona "padres son primos", piense AR.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #7 — CVS vs Amniocentesis: ¿cuándo?</strong>
+    CVS: 10–13 semanas (1er trimestre, más temprano). Amniocentesis: 15–20 semanas (2do trimestre). CVS tiene mayor riesgo de aborto (~1%) que amniocentesis (~0.1–0.3%). Si la pregunta pregunta cuál tiene resultado más rápido → CVS. Si pregunta cuál tiene menor riesgo → Amniocentesis.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #8 — Acondroplasia: homocigoto es letal</strong>
+    El genotipo heterocigoto (Aa) produce acondroplasia clásica. El homocigoto (AA en sentido de dos alelos mutados) es prácticamente letal en período neonatal por hipoplasia grave del foramen magno y tórax. Si dos personas con acondroplasia tienen un hijo, hay 25% normal, 50% acondroplasia, 25% homocigoto (letal).
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #9 — Síndrome de X Frágil y su herencia inusual</strong>
+    X Frágil tiene herencia XR pero con particularidades: anticipación por expansión de tripletes CGG, "paradoja de Sherman" (abuelo portador normal → hijas portadoras → nietos afectados), penetrancia incompleta en mujeres. No sigue el patrón XR clásico. Es la causa más frecuente de retraso mental hereditario.
+  </div>
+
+  <div class="trap-item">
+    <strong>🪤 Trampa #10 — AFP materna elevada no siempre es defecto del tubo neural</strong>
+    AFP elevada en suero materno puede indicar: defecto del tubo neural (principal), gastrosquisis, onfalocele, necrosis fetal, embarazo gemelar, error en la fecha gestacional. Es una señal de alerta que requiere ecografía de confirmación, no diagnóstico por sí sola.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════
+     BIBLIOGRAFÍA
+══════════════════════════════════════ -->
+<section class="section-block" id="biblio">
+  <div class="biblio">
+    <h3>📚 Bibliografía y Fuentes</h3>
+    <div class="biblio-item">
+      <strong>Fuente principal (Emery):</strong> Turnpenny, P.D.; Ellard, S. <em>Emery: Elementos de Genética Médica.</em> 15ª ed. Barcelona: Elsevier, 2017. — Capítulos 5, 6, 7 (Herencia Mendeliana), Cap. 8 (Patrones de pedigrí), Cap. 16 (Defectos congénitos y diagnóstico prenatal).
+    </div>
+    <div class="biblio-item">
+      <strong>Herencia Mendeliana:</strong> Thompson, M.W.; McInnes, R.R.; Willard, H.F. <em>Thompson & Thompson: Genetics and Genomics in Medicine.</em> 9ª ed. — Cap. 5, 6 y 7.
+    </div>
+    <div class="biblio-item">
+      <strong>Diagnóstico Prenatal:</strong> ACOG Practice Bulletin No. 226: Screening for Fetal Chromosomal Abnormalities. <em>Obstetrics & Gynecology.</em> 2020;136(4).
+    </div>
+    <div class="biblio-item">
+      <strong>Teratología:</strong> Schardein, J.L. <em>Chemically Induced Birth Defects.</em> 3ª ed. Marcel Dekker, 2000. — Principios de Wilson aplicados en Emery Cap. 16.
+    </div>
+    <div class="biblio-item">
+      <strong>Base de datos de enfermedades genéticas:</strong> OMIM — Online Mendelian Inheritance in Man. <em>omim.org</em>. Johns Hopkins University.
+    </div>
+    <div class="biblio-item">
+      <strong>Diapositivas del curso:</strong> Dr. Roberto Ottoni. <em>Clases 9, 10 y 11 — Genética Médica.</em> Universidad Central del Paraguay, Filial Pedro Juan Caballero. 2025.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer style="text-align:center;padding:2rem;color:var(--text-dim);font-size:0.78rem;border-top:1px solid var(--border);font-family:'Courier New',monospace;letter-spacing:0.05em;">
+  Resumen académico premium · Genética Médica · André — UCP-PJC 3er Sem. · Basado en Emery 15ª ed. + Diapositivas Dr. Ottoni
+</footer>
+
+</body>
+</html>

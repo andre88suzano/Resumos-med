@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vacunas — Guía de Estudio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0a0e17 0%, #0d1b2e 50%, #091628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 10%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  header h1 span {
+    color: var(--accent);
+  }
+
+  .header-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-top: 14px;
+  }
+
+  .header-sub strong {
+    color: var(--accent3);
+  }
+
+  /* ── NAVIGATION TABS ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  nav button:hover { color: var(--text); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 28px 80px;
+  }
+
+  .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+  .tab-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SECTION HEADERS ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .section-lead {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+    padding: 18px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: border-color 0.2s;
+  }
+
+  .timeline-item:hover { border-color: var(--accent); }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -33px; top: 22px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+
+  .timeline-year {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-title {
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+
+  .timeline-body {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  /* ── CARDS GRID ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+
+  .card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+
+  .card-body {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  /* ── ALERT / HIGHLIGHT BOXES ── */
+  .alert {
+    border-left: 3px solid var(--accent3);
+    background: rgba(245,158,11,0.06);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+
+  .alert strong { color: var(--accent3); }
+
+  .alert-blue {
+    border-left-color: var(--accent);
+    background: rgba(59,130,246,0.06);
+  }
+  .alert-blue strong { color: var(--accent); }
+
+  .alert-green {
+    border-left-color: var(--success);
+    background: rgba(16,185,129,0.06);
+  }
+  .alert-green strong { color: var(--success); }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .tag-cyan { background: rgba(6,182,212,0.15); color: var(--accent2); }
+  .tag-yellow { background: rgba(245,158,11,0.15); color: var(--accent3); }
+  .tag-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .tag-green { background: rgba(16,185,129,0.15); color: var(--success); }
+
+  /* ── MECHANISM DIAGRAM ── */
+  .mechanism {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .mechanism-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(30,45,69,0.6);
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content strong { color: var(--text); font-size: 14px; }
+  .step-content p { color: var(--text-muted); font-size: 13px; margin-top: 3px; }
+
+  /* ── VACCINE TYPE TABLE ── */
+  .vtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 20px 0;
+  }
+
+  .vtable th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vtable td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .vtable tr:hover td { background: rgba(59,130,246,0.04); }
+
+  .vtable td:first-child { color: var(--text); font-weight: 500; }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .quiz-q {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: #fff;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .quiz-q span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+  .quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface2);
+    font-size: 13.5px;
+    color: var(--text-dim);
+    text-align: left;
+    width: 100%;
+  }
+
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+
+  .quiz-opt .opt-letter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(59,130,246,0.1);
+    border-radius: 3px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .quiz-opt.correct { border-color: var(--success) !important; background: rgba(16,185,129,0.08) !important; color: var(--text) !important; }
+  .quiz-opt.wrong { border-color: var(--danger) !important; background: rgba(239,68,68,0.08) !important; }
+  .quiz-opt:disabled { cursor: default; }
+
+  .quiz-feedback {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    display: none;
+  }
+
+  .quiz-feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .quiz-feedback.ok { background: rgba(16,185,129,0.1); border-left: 3px solid var(--success); color: var(--text-dim); }
+  .quiz-feedback.nok { background: rgba(239,68,68,0.08); border-left: 3px solid var(--danger); color: var(--text-dim); }
+  .quiz-feedback strong { color: var(--text); }
+
+  .quiz-score {
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 24px;
+    display: none;
+  }
+
+  .quiz-score .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    color: var(--accent);
+  }
+
+  .quiz-score p { color: var(--text-muted); font-size: 12px; margin-top: 6px; }
+
+  /* ── KEY CONCEPTS ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .concept {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .concept-term {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  .concept-def {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    header { padding: 32px 20px 24px; }
+    nav { padding: 0 12px; }
+    nav button { padding: 14px 12px; font-size: 10px; }
+    main { padding: 28px 16px 60px; }
+    .vtable { font-size: 12px; }
+    .vtable th, .vtable td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="header-label">Inmunología &amp; Salud Pública — Resumen de Estudio</p>
+  <h1>Historia &amp; Inmunología<br>de las <span>Vacunas</span></h1>
+  <p class="header-sub">Basado en: San Miguel-Hernández (2013) · Santos &amp; Almeida (2024) · Muñoz &amp; Pereira (2026)<br>
+  <strong>Prueba:</strong> martes — 5 preguntas</p>
+</header>
+
+<nav id="nav">
+  <button class="active" onclick="showTab('historia')">Historia</button>
+  <button onclick="showTab('mecanismos')">Mecanismos Inmunes</button>
+  <button onclick="showTab('tipos')">Tipos de Vacunas</button>
+  <button onclick="showTab('desafios')">Desafíos Actuales</button>
+  <button onclick="showTab('quiz')">🧪 Quiz</button>
+</nav>
+
+<main>
+
+  <!-- ══════════════════════════ TAB 1: HISTORIA ══════════════════════════ -->
+  <div class="tab-panel active" id="tab-historia">
+    <h2 class="section-title">Historia de la Vacunación</h2>
+    <p class="section-lead">De la variolización empírica a la vacunología reversa — ~3000 años de historia.</p>
+
+    <div class="alert">
+      <strong>⚠ Concepto clave:</strong> Una <strong>vacuna</strong> es la suspensión de microorganismos (vivos, atenuados o muertos) que, inoculada regularmente, genera una <strong>respuesta inmune activa, duradera y específica</strong>. Es preventiva, no curativa. La <strong>sueroterapia</strong> en cambio utiliza anticuerpos ya formados por otro individuo — genera inmunidad <em>pasiva y de corta duración</em>.
+    </div>
+
+    <div class="timeline">
+
+      <div class="timeline-item">
+        <div class="timeline-year">~1000 a.C. — Siglo XI</div>
+        <div class="timeline-title">Variolización — Oriente</div>
+        <div class="timeline-body">
+          En India y China se inoculaba material de pústulas de viruela en personas sanas para conferir protección. Los primeros textos son chinos (siglo XI). En India, la práctica tenía carácter religioso — descrita en el <em>Sact'eya Grantham</em> (1000 a.C.). La técnica consistía en soplar polvo de costras secas por la fosa nasal (izquierda en niñas, derecha en niños). <span class="tag tag-red">Riesgo: ~3% de mortalidad</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1721</div>
+        <div class="timeline-title">Lady Montagu introduce la variolización en Europa</div>
+        <div class="timeline-body">
+          Lady Mary Wortley Montagu (esposa del embajador inglés en Constantinopla) sobrevivió a la viruela e introdujo el método en Gran Bretaña, convenciendo a la nobleza tras probarlo en prisioneros. Desde allí se extendió al resto de Europa y Norteamérica.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1796 — 1798</div>
+        <div class="timeline-title">Edward Jenner — La primera vacuna real</div>
+        <div class="timeline-body">
+          Jenner observó que los ordeñadores que contraían la <em>vaccinia</em> (viruela bovina, más leve) quedaban protegidos contra la viruela humana. En 1796 inoculó el fluido de la pústula de Sarah Nelmes en el niño James Phillipp (8 años) — dos semanas de síntomas leves, luego inmunidad completa al inocularle viruela humana.<br><br>
+          Publicó sus hallazgos en <em>"An Inquiry into Causes and Effects of Variolae Vaccinae"</em> (1798). Acuñó el término <strong>vacuna</strong> (del latín <em>vacca</em>). Ventajas sobre la variolización: sin pústulas, sin riesgo de muerte, no contagiosa, técnica sencilla.
+          <br><span class="tag tag-green">1979: OMS declara la viruela erradicada globalmente</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1803</div>
+        <div class="timeline-title">Expedición de Balmis — España</div>
+        <div class="timeline-body">
+          Carlos IV organizó la <em>Real Expedición Marítima de la Vacuna</em> dirigida por Francisco Xavier Balmis. La goleta "María Pita" zarpó de La Coruña con 25 niños portadores del fluido vacunal ("brazo a brazo"). Recorrió Canarias, Caracas, Cuba, México, Filipinas y Macao. Es la primera campaña global de vacunación de la historia.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1880 — 1895</div>
+        <div class="timeline-title">Louis Pasteur — Era bacteriológica y concepto de atenuación</div>
+        <div class="timeline-body">
+          Pasteur estableció la <em>Teoría de los Gérmenes</em>, demostrando que los microorganismos son responsables de las infecciones. Desarrolló el concepto de <strong>atenuación</strong>: cultivos envejecidos de <em>Pasteurella multocida</em> (cólera aviar) perdían virulencia pero generaban inmunidad.<br><br>
+          Vacunas desarrolladas: cólera aviar, carbunco (demostración pública en Pouilly-le-Fort, 1881 — con grupos vacunados y no vacunados). En 1885 administró la vacuna antirrábica al niño Joseph Meister (9 años), mordido por un perro rabioso — caso histórico más famoso de Pasteur.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1885 — España</div>
+        <div class="timeline-title">Jaime Ferrán — Vacuna anticolérica</div>
+        <div class="timeline-body">
+          Ante una epidemia de cólera en Valencia, Ferrán aplicó gérmenes atenuados por vía subcutánea — primera vacuna anticolérica aplicada a humanos en España, con resultados muy positivos.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1888 — 1923</div>
+        <div class="timeline-title">Sueroterapia antidiftérica y Toxoides</div>
+        <div class="timeline-body">
+          Roux y Yersin descubren la <strong>toxina diftérica</strong> (1888-1890). Emil Behring y Kitasato demuestran que el suero de animales inmunes neutraliza la toxina — fundamento de la inmunidad <em>humoral</em>.<br>
+          En 1923, <strong>Gaston Ramon</strong> desarrolla la <strong>anatoxina (toxoide)</strong> usando formol + calor — sustancia inactivada que conserva poder inmunizante sin toxicidad. Base de las vacunas antitetánica y antidiftérica actuales.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1921</div>
+        <div class="timeline-title">BCG — Vacuna contra la Tuberculosis</div>
+        <div class="timeline-body">
+          Calmette y Guérin cultivaron una cepa de <em>Mycobacterium bovis</em> durante 13 años (232 pasajes en 3 semanas) hasta atenuarla completamente. En 1921 se usó por primera vez en Francia. Hoy la OMS solo la recomienda en recién nacidos de países con alta prevalencia.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1949 — 1960s</div>
+        <div class="timeline-title">Edad de Oro — Cultivo celular y Poliomielitis</div>
+        <div class="timeline-body">
+          El cultivo celular <em>in vitro</em> (Enders, Weller, Robbins) permitió producir virus fuera de organismos vivos. <strong>Jonas Salk</strong> (1954): vacuna antipolio inyectable con virus inactivados — redujo los casos en EE.UU. de 55.000 a 200 en 3 años. <strong>Albert Sabin</strong> (1958): vacuna oral con cepas atenuadas. Después: sarampión, parotiditis, rubéola, varicela.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">1970s — 1990s</div>
+        <div class="timeline-title">Vacunas de Polisacáridos, Conjugadas y ADN Recombinante</div>
+        <div class="timeline-body">
+          Vacunas de subunidades (no microorganismos completos): meningocócica, neumocócica, <em>Haemophilus influenzae</em> tipo B. Vacunas conjugadas: polisacáridos + proteína transportadora → mayor eficacia, posible en lactantes. Primera vacuna de <strong>ADN recombinante</strong>: hepatitis B (1986) — tan eficaz como la derivada de plasma y sin riesgo de transmisión sanguínea.
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-year">Siglo XXI</div>
+        <div class="timeline-title">Vacunología reversa y vacunas de mRNA</div>
+        <div class="timeline-body">
+          La <strong>vacunología inversa (reversa)</strong>: en lugar de cultivar el microorganismo, se parte del genoma para identificar antígenos relevantes computacionalmente — proceso mucho más rápido. Las vacunas de <strong>mRNA</strong> (COVID-19) evidenciaron esta aceleración: el genoma del SARS-CoV-2 fue secuenciado en días y las vacunas estuvieron en fase clínica en meses. También se investigan vacunas terapéuticas contra VIH, cáncer, Alzheimer y caries.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ TAB 2: MECANISMOS ══════════════════════════ -->
+  <div class="tab-panel" id="tab-mecanismos">
+    <h2 class="section-title">Mecanismos Inmunológicos</h2>
+    <p class="section-lead">Cómo el sistema inmune responde a una vacuna — inmunidad inata → adaptativa → memoria.</p>
+
+    <div class="mechanism">
+      <div class="mechanism-title">🔬 Secuencia de la Respuesta Vacunal</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Reconocimiento antigénico (Innata)</strong>
+            <p>Macrófagos y células dendríticas reconocen el antígeno vacunal a través de receptores PRR (Pattern Recognition Receptors), que identifican estructuras conservadas de patógenos llamadas PAMPs. Se activa la producción de citocinas y mediadores inflamatorios.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Presentación antigénica</strong>
+            <p>Las células dendríticas procesan el antígeno y lo presentan a los linfócitos T en moléculas del MHC (Complejo Mayor de Histocompatibilidad), proporcionando señales coestimuladoras y citocinas que condicionan la activación.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Activación de linfócitos T (Adaptativa)</strong>
+            <p>Los linfócitos T sufren expansión clonal: <strong>T CD4+</strong> (auxiliares) coordinan la respuesta, ayudan a los linfócitos B y organizan los centros germinativos. <strong>T CD8+</strong> (citotóxicos) eliminan células infectadas.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Respuesta Humoral — Producción de Anticuerpos</strong>
+            <p>Los linfócitos B son estimulados a producir anticuerpos específicos. En los centros germinativos ocurre la <em>maduración de afinidad</em> y la <em>cambio de clase</em>. Los anticuerpos de alta afinidad pueden bloquear la entrada del patógeno, favorecer opsonización y activar el complemento.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <strong>Formación de Memoria Inmunológica</strong>
+            <p>Se generan células B y T de memoria de larga vida, y plasmócitos de larga duración que mantienen anticuerpos circulantes. En una exposición futura, la respuesta anamnésica es más rápida e intensa. La duración de la memoria depende del tipo de antígeno, adjuvantes y características del individuo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-blue">
+      <strong>🔑 Concepto clave:</strong> La protección vacunal <em>raramente depende de un solo mecanismo</em>. Anticuerpos neutralizantes, anticuerpos no neutralizantes con funciones efectoras, células T auxiliares y T citotóxicas actúan de forma <strong>complementaria</strong>, con variaciones según el patógeno y la plataforma vacunal.
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept">
+        <div class="concept-term">Inmunidad Inata</div>
+        <div class="concept-def">Primera línea de defensa. Rápida, no específica. Actores: neutrófilos, macrófagos, células NK, células dendríticas, mastócitos. Establece el ambiente inflamatorio que guía la respuesta adaptativa.</div>
+      </div>
+      <div class="concept">
+        <div class="concept-term">Inmunidad Adaptativa</div>
+        <div class="concept-def">Segunda línea. Específica y con memoria. Mediada por linfócitos B y T. Requiere días en activarse pero genera protección duradera contra patógenos específicos.</div>
+      </div>
+      <div class="concept">
+        <div class="concept-term">Adjuvante</div>
+        <div class="concept-def">Sustancia que potencia la respuesta inmune al antígeno. Aumenta la migración de células dendríticas a órganos linfoides y la expresión de moléculas coestimuladoras. Esencial en vacunas inactivadas y de subunidades.</div>
+      </div>
+      <div class="concept">
+        <div class="concept-term">Centro Germinativo</div>
+        <div class="concept-def">Estructura en órganos linfoides secundarios donde los linfócitos B pasan por selección, cambio de clase y maduración de afinidad. Las vacunas de mRNA inducen respuestas prolongadas en centros germinativos.</div>
+      </div>
+      <div class="concept">
+        <div class="concept-term">Plasmócito de larga vida</div>
+        <div class="concept-def">Linfocito B diferenciado que produce anticuerpos circulantes durante años o décadas en la médula ósea, manteniendo la inmunidad humoral a largo plazo.</div>
+      </div>
+      <div class="concept">
+        <div class="concept-term">PAMP</div>
+        <div class="concept-def">Pathogen-Associated Molecular Patterns. Estructuras conservadas de microorganismos (ej: LPS, flagelina) reconocidas por los PRR de la inmunidad innata, desencadenando la respuesta inflamatoria inicial.</div>
+      </div>
+    </div>
+
+    <div class="alert alert-green">
+      <strong>mRNA y centros germinativos:</strong> Estudios (Turner et al., 2021) demostraron que las vacunas de mRNA inducen respuestas persistentes en centros germinativos — indicador de inmunidad humoral duradera. Esto favorece el desarrollo de plasmócitos de larga vida y células B de memoria más eficaces.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ TAB 3: TIPOS ══════════════════════════ -->
+  <div class="tab-panel" id="tab-tipos">
+    <h2 class="section-title">Tipos de Vacunas y Desarrollo</h2>
+    <p class="section-lead">Clasificación por plataforma, perfil inmunológico y etapas de desarrollo clínico.</p>
+
+    <table class="vtable">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Mecanismo</th>
+          <th>Ventajas</th>
+          <th>Limitaciones</th>
+          <th>Ejemplos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Vivas Atenuadas</td>
+          <td>Microorganismo debilitado que se replica de forma limitada</td>
+          <td>Respuesta robusta (humoral + celular), generalmente 1 dosis</td>
+          <td>Riesgo en inmunocomprometidos, requiere cadena de frío estricta</td>
+          <td>BCG, polio oral (Sabin), sarampión, varicela, fiebre amarilla</td>
+        </tr>
+        <tr>
+          <td>Inactivadas</td>
+          <td>Patógeno completo muerto por calor/químicos</td>
+          <td>Mayor seguridad, estabilidad</td>
+          <td>Menor inmunogenicidad, requiere adjuvante y refuerzos</td>
+          <td>Polio inyectable (Salk), hepatitis A, influenza, rabia</td>
+        </tr>
+        <tr>
+          <td>Toxoides</td>
+          <td>Toxina inactivada con formol (anatoxina), no el microorganismo</td>
+          <td>Seguras, respuesta dirigida a la toxina</td>
+          <td>Requieren refuerzos periódicos</td>
+          <td>Antitetánica (1924), antidiftérica (1923 — Ramón)</td>
+        </tr>
+        <tr>
+          <td>Subunidades / Recombinantes</td>
+          <td>Proteínas o polisacáridos purificados del patógeno</td>
+          <td>Alta seguridad, producción precisa</td>
+          <td>Baja inmunogenicidad sola, necesita adjuvante</td>
+          <td>Hepatitis B recombinante (1986), neumocócica, meningocócica, VPH</td>
+        </tr>
+        <tr>
+          <td>Conjugadas</td>
+          <td>Polisacárido + proteína transportadora → respuesta T-dependiente</td>
+          <td>Eficaces en lactantes, memoria inmune superior</td>
+          <td>Producción compleja y costosa</td>
+          <td>Haemophilus influenzae tipo B, meningococo, neumococo conjugada</td>
+        </tr>
+        <tr>
+          <td>Vectores Virales</td>
+          <td>Virus modificado no replicante portando el gen del antígeno</td>
+          <td>Alta inmunogenicidad, respuesta celular fuerte</td>
+          <td>Inmunidad previa al vector puede reducir eficacia</td>
+          <td>COVID-19 (AstraZeneca, Janssen)</td>
+        </tr>
+        <tr>
+          <td>ARN mensajero (mRNA)</td>
+          <td>mRNA encapsulado en nanopartículas lipídicas; células del hospedero producen el antígeno</td>
+          <td>Desarrollo rápido, centros germinativos robustos, adaptable a variantes</td>
+          <td>Requiere cadena de frío ultra-fría, tecnología costosa</td>
+          <td>COVID-19 (Pfizer-BioNTech, Moderna)</td>
+        </tr>
+        <tr>
+          <td>ADN</td>
+          <td>Secuencias de DNA que son expresadas por células del hospedero vía MHC</td>
+          <td>Estabilidad del material genético, producción escalable</td>
+          <td>Necesita vectores/electroporación, variabilidad de respuesta interindividual</td>
+          <td>En desarrollo/investigación</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert">
+      <strong>Diferencia clave — Salk vs. Sabin:</strong> La vacuna de Salk (1954) usa virus <em>inactivados</em> administrada <em>inyectada</em>. La de Sabin (1958) usa cepas <em>atenuadas</em> administradas <em>vía oral</em>. Ambas eliminaron la poliomielitis de la mayor parte del mundo.
+    </div>
+
+    <h3 style="font-family: 'Playfair Display'; color: #fff; margin: 28px 0 12px;">Etapas del Desarrollo Vacunal</h3>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔬</div>
+        <div class="card-title">Fase Preclínica</div>
+        <div class="card-body">Selección del antígeno. Evaluación en modelos animales: seguridad, capacidad de inducir respuesta inmune, potencial preventivo. Estudios de producción, estabilidad y viabilidad.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <div class="card-title">Fase 1</div>
+        <div class="card-body">Pocos voluntarios. Énfasis en <strong>seguridad, reatogenicidad y dosis</strong>. Primeras señales de inmunogenicidad. Verifica si la formulación es tolerable.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">Fase 2</div>
+        <div class="card-body">Cientos de participantes, más próximos a la población objetivo. Análisis de seguridad, dosis óptima, esquema de administración y capacidad inmunogénica.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <div class="card-title">Fase 3</div>
+        <div class="card-body">Miles de voluntarios. Vacinados vs. grupo control. Estima <strong>eficacia real</strong> contra la enfermedad, detecta efectos adversos raros, verifica consistencia en distintos contextos.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <div class="card-title">Aprobación Regulatoria</div>
+        <div class="card-body">Análisis de calidad, seguridad y efectividad. No solo buena respuesta inmunológica — también producción estable, segura y reproducible (FDA, EMA, ANVISA).</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👁️</div>
+        <div class="card-title">Fase 4 — Farmacovigilancia</div>
+        <div class="card-body">Monitoreo post-aprobación: efectos adversos raros, duración real de la protección, efectividad en condiciones reales, ajuste de políticas públicas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ TAB 4: DESAFÍOS ══════════════════════════ -->
+  <div class="tab-panel" id="tab-desafios">
+    <h2 class="section-title">Desafíos Actuales</h2>
+    <p class="section-lead">La hesitación vacunal, el COVID-19 y los retos de la vacunología contemporánea.</p>
+
+    <div class="alert">
+      <strong>Hesitación vacunal:</strong> Fenómeno que ha existido desde los inicios de la vacunación (la <em>Revolta da Vacina</em> en Brasil, 1904) y persiste hasta hoy, amplificado por redes sociales. Las causas incluyen dudas sobre eficacia, miedo a efectos secundarios y desconfianza en la industria farmacéutica. La reducción paradójica de la frecuencia de enfermedades (gracias a las vacunas) hace que la sociedad perciba más los efectos adversos que la enfermedad que previenen.
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🦠</div>
+        <div class="card-title">COVID-19 — Prueba histórica</div>
+        <div class="card-body">Pandemia por SARS-CoV-2, detectada en Wuhan en 2019. Más de 6 millones de muertes y 766 millones de casos confirmados (OMS). El genoma fue secuenciado en días → vacunas en fase clínica en meses. El 5 de mayo de 2023 la OMS decretó el fin de la pandemia, con ~13,5 mil millones de dosis aplicadas globalmente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <div class="card-title">Desigualdad de Acceso</div>
+        <div class="card-body">Millones de niños aún sin esquemas básicos de vacunación. La cadena de frío, costos de producción y fallas logísticas limitan el acceso en países de bajos ingresos. El éxito depende tanto de la sofisticación del producto como de la capacidad del sistema de salud de distribuirlo con equidad.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔁</div>
+        <div class="card-title">Durabilidad de la Respuesta</div>
+        <div class="card-body">La duración de la memoria inmunológica varía según el antígeno, adjuvante, plataforma y características del individuo. Algunas vacunas requieren múltiples refuerzos. Vacunas de mRNA han mostrado centros germinativos persistentes — señal prometedora de inmunidad duradera.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧬</div>
+        <div class="card-title">Vacunología Reversa</div>
+        <div class="card-body">Identifica antígenos a partir del genoma del patógeno, sin necesidad de cultivarlo. Bioinformática y modelado computacional permiten seleccionar epítopos relevantes rápidamente. Especialmente útil para patógenos difíciles de cultivar o de alta mutagenicidad.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">Nuevas Fronteras Terapéuticas</div>
+        <div class="card-body">Se investigan vacunas terapéuticas (no solo preventivas) contra VIH, cáncer, Alzheimer y caries dental. La integración de imunología, bioinformática y biología estructural abre posibilidades antes inimaginables.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📉</div>
+        <div class="card-title">Cobertura vacunal en declive</div>
+        <div class="card-body">En Brasil, el Programa Nacional de Imunização (PNI, 1973) tuvo éxito histórico, pero los Índices de Cobertura Vacinal (ICV) han disminuido progresivamente desde 2016 — tendencia observada en varios países en el mismo período, agravada por la pandemia de COVID-19.</div>
+      </div>
+    </div>
+
+    <div class="alert alert-green">
+      <strong>Avances contemporáneos a destacar:</strong> vacunas de mRNA, vacinología reversa, biología estructural, imunoinformática y adjuvantes más dirigidos. Estos avances redujeron el tiempo entre identificación del patógeno y formulación del candidato vacunal de décadas a meses, como evidenció el COVID-19.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ TAB 5: QUIZ ══════════════════════════ -->
+  <div class="tab-panel" id="tab-quiz">
+    <h2 class="section-title">Quiz de Preparación</h2>
+    <p class="section-lead">5 preguntas sobre los temas más probables de la prueba del martes.</p>
+
+    <div id="quiz-container"></div>
+    <div class="quiz-score" id="quiz-score">
+      <div class="score-num" id="score-num">0/5</div>
+      <p>Resultado Final — Quiz de Vacunas</p>
+      <p style="margin-top:10px; font-size:11px;" id="score-msg"></p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── TAB NAVIGATION ──
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // ── QUIZ DATA ──
+  const questions = [
+    {
+      q: "¿Cuál fue la principal contribución de Edward Jenner a la historia de la vacunación, y qué ventaja tenía su método sobre la variolización?",
+      opts: [
+        "Desarrolló la primera vacuna de ARN mensajero usando material genético del virus de la viruela.",
+        "Demostró que la inoculación con viruela bovina (vaccinia) confería protección contra la viruela humana, sin causar pústulas, sin riesgo de muerte y sin ser foco de contagio.",
+        "Descubrió el concepto de atenuación al cultivar bacterias envejecidas que perdían virulencia pero mantenían inmunogenicidad.",
+        "Creó la primera vacuna conjugada, uniendo polisacáridos capsulares a proteínas transportadoras para potenciar la respuesta inmune."
+      ],
+      correct: 1,
+      feedback: "Jenner observó que los ordeñadores inmunizados con vaccinia resistían la viruela humana. Su método era superior a la variolización porque no producía enfermedad real, no causaba muerte (~3% de mortalidad en la variolización) y no generaba contagio. Pasteur es quien desarrolló el concepto de atenuación; las vacunas conjugadas son posteriores al siglo XX."
+    },
+    {
+      q: "En la respuesta inmune vacunal, ¿cuál es la función específica de las células dendríticas y por qué son consideradas el 'eslabón' entre la inmunidad innata y adaptativa?",
+      opts: [
+        "Producen anticuerpos de alta afinidad directamente, sin necesidad de interacción con linfócitos T.",
+        "Reconocen PAMPs a través de PRRs, capturan el antígeno, lo procesan y lo presentan en moléculas del MHC a los linfócitos T, proporcionando además señales coestimuladoras y citocinas.",
+        "Ejercen actividad citotóxica directa sobre células infectadas, eliminando el patógeno sin activar la respuesta adaptativa.",
+        "Mantienen anticuerpos circulantes durante años en la médula ósea, siendo responsables exclusivas de la memoria humoral a largo plazo."
+      ],
+      correct: 1,
+      feedback: "Las células dendríticas son APCs (células presentadoras de antígeno) por excelencia. Conectan los dos brazos del sistema inmune: pertenecen a la inmunidad innata (reconocen PAMPs vía PRRs) pero su función principal es activar la inmunidad adaptativa al presentar el antígeno procesado a los linfócitos T en los órganos linfoides secundarios. Los plasmócitos de larga vida (no las dendríticas) mantienen anticuerpos circulantes."
+    },
+    {
+      q: "¿Cuál fue el aporte de Gaston Ramon (1923) en la historia del desarrollo vacunal, y qué tipo de vacunas surgieron a partir de su descubrimiento?",
+      opts: [
+        "Desarrolló la vacuna BCG cultivando Mycobacterium bovis durante 13 años con 232 pasajes sucesivos.",
+        "Demostró que los polisacáridos capsulares podían usarse como antígenos, dando origen a las vacunas de subunidades.",
+        "Desarrolló la anatoxina (toxoide) combinando formol y calor, que inactiva la toxina sin destruir su poder inmunizante — base de las vacunas antidiftérica y antitetánica.",
+        "Creó el primer sistema de vacunación 'brazo a brazo' para transportar el fluido vacunal sin refrigeración."
+      ],
+      correct: 2,
+      feedback: "Ramon descubrió que el efecto combinado de formol + calor producía una sustancia segura — la anatoxina o toxoide — que conserva la capacidad inmunizante de la toxina sin su toxicidad. Esto permitió crear las vacunas antidiftérica (1923) y antitetánica (1924). La BCG fue desarrollada por Calmette y Guérin; el sistema 'brazo a brazo' fue de Balmis (1803)."
+    },
+    {
+      q: "¿Qué diferencia fundamental existe entre las vacunas de virus vivos atenuados y las vacunas de ARN mensajero (mRNA) en términos de mecanismo de acción y perfil de respuesta inmune?",
+      opts: [
+        "Las vacunas atenuadas generan solo respuesta humoral, mientras que las de mRNA generan exclusivamente respuesta celular citotóxica.",
+        "Las vacunas atenuadas usan microorganismos enfraquecidos capaces de replicarse de forma limitada, induciendo respuesta robusta humoral y celular; las de mRNA instruyen a las células del hospedero a producir el antígeno, induciendo respuestas de centro germinativo persistentes y memoria duradera.",
+        "Las vacunas de mRNA son más antiguas que las atenuadas y tienen un perfil de seguridad inferior debido a su capacidad de integrarse al ADN del hospedero.",
+        "Ambas plataformas producen respuestas inmunes idénticas; la única diferencia es la vía de administración."
+      ],
+      correct: 1,
+      feedback: "Las vacunas atenuadas contienen microorganismos vivos debilitados que se replican limitadamente, mimetizando la infección natural (respuesta robusta, a menudo con 1 dosis). Las vacunas de mRNA contienen instrucciones genéticas — el mRNA es traducido por el ribosoma celular y produce el antígeno, que luego activa la respuesta inmune. Turner et al. (2021) demostraron que inducen centros germinativos persistentes. El mRNA NO se integra al ADN."
+    },
+    {
+      q: "¿Cuál de los siguientes factores NO explica el fenómeno de hesitación vacinal contemporánea, según los artículos analizados?",
+      opts: [
+        "La reducción paradójica de la visibilidad de las enfermedades prevenibles por la vacunación, que hace que la sociedad perciba más los efectos adversos que la enfermedad.",
+        "La desinformación amplificada por redes sociales, que incluye teorías conspirativas sobre la industria farmacéutica y efectos adversos exagerados.",
+        "La sobrecarga de los centros germinativos producida por múltiples vacunas simultáneas, que genera una respuesta inmune deficiente en niños.",
+        "La escasa comprensión de la historia y los mecanismos de las vacunas por parte de sectores de la población civil, favorecida por el complejo contexto histórico-científico del tema."
+      ],
+      correct: 2,
+      feedback: "La 'sobrecarga de centros germinativos por vacunas simultáneas' es un argumento antivacunas sin base científica — no es identificado en ninguno de los tres artículos como causa real de hesitación vacinal. Las demás opciones sí son identificadas: la reducción paradójica de la visibilidad de las enfermedades (Dubé et al., 2015), la desinformación en redes sociales (Galhardi et al., 2022) y la complejidad histórico-científica del tema (Santos & Almeida, 2024)."
+    }
+  ];
+
+  // ── RENDER QUIZ ──
+  const container = document.getElementById('quiz-container');
+  let answered = 0;
+  let correct = 0;
+
+  questions.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-card';
+    div.innerHTML = `
+      <div class="quiz-q">
+        <span>PREGUNTA ${qi + 1} / ${questions.length}</span>
+        ${q.q}
+      </div>
+      <div class="quiz-options" id="opts-${qi}">
+        ${q.opts.map((opt, oi) => `
+          <button class="quiz-opt" onclick="answer(${qi}, ${oi})" id="opt-${qi}-${oi}">
+            <span class="opt-letter">${['A','B','C','D'][oi]}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb-${qi}"></div>
+    `;
+    container.appendChild(div);
+  });
+
+  function answer(qi, oi) {
+    const q = questions[qi];
+    const opts = document.querySelectorAll(`#opts-${qi} button`);
+    opts.forEach(b => b.disabled = true);
+
+    const fb = document.getElementById(`fb-${qi}`);
+    const chosen = document.getElementById(`opt-${qi}-${oi}`);
+    const correctBtn = document.getElementById(`opt-${qi}-${q.correct}`);
+
+    correctBtn.classList.add('correct');
+    if (oi !== q.correct) chosen.classList.add('wrong');
+
+    const isOk = oi === q.correct;
+    if (isOk) correct++;
+    answered++;
+
+    fb.className = 'quiz-feedback show ' + (isOk ? 'ok' : 'nok');
+    fb.innerHTML = `<strong>${isOk ? '✓ Correcto' : '✗ Incorrecto'}</strong> — ${q.feedback}`;
+
+    if (answered === questions.length) {
+      const scoreEl = document.getElementById('quiz-score');
+      scoreEl.style.display = 'block';
+      document.getElementById('score-num').textContent = `${correct}/${questions.length}`;
+      const msg = correct === 5 ? '¡Perfecto! Dominas los tres artículos.' :
+                  correct >= 3 ? 'Buen resultado — revisa los errores antes del martes.' :
+                  'Repasa especialmente los mecanismos inmunológicos y la historia.';
+      document.getElementById('score-msg').textContent = msg;
+      scoreEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+</script>
+
+</body>
+</html>

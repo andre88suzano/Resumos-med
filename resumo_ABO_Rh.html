@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema ABO y Factor Rh — Genética Médica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --red:     #C0392B;
+    --red-lt:  #FDECEA;
+    --red-mid: #E74C3C;
+    --blue:    #1A5276;
+    --blue-lt: #EAF2FF;
+    --blue-mid:#2980B9;
+    --amber:   #784212;
+    --amber-lt:#FEF9E7;
+    --amber-mid:#F39C12;
+    --green:   #1E8449;
+    --green-lt:#E9F7EF;
+    --green-mid:#27AE60;
+    --gray:    #2C3E50;
+    --gray-lt: #F4F6F7;
+    --border:  #DDE1E7;
+    --text:    #1C2833;
+    --muted:   #5D6D7E;
+    --serif:   'DM Serif Display', Georgia, serif;
+    --sans:    'DM Sans', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: #F8F9FB;
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  .hero {
+    background: linear-gradient(135deg, #1C2833 0%, #2E4053 60%, #17202A 100%);
+    color: #fff;
+    padding: 3.5rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(192,57,43,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 40%, rgba(41,128,185,0.15) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 5px 14px; border-radius: 20px;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    position: relative;
+  }
+  .hero h1 span { color: #E74C3C; }
+  .hero-sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 14px;
+    margin-top: 0.7rem;
+    position: relative;
+  }
+
+  /* ─── Nav pills ─── */
+  .nav-wrap {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(248,249,251,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
+    display: flex; gap: 4px; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-wrap::-webkit-scrollbar { display: none; }
+  .nav-pill {
+    flex-shrink: 0;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    padding: 10px 16px;
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+    white-space: nowrap;
+  }
+  .nav-pill.active, .nav-pill:hover { color: var(--red); border-bottom-color: var(--red); }
+
+  /* ─── Layout ─── */
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ─── Typography ─── */
+  .section-title {
+    font-family: var(--serif);
+    font-size: 1.9rem; font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .section-title span { color: var(--red); }
+  .section-lead {
+    color: var(--muted); font-size: 14.5px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem; margin-bottom: 2rem;
+  }
+
+  h3 {
+    font-size: 16px; font-weight: 600;
+    color: var(--text);
+    margin: 2rem 0 0.7rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3 .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red); display: inline-block; flex-shrink: 0;
+  }
+
+  p { font-size: 15px; margin-bottom: 0.9rem; color: var(--text); }
+
+  /* ─── Cards ─── */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+  .card.red   { border-left: 4px solid var(--red-mid);   background: var(--red-lt); }
+  .card.blue  { border-left: 4px solid var(--blue-mid);  background: var(--blue-lt); }
+  .card.amber { border-left: 4px solid var(--amber-mid); background: var(--amber-lt); }
+  .card.green { border-left: 4px solid var(--green-mid); background: var(--green-lt); }
+
+  .card-title {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .card.red   .card-title { color: var(--red); }
+  .card.blue  .card-title { color: var(--blue); }
+  .card.amber .card-title { color: var(--amber); }
+  .card.green .card-title { color: var(--green); }
+
+  /* ─── Table ─── */
+  .tbl-wrap { overflow-x: auto; margin: 1.2rem 0; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    background: var(--gray);
+    color: #fff; font-weight: 600;
+    padding: 10px 14px; text-align: left;
+  }
+  tbody tr:nth-child(even) { background: var(--gray-lt); }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #EEF0F3; }
+  tbody tr:last-child td { border-bottom: none; }
+  .tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  }
+  .tag-dom  { background: #D5F5E3; color: #1E8449; }
+  .tag-cod  { background: #D6EAF8; color: #1A5276; }
+  .tag-rec  { background: #FDEDEC; color: #C0392B; }
+
+  /* ─── Punnett square ─── */
+  .punnett-wrap { margin: 2rem 0; }
+  .punnett-label {
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+  .punnett-controls {
+    display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: flex-end;
+  }
+  .punnett-controls label {
+    font-size: 13px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 4px;
+  }
+  .punnett-controls select {
+    font-family: var(--sans); font-size: 14px;
+    padding: 7px 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; color: var(--text); cursor: pointer;
+    outline: none;
+  }
+  .punnett-controls select:focus { border-color: var(--red-mid); }
+
+  .punnett-btn {
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    color: #fff; background: var(--red-mid);
+    border: none; border-radius: 8px; padding: 9px 20px; cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  .punnett-btn:hover   { background: var(--red); }
+  .punnett-btn:active  { transform: scale(0.97); }
+
+  .square-grid {
+    display: inline-grid;
+    gap: 2px;
+    border: 2px solid var(--gray);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--gray);
+    margin-top: 1rem;
+  }
+  .sq-cell {
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    min-width: 90px; min-height: 58px;
+    padding: 6px;
+    text-align: center;
+  }
+  .sq-header { background: var(--gray); color: #fff; font-size: 14px; }
+  .sq-result { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 3px; }
+
+  /* ─── Offspring summary ─── */
+  .offspring-summary {
+    margin-top: 1rem; padding: 1rem 1.2rem;
+    background: var(--gray-lt); border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .offspring-summary .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .offspring-summary .row + .row { border-top: 1px solid var(--border); }
+
+  /* ─── Compatibilidade grid ─── */
+  .compat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px; margin: 1.2rem 0;
+  }
+  .compat-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    font-size: 13.5px;
+  }
+  .compat-card .blood-type {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .compat-card .compat-detail { color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.5; }
+
+  /* ─── HDNF timeline ─── */
+  .timeline { position: relative; margin: 1.5rem 0; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 18px; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-item {
+    display: flex; gap: 14px;
+    margin-bottom: 1.4rem; position: relative;
+  }
+  .tl-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--border);
+    z-index: 1;
+  }
+  .tl-content { padding-top: 6px; }
+  .tl-step { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .tl-desc { font-size: 14px; color: var(--text); margin-top: 3px; }
+
+  /* ─── Quiz ─── */
+  .quiz-wrap { margin-top: 1.5rem; }
+  .q-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.3rem 1.5rem;
+    margin-bottom: 1rem;
+    transition: box-shadow .2s;
+  }
+  .q-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .q-num {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--red); margin-bottom: 0.5rem;
+  }
+  .q-text { font-size: 15px; font-weight: 500; margin-bottom: 1rem; }
+  .q-options { display: flex; flex-direction: column; gap: 8px; }
+  .q-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: #fff;
+    transition: background .15s, border-color .15s;
+    text-align: left;
+  }
+  .q-opt:hover { background: var(--gray-lt); border-color: #BDC3C7; }
+  .q-opt.correct { background: var(--green-lt); border-color: var(--green-mid); color: var(--green); font-weight: 600; }
+  .q-opt.wrong   { background: var(--red-lt);   border-color: var(--red-mid);   color: var(--red);   font-weight: 600; }
+  .q-feedback {
+    font-size: 13px; margin-top: 8px; padding: 8px 12px;
+    border-radius: 6px; display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.ok  { background: var(--green-lt); color: var(--green); }
+  .q-feedback.err { background: var(--red-lt);   color: var(--red); }
+
+  .score-bar {
+    margin-top: 1.5rem; padding: 1rem 1.4rem;
+    background: var(--gray-lt); border-radius: 10px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .score-num { font-size: 2rem; font-weight: 700; color: var(--red); font-family: var(--serif); }
+  .score-label { font-size: 14px; color: var(--muted); }
+  .reset-btn {
+    margin-left: auto;
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    padding: 8px 18px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: #fff;
+    cursor: pointer; transition: background .15s;
+  }
+  .reset-btn:hover { background: var(--gray-lt); }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 600px) {
+    .punnett-controls { flex-direction: column; }
+    .sq-cell { min-width: 70px; font-size: 12px; }
+    .section-title { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<header class="hero">
+  <div class="hero-badge">Genética Médica · Dr. Roberto Ottoni</div>
+  <h1>Sistema <span>ABO</span> y Factor Rh</h1>
+  <p class="hero-sub">Basado en Emery: Genética Médica · 12ª ed. | Ottoni — Clase 5</p>
+</header>
+
+<!-- ══ NAV ══ -->
+<nav class="nav-wrap">
+  <button class="nav-pill active" onclick="show('s-abo',this)">Sistema ABO</button>
+  <button class="nav-pill" onclick="show('s-rh',this)">Factor Rh</button>
+  <button class="nav-pill" onclick="show('s-her',this)">Herencia</button>
+  <button class="nav-pill" onclick="show('s-compat',this)">Compatibilidad</button>
+  <button class="nav-pill" onclick="show('s-hdnf',this)">HDNF</button>
+  <button class="nav-pill" onclick="show('s-quiz',this)">Quiz</button>
+</nav>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 1 — SISTEMA ABO
+══════════════════════════════════════════ -->
+<section id="s-abo" class="section active">
+  <h2 class="section-title">Sistema <span>ABO</span></h2>
+  <p class="section-lead">Descubierto por Karl Landsteiner en 1901 · Primer sistema de grupos sanguíneos descrito en humanos</p>
+
+  <p>El sistema ABO está controlado por un único locus en el <strong>cromosoma 9</strong>, con tres alelos principales: <em>I<sup>A</sup></em>, <em>I<sup>B</sup></em> e <em>i</em> (o). Determina qué <strong>antígenos</strong> se expresan en la superficie del eritrocito y qué <strong>anticuerpos</strong> están naturalmente presentes en el plasma.</p>
+
+  <div class="card blue">
+    <div class="card-title">Base molecular (Emery, cap. 7)</div>
+    Los alelos I<sup>A</sup> e I<sup>B</sup> codifican <strong>glicosiltransferasas</strong> distintas que modifican el antígeno H de la superficie eritrocitaria. El alelo <em>i</em> produce una enzima no funcional, dejando el antígeno H sin modificar (grupo O).
+  </div>
+
+  <h3><span class="dot"></span>Antígenos y anticuerpos</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo sanguíneo (fenotipo)</th>
+          <th>Antígeno en eritrocito</th>
+          <th>Anticuerpo en plasma</th>
+          <th>Genotipo(s) posibles</th>
+          <th>Frecuencia aprox. (Brasil)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>A</strong></td><td>A</td><td>Anti-B</td><td>I<sup>A</sup>I<sup>A</sup> · I<sup>A</sup>i</td><td>~44%</td></tr>
+        <tr><td><strong>B</strong></td><td>B</td><td>Anti-A</td><td>I<sup>B</sup>I<sup>B</sup> · I<sup>B</sup>i</td><td>~10%</td></tr>
+        <tr><td><strong>AB</strong></td><td>A y B</td><td>Ninguno</td><td>I<sup>A</sup>I<sup>B</sup></td><td>~3%</td></tr>
+        <tr><td><strong>O</strong></td><td>Ninguno (solo H)</td><td>Anti-A y Anti-B</td><td>ii</td><td>~43%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3><span class="dot"></span>Tipos de alelos y herencia</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Genotipo</th><th>Fenotipo</th><th>Tipo de alelo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>I<sup>A</sup>i</td><td>Tipo A</td><td><span class="tag tag-dom">Dominante</span></td></tr>
+        <tr><td>I<sup>A</sup>I<sup>A</sup></td><td>Tipo A</td><td><span class="tag tag-dom">Dominante</span></td></tr>
+        <tr><td>I<sup>B</sup>i</td><td>Tipo B</td><td><span class="tag tag-dom">Dominante</span></td></tr>
+        <tr><td>I<sup>B</sup>I<sup>B</sup></td><td>Tipo B</td><td><span class="tag tag-dom">Dominante</span></td></tr>
+        <tr><td>I<sup>A</sup>I<sup>B</sup></td><td>Tipo AB</td><td><span class="tag tag-cod">Codominante</span></td></tr>
+        <tr><td>ii</td><td>Tipo O</td><td><span class="tag tag-rec">Recesivo</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card amber">
+    <div class="card-title">Punto clave — Codominancia</div>
+    En el tipo AB, ambos alelos I<sup>A</sup> e I<sup>B</sup> se expresan de forma <em>codominante</em>: ambos antígenos están presentes simultáneamente en la membrana eritrocitaria. Esto es diferente de la dominancia incompleta; los dos productos genéticos se producen sin interferencia.
+  </div>
+
+  <h3><span class="dot"></span>Tipificación sanguínea (prueba de aglutinación)</h3>
+  <p>Se mezcla la sangre del paciente con antisueros específicos. La <strong>aglutinación</strong> indica la presencia del antígeno correspondiente:</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Anti-A (azul)</th><th>Anti-B (amarillo)</th><th>Anti-D / Anti-Rh (transparente)</th><th>Tipo de sangre</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>✅ Aglutina</td><td>❌ No aglutina</td><td>✅ Aglutina</td><td><strong>A Rh+</strong></td></tr>
+        <tr><td>❌ No aglutina</td><td>✅ Aglutina</td><td>❌ No aglutina</td><td><strong>B Rh−</strong></td></tr>
+        <tr><td>✅ Aglutina</td><td>✅ Aglutina</td><td>✅ Aglutina</td><td><strong>AB Rh+</strong></td></tr>
+        <tr><td>❌ No aglutina</td><td>❌ No aglutina</td><td>❌ No aglutina</td><td><strong>O Rh−</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card red">
+    <div class="card-title">Caso clínico de la clase (Ottoni)</div>
+    Paciente con aglutinación con Anti-A (azul) + Anti-D (transparente), sin aglutinación con Anti-B → <strong>Antígeno A y antígeno D presentes</strong> → Grupo sanguíneo: <strong>A Rh+</strong>.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 2 — FACTOR Rh
+══════════════════════════════════════════ -->
+<section id="s-rh" class="section">
+  <h2 class="section-title">Factor <span>Rh</span></h2>
+  <p class="section-lead">Sistema antigénico más complejo clínicamente después del ABO · Descubierto por Landsteiner y Wiener (1940)</p>
+
+  <p>El sistema Rh está codificado por dos genes altamente homólogos en el <strong>cromosoma 1p36</strong>: <em>RHD</em> y <em>RHCE</em>. El antígeno más clínicamente relevante es el <strong>antígeno D</strong>, determinado por el gen <em>RHD</em>.</p>
+
+  <div class="card blue">
+    <div class="card-title">Base molecular (Emery, cap. 7)</div>
+    El antígeno D es una proteína transmembrana (polipeptídico no glicosilado). Personas Rh− carecen del gen RHD funcional (deleción o inactivación). Anticuerpos anti-D se forman solo tras <em>sensibilización</em> (transfusión incompatible o embarazo previo), a diferencia del sistema ABO donde los anticuerpos son naturales.
+  </div>
+
+  <h3><span class="dot"></span>Genotipos del factor Rh</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Genotipo</th><th>Fenotipo</th><th>Tipo de alelo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DD</td><td>Rh+ (positivo)</td><td><span class="tag tag-dom">Dominante homocigoto</span></td></tr>
+        <tr><td>Dd</td><td>Rh+ (positivo)</td><td><span class="tag tag-dom">Dominante heterocigoto</span></td></tr>
+        <tr><td>dd</td><td>Rh− (negativo)</td><td><span class="tag tag-rec">Recesivo homocigoto</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card amber">
+    <div class="card-title">Diferencias clave ABO vs Rh</div>
+    <table style="font-size:13.5px; width:100%; border-collapse:collapse;">
+      <thead><tr style="background:rgba(0,0,0,0.05)"><th style="padding:6px 10px; text-align:left">Característica</th><th style="padding:6px 10px; text-align:left">Sistema ABO</th><th style="padding:6px 10px; text-align:left">Sistema Rh</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:6px 10px">Anticuerpos</td><td style="padding:6px 10px">Naturales (IgM)</td><td style="padding:6px 10px">Inmunes / tras sensibilización (IgG)</td></tr>
+        <tr style="background:rgba(0,0,0,0.04)"><td style="padding:6px 10px">Cruzan placenta</td><td style="padding:6px 10px">No (IgM, grande)</td><td style="padding:6px 10px">Sí (IgG, pequeño)</td></tr>
+        <tr><td style="padding:6px 10px">Cromosoma</td><td style="padding:6px 10px">9q34</td><td style="padding:6px 10px">1p36</td></tr>
+        <tr style="background:rgba(0,0,0,0.04)"><td style="padding:6px 10px">Nat. del antígeno</td><td style="padding:6px 10px">Glicoproteína / glicolípido</td><td style="padding:6px 10px">Proteína transmembrana</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3><span class="dot"></span>Frecuencia del factor Rh</h3>
+  <p>Aproximadamente el <strong>85%</strong> de la población caucásica es Rh+ y el <strong>15%</strong> es Rh−. En Brasil, esta distribución es similar aunque con leve variación étnica. El 85% de los individuos Rh+ son <em>heterocigotos</em> (Dd), lo que tiene implicaciones en la predicción del riesgo de HDNF.</p>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 3 — HERENCIA (CUADRO DE PUNNETT)
+══════════════════════════════════════════ -->
+<section id="s-her" class="section">
+  <h2 class="section-title"><span>Herencia</span> de grupos sanguíneos</h2>
+  <p class="section-lead">Cruces genéticos interactivos basados en los ejercicios de la Clase 5 del Dr. Ottoni</p>
+
+  <div class="card green">
+    <div class="card-title">Recuerda</div>
+    El grupo ABO y el factor Rh se heredan <strong>independientemente</strong> (están en cromosomas distintos). Para predecir la descendencia, analizamos los dos caracteres por separado y luego combinamos.
+  </div>
+
+  <div class="punnett-wrap">
+    <p class="punnett-label">Selecciona los genotipos de los progenitores:</p>
+    <div class="punnett-controls">
+      <div>
+        <label>Progenitor 1 — ABO</label>
+        <select id="p1-abo">
+          <option value="AA">I<sup>A</sup>I<sup>A</sup> (A homocigoto)</option>
+          <option value="AO" selected>I<sup>A</sup>i (A heterocigoto)</option>
+          <option value="BB">I<sup>B</sup>I<sup>B</sup> (B homocigoto)</option>
+          <option value="BO">I<sup>B</sup>i (B heterocigoto)</option>
+          <option value="AB">I<sup>A</sup>I<sup>B</sup> (AB)</option>
+          <option value="OO">ii (O)</option>
+        </select>
+      </div>
+      <div>
+        <label>Progenitor 1 — Rh</label>
+        <select id="p1-rh">
+          <option value="DD">DD (Rh+ homocigoto)</option>
+          <option value="Dd" selected>Dd (Rh+ heterocigoto)</option>
+          <option value="dd">dd (Rh−)</option>
+        </select>
+      </div>
+      <div>
+        <label>Progenitor 2 — ABO</label>
+        <select id="p2-abo">
+          <option value="AA">I<sup>A</sup>I<sup>A</sup> (A homocigoto)</option>
+          <option value="AO">I<sup>A</sup>i (A heterocigoto)</option>
+          <option value="BB">I<sup>B</sup>I<sup>B</sup> (B homocigoto)</option>
+          <option value="BO">I<sup>B</sup>i (B heterocigoto)</option>
+          <option value="AB" selected>I<sup>A</sup>I<sup>B</sup> (AB)</option>
+          <option value="OO">ii (O)</option>
+        </select>
+      </div>
+      <div>
+        <label>Progenitor 2 — Rh</label>
+        <select id="p2-rh">
+          <option value="DD">DD (Rh+ homocigoto)</option>
+          <option value="Dd">Dd (Rh+ heterocigoto)</option>
+          <option value="dd" selected>dd (Rh−)</option>
+        </select>
+      </div>
+      <button class="punnett-btn" onclick="calcCross()">Calcular descendencia ›</button>
+    </div>
+    <div id="cross-result"></div>
+  </div>
+
+  <h3><span class="dot"></span>Ejemplos de la clase (Ottoni)</h3>
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">Ejemplo 1</div>
+    <p><strong>Progenitores:</strong> Tipo A+ heterocigótico para ambos (I<sup>A</sup>i Dd) × Tipo AB− (I<sup>A</sup>I<sup>B</sup> dd)</p>
+    <p><strong>Descendencia posible:</strong> A+ · AB+ · A− · B−</p>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">Ejemplo 2</div>
+    <p><strong>Progenitores:</strong> Tipo A− heterocigótico (I<sup>A</sup>i dd) × Tipo B+ heterocigótico para B y homocigótico para Rh (I<sup>B</sup>i DD)</p>
+    <p><strong>Descendencia posible:</strong> AB+ · A+ · B+ · O+</p>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">Ejemplo 3</div>
+    <p><strong>Progenitores:</strong> Tipo O− (ii dd) × Tipo B+ heterocigótico (I<sup>B</sup>i DD)</p>
+    <p><strong>Descendencia posible:</strong> B+ · O+ · B+ · O+</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 4 — COMPATIBILIDAD
+══════════════════════════════════════════ -->
+<section id="s-compat" class="section">
+  <h2 class="section-title"><span>Compatibilidad</span> en transfusiones</h2>
+  <p class="section-lead">Reglas de compatibilidad ABO y Rh para transfusiones seguras · Relevancia clínica directa</p>
+
+  <p>Una transfusión incompatible desencadena una <strong>reacción hemolítica</strong>: los anticuerpos del receptor se unen a los antígenos del donante, activando el complemento y causando hemólisis intravascular grave (shock, insuficiencia renal, muerte).</p>
+
+  <div class="card red">
+    <div class="card-title">Regla fundamental</div>
+    El receptor <strong>NO debe tener anticuerpos</strong> contra los antígenos del donante. Rh− debe recibir solo sangre Rh− (para evitar sensibilización y producción de Anti-D).
+  </div>
+
+  <h3><span class="dot"></span>Compatibilidad por grupo sanguíneo</h3>
+  <div class="compat-grid">
+    <div class="compat-card">
+      <div class="blood-type" style="color:var(--red)">AB+</div>
+      <div class="compat-detail">
+        <strong>Receptor universal</strong><br>
+        Puede recibir: A, B, AB, O / Rh+ o Rh−<br>
+        Puede donar a: AB+ solo
+      </div>
+    </div>
+    <div class="compat-card">
+      <div class="blood-type" style="color:#C0392B">A+</div>
+      <div class="compat-detail">
+        Puede recibir: A+ · A− · O+ · O−<br>
+        Puede donar a: A+ · AB+
+      </div>
+    </div>
+    <div class="compat-card">
+      <div class="blood-type" style="color:#1A5276">B+</div>
+      <div class="compat-detail">
+        Puede recibir: B+ · B− · O+ · O−<br>
+        Puede donar a: B+ · AB+
+      </div>
+    </div>
+    <div class="compat-card">
+      <div class="blood-type" style="color:#1E8449">O−</div>
+      <div class="compat-detail">
+        <strong>Donador universal</strong><br>
+        Puede recibir: O− solo<br>
+        Puede donar a: todos los grupos
+      </div>
+    </div>
+    <div class="compat-card">
+      <div class="blood-type" style="color:#8E44AD">AB−</div>
+      <div class="compat-detail">
+        Plasma universal (no eritrocitos)<br>
+        Puede recibir eritrocitos: A− · B− · AB− · O−
+      </div>
+    </div>
+    <div class="compat-card">
+      <div class="blood-type" style="color:#D35400">O+</div>
+      <div class="compat-detail">
+        Puede recibir: O+ · O−<br>
+        Puede donar a: A+ · B+ · AB+ · O+
+      </div>
+    </div>
+  </div>
+
+  <div class="card amber">
+    <div class="card-title">Por qué O− es el donador universal</div>
+    Los eritrocitos O− carecen de antígenos A, B y D → no hay anticuerpos del receptor que puedan reconocerlos y atacarlos. Sin embargo, el plasma de O− contiene Anti-A y Anti-B, por lo que la transfusión de <em>plasma</em> debe respetar el grupo ABO.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 5 — HDNF
+══════════════════════════════════════════ -->
+<section id="s-hdnf" class="section">
+  <h2 class="section-title"><span>Enfermedad Hemolítica</span> del Recién Nacido</h2>
+  <p class="section-lead">Eritroblastosis fetal · Consecuencia clínica más grave de la incompatibilidad Rh · Prevenible</p>
+
+  <p>La <strong>HDNF (Hemolytic Disease of the Newborn/Fetus)</strong> ocurre cuando la madre produce anticuerpos IgG contra antígenos eritrocitarios del feto. Estos anticuerpos cruzan la placenta y destruyen los eritrocitos fetales.</p>
+
+  <div class="card red">
+    <div class="card-title">Escenario clásico (Emery, cap. 7)</div>
+    Madre <strong>Rh−</strong> (dd) × Padre <strong>Rh+</strong> (Dd o DD) → feto Rh+ → hemorragia fetomaterna → sensibilización materna → producción de Anti-D (IgG) → en embarazos <em>siguientes</em> con feto Rh+, los anticuerpos cruzan la placenta y causan hemólisis fetal.
+  </div>
+
+  <h3><span class="dot"></span>Mecanismo paso a paso</h3>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot" style="background:#E8F8F5; color:#1E8449; border-color:#A9DFBF">1</div>
+      <div class="tl-content">
+        <div class="tl-step" style="color:#1E8449">1er embarazo — exposición</div>
+        <div class="tl-desc">Pequeña cantidad de eritrocitos fetales Rh+ entra en la circulación materna (especialmente durante el parto). Madre Rh− produce primero IgM (no cruza placenta) — bebé no afectado.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:#FEF9E7; color:#F39C12; border-color:#F9E79F">2</div>
+      <div class="tl-content">
+        <div class="tl-step" style="color:#D68910">Sensibilización materna</div>
+        <div class="tl-desc">El sistema inmune materno produce células de memoria anti-D. En embarazos posteriores con feto Rh+, responde rápidamente con IgG.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:#FDEDEC; color:#C0392B; border-color:#F5B7B1">3</div>
+      <div class="tl-content">
+        <div class="tl-step" style="color:#C0392B">2do+ embarazo — daño fetal</div>
+        <div class="tl-desc">Anti-D (IgG) cruza la barrera placentaria → se une a eritrocitos fetales → hemólisis por fagocitosis en bazo fetal → anemia fetal grave → eritroblastosis (médula ósea libera eritroblastos inmaduros).</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:#EBF5FB; color:#1A5276; border-color:#AED6F1">4</div>
+      <div class="tl-content">
+        <div class="tl-step" style="color:#1A5276">Complicaciones</div>
+        <div class="tl-desc">Hydrops fetalis (edema severo), hiperbilirrubinemia neonatal con riesgo de ictericia nuclear (kernicterus) y daño neurológico irreversible.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:#E9F7EF; color:#1E8449; border-color:#A9DFBF">5</div>
+      <div class="tl-content">
+        <div class="tl-step" style="color:#1E8449">Prevención</div>
+        <div class="tl-desc"><strong>Inmunoglobulina anti-D (Rhogam)</strong>: administrada a madre Rh− en semana 28 y dentro de las 72h postparto (o tras aborto). Neutraliza eritrocitos fetales Rh+ antes de que induzcan sensibilización.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <div class="card-title">HDNF por incompatibilidad ABO</div>
+    La incompatibilidad ABO (madre O, feto A o B) causa una forma más leve y no requiere sensibilización previa porque los anticuerpos anti-A/anti-B son naturales. Los anticuerpos IgG anti-A y anti-B pueden cruzar la placenta, pero los antígenos ABO también están presentes en otros tejidos fetales, "absorbiendo" los anticuerpos y reduciendo la hemólisis.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECCIÓN 6 — QUIZ
+══════════════════════════════════════════ -->
+<section id="s-quiz" class="section">
+  <h2 class="section-title"><span>Quiz</span> de repaso</h2>
+  <p class="section-lead">20 preguntas · Sistema ABO, Factor Rh, Herencia y Clínica</p>
+  <div class="quiz-wrap" id="quiz-container"></div>
+  <div class="score-bar" id="score-bar" style="display:none">
+    <div class="score-num" id="score-num">0/0</div>
+    <div><div style="font-size:15px;font-weight:600">Resultado</div><div class="score-label" id="score-label"></div></div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ Reiniciar</button>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<script>
+// ─── NAV ───────────────────────────────────────
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ─── CUADRO DE PUNNETT ─────────────────────────
+const genoABO = {
+  AA: ['A','A'],
+  AO: ['A','O'],
+  BB: ['B','B'],
+  BO: ['B','O'],
+  AB: ['A','B'],
+  OO: ['O','O']
+};
+const genoRh = {
+  DD: ['D','D'],
+  Dd: ['D','d'],
+  dd: ['d','d']
+};
+
+function combine(a1, a2) {
+  const alleles = [[a1[0], a2[0]], [a1[0], a2[1]], [a1[1], a2[0]], [a1[1], a2[1]]];
+  return alleles;
+}
+
+function aboFenotype(pair) {
+  const s = pair.sort().join('');
+  if (s === 'AA') return 'Tipo A';
+  if (s === 'AO') return 'Tipo A';
+  if (s === 'BB') return 'Tipo B';
+  if (s === 'BO') return 'Tipo B';
+  if (s === 'AB') return 'Tipo AB';
+  if (s === 'OO') return 'Tipo O';
+  return '?';
+}
+function aboGeno(pair) {
+  const map = {
+    'AA': 'I<sup>A</sup>I<sup>A</sup>',
+    'AO': 'I<sup>A</sup>i',
+    'AB': 'I<sup>A</sup>I<sup>B</sup>',
+    'BB': 'I<sup>B</sup>I<sup>B</sup>',
+    'BO': 'I<sup>B</sup>i',
+    'OO': 'ii'
+  };
+  return map[pair.slice().sort().join('')] || pair.join('');
+}
+function rhFenotype(pair) {
+  return pair.includes('D') ? 'Rh+' : 'Rh−';
+}
+function rhGeno(pair) {
+  return pair.slice().sort().reverse().join('');
+}
+
+function calcCross() {
+  const p1a = document.getElementById('p1-abo').value;
+  const p1r = document.getElementById('p1-rh').value;
+  const p2a = document.getElementById('p2-abo').value;
+  const p2r = document.getElementById('p2-rh').value;
+
+  const combABO = combine(genoABO[p1a], genoABO[p2a]);
+  const combRh  = combine(genoRh[p1r],  genoRh[p2r]);
+
+  const offspring = [];
+  combABO.forEach((ab, i) => {
+    const rh = combRh[i];
+    offspring.push({ ab, rh });
+  });
+
+  // Build 2x2 Punnett for ABO
+  const ga1 = genoABO[p1a], ga2 = genoABO[p2a];
+  const gr1 = genoRh[p1r],  gr2 = genoRh[p2r];
+
+  let html = `<div style="overflow-x:auto">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:6px">Cuadro de Punnett — Sistema ABO</p>
+  <div class="square-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sq-cell sq-header">✕</div>
+    <div class="sq-cell sq-header">${ga2[0]}</div>
+    <div class="sq-cell sq-header">${ga2[1]}</div>
+    <div class="sq-cell sq-header">${ga1[0]}</div>`;
+
+  [[ga1[0],ga2[0]],[ga1[0],ga2[1]]].forEach(p => {
+    html += `<div class="sq-cell"><strong>${aboGeno(p)}</strong><div class="sq-result">${aboFenotype(p)}</div></div>`;
+  });
+  html += `<div class="sq-cell sq-header">${ga1[1]}</div>`;
+  [[ga1[1],ga2[0]],[ga1[1],ga2[1]]].forEach(p => {
+    html += `<div class="sq-cell"><strong>${aboGeno(p)}</strong><div class="sq-result">${aboFenotype(p)}</div></div>`;
+  });
+  html += `</div></div>`;
+
+  // Punnett for Rh
+  html += `<p style="font-size:13px;color:var(--muted);margin:14px 0 6px">Cuadro de Punnett — Factor Rh</p>
+  <div class="square-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sq-cell sq-header">✕</div>
+    <div class="sq-cell sq-header">${gr2[0]}</div>
+    <div class="sq-cell sq-header">${gr2[1]}</div>
+    <div class="sq-cell sq-header">${gr1[0]}</div>`;
+  [[gr1[0],gr2[0]],[gr1[0],gr2[1]]].forEach(p => {
+    html += `<div class="sq-cell"><strong>${rhGeno(p)}</strong><div class="sq-result">${rhFenotype(p)}</div></div>`;
+  });
+  html += `<div class="sq-cell sq-header">${gr1[1]}</div>`;
+  [[gr1[1],gr2[0]],[gr1[1],gr2[1]]].forEach(p => {
+    html += `<div class="sq-cell"><strong>${rhGeno(p)}</strong><div class="sq-result">${rhFenotype(p)}</div></div>`;
+  });
+  html += `</div>`;
+
+  // Count offspring
+  const freq = {};
+  offspring.forEach(o => {
+    const key = aboFenotype(o.ab) + ' ' + rhFenotype(o.rh);
+    freq[key] = (freq[key] || 0) + 1;
+  });
+  html += `<div class="offspring-summary"><strong style="font-size:13px">Descendencia esperada (proporcional):</strong>`;
+  Object.entries(freq).forEach(([k,v]) => {
+    html += `<div class="row"><span>${k}</span><span><strong>${v}/4</strong> (${v*25}%)</span></div>`;
+  });
+  html += `</div>`;
+
+  document.getElementById('cross-result').innerHTML = html;
+}
+// Run default
+calcCross();
+
+// ─── QUIZ ──────────────────────────────────────
+const questions = [
+  {q:"¿En qué cromosoma se encuentra el locus del sistema ABO?", opts:["Cromosoma 1","Cromosoma 9","Cromosoma X","Cromosoma 6"], ans:1, fb:"El sistema ABO está codificado en el cromosoma 9q34 (Emery, cap. 7)."},
+  {q:"¿Cuál es el genotipo de un individuo del grupo O?", opts:["I\u1D2AI\u1D2B","I\u1D2Ai","I\u1D2Bi","ii"], ans:3, fb:"El grupo O resulta del genotipo homocigoto recesivo 'ii', que no produce glicosiltransferasa funcional."},
+  {q:"¿Qué anticuerpos están presentes en el plasma de un individuo del grupo A?", opts:["Anti-A","Anti-B","Anti-A y Anti-B","Ninguno"], ans:1, fb:"Grupo A tiene antígeno A en eritrocitos → anticuerpos anti-B en plasma."},
+  {q:"¿Cuál es el tipo de herencia de los alelos I\u1D2A e I\u1D2B?", opts:["Dominancia completa","Recesividad","Codominancia","Dominancia incompleta"], ans:2, fb:"En el grupo AB, ambos alelos se expresan simultáneamente → codominancia."},
+  {q:"¿En qué cromosoma se encuentran los genes RHD y RHCE?", opts:["Cromosoma 9","Cromosoma 1","Cromosoma 6","Cromosoma 11"], ans:1, fb:"Los genes RHD y RHCE están en el cromosoma 1p36 (Emery)."},
+  {q:"¿Qué genotipo corresponde a una persona Rh negativo?", opts:["DD","Dd","dd","D−"], ans:2, fb:"El fenotipo Rh− resulta del genotipo homocigoto recesivo 'dd'."},
+  {q:"¿Qué clase de inmunoglobulina es el Anti-D producido en la HDNF?", opts:["IgM","IgA","IgG","IgE"], ans:2, fb:"Los anticuerpos anti-Rh formados por sensibilización son IgG, que cruzan la placenta (a diferencia de IgM)."},
+  {q:"¿Cuál es el donador universal de eritrocitos?", opts:["AB+","O−","O+","AB−"], ans:1, fb:"O− no posee antígenos A, B ni D → puede donar a todos los grupos sin riesgo de reacción."},
+  {q:"¿Cuál es el receptor universal de eritrocitos?", opts:["O−","AB+","AB−","A+"], ans:1, fb:"AB+ tiene antígenos A, B y D, y sin anticuerpos anti-A, anti-B ni anti-D → puede recibir de cualquier grupo."},
+  {q:"Una madre O− tiene un hijo con padre B+ (genotipo I\u1D2Bi Dd). ¿Cuál es la probabilidad de que el hijo sea Rh+?", opts:["0%","25%","50%","100%"], ans:2, fb:"Madre dd × Padre Dd → 50% Dd (Rh+) y 50% dd (Rh−)."},
+  {q:"¿Cuándo se administra la inmunoglobulina anti-D (Rhogam)?", opts:["Solo en el parto","Semana 28 y dentro de 72h postparto","Solo en el 2do embarazo","Cuando el bebé nace Rh−"], ans:1, fb:"El protocolo estándar es: 28 semanas de gestación + 72h tras el parto (o aborto) para prevenir sensibilización."},
+  {q:"¿Por qué la HDNF por incompatibilidad ABO es generalmente más leve que la por Rh?", opts:["Los anticuerpos ABO son IgG más débiles","Los antígenos ABO están en otros tejidos que absorben anticuerpos","El sistema ABO no cruza la placenta","No hay anticuerpos naturales anti-A/anti-B"], ans:1, fb:"Los antígenos ABO presentes en otros tejidos fetales absorben los anticuerpos anti-A/anti-B, reduciendo la hemólisis eritrocitaria."},
+  {q:"¿Qué prueba clínica detecta los antígenos en la superficie eritrocitaria?", opts:["ELISA","Prueba de aglutinación con antisueros","PCR","Electroforesis de hemoglobina"], ans:1, fb:"La tipificación sanguínea usa antisueros específicos (Anti-A, Anti-B, Anti-D). La aglutinación indica presencia del antígeno."},
+  {q:"¿Cuáles son los anticuerpos presentes en el plasma del grupo O?", opts:["Anti-A solamente","Anti-B solamente","Anti-A y Anti-B","Ninguno"], ans:2, fb:"El grupo O no tiene antígenos A ni B → produce anticuerpos naturales anti-A y anti-B."},
+  {q:"Si el paciente aglutina con Anti-A (azul) y Anti-D (transparente), pero no con Anti-B (amarillo), ¿cuál es su tipo de sangre?", opts:["B Rh+","A Rh+","AB Rh+","O Rh+"], ans:1, fb:"Aglutinación con Anti-A → antígeno A presente (grupo A). Aglutinación con Anti-D → Rh+. Resultado: A Rh+ (caso clínico del Dr. Ottoni)."},
+  {q:"¿Cuántos alelos principales existen en el sistema ABO?", opts:["2","3","4","6"], ans:1, fb:"Tres alelos: I\u1D2A, I\u1D2B e i (o). Aunque pueden existir variantes raras, el modelo clásico usa estos tres."},
+  {q:"Progenitores: I\u1D2Bi × ii. ¿Cuáles son los tipos ABO posibles en la descendencia?", opts:["Solo B","B y O","A, B y O","A y O"], ans:1, fb:"I\u1D2Bi × ii → I\u1D2Bi (tipo B) y ii (tipo O). Proporción 50% cada uno."},
+  {q:"¿Qué significa que el anticuerpo anti-D sea una IgG en el contexto obstétrico?", opts:["No activa el complemento","Puede cruzar la barrera placentaria","No causa hemólisis","Solo aparece en el 1er embarazo"], ans:1, fb:"Las IgG son pequeñas y cruzan activamente la placenta mediante receptores FcRn, a diferencia de las IgM grandes → causan HDNF en embarazos posteriores."},
+  {q:"¿Cuál es la consecuencia del kernicterus en HDNF?", opts:["Anemia crónica","Daño neurológico por bilirrubina en tejido cerebral","Trombocitopenia","Insuficiencia renal"], ans:1, fb:"El exceso de bilirrubina no conjugada (producto de la hemólisis) atraviesa la barrera hematoencefálica y causa daño neurológico irreversible (kernicterus)."},
+  {q:"¿Cuál grupo sanguíneo es INCOMPATIBLE para transfundir a un paciente A+?", opts:["O+","O−","A−","B+"], ans:3, fb:"Un paciente A+ tiene anticuerpos anti-B. Si recibe sangre B+, sus anti-B atacarán los eritrocitos del donante → reacción hemolítica grave."}
+];
+
+let answered = {};
+let correct = 0;
+let total = questions.length;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  answered = {}; correct = 0;
+  document.getElementById('score-bar').style.display = 'none';
+
+  questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    const opts = q.opts.map((o, oi) => `
+      <button class="q-opt" onclick="answer(${qi},${oi})" id="q${qi}o${oi}">${o}</button>
+    `).join('');
+    card.innerHTML = `
+      <div class="q-num">Pregunta ${qi+1} / ${total}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">${opts}</div>
+      <div class="q-feedback" id="q${qi}-fb"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (answered[qi] !== undefined) return;
+  answered[qi] = oi;
+
+  const q = questions[qi];
+  const fb = document.getElementById(`q${qi}-fb`);
+  const chosen = document.getElementById(`q${qi}o${oi}`);
+  const correctBtn = document.getElementById(`q${qi}o${q.ans}`);
+
+  if (oi === q.ans) {
+    chosen.classList.add('correct');
+    fb.textContent = '✓ ' + q.fb;
+    fb.className = 'q-feedback ok show';
+    correct++;
+  } else {
+    chosen.classList.add('wrong');
+    correctBtn.classList.add('correct');
+    fb.textContent = '✗ Respuesta correcta: ' + q.opts[q.ans] + '. ' + q.fb;
+    fb.className = 'q-feedback err show';
+  }
+
+  // Disable all options for this question
+  for (let i = 0; i < q.opts.length; i++) {
+    const btn = document.getElementById(`q${qi}o${i}`);
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+  }
+
+  // Check if all answered
+  if (Object.keys(answered).length === total) {
+    const pct = Math.round((correct/total)*100);
+    let label = pct >= 80 ? '🎉 Excelente dominio del tema.' : pct >= 60 ? '👍 Buen desempeño. Repasa los errores.' : '📖 Sigue estudiando. Revisa el material.';
+    document.getElementById('score-num').textContent = `${correct}/${total}`;
+    document.getElementById('score-label').textContent = label;
+    document.getElementById('score-bar').style.display = 'flex';
+    document.getElementById('score-bar').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+function resetQuiz() { buildQuiz(); }
+
+buildQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dieta & Hidratação — Natação 100m</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg2: #111720;
+    --bg3: #1a2333;
+    --bg4: #1f2d42;
+    --border: rgba(99,179,255,0.12);
+    --border2: rgba(99,179,255,0.22);
+    --accent: #3b9eff;
+    --accent2: #00e5a0;
+    --accent3: #ffb347;
+    --accent4: #ff6b6b;
+    --text: #e8f0ff;
+    --text2: #8ba3c4;
+    --text3: #4d6a8a;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Outfit', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 340px; height: 340px;
+    background: radial-gradient(circle, rgba(59,158,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .header-sub {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text2);
+    font-weight: 300;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+
+  .meta-pill .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,14,20,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    padding: 1rem 1.25rem;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text3);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-btn:hover { color: var(--text2); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  /* ── LAYOUT ── */
+  main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* ── MACRO STATS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.green::before { background: var(--accent2); }
+  .stat-card.amber::before { background: var(--accent3); }
+  .stat-card.red::before { background: var(--accent4); }
+
+  .stat-val {
+    font-size: 1.9rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .stat-val.blue { color: var(--accent); }
+  .stat-val.green { color: var(--accent2); }
+  .stat-val.amber { color: var(--accent3); }
+  .stat-val.red { color: var(--accent4); }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .cl-blue { color: var(--accent); }
+  .cl-green { color: var(--accent2); }
+  .cl-amber { color: var(--accent3); }
+  .cl-red { color: var(--accent4); }
+  .cl-purple { color: #b48aff; }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card-body {
+    font-size: 0.875rem;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  /* ── ROWS ── */
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .row:last-child { border-bottom: none; }
+  .row-lbl { color: var(--text2); }
+  .row-val { font-weight: 500; color: var(--text); font-family: var(--mono); }
+
+  /* ── MACRO BARS ── */
+  .macro-item { margin-bottom: 14px; }
+  .macro-top { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.8rem; }
+  .macro-name { color: var(--text2); }
+  .macro-amount { font-family: var(--mono); color: var(--text); font-weight: 500; }
+  .bar-bg { height: 5px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ── MEALS ── */
+  .meal-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .meal-card:hover { border-color: var(--border2); }
+  .meal-card.highlight { border-color: rgba(59,158,255,0.35); }
+  .meal-card.highlight-green { border-color: rgba(0,229,160,0.35); }
+
+  .meal-time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+
+  .meal-hour {
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .meal-period {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+  }
+
+  .meal-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 8px;
+  }
+
+  .meal-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .meal-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: var(--mono);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .meal-tag.pre { background: rgba(59,158,255,0.12); color: var(--accent); border: 1px solid rgba(59,158,255,0.2); }
+  .meal-tag.pos { background: rgba(0,229,160,0.1); color: var(--accent2); border: 1px solid rgba(0,229,160,0.2); }
+
+  .meal-foods {
+    font-size: 0.85rem;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .meal-macros {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .macro-chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+
+  .macro-chip.kcal { color: var(--accent3); border-color: rgba(255,179,71,0.2); background: rgba(255,179,71,0.06); }
+
+  /* ── WATER ── */
+  .water-timeline { position: relative; margin: 1rem 0; }
+
+  .water-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .water-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    text-align: right;
+  }
+
+  .water-bar-wrap { position: relative; }
+
+  .water-bar-bg {
+    height: 8px;
+    background: var(--bg4);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .water-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), rgba(59,158,255,0.5));
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .water-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .water-ml {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* ── URINE GUIDE ── */
+  .urine-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .urine-row:last-child { border-bottom: none; }
+
+  .urine-swatch {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .urine-desc { font-size: 0.85rem; color: var(--text2); flex: 1; }
+  .urine-status { font-size: 11px; font-family: var(--mono); font-weight: 500; }
+
+  /* ── CALC ── */
+  .calc-slider-group { margin-bottom: 1.5rem; }
+
+  .calc-slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text2);
+  }
+
+  .calc-slider-label span:last-child {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    background: var(--bg4);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 8px rgba(59,158,255,0.4);
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  /* ── TIPS / ALERTS ── */
+  .alert {
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 14px;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    border-left: 3px solid;
+  }
+
+  .alert.blue { background: rgba(59,158,255,0.07); border-color: var(--accent); color: var(--text2); }
+  .alert.green { background: rgba(0,229,160,0.06); border-color: var(--accent2); color: var(--text2); }
+  .alert.amber { background: rgba(255,179,71,0.07); border-color: var(--accent3); color: var(--text2); }
+
+  /* ── SECTION HEADING ── */
+  .sec-heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sec-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TOTAL BAR ── */
+  .total-bar {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .total-item { text-align: center; }
+  .total-val { font-size: 1.2rem; font-weight: 600; font-family: var(--mono); }
+  .total-lbl { font-size: 10px; color: var(--text3); letter-spacing: 0.08em; margin-top: 2px; text-transform: uppercase; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    color: var(--text3);
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    line-height: 1.8;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section.visible > * {
+    animation: fadeUp 0.3s ease both;
+  }
+
+  .section.visible > *:nth-child(1) { animation-delay: 0.02s; }
+  .section.visible > *:nth-child(2) { animation-delay: 0.06s; }
+  .section.visible > *:nth-child(3) { animation-delay: 0.10s; }
+  .section.visible > *:nth-child(4) { animation-delay: 0.14s; }
+  .section.visible > *:nth-child(5) { animation-delay: 0.18s; }
+  .section.visible > *:nth-child(n+6) { animation-delay: 0.22s; }
+
+  @media (max-width: 600px) {
+    header { padding: 2rem 1.25rem 1.5rem; }
+    main { padding: 1.25rem; }
+    nav { padding: 0 1rem; }
+    .meal-card { grid-template-columns: 55px 1fr; gap: 0.75rem; }
+    .meal-hour { font-size: 0.85rem; }
+    .water-item { grid-template-columns: 65px 1fr 50px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="header-tag">Natação · 100m rasos · Performance</p>
+  <h1>Dieta & <span>Hidratação</span></h1>
+  <p class="header-sub">Plano personalizado para ganho de massa muscular com performance na piscina</p>
+  <div class="header-meta">
+    <div class="meta-pill"><div class="dot"></div> Peso: 80 kg</div>
+    <div class="meta-pill"><div class="dot"></div> 5–6x treinos / semana</div>
+    <div class="meta-pill"><div class="dot"></div> Objetivo: ganho de massa</div>
+    <div class="meta-pill"><div class="dot"></div> ~3.400 kcal / dia</div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="show('macros',this)">Macros</button>
+  <button class="nav-btn" onclick="show('refeicoes',this)">Refeições</button>
+  <button class="nav-btn" onclick="show('agua',this)">Hidratação</button>
+  <button class="nav-btn" onclick="show('suplementos',this)">Suplementos</button>
+  <button class="nav-btn" onclick="show('calc',this)">Calculadora</button>
+</nav>
+
+<main>
+
+  <!-- ══ MACROS ══ -->
+  <div class="section visible" id="macros">
+    <div class="sec-heading">Metas diárias</div>
+
+    <div class="stats-grid">
+      <div class="stat-card amber">
+        <div class="stat-val amber">3.400</div>
+        <div class="stat-lbl">kcal / dia</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-val blue">176g</div>
+        <div class="stat-lbl">proteína</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val green">483g</div>
+        <div class="stat-lbl">carboidrato</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-val red">85g</div>
+        <div class="stat-lbl">gordura</div>
+      </div>
+    </div>
+
+    <div class="alert blue">
+      Superávit calórico de ~600 kcal acima da manutenção, adequado para ectomorfo com metabolismo acelerado e 5–6x de treino semanal. Meta de ganho limpo de ~0,5–0,8 kg/semana.
+    </div>
+
+    <div class="sec-heading">Distribuição por macro</div>
+
+    <div class="card">
+      <div class="macro-item">
+        <div class="macro-top">
+          <span class="macro-name">Proteína — 2,2g / kg</span>
+          <span class="macro-amount cl-blue">176g · 704 kcal · 21%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:45%; background:var(--accent)"></div></div>
+      </div>
+      <div class="macro-item">
+        <div class="macro-top">
+          <span class="macro-name">Carboidrato — 4,9g / kg</span>
+          <span class="macro-amount cl-green">483g · 1.931 kcal · 57%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:90%; background:var(--accent2)"></div></div>
+      </div>
+      <div class="macro-item" style="margin-bottom:0">
+        <div class="macro-top">
+          <span class="macro-name">Gordura — 1,0g / kg</span>
+          <span class="macro-amount cl-amber">85g · 765 kcal · 22%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:25%; background:var(--accent3)"></div></div>
+      </div>
+    </div>
+
+    <div class="sec-heading">Fontes alimentares recomendadas</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+      <div class="card">
+        <div class="card-label cl-blue">Proteínas</div>
+        <div class="card-body">Frango desfiado · Ovo inteiro · Iogurte grego natural · Atum em água · Carne bovina magra · Whey protein</div>
+      </div>
+      <div class="card">
+        <div class="card-label cl-green">Carboidratos</div>
+        <div class="card-body">Arroz branco · Batata-doce · Aveia em flocos · Banana · Macarrão integral · Pão integral · Cuscuz</div>
+      </div>
+      <div class="card">
+        <div class="card-label cl-amber">Gorduras</div>
+        <div class="card-body">Azeite extravirgem · Castanha-de-caju · Amendoim · Abacate · Ovos · Linhaça e chia</div>
+      </div>
+    </div>
+
+    <div class="sec-heading">Timing peri-treino</div>
+
+    <div class="card">
+      <div class="card-label cl-blue">Pré-treino — 1 a 2h antes</div>
+      <div class="card-title">Carboidrato + proteína de fácil digestão</div>
+      <div class="card-body">Evite gordura em excesso — retarda o esvaziamento gástrico e pode causar desconforto na piscina. Priorize arroz com frango, batata-doce com ovo, ou aveia com iogurte e banana.</div>
+    </div>
+    <div class="card">
+      <div class="card-label cl-green">Pós-treino — até 45 minutos após</div>
+      <div class="card-title">Janela anabólica — não pule essa refeição</div>
+      <div class="card-body">Proteína de absorção rápida + carboidrato de alto índice glicêmico. Whey + banana + aveia é a combinação ideal. Se usar creatina, é o melhor momento para ingerir.</div>
+    </div>
+  </div>
+
+  <!-- ══ REFEIÇÕES ══ -->
+  <div class="section" id="refeicoes">
+    <div class="sec-heading">7 refeições · plano diário</div>
+
+    <div class="alert green">
+      Distribua as refeições a cada 2–3h para manter o anabolismo constante, os estoques de glicogênio cheios e a síntese proteica ativa ao longo do dia.
+    </div>
+
+    <div class="meal-card">
+      <div class="meal-time-block">
+        <div class="meal-hour">06:30</div>
+        <div class="meal-period">manhã</div>
+        <div class="meal-dot" style="background:var(--accent)"></div>
+      </div>
+      <div>
+        <div class="meal-name">Café da manhã</div>
+        <div class="meal-foods">100g aveia com leite, 3 ovos mexidos, 1 banana + 1 fatia de pão integral. Café sem açúcar.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~700 kcal</span>
+          <span class="macro-chip">37g prot</span>
+          <span class="macro-chip">100g carb</span>
+          <span class="macro-chip">15g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div class="meal-time-block">
+        <div class="meal-hour">09:00</div>
+        <div class="meal-period">manhã</div>
+        <div class="meal-dot" style="background:var(--accent2)"></div>
+      </div>
+      <div>
+        <div class="meal-name">Lanche da manhã</div>
+        <div class="meal-foods">200g iogurte grego natural, 30g castanha-de-caju ou amendoim, 1 colher de mel.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~350 kcal</span>
+          <span class="macro-chip">22g prot</span>
+          <span class="macro-chip">22g carb</span>
+          <span class="macro-chip">16g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card highlight">
+      <div class="meal-time-block">
+        <div class="meal-hour">11:00</div>
+        <div class="meal-period">pré-treino</div>
+        <div class="meal-dot" style="background:var(--accent)"></div>
+      </div>
+      <div>
+        <div class="meal-tag pre">pré-treino · 1h antes</div>
+        <div class="meal-name">Almoço / pré-treino</div>
+        <div class="meal-foods">250g arroz cozido, 180g frango grelhado, brócolis + cenoura refogados no azeite. Suco de laranja natural + 1 fruta.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~880 kcal</span>
+          <span class="macro-chip">54g prot</span>
+          <span class="macro-chip">115g carb</span>
+          <span class="macro-chip">13g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card highlight-green">
+      <div class="meal-time-block">
+        <div class="meal-hour">14:00</div>
+        <div class="meal-period">pós-treino</div>
+        <div class="meal-dot" style="background:var(--accent2)"></div>
+      </div>
+      <div>
+        <div class="meal-tag pos">pós-treino · até 45 min</div>
+        <div class="meal-name">Shake de recuperação</div>
+        <div class="meal-foods">1 dose de whey protein (30g prot) com leite, 1 banana, 50g aveia, 1 colher de mel. Creatina 5g misturada.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~520 kcal</span>
+          <span class="macro-chip">42g prot</span>
+          <span class="macro-chip">72g carb</span>
+          <span class="macro-chip">6g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div class="meal-time-block">
+        <div class="meal-hour">17:00</div>
+        <div class="meal-period">tarde</div>
+        <div class="meal-dot" style="background:var(--accent3)"></div>
+      </div>
+      <div>
+        <div class="meal-name">Lanche da tarde</div>
+        <div class="meal-foods">3 fatias de pão integral, 1 lata de atum em água, tomate e azeite. 2 colheres de queijo cottage. 1 fruta.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~420 kcal</span>
+          <span class="macro-chip">33g prot</span>
+          <span class="macro-chip">50g carb</span>
+          <span class="macro-chip">9g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div class="meal-time-block">
+        <div class="meal-hour">20:00</div>
+        <div class="meal-period">noite</div>
+        <div class="meal-dot" style="background:var(--accent)"></div>
+      </div>
+      <div>
+        <div class="meal-name">Jantar</div>
+        <div class="meal-foods">250g batata-doce assada, 180g carne bovina ou frango, salada verde com azeite e limão. 1 fatia de pão.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~650 kcal</span>
+          <span class="macro-chip">44g prot</span>
+          <span class="macro-chip">78g carb</span>
+          <span class="macro-chip">15g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div class="meal-time-block">
+        <div class="meal-hour">22:00</div>
+        <div class="meal-period">ceia</div>
+        <div class="meal-dot" style="background:#b48aff"></div>
+      </div>
+      <div>
+        <div class="meal-name">Ceia — sono anabólico</div>
+        <div class="meal-foods">200g iogurte grego natural + 1 colher de sopa de chia + 30g granola sem açúcar. Proteína de digestão lenta para manter o anabolismo durante o sono.</div>
+        <div class="meal-macros">
+          <span class="macro-chip kcal">~280 kcal</span>
+          <span class="macro-chip">20g prot</span>
+          <span class="macro-chip">28g carb</span>
+          <span class="macro-chip">8g gord</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="total-bar">
+      <div class="total-item">
+        <div class="total-val" style="color:var(--accent3)">~3.450</div>
+        <div class="total-lbl">kcal total</div>
+      </div>
+      <div class="total-item">
+        <div class="total-val" style="color:var(--accent)">~230g</div>
+        <div class="total-lbl">proteína</div>
+      </div>
+      <div class="total-item">
+        <div class="total-val" style="color:var(--accent2)">~443g</div>
+        <div class="total-lbl">carboidrato</div>
+      </div>
+      <div class="total-item">
+        <div class="total-val" style="color:var(--accent4)">~66g</div>
+        <div class="total-lbl">gordura</div>
+      </div>
+      <div class="total-item">
+        <div class="total-val" style="color:#b48aff">7</div>
+        <div class="total-lbl">refeições</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HIDRATAÇÃO ══ -->
+  <div class="section" id="agua">
+    <div class="sec-heading">Necessidade hídrica</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem">
+      <div class="stat-card blue">
+        <div class="stat-val blue">3,7L</div>
+        <div class="stat-lbl">mínimo diário</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val green">4,5L</div>
+        <div class="stat-lbl">dias de treino intenso</div>
+      </div>
+    </div>
+
+    <div class="alert amber">
+      Nadadores subestimam a perda hídrica porque a água da piscina dissipa calor e mascara o suor. A perda real durante 1h de treino pode chegar a 500–800ml.
+    </div>
+
+    <div class="sec-heading">Distribuição ao longo do dia</div>
+
+    <div class="card">
+      <div class="water-item">
+        <div class="water-time">06:00</div>
+        <div>
+          <div class="water-label">Ao acordar — em jejum</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:9%"></div></div>
+        </div>
+        <div class="water-ml">400ml</div>
+      </div>
+      <div class="water-item">
+        <div class="water-time">06:30–10:00</div>
+        <div>
+          <div class="water-label">Café da manhã até lanche</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:18%"></div></div>
+        </div>
+        <div class="water-ml">800ml</div>
+      </div>
+      <div class="water-item">
+        <div class="water-time">10:30</div>
+        <div>
+          <div class="water-label">Pré-treino (30 min antes)</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:11%"></div></div>
+        </div>
+        <div class="water-ml">500ml</div>
+      </div>
+      <div class="water-item">
+        <div class="water-time">treino</div>
+        <div>
+          <div class="water-label">Durante o treino (a cada 20 min)</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:13%"></div></div>
+        </div>
+        <div class="water-ml">600ml</div>
+      </div>
+      <div class="water-item">
+        <div class="water-time">14:00</div>
+        <div>
+          <div class="water-label">Pós-treino (1h após)</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:13%"></div></div>
+        </div>
+        <div class="water-ml">600ml</div>
+      </div>
+      <div class="water-item">
+        <div class="water-time">15:00–20:00</div>
+        <div>
+          <div class="water-label">Tarde e jantar</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:18%"></div></div>
+        </div>
+        <div class="water-ml">800ml</div>
+      </div>
+      <div class="water-item" style="margin-bottom:0">
+        <div class="water-time">20:00–22:00</div>
+        <div>
+          <div class="water-label">Após jantar até dormir</div>
+          <div class="water-bar-bg"><div class="water-bar-fill" style="width:11%"></div></div>
+        </div>
+        <div class="water-ml">500ml</div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px">
+        <div class="water-item" style="margin-bottom:0">
+          <div class="water-time" style="color:var(--accent);font-weight:500">Total</div>
+          <div>
+            <div class="water-bar-bg"><div class="water-bar-fill" style="width:100%"></div></div>
+          </div>
+          <div class="water-ml" style="font-size:13px;font-weight:500">4.200ml</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-heading">Guia visual de hidratação</div>
+
+    <div class="card">
+      <div class="urine-row">
+        <div class="urine-swatch" style="background:#f5f0d0;border:1px solid var(--border)"></div>
+        <div class="urine-desc">Transparente ou quase sem cor</div>
+        <div class="urine-status cl-green">Hidratado</div>
+      </div>
+      <div class="urine-row">
+        <div class="urine-swatch" style="background:#e8d87a"></div>
+        <div class="urine-desc">Amarelo claro — ideal</div>
+        <div class="urine-status cl-green">Ótimo</div>
+      </div>
+      <div class="urine-row">
+        <div class="urine-swatch" style="background:#c8a830"></div>
+        <div class="urine-desc">Amarelo médio</div>
+        <div class="urine-status cl-amber">Beba água agora</div>
+      </div>
+      <div class="urine-row">
+        <div class="urine-swatch" style="background:#9a6b10"></div>
+        <div class="urine-desc">Amarelo escuro</div>
+        <div class="urine-status" style="color:var(--accent4)">Desidratado</div>
+      </div>
+      <div class="urine-row">
+        <div class="urine-swatch" style="background:#6b3a08"></div>
+        <div class="urine-desc">Laranja ou marrom</div>
+        <div class="urine-status" style="color:var(--accent4)">Urgente</div>
+      </div>
+    </div>
+
+    <div class="sec-heading">Eletrólitos</div>
+
+    <div class="card">
+      <div class="card-label cl-amber">Quando usar</div>
+      <div class="card-body">Em treinos acima de 90 minutos, treinos duplos ou dias muito quentes, reponha eletrólitos além da água pura.<br><br>
+      <strong style="color:var(--text)">Isotônico caseiro:</strong> 1L água · ½ colher chá sal · suco de 1 limão · 1 colher sopa mel. Misture e beba durante ou após o treino.</div>
+    </div>
+  </div>
+
+  <!-- ══ SUPLEMENTOS ══ -->
+  <div class="section" id="suplementos">
+    <div class="sec-heading">Suplementação baseada em evidência</div>
+
+    <div class="alert blue">
+      Suplementos são complementares — a base é a alimentação. Comece pelos essenciais (creatina + whey) antes de considerar qualquer outro.
+    </div>
+
+    <div class="card">
+      <div class="card-label cl-green">Prioridade 1 — Essencial</div>
+      <div class="card-title">Creatina monoidratada</div>
+      <div class="card-body">O suplemento com maior evidência científica para provas anaeróbias como os 100m. Aumenta os estoques de fosfocreatina (ATP-CP), melhorando potência máxima e capacidade de repetir sprints.<br><br>
+      <strong style="color:var(--text)">Dose:</strong> 5g/dia, todos os dias (sem necessidade de fase de saturação).<br>
+      <strong style="color:var(--text)">Quando:</strong> Pós-treino junto com o shake é o momento mais conveniente.<br>
+      <strong style="color:var(--text)">Tipo:</strong> Monoidratada (qualquer marca — o princípio ativo é idêntico).</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label cl-blue">Prioridade 2 — Conveniente</div>
+      <div class="card-title">Whey protein</div>
+      <div class="card-body">Não é indispensável se você atinge 176g de proteína só com a alimentação, mas facilita muito o dia a dia. Absorção rápida — ideal no pós-treino.<br><br>
+      <strong style="color:var(--text)">Dose:</strong> 1 dose (25–30g proteína) no pós-treino.<br>
+      <strong style="color:var(--text)">Tipo:</strong> Whey concentrate ou isolate — concentrado é mais barato e funciona bem para quem não tem intolerância à lactose.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label cl-amber">Prioridade 3 — Situacional</div>
+      <div class="card-title">Cafeína</div>
+      <div class="card-body">Ergogênico comprovado para performance de curta duração e foco. Útil antes de treinos difíceis ou competições.<br><br>
+      <strong style="color:var(--text)">Dose:</strong> 3–6mg/kg corporal (240–480mg para 80kg). Comece com a dose menor.<br>
+      <strong style="color:var(--text)">Quando:</strong> 30–60 min antes do treino. Não use em treinos noturnos — interfere no sono, que é seu maior aliado de recuperação.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label cl-purple">Prioridade 4 — Se necessário</div>
+      <div class="card-title">Vitamina D + Magnésio</div>
+      <div class="card-body">A maioria das pessoas tem algum grau de deficiência, especialmente quem treina muito dentro de piscinas cobertas (menor exposição solar). Afeta síntese proteica, função muscular e qualidade do sono.<br><br>
+      <strong style="color:var(--text)">Dose:</strong> Vitamina D 2.000–4.000 UI/dia · Magnésio 300–400mg/dia (glicinato ou malato).<br>
+      <strong style="color:var(--text)">Verificação:</strong> Exame de sangue para confirmar deficiência antes de suplementar.</div>
+    </div>
+
+    <div class="sec-heading">O que não vale a pena</div>
+
+    <div class="card">
+      <div class="card-label cl-red">Evitar ou ignorar</div>
+      <div class="card-body">
+        <div class="row"><span class="row-lbl">Termogênicos / fat burners</span><span class="row-val" style="color:var(--accent4)">Desnecessário</span></div>
+        <div class="row"><span class="row-lbl">BCAAs (se já come proteína suficiente)</span><span class="row-val" style="color:var(--accent4)">Custo sem benefício</span></div>
+        <div class="row"><span class="row-lbl">Pré-treinos com doses absurdas de cafeína</span><span class="row-val" style="color:var(--accent4)">Risco</span></div>
+        <div class="row"><span class="row-lbl">Gainers industriais cheios de açúcar</span><span class="row-val" style="color:var(--accent4)">Substitua por comida real</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CALCULADORA ══ -->
+  <div class="section" id="calc">
+    <div class="sec-heading">Calculadora personalizada</div>
+
+    <div class="alert blue">
+      Ajuste os sliders abaixo para recalcular seus macros e necessidade hídrica conforme seu peso e frequência de treino evoluem.
+    </div>
+
+    <div class="card">
+      <div class="calc-slider-group">
+        <div class="calc-slider-label">
+          <span>Peso corporal</span>
+          <span id="lbl-peso">80 kg</span>
+        </div>
+        <input type="range" min="55" max="110" value="80" step="1" id="sl-peso" oninput="calcular()">
+      </div>
+
+      <div class="calc-slider-group" style="margin-bottom:0">
+        <div class="calc-slider-label">
+          <span>Treinos por semana</span>
+          <span id="lbl-treinos">5x / semana</span>
+        </div>
+        <input type="range" min="3" max="7" value="5" step="1" id="sl-treinos" oninput="calcular()">
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-top:1.5rem">
+      <div class="stat-card amber">
+        <div class="stat-val amber" id="r-kcal">3.400</div>
+        <div class="stat-lbl">kcal / dia</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-val blue" id="r-prot">176g</div>
+        <div class="stat-lbl">proteína</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val green" id="r-carb">483g</div>
+        <div class="stat-lbl">carboidrato</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-val red" id="r-gord">85g</div>
+        <div class="stat-lbl">gordura</div>
+      </div>
+    </div>
+
+    <div class="sec-heading" style="margin-top:1.5rem">Hidratação calculada</div>
+
+    <div class="card">
+      <div class="row"><span class="row-lbl">Mínimo diário</span><span class="row-val cl-blue" id="r-agua-min">3,7 L</span></div>
+      <div class="row"><span class="row-lbl">Dias de treino intenso</span><span class="row-val cl-green" id="r-agua-max">4,5 L</span></div>
+      <div class="row"><span class="row-lbl">Referência base</span><span class="row-val">35–45 ml / kg</span></div>
+    </div>
+
+    <div class="sec-heading">Velocidade de ganho esperada</div>
+
+    <div class="card">
+      <div class="row"><span class="row-lbl">Ganho mensal estimado (limpo)</span><span class="row-val cl-green">1,2 – 2,0 kg</span></div>
+      <div class="row"><span class="row-lbl">Se não ganhar peso em 3 semanas</span><span class="row-val cl-amber">Adicione +200 kcal em carb</span></div>
+      <div class="row"><span class="row-lbl">Se ganhar mais de 2,5 kg/mês</span><span class="row-val cl-red">Reduza 200 kcal</span></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  André Suzano · Natação 100m Rasos · Plano de Dieta &amp; Hidratação<br>
+  Gerado com Claude · Referência orientativa — consulte um nutricionista esportivo para personalização clínica
+</footer>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+function calcular() {
+  const p = parseInt(document.getElementById('sl-peso').value);
+  const t = parseInt(document.getElementById('sl-treinos').value);
+
+  document.getElementById('lbl-peso').textContent = p + ' kg';
+  document.getElementById('lbl-treinos').textContent = t + 'x / semana';
+
+  const fator = t >= 7 ? 42 : t >= 6 ? 40 : t >= 5 ? 38 : 36;
+  const manut = Math.round(p * fator);
+  const kcal = manut + 600;
+  const prot = Math.round(p * 2.2);
+  const protCal = prot * 4;
+  const gordCal = Math.round(kcal * 0.23);
+  const carb = Math.round((kcal - protCal - gordCal) / 4);
+  const gord = Math.round(gordCal / 9);
+  const aguaMin = (p * 0.035 + 0.5).toFixed(1);
+  const aguaMax = (p * 0.045 + 0.8).toFixed(1);
+
+  document.getElementById('r-kcal').textContent = kcal.toLocaleString('pt-BR');
+  document.getElementById('r-prot').textContent = prot + 'g';
+  document.getElementById('r-carb').textContent = carb + 'g';
+  document.getElementById('r-gord').textContent = gord + 'g';
+  document.getElementById('r-agua-min').textContent = aguaMin.replace('.', ',') + ' L';
+  document.getElementById('r-agua-max').textContent = aguaMax.replace('.', ',') + ' L';
+}
+</script>
+</body>
+</html>

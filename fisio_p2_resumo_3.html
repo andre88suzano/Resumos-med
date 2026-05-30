@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fisiología P2 — Circulación, Flujo y Gasto Cardíaco</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d14;
+    --bg2: #10141f;
+    --bg3: #151a28;
+    --card: #1a2035;
+    --border: #1e2840;
+    --cyan: #00e5ff;
+    --purple: #a855f7;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --green: #22c55e;
+    --orange: #f97316;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --sidebar-w: 270px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+  }
+
+  /* ========= SIDEBAR ========= */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 32px;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sidebar-brand {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-course {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* MARCA PESSOAL */
+  .brand-badge {
+    background: linear-gradient(135deg, rgba(0,229,255,0.08), rgba(168,85,247,0.08));
+    border: 1px solid var(--cyan);
+    border-radius: 10px;
+    padding: 14px 14px 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.03);
+  }
+  .brand-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .brand-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 4px;
+    margin-top: 6px;
+  }
+
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 20px 20px 8px;
+  }
+  .nav-chapter {
+    padding: 8px 20px 4px;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    opacity: 0.7;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+  .nav-item:hover, .nav-item.active {
+    color: var(--text);
+    border-left-color: var(--cyan);
+    background: rgba(0,229,255,0.04);
+  }
+  .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .nav-item:hover .nav-dot, .nav-item.active .nav-dot {
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+  }
+
+  /* ========= MAIN ========= */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: calc(100vw - var(--sidebar-w));
+    padding: 0 40px 80px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 56px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3.5vw, 40px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero-title span {
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-desc {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 600px;
+    margin-bottom: 24px;
+  }
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .pill-cyan { color: var(--cyan); border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.05); }
+  .pill-purple { color: var(--purple); border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.05); }
+  .pill-blue { color: var(--blue); border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
+  .pill-orange { color: var(--orange); border-color: rgba(249,115,22,0.3); background: rgba(249,115,22,0.05); }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .chapter-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: rgba(0,229,255,0.1);
+    color: var(--cyan);
+    border: 1px solid rgba(0,229,255,0.2);
+    margin-left: auto;
+    flex-shrink: 0;
+    letter-spacing: 1px;
+  }
+
+  .sub-section {
+    margin-bottom: 36px;
+    scroll-margin-top: 24px;
+  }
+  .sub-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-title::before {
+    content: '';
+    display: block;
+    width: 3px; height: 16px;
+    background: var(--cyan);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,229,255,0.2); }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .card-sm {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card-sm-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* STAT BOXES */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* FORMULA BOXES */
+  .formula-box {
+    background: linear-gradient(135deg, rgba(0,229,255,0.06), rgba(168,85,247,0.06));
+    border: 1px solid rgba(0,229,255,0.25);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    text-align: center;
+    position: relative;
+  }
+  .formula-box::before {
+    content: '⚡ FÓRMULA';
+    position: absolute;
+    top: -10px; left: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    background: var(--bg);
+    padding: 0 8px;
+  }
+  .formula-main {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+  .formula-vars {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ALERT BOXES */
+  .alert {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-cyan { background: rgba(0,229,255,0.06); border: 1px solid rgba(0,229,255,0.2); }
+  .alert-red { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); }
+  .alert-green { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); }
+  .alert-orange { background: rgba(249,115,22,0.06); border: 1px solid rgba(249,115,22,0.2); }
+  .alert-text { font-size: 13.5px; line-height: 1.6; }
+  .alert strong { color: var(--text); }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: rgba(0,229,255,0.08);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    font-size: 13.5px;
+    border-bottom: 1px solid rgba(30,40,64,0.5);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* BULLET LIST */
+  .blist { list-style: none; padding: 0; }
+  .blist li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .blist li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--cyan);
+    font-size: 12px;
+  }
+
+  /* SVG CHARTS */
+  .chart-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 16px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  svg text { font-family: 'DM Sans', sans-serif; }
+
+  /* TWO COLS */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+  @media(max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* HIGHLIGHT TEXT */
+  .hl-cyan { color: var(--cyan); font-weight: 600; }
+  .hl-purple { color: var(--purple); font-weight: 600; }
+  .hl-orange { color: var(--orange); font-weight: 600; }
+  .hl-red { color: var(--red); font-weight: 600; }
+  .hl-green { color: var(--green); font-weight: 600; }
+
+  p { margin-bottom: 12px; font-size: 14px; line-height: 1.75; color: #c8d4e8; }
+
+  /* Guyton callout */
+  .guyton-note {
+    background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(0,229,255,0.05));
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: #b4a8d4;
+    margin: 12px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .guyton-note::before { content: '📖'; font-size: 14px; }
+
+  /* SCROLLBAR MAIN */
+  #main::-webkit-scrollbar { width: 6px; }
+  #main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* PROGRESS INDICATOR */
+  .top-bar {
+    position: fixed;
+    top: 0; left: var(--sidebar-w); right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    z-index: 200;
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.1s;
+  }
+
+  /* DIAGRAM */
+  .diagram-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar" id="progressBar"></div>
+
+<!-- ====== SIDEBAR ====== -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-course">Fisiología Médica · Interamericana PJC</div>
+    <div class="brand-badge">
+      <div class="brand-name">André Luiz<br>Miranda Suzano</div>
+      <div class="brand-sub">3H</div>
+    </div>
+  </div>
+
+  <div class="sidebar-title">Navegación</div>
+
+  <div class="nav-chapter">Cap. 14</div>
+  <a class="nav-item" onclick="scrollTo('s1')"><span class="nav-dot"></span>Presiones Sanguíneas</a>
+  <a class="nav-item" onclick="scrollTo('s2')"><span class="nav-dot"></span>Principios Circulatorios</a>
+  <a class="nav-item" onclick="scrollTo('s3')"><span class="nav-dot"></span>Ley de Ohm · Flujo</a>
+  <a class="nav-item" onclick="scrollTo('s4')"><span class="nav-dot"></span>Flujo Laminar y Turbulento</a>
+  <a class="nav-item" onclick="scrollTo('s5')"><span class="nav-dot"></span>Resistencia Vascular</a>
+  <a class="nav-item" onclick="scrollTo('s6')"><span class="nav-dot"></span>Hematocrito y Viscosidad</a>
+  <a class="nav-item" onclick="scrollTo('s7')"><span class="nav-dot"></span>Autorregulación</a>
+
+  <div class="nav-chapter">Cap. 15</div>
+  <a class="nav-item" onclick="scrollTo('s8')"><span class="nav-dot"></span>Distensibilidad Vascular</a>
+  <a class="nav-item" onclick="scrollTo('s9')"><span class="nav-dot"></span>Compliancia Vascular</a>
+  <a class="nav-item" onclick="scrollTo('s10')"><span class="nav-dot"></span>Sistema Arterial y Venoso</a>
+  <a class="nav-item" onclick="scrollTo('s11')"><span class="nav-dot"></span>Presión Venosa</a>
+
+  <div class="nav-chapter">Cap. 16 · Líquido Intersticial</div>
+  <a class="nav-item" onclick="scrollTo('s12')"><span class="nav-dot"></span>Fuerzas de Starling</a>
+  <a class="nav-item" onclick="scrollTo('s13')"><span class="nav-dot"></span>Sistema Linfático</a>
+
+  <div class="nav-chapter">Cap. 17 · Control Local</div>
+  <a class="nav-item" onclick="scrollTo('s14')"><span class="nav-dot"></span>Control Local del Flujo</a>
+  <a class="nav-item" onclick="scrollTo('s15')"><span class="nav-dot"></span>Control Humoral</a>
+
+  <div class="nav-chapter">Cap. 18 · Control Nervioso</div>
+  <a class="nav-item" onclick="scrollTo('s16')"><span class="nav-dot"></span>Sistema Simpático</a>
+  <a class="nav-item" onclick="scrollTo('s17')"><span class="nav-dot"></span>Barorreceptores</a>
+  <a class="nav-item" onclick="scrollTo('s18')"><span class="nav-dot"></span>Control Rápido P.A.</a>
+
+  <div class="nav-chapter">Cap. 19 · Control Renal</div>
+  <a class="nav-item" onclick="scrollTo('s19')"><span class="nav-dot"></span>Diuresis por Presión</a>
+  <a class="nav-item" onclick="scrollTo('s20')"><span class="nav-dot"></span>SRAA y Aldosterona</a>
+
+  <div class="nav-chapter">Cap. 20 · Gasto Cardíaco</div>
+  <a class="nav-item" onclick="scrollTo('s21')"><span class="nav-dot"></span>Gasto Cardíaco y RV</a>
+  <a class="nav-item" onclick="scrollTo('s22')"><span class="nav-dot"></span>Curvas de Frank-Starling</a>
+  <a class="nav-item" onclick="scrollTo('s23')"><span class="nav-dot"></span>Regulación del GC</a>
+  <a class="nav-item" onclick="scrollTo('s24')"><span class="nav-dot"></span>Angina de Pecho</a>
+
+  <div class="nav-chapter">Cap. 21 · Ejercicio y Coronarias</div>
+  <a class="nav-item" onclick="scrollTo('s25')"><span class="nav-dot"></span>Reajustes durante Ejercicio</a>
+  <a class="nav-item" onclick="scrollTo('s26')"><span class="nav-dot"></span>Flujo Coronario: Sístole/Diástole</a>
+  <a class="nav-item" onclick="scrollTo('s27')"><span class="nav-dot"></span>Control del Flujo Coronario</a>
+  <a class="nav-item" onclick="scrollTo('s28')"><span class="nav-dot"></span>Metabolismo Cardíaco</a>
+  <a class="nav-item" onclick="scrollTo('s29')"><span class="nav-dot"></span>Aterosclerosis</a>
+  <a class="nav-item" onclick="scrollTo('s30')"><span class="nav-dot"></span>IAM — Recuperación</a>
+  <a class="nav-item" onclick="scrollTo('s31')"><span class="nav-dot"></span>Reposo en el IAM · Angina</a>
+
+  <div class="nav-chapter" style="color:var(--orange);opacity:1;">🧠 Quiz</div>
+  <a class="nav-item" onclick="scrollTo('quiz')" style="color:#f97316;"><span class="nav-dot" style="background:var(--orange)"></span>30 Preguntas</a>
+</nav>
+
+<!-- ====== MAIN ====== -->
+<main id="main">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Guyton & Hall, 14ª ed. · Fisiología Médica</div>
+    <h1 class="hero-title">Circulación: <span>Presión, Flujo,</span><br>Resistencia, GC y Coronarias</h1>
+    <p class="hero-desc">Resumen integral de los Capítulos 14, 15, 16, 17, 18, 19, 20 y 21 — con fórmulas, gráficos y análisis clínico.</p>
+    <div class="hero-pills">
+      <span class="pill pill-cyan">Cap. 14 · Visión General</span>
+      <span class="pill pill-purple">Cap. 15 · Distensibilidad</span>
+      <span class="pill pill-blue">Cap. 16–19 · Regulación</span>
+      <span class="pill pill-orange">Cap. 20 · Gasto Cardíaco</span>
+      <span class="pill pill-red" style="color:#ef4444;border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);">Cap. 21 · Ejercicio · Coronarias</span>
+    </div>
+  </div>
+
+  <!-- ========== CAP 14 ========== -->
+
+  <!-- S1: Presiones -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Presiones Sanguíneas en la Circulación</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+
+    <div class="guyton-note">Guyton Cap. 14 — La diferencia de presión entre el inicio y el final del circuito es el principal determinante del flujo sanguíneo en cualquier segmento vascular.</div>
+
+    <div class="two-col">
+      <div class="sub-section">
+        <div class="sub-title">Circulación Sistémica</div>
+        <div class="stat-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--cyan)">120/80</div>
+            <div class="stat-label">Presión Aórtica (mmHg)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--cyan)">≈100</div>
+            <div class="stat-label">Presión Media Aórtica</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--orange)">35 → 10</div>
+            <div class="stat-label">Presión Capilar (mmHg)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--muted)">≈17</div>
+            <div class="stat-label">Capilar Media Funcional</div>
+          </div>
+        </div>
+        <ul class="blist">
+          <li>La presión cae <span class="hl-cyan">progresivamente</span> desde la aorta hasta las venas cavas (0 mmHg).</li>
+          <li>La mayor caída ocurre en las <span class="hl-orange">arteriolas</span> — principal sitio de resistencia.</li>
+          <li>Las venas tienen baja presión pero gran capacitancia.</li>
+        </ul>
+      </div>
+      <div class="sub-section">
+        <div class="sub-title">Circulación Pulmonar</div>
+        <div class="stat-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--purple)">≈25</div>
+            <div class="stat-label">Sistólica Art. Pulmonar</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--purple)">≈8</div>
+            <div class="stat-label">Diastólica Art. Pulmonar</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--purple)">≈16</div>
+            <div class="stat-label">Media Art. Pulmonar</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--purple)">≈7</div>
+            <div class="stat-label">Presión Media Capilar</div>
+          </div>
+        </div>
+        <div class="alert alert-purple" style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.25);">
+          <span class="alert-icon">🫁</span>
+          <span class="alert-text">Las <strong>bajas presiones pulmonares</strong> permiten el intercambio gaseoso sin generar edema pulmonar — solo se requiere exposición al O₂ alveolar.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico SVG: Caída de presión en el circuito -->
+    <div class="chart-wrap">
+      <div class="chart-title">Perfil de Presión Arterial a lo largo de la Circulación Sistémica (Guyton, Fig. 14-1)</div>
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#00e5ff"/>
+            <stop offset="60%" style="stop-color:#f97316"/>
+            <stop offset="100%" style="stop-color:#3b82f6"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid -->
+        <line x1="60" y1="20" x2="60" y2="210" stroke="#1e2840" stroke-width="1"/>
+        <line x1="60" y1="210" x2="680" y2="210" stroke="#1e2840" stroke-width="1"/>
+        <!-- Y labels -->
+        <text x="50" y="24" text-anchor="end" fill="#64748b" font-size="10">120</text>
+        <line x1="58" y1="20" x2="680" y2="20" stroke="#1e2840" stroke-width="0.5" stroke-dasharray="3,4"/>
+        <text x="50" y="72" text-anchor="end" fill="#64748b" font-size="10">100</text>
+        <line x1="58" y1="68" x2="680" y2="68" stroke="#1e2840" stroke-width="0.5" stroke-dasharray="3,4"/>
+        <text x="50" y="120" text-anchor="end" fill="#64748b" font-size="10">60</text>
+        <line x1="58" y1="118" x2="680" y2="118" stroke="#1e2840" stroke-width="0.5" stroke-dasharray="3,4"/>
+        <text x="50" y="172" text-anchor="end" fill="#64748b" font-size="10">20</text>
+        <line x1="58" y1="168" x2="680" y2="168" stroke="#1e2840" stroke-width="0.5" stroke-dasharray="3,4"/>
+        <text x="50" y="214" text-anchor="end" fill="#64748b" font-size="10">0</text>
+        <text x="20" y="120" text-anchor="middle" fill="#64748b" font-size="10" transform="rotate(-90,20,120)">Presión (mmHg)</text>
+        <!-- Pressure curve (systolic) -->
+        <polyline fill="none" stroke="url(#lineGrad)" stroke-width="2.5"
+          points="65,20 90,20 90,28 115,25 115,140 160,130 220,180 290,195 380,205 430,205 480,205 540,205 620,206 680,207"/>
+        <!-- Diastolic -->
+        <polyline fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"
+          points="65,58 90,58 90,68 115,65 115,160 160,150 220,185 290,198 380,207 680,209"/>
+        <!-- Labels x axis -->
+        <text x="75" y="228" text-anchor="middle" fill="#64748b" font-size="9">Aorta</text>
+        <text x="140" y="228" text-anchor="middle" fill="#64748b" font-size="9">Grandes<br/>arterias</text>
+        <text x="230" y="228" text-anchor="middle" fill="#f97316" font-size="9" font-weight="bold">Arteriolas</text>
+        <text x="330" y="228" text-anchor="middle" fill="#64748b" font-size="9">Capilares</text>
+        <text x="430" y="228" text-anchor="middle" fill="#64748b" font-size="9">Venas</text>
+        <text x="560" y="228" text-anchor="middle" fill="#64748b" font-size="9">Venas cavas</text>
+        <!-- Legend -->
+        <line x1="420" y1="35" x2="450" y2="35" stroke="url(#lineGrad)" stroke-width="2.5"/>
+        <text x="455" y="39" fill="#c8d4e8" font-size="10">Sistólica</text>
+        <line x1="420" y1="52" x2="450" y2="52" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="455" y="56" fill="#c8d4e8" font-size="10">Diastólica</text>
+        <!-- Arrow: mayor caída -->
+        <text x="222" y="100" fill="#f97316" font-size="9" font-weight="bold">▼ Mayor caída</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- S2: Principios -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">3 Principios Básicos de la Función Circulatoria</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">① Control Local</div>
+        <p style="margin:0;font-size:13.5px;color:#c8d4e8;">El flujo en cada tejido está controlado <strong>según la necesidad metabólica tisular</strong>. Los vasos locales se dilatan o contraen en respuesta a O₂, CO₂, adenosina y otros metabolitos.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">② Gasto Cardíaco</div>
+        <p style="margin:0;font-size:13.5px;color:#c8d4e8;">El <strong>gasto cardíaco = suma de todos los flujos locales</strong>. Si un tejido necesita más sangre, el GC total aumenta para satisfacer la demanda global.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">③ Presión Arterial</div>
+        <p style="margin:0;font-size:13.5px;color:#c8d4e8;">La P.A. es regulada <strong>independientemente</strong> del control local. El S.N. simpático es el principal responsable del control rápido de la PA. El riñón, del control a largo plazo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3: Ley de Ohm -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Ley de Ohm y Flujo Sanguíneo</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-main">F = ΔP / R</div>
+      <div class="formula-vars">
+        <strong style="color:var(--cyan)">F</strong> = flujo sanguíneo (ml/min) &nbsp;|&nbsp;
+        <strong style="color:var(--purple)">ΔP</strong> = diferencia de presión (mmHg) &nbsp;|&nbsp;
+        <strong style="color:var(--orange)">R</strong> = resistencia vascular
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Derivaciones</div>
+        <ul class="blist">
+          <li><span class="hl-cyan">ΔP = F × R</span> (calcular gradiente)</li>
+          <li><span class="hl-cyan">R = ΔP / F</span> (calcular resistencia)</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Flujo Global en Reposo</div>
+        <div class="stat-box" style="margin-top:8px;">
+          <div class="stat-val" style="color:var(--cyan)">5.000</div>
+          <div class="stat-label">ml/min en adulto en reposo (= Gasto Cardíaco)</div>
+        </div>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Concepto Clave</div>
+        <div class="alert alert-cyan" style="margin:0;">
+          <span class="alert-icon">⚡</span>
+          <span class="alert-text">Es la <strong>DIFERENCIA</strong> de presión lo que determina el flujo — no la presión absoluta. Si P₁ = P₂, flujo = 0.</span>
+        </div>
+      </div>
+    </div>
+    <div class="guyton-note">Guyton Cap. 14 — El flujo es directamente proporcional al gradiente de presión e inversamente proporcional a la resistencia. Concepto análogo a la ley de Ohm eléctrica (I = V/R).</div>
+  </section>
+
+  <!-- S4: Flujo Laminar y Turbulento -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Flujo Laminar y Flujo Turbulento</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Flujo Laminar</div>
+        <ul class="blist">
+          <li>Flujo <span class="hl-cyan">ordenado en capas paralelas</span> — cada capa se mueve a velocidad constante según su distancia de la pared.</li>
+          <li>La capa central se mueve <span class="hl-cyan">más rápido</span>; la periférica (pared), más lento.</li>
+          <li>Ocurre en vasos <span class="hl-cyan">largos, lisos y con velocidad moderada</span>.</li>
+          <li>Produce el sonido característico de los tonos de Korotkoff normales.</li>
+        </ul>
+        <div class="alert alert-green" style="margin-top:12px;">
+          <span class="alert-icon">✓</span>
+          <span class="alert-text"><strong>Normal en la mayoría</strong> de la vasculatura. Es silencioso (no produce soplos).</span>
+        </div>
+      </div>
+      <div>
+        <div class="sub-title">Flujo Turbulento</div>
+        <ul class="blist">
+          <li>El flujo transcurre en <span class="hl-red">todas las direcciones</span>, con remolinos y mezcla continua.</li>
+          <li>Se produce cuando: <span class="hl-orange">velocidad excesiva</span>, obstrucciones, curvas bruscas o superficies rugosas.</li>
+          <li>Genera <span class="hl-red">soplos cardíacos y vasculares</span> audibles.</li>
+          <li>Requiere mayor trabajo para mover la misma cantidad de sangre.</li>
+        </ul>
+        <div class="alert alert-red" style="margin-top:12px;">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-text"><strong>Patológico</strong> en la mayoría de los contextos — indica estenosis, anemia severa o disfunción valvular.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reynolds -->
+    <div class="formula-box" style="margin-top:24px;">
+      <div class="formula-main">Re = (v · d · ρ) / η</div>
+      <div class="formula-vars">
+        Número de Reynolds — predice si el flujo será laminar o turbulento<br>
+        <strong style="color:var(--cyan)">v</strong> = velocidad media (cm/s) &nbsp;|&nbsp;
+        <strong style="color:var(--cyan)">d</strong> = diámetro del vaso (cm) &nbsp;|&nbsp;
+        <strong style="color:var(--cyan)">ρ</strong> = densidad de la sangre &nbsp;|&nbsp;
+        <strong style="color:var(--cyan)">η</strong> = viscosidad
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">↑ Turbulencia si...</div>
+        <ul class="blist">
+          <li>↑ Velocidad del flujo</li>
+          <li>↑ Diámetro del vaso</li>
+          <li>↑ Densidad de la sangre</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">↓ Turbulencia si...</div>
+        <ul class="blist">
+          <li>↑ Viscosidad de la sangre</li>
+          <li>↓ Velocidad</li>
+          <li>Vasos lisos y rectos</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Valor Crítico</div>
+        <div class="alert alert-orange" style="margin:0;">
+          <span class="alert-icon">📊</span>
+          <span class="alert-text">Re <strong>&lt; 2000</strong>: laminar<br>Re <strong>&gt; 3000</strong>: turbulento</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S5: Resistencia -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Resistencia Vascular y Ley de Poiseuille</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-main">F = (π · ΔP · r⁴) / (8 · η · L)</div>
+      <div class="formula-vars">
+        Ley de Poiseuille — determina el flujo según la geometría del vaso<br>
+        <strong style="color:var(--cyan)">r</strong> = radio &nbsp;|&nbsp;
+        <strong style="color:var(--cyan)">η</strong> = viscosidad &nbsp;|&nbsp;
+        <strong style="color:var(--cyan)">L</strong> = longitud del vaso
+      </div>
+    </div>
+
+    <div class="alert alert-red">
+      <span class="alert-icon">🎯</span>
+      <span class="alert-text"><strong>El radio elevado a la 4ª potencia</strong> es el factor más importante. Si el radio se reduce a la mitad, el flujo cae a <strong>1/16</strong> del original. Por eso las arteriolas son el principal punto de control de la resistencia.</span>
+    </div>
+
+    <div class="sub-title" style="margin-top:24px;">Resistencia Periférica Total (RPT)</div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Cálculo RPT Normal</div>
+        <ul class="blist">
+          <li>GC en reposo: 100 ml/s</li>
+          <li>ΔP = 100 mmHg</li>
+          <li>RPT = ΔP / F = <span class="hl-cyan">1 PRU</span></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Rangos Fisiológicos</div>
+        <ul class="blist">
+          <li>Vasoconstricción máxima: <span class="hl-red">4 PRU</span></li>
+          <li>Vasodilatación máxima: <span class="hl-green">0.2 PRU</span></li>
+          <li>Normal reposo: <span class="hl-cyan">≈ 1 PRU</span></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Fórmula Clave</div>
+        <div class="formula-box" style="margin:0;padding:12px;"><div class="formula-main" style="font-size:14px;">PA = GC × RPT</div></div>
+      </div>
+    </div>
+
+    <!-- Gráfico: vasos en paralelo -->
+    <div class="chart-wrap">
+      <div class="chart-title">Resistencias en Serie vs. Paralelo — Efecto sobre la Resistencia Total</div>
+      <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Serie -->
+        <text x="165" y="25" text-anchor="middle" fill="#00e5ff" font-size="11" font-weight="bold">EN SERIE</text>
+        <line x1="20" y1="100" x2="80" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <rect x="80" y="80" width="50" height="40" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="105" y="103" text-anchor="middle" fill="#a855f7" font-size="10">R₁</text>
+        <line x1="130" y1="100" x2="160" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <rect x="160" y="80" width="50" height="40" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="185" y="103" text-anchor="middle" fill="#a855f7" font-size="10">R₂</text>
+        <line x1="210" y1="100" x2="240" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <rect x="240" y="80" width="50" height="40" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="265" y="103" text-anchor="middle" fill="#a855f7" font-size="10">R₃</text>
+        <line x1="290" y1="100" x2="310" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <text x="165" y="155" text-anchor="middle" fill="#f97316" font-size="10">Rtotal = R₁ + R₂ + R₃ (↑ mayor)</text>
+
+        <!-- Paralelo -->
+        <text x="510" y="25" text-anchor="middle" fill="#00e5ff" font-size="11" font-weight="bold">EN PARALELO</text>
+        <line x1="360" y1="100" x2="400" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <line x1="400" y1="100" x2="400" y2="55" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="400" y1="100" x2="400" y2="100" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="400" y1="100" x2="400" y2="145" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="400" y1="55" x2="430" y2="55" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="400" y1="100" x2="430" y2="100" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="400" y1="145" x2="430" y2="145" stroke="#00e5ff" stroke-width="1.5"/>
+        <rect x="430" y="38" width="60" height="32" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="460" y="57" text-anchor="middle" fill="#a855f7" font-size="10">R₁</text>
+        <rect x="430" y="83" width="60" height="32" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="460" y="102" text-anchor="middle" fill="#a855f7" font-size="10">R₂</text>
+        <rect x="430" y="128" width="60" height="32" rx="4" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="460" y="147" text-anchor="middle" fill="#a855f7" font-size="10">R₃</text>
+        <line x1="490" y1="55" x2="570" y2="55" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="490" y1="100" x2="570" y2="100" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="490" y1="145" x2="570" y2="145" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="570" y1="55" x2="570" y2="145" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="570" y1="100" x2="640" y2="100" stroke="#00e5ff" stroke-width="2"/>
+        <text x="510" y="178" text-anchor="middle" fill="#22c55e" font-size="10">1/Rtotal = 1/R₁ + 1/R₂ + 1/R₃ (↓ menor)</text>
+      </svg>
+    </div>
+    <div class="alert alert-cyan">
+      <span class="alert-icon">💡</span>
+      <span class="alert-text"><strong>Clave clínica:</strong> La adición de vasos en <strong>paralelo</strong> (vasodilatación tisular) <em>disminuye</em> la resistencia total y aumenta el GC. La vasoconstricción la aumenta.</span>
+    </div>
+  </section>
+
+  <!-- S6: Hematocrito y Viscosidad -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Hematocrito, Viscosidad y Flujo</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+    <p>Según Poiseuille, cuanto mayor sea la viscosidad (η), menor el flujo para todos los demás factores constantes. La viscosidad de la sangre normal es <span class="hl-cyan">≈ 3× mayor que el agua</span>.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Condición</th><th>Hematocrito</th><th>Viscosidad</th><th>Efecto sobre el flujo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Normal</strong></td><td>♂ 45% / ♀ 40%</td><td>≈ 3× agua</td><td>Normal</td></tr>
+          <tr><td><span class="hl-red">Anemia severa</span></td><td>↓↓ (&lt;30%)</td><td>↓ (más fluida)</td><td>↑ Flujo (pero ↓ O₂ transportado)</td></tr>
+          <tr><td><span class="hl-orange">Policitemia</span></td><td>↑↑ (&gt;60%)</td><td>↑↑ (hasta 10× agua)</td><td>↓↓ Flujo — riesgo trombótico</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="guyton-note">Guyton Cap. 14 — La policitemia puede aumentar la viscosidad hasta 10 veces la del agua, haciendo que el corazón deba trabajar mucho más para mantener el flujo normal.</div>
+  </section>
+
+  <!-- S7: Autorregulación -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Autorregulación del Flujo Sanguíneo Tisular</h2>
+      <span class="chapter-badge">CAP. 14</span>
+    </div>
+    <div class="alert alert-cyan">
+      <span class="alert-icon">🎯</span>
+      <span class="alert-text"><strong>Autorregulación:</strong> Capacidad de cada tejido para mantener flujo normal frente a cambios de presión arterial entre <strong>≈ 70 y 175 mmHg</strong>, ajustando su resistencia vascular local.</span>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Autorregulación — Flujo vs. Presión Arterial Media</div>
+      <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+        <line x1="50" y1="20" x2="50" y2="185" stroke="#1e2840" stroke-width="1"/>
+        <line x1="50" y1="185" x2="480" y2="185" stroke="#1e2840" stroke-width="1"/>
+        <!-- Y axis labels -->
+        <text x="44" y="24" text-anchor="end" fill="#64748b" font-size="9">2.5×</text>
+        <text x="44" y="70" text-anchor="end" fill="#64748b" font-size="9">2.0×</text>
+        <text x="44" y="115" text-anchor="end" fill="#64748b" font-size="9">1.0×</text>
+        <text x="44" y="160" text-anchor="end" fill="#64748b" font-size="9">0.5×</text>
+        <text x="18" y="110" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,18,110)">Flujo sanguíneo</text>
+        <!-- X axis labels -->
+        <text x="100" y="198" text-anchor="middle" fill="#64748b" font-size="9">50</text>
+        <text x="200" y="198" text-anchor="middle" fill="#64748b" font-size="9">100</text>
+        <text x="300" y="198" text-anchor="middle" fill="#64748b" font-size="9">150</text>
+        <text x="400" y="198" text-anchor="middle" fill="#64748b" font-size="9">200</text>
+        <text x="265" y="210" text-anchor="middle" fill="#64748b" font-size="9">Presión arterial media (mmHg)</text>
+        <!-- Autorregulation curve (flat in middle) -->
+        <polyline fill="none" stroke="#00e5ff" stroke-width="2.5"
+          points="60,175 90,145 110,115 140,112 200,113 260,114 310,116 340,120 380,125 430,135 470,142"/>
+        <!-- Sin control (linear) -->
+        <polyline fill="none" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,3"
+          points="60,180 470,20"/>
+        <!-- Labels -->
+        <text x="220" y="96" fill="#00e5ff" font-size="10">Control local (Autorregulación)</text>
+        <text x="330" y="65" fill="#f97316" font-size="10">Sin control</text>
+        <!-- Plateau annotation -->
+        <line x1="115" y1="112" x2="330" y2="112" stroke="#22c55e" stroke-width="1" stroke-dasharray="2,3"/>
+        <text x="225" y="104" fill="#22c55e" font-size="9" text-anchor="middle">Zona de autorregulación</text>
+      </svg>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 15 ========== -->
+
+  <!-- S8: Distensibilidad -->
+  <section class="section" id="s8">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Distensibilidad Vascular</h2>
+      <span class="chapter-badge">CAP. 15</span>
+    </div>
+    <div class="formula-box">
+      <div class="formula-main">Distensibilidad = ΔV / (V · ΔP)</div>
+      <div class="formula-vars">Cambio fraccional de volumen por cada mmHg de presión</div>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Venas (Alta Distensibilidad)</div>
+        <ul class="blist">
+          <li>Distensibilidad <span class="hl-cyan">≈ 8× mayor</span> que las arterias</li>
+          <li>Actúan como <span class="hl-cyan">reservorio de sangre</span> (sistema de capacitancia)</li>
+          <li>Contienen <strong>≈64%</strong> del volumen sanguíneo total</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Arterias (Baja Distensibilidad)</div>
+        <ul class="blist">
+          <li>Paredes musculares y elásticas rígidas</li>
+          <li>Función de <span class="hl-orange">amortiguación</span> de la pulsatilidad</li>
+          <li>En vejez/arteriosclerosis: ↓ distensibilidad → ↑ P. sistólica</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S9: Compliancia -->
+  <section class="section" id="s9">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">Compliancia Vascular</h2>
+      <span class="chapter-badge">CAP. 15</span>
+    </div>
+    <div class="formula-box">
+      <div class="formula-main">C = Distensibilidad × Volumen</div>
+      <div class="formula-vars">La compliancia es proporcional al volumen e inversamente proporcional a la presión</div>
+    </div>
+    <div class="alert alert-orange">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-text"><strong>Paradoja:</strong> Un vaso muy distensible pero de volumen pequeño puede tener <strong>MENOS compliancia</strong> que uno poco distensible con volumen grande. La compliancia depende de ambas variables.</span>
+    </div>
+    <div class="guyton-note">Guyton Cap. 15 — Las venas son el reservorio principal de sangre del organismo. Una pequeña constricción venosa puede desplazar grandes volúmenes hacia la circulación central, aumentando el retorno venoso y el GC.</div>
+  </section>
+
+  <!-- S10: Arterial y Venoso -->
+  <section class="section" id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2 class="section-title">Funciones del Sistema Arterial y Venoso</h2>
+      <span class="chapter-badge">CAP. 15</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Sistema Arterial</th><th>Sistema Venoso</th></tr></thead>
+        <tbody>
+          <tr><td>Función principal</td><td>Distribución a presión</td><td>Retorno y reservorio</td></tr>
+          <tr><td>Presión</td><td>Alta (80–120 mmHg)</td><td>Baja (0–8 mmHg)</td></tr>
+          <tr><td>% del volumen sanguíneo</td><td>≈15%</td><td>≈64%</td></tr>
+          <tr><td>Distensibilidad</td><td>Baja</td><td>Alta (8× las arterias)</td></tr>
+          <tr><td>Pared</td><td>Muscular y elástica gruesa</td><td>Delgada, con válvulas</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- S11: Presión Venosa -->
+  <section class="section" id="s11">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <h2 class="section-title">Resistencia Venosa y Presión Venosa</h2>
+      <span class="chapter-badge">CAP. 15</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <ul class="blist">
+          <li>Las venas grandes que ingresan al tórax son <span class="hl-cyan">comprimidas</span> por tejidos circundantes, limitando el flujo.</li>
+          <li>La <span class="hl-orange">presión intratorácica negativa</span> (≈ −4 mmHg) favorece el retorno venoso durante la inspiración.</li>
+          <li>La <span class="hl-cyan">bomba muscular</span> (contracción de músculos esqueléticos) empuja sangre hacia arriba, junto con las válvulas venosas.</li>
+          <li>La <span class="hl-purple">bomba respiratoria</span> (inspiración) reduce la P. intratorácica y succiona sangre venosa.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card-sm">
+          <div class="card-sm-title">Puntos de colapso venoso</div>
+          <ul class="blist">
+            <li>Cuello (P. atmosférica)</li>
+            <li>Costillas (compresión)</li>
+            <li>Axila</li>
+            <li>Abdomen (P. abdominal)</li>
+          </ul>
+        </div>
+        <div class="alert alert-cyan" style="margin-top:12px;">
+          <span class="alert-icon">↑</span>
+          <span class="alert-text">Ejercicio → ↑ bomba muscular → ↑ retorno venoso → ↑ GC</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 16 ========== -->
+  <section class="section" id="s12">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <h2 class="section-title">Fuerzas de Starling — Intercambio Capilar</h2>
+      <span class="chapter-badge">CAP. 16</span>
+    </div>
+    <div class="guyton-note">Guyton Cap. 16 — El movimiento neto de líquido a través de la pared capilar depende del balance entre 4 fuerzas de Starling: 2 que empujan hacia afuera y 2 que empujan hacia adentro.</div>
+    <div class="card-grid">
+      <div class="card-sm" style="border-color:rgba(239,68,68,0.3);">
+        <div class="card-sm-title" style="color:var(--red)">Fuerzas de Filtración (→ intersticio)</div>
+        <ul class="blist">
+          <li>Pc (presión hidrostática capilar): <span class="hl-cyan">+17 mmHg</span></li>
+          <li>πi (presión oncótica intersticial): <span class="hl-cyan">+8 mmHg</span></li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(34,197,94,0.3);">
+        <div class="card-sm-title" style="color:var(--green)">Fuerzas de Reabsorción (→ capilar)</div>
+        <ul class="blist">
+          <li>πp (presión oncótica plasma): <span class="hl-green">−28 mmHg</span></li>
+          <li>Pi (presión hidrostática intersticial): <span class="hl-green">−3 mmHg</span></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Resultado Neto</div>
+        <div class="formula-box" style="margin:0;padding:12px;">
+          <div class="formula-main" style="font-size:13px;">Filtración Neta ≈ +6 mmHg</div>
+        </div>
+        <p style="font-size:12px;margin:8px 0 0;color:var(--muted);">→ Este exceso es drenado por el sistema linfático (≈2–4 L/día)</p>
+      </div>
+    </div>
+    <div class="alert alert-orange" style="margin-top:16px;">
+      <span class="alert-icon">💧</span>
+      <span class="alert-text"><strong>Edema</strong> ocurre cuando la filtración supera la capacidad de drenaje linfático: ↑Pc (IC derecha), ↓πp (hipoalbuminemia), ↑permeabilidad (inflamación) o bloqueo linfático.</span>
+    </div>
+
+    <div class="sub-title" style="margin-top:28px;">Tejidos Encapsulados — Presión Intersticial Positiva</div>
+    <p>En tejidos rodeados por estructuras rígidas (cráneo, riñón con cápsula fibrosa, músculos con vainas fibrosas, esclerótica ocular), la presión del líquido intersticial es <span class="hl-cyan">POSITIVA</span> — lo que limita la acumulación de líquido en esos compartimentos.</p>
+  </section>
+
+  <!-- S13: Linfático -->
+  <section class="section" id="s13">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <h2 class="section-title">Sistema Linfático</h2>
+      <span class="chapter-badge">CAP. 16</span>
+    </div>
+    <div class="alert alert-cyan">
+      <span class="alert-icon">🔄</span>
+      <span class="alert-text">El sistema linfático actúa como <strong>mecanismo de rebosamiento</strong> — devuelve a la circulación el exceso de proteínas y volumen de los espacios tisulares.</span>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Funciones Linfáticas</div>
+        <ul class="blist">
+          <li>Control de la concentración de proteínas intersticiales</li>
+          <li>Regulación del volumen intersticial</li>
+          <li>Mantenimiento de la P. del líquido intersticial</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Factores del Flujo Linfático</div>
+        <ul class="blist">
+          <li>(1) Presión del líquido intersticial</li>
+          <li>(2) Actividad de la bomba linfática</li>
+          <li>Velocidad = P. intersticial × Actividad bomba</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Bombeo Linfático</div>
+        <ul class="blist">
+          <li>Contracción intrínseca de la pared linfática</li>
+          <li>Contracción músculos esqueléticos</li>
+          <li>Movimiento corporal</li>
+          <li>Pulsaciones arteriales adyacentes</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 17 ========== -->
+  <section class="section" id="s14">
+    <div class="section-header">
+      <span class="section-num">14</span>
+      <h2 class="section-title">Control Local del Flujo Sanguíneo</h2>
+      <span class="chapter-badge">CAP. 17</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Teoría Metabólica</div>
+        <ul class="blist">
+          <li>El flujo se ajusta según las <span class="hl-cyan">necesidades metabólicas</span> del tejido</li>
+          <li>↓ O₂ o ↑ CO₂ → vasodilatación local</li>
+          <li>↑ PA → ↑ O₂ → vasodilatación disminuye → vasoconstricción</li>
+          <li>Resultado: flujo constante a pesar de variaciones de PA</li>
+        </ul>
+        <div class="alert alert-green" style="margin-top:12px;">
+          <span class="alert-icon">🧪</span>
+          <span class="alert-text"><strong>Mediadores vasodilatadores:</strong> O₂↓, CO₂↑, adenosina, lactato, iones K⁺, iones H⁺, bradiquininas.</span>
+        </div>
+      </div>
+      <div>
+        <div class="sub-title">Teoría Miogénica</div>
+        <ul class="blist">
+          <li>El músculo liso vascular responde directamente al <span class="hl-purple">estiramiento</span></li>
+          <li>↑ Presión → estiramiento → contracción → vasoconstricción</li>
+          <li>↓ Presión → relajación → vasodilatación</li>
+          <li>Contribuye a la autorregulación junto con la teoría metabólica</li>
+        </ul>
+      </div>
+    </div>
+    <div class="sub-title" style="margin-top:20px;">Hiperemia Reactiva y Activa</div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Hiperemia Reactiva</div>
+        <p style="margin:0;font-size:13px;color:#c8d4e8;">Oclusión temporal → acumulación de metabolitos → vasodilatación intensa al restaurar el flujo. <span class="hl-cyan">Señal: "deuda de O₂"</span>.</p>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Hiperemia Activa</div>
+        <p style="margin:0;font-size:13px;color:#c8d4e8;">Aumento de actividad metabólica → ↑ metabolitos → vasodilatación proporcional. Ej: músculo durante ejercicio → flujo ↑ 20×.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S15: Control Humoral -->
+  <section class="section" id="s15">
+    <div class="section-header">
+      <span class="section-num">15</span>
+      <h2 class="section-title">Control Humoral del Flujo</h2>
+      <span class="chapter-badge">CAP. 17</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Sustancia</th><th>Efecto</th><th>Mecanismo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Noradrenalina</strong></td><td><span class="hl-red">Vasoconstricción</span></td><td>Receptores α₁</td></tr>
+          <tr><td><strong>Adrenalina</strong></td><td>Variable (α/β)</td><td>α₁ → constricción; β₂ → dilatación músculo</td></tr>
+          <tr><td><strong>Angiotensina II</strong></td><td><span class="hl-red">Vasoconstricción</span> intensa</td><td>Directo sobre músculo liso</td></tr>
+          <tr><td><strong>Vasopresina (ADH)</strong></td><td><span class="hl-red">Vasoconstricción</span></td><td>Receptores V₁ en músculo liso</td></tr>
+          <tr><td><strong>Histamina</strong></td><td><span class="hl-green">Vasodilatación</span></td><td>Receptores H₁ — inflamación</td></tr>
+          <tr><td><strong>Óxido Nítrico (NO)</strong></td><td><span class="hl-green">Vasodilatación</span> potente</td><td>↑ GMPc → relajación músculo liso</td></tr>
+          <tr><td><strong>Prostaciclina (PGI₂)</strong></td><td><span class="hl-green">Vasodilatación</span></td><td>Endotelio vascular</td></tr>
+          <tr><td><strong>Endotelina</strong></td><td><span class="hl-red">Vasoconstricción</span> intensa</td><td>Endotelio → músculo liso</td></tr>
+          <tr><td><strong>Serotonina</strong></td><td>Variable</td><td>Constricción arterial; dilatación venas</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 18 ========== -->
+  <section class="section" id="s16">
+    <div class="section-header">
+      <span class="section-num">16</span>
+      <h2 class="section-title">Control Nervioso — Sistema Simpático Vasoconstrictor</h2>
+      <span class="chapter-badge">CAP. 18</span>
+    </div>
+    <div class="alert alert-cyan">
+      <span class="alert-icon">🧠</span>
+      <span class="alert-text">El S.N. simpático afecta 3 funciones generales: <strong>(1) redistribución del flujo</strong> sanguíneo, <strong>(2) control del bombeo del corazón</strong>, y <strong>(3) control rápido de la presión arterial</strong>.</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Fibras Vasoconstrictoras</div>
+        <ul class="blist">
+          <li>Abundantes en: riñones, intestino, bazo, piel</li>
+          <li>Escasas en: músculo esquelético, cerebro</li>
+          <li>Neurotransmisor: <span class="hl-cyan">noradrenalina</span> → receptores α₁</li>
+          <li>Efecto depende del receptor adrenérgico del órgano</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Fibras Vasodilatadoras</div>
+        <ul class="blist">
+          <li>Solo en músculo esquelético (respuesta al ejercicio)</li>
+          <li>Activadas por la corteza cerebral antes del ejercicio</li>
+          <li>Permiten vasodilatación anticipatoria</li>
+        </ul>
+        <div class="alert alert-green" style="margin-top:12px;">
+          <span class="alert-icon">🏃</span>
+          <span class="alert-text">En ejercicio: ↑ flujo muscular (vasodilatación metabólica + nerviosa) y ↓ flujo visceral (vasoconstricción simpática).</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S17: Barorreceptores -->
+  <section class="section" id="s17">
+    <div class="section-header">
+      <span class="section-num">17</span>
+      <h2 class="section-title">Barorreceptores Arteriales</h2>
+      <span class="chapter-badge">CAP. 18</span>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Localización</div>
+        <ul class="blist">
+          <li>Seno carotídeo (IX par)</li>
+          <li>Cayado aórtico (X par)</li>
+          <li>Activos en rango 60–180 mmHg</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Mecanismo</div>
+        <ul class="blist">
+          <li>↑ PA → ↑ descarga barorreceptora → inhibe centros simpáticos → ↓ PA</li>
+          <li>↓ PA → ↓ descarga → ↑ simpático → ↑ PA</li>
+          <li>Respuesta: en <strong>segundos</strong></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Función Postural</div>
+        <ul class="blist">
+          <li>Al ponerse de pie: ↓ PA cabeza</li>
+          <li>Barorreceptores detectan → reflejo simpático inmediato</li>
+          <li>Evita el mareo ortostático</li>
+        </ul>
+      </div>
+    </div>
+    <div class="guyton-note">Guyton Cap. 18 — Los barorreceptores son el mecanismo más potente de control rápido de la PA, pero se adaptan en 1–2 días a una nueva presión. Por eso no sirven para el control a largo plazo — solo para amortiguar las variaciones momento a momento.</div>
+  </section>
+
+  <!-- S18: Control Rápido PA -->
+  <section class="section" id="s18">
+    <div class="section-header">
+      <span class="section-num">18</span>
+      <h2 class="section-title">Control Rápido de la Presión Arterial</h2>
+      <span class="chapter-badge">CAP. 18</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mecanismo</th><th>Tiempo de acción</th><th>Efecto</th></tr></thead>
+        <tbody>
+          <tr><td>Barorreceptores arteriales</td><td>Segundos</td><td>Amortigua variaciones bruscas</td></tr>
+          <tr><td>Quimiorreceptores (O₂, CO₂)</td><td>Segundos</td><td>Eleva PA en hipoxia/hipercapnia</td></tr>
+          <tr><td>Respuesta isquémica del SNC</td><td>Segundos–minutos</td><td>Emergencia: PA &lt;50 → vasoconstricción máxima</td></tr>
+          <tr><td>Control renal (riñón-líquido)</td><td>Horas–días</td><td>Control definitivo a largo plazo</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-red">
+      <span class="alert-icon">🚨</span>
+      <span class="alert-text"><strong>Respuesta isquémica del SNC:</strong> Cuando la PA cae a &lt;50 mmHg, los centros vasomotores bulbares son estimulados directamente por la isquemia → descarga simpática masiva → vasoconstricción máxima. Es el "último recurso" del organismo.</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 19 ========== -->
+  <section class="section" id="s19">
+    <div class="section-header">
+      <span class="section-num">19</span>
+      <h2 class="section-title">Diuresis por Presión — Control Renal de la PA</h2>
+      <span class="chapter-badge">CAP. 19</span>
+    </div>
+    <div class="guyton-note">Guyton Cap. 19 — El riñón es el árbitro final de la presión arterial a largo plazo. Su mecanismo de diuresis/natriuresis por presión es el único capaz de corregir definitivamente alteraciones crónicas de la PA.</div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Curva de Diuresis por Presión — Punto de Equilibrio del Volumen Corporal</div>
+      <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
+        <line x1="50" y1="20" x2="50" y2="170" stroke="#1e2840" stroke-width="1"/>
+        <line x1="50" y1="170" x2="460" y2="170" stroke="#1e2840" stroke-width="1"/>
+        <text x="44" y="24" text-anchor="end" fill="#64748b" font-size="9">8×</text>
+        <text x="44" y="80" text-anchor="end" fill="#64748b" font-size="9">4×</text>
+        <text x="44" y="130" text-anchor="end" fill="#64748b" font-size="9">1×</text>
+        <text x="44" y="173" text-anchor="end" fill="#64748b" font-size="9">0</text>
+        <text x="12" y="100" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,12,100)">Excreción renal</text>
+        <!-- Pressure natriuresis curve -->
+        <path d="M 65,168 Q 120,168 150,155 Q 200,130 250,80 Q 300,40 360,22 Q 400,16 450,14"
+          fill="none" stroke="#ef4444" stroke-width="2.5"/>
+        <!-- Ingestion line -->
+        <line x1="65" y1="130" x2="450" y2="130" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <!-- Equilibrium point -->
+        <circle cx="215" cy="130" r="6" fill="none" stroke="#22c55e" stroke-width="2"/>
+        <text x="215" y="148" text-anchor="middle" fill="#22c55e" font-size="9">Equilibrio (≈100mmHg)</text>
+        <!-- X labels -->
+        <text x="130" y="185" text-anchor="middle" fill="#64748b" font-size="9">50</text>
+        <text x="215" y="185" text-anchor="middle" fill="#64748b" font-size="9">100</text>
+        <text x="310" y="185" text-anchor="middle" fill="#64748b" font-size="9">150</text>
+        <text x="400" y="185" text-anchor="middle" fill="#64748b" font-size="9">200</text>
+        <text x="255" y="196" text-anchor="middle" fill="#64748b" font-size="9">Presión arterial media (mmHg)</text>
+        <!-- Legend -->
+        <line x1="280" y1="50" x2="310" y2="50" stroke="#ef4444" stroke-width="2.5"/>
+        <text x="315" y="54" fill="#c8d4e8" font-size="9">Excreción renal</text>
+        <line x1="280" y1="67" x2="310" y2="67" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="315" y="71" fill="#c8d4e8" font-size="9">Ingestión agua/sal</text>
+        <!-- Annotations -->
+        <text x="110" y="90" fill="#64748b" font-size="8.5">PA 50mmHg:</text>
+        <text x="110" y="100" fill="#64748b" font-size="8.5">Excreción ≈ 0</text>
+        <text x="340" y="70" fill="#64748b" font-size="8.5">PA 200mmHg:</text>
+        <text x="340" y="80" fill="#64748b" font-size="8.5">Excreción ≈ 4–6×</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- S20: SRAA -->
+  <section class="section" id="s20">
+    <div class="section-header">
+      <span class="section-num">20</span>
+      <h2 class="section-title">Sistema Renina-Angiotensina-Aldosterona (SRAA)</h2>
+      <span class="chapter-badge">CAP. 19</span>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Angiotensina II — Efectos</div>
+        <ul class="blist">
+          <li><span class="hl-red">Vasoconstricción</span> directa (potente)</li>
+          <li>Estimula secreción de <span class="hl-orange">aldosterona</span></li>
+          <li>Retención de sodio y agua → ↑ volumen LEC</li>
+          <li>Estimula centro de la sed</li>
+          <li>Retroalimentación → ↑ PA</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Aldosterona — Efectos</div>
+        <ul class="blist">
+          <li>Acumula sal en tejidos → ↑ osmolalidad</li>
+          <li>Estimula <span class="hl-cyan">centro de la sed</span> (cerebro)</li>
+          <li>↑ Osmolalidad → eje hipotálamo-hipófisis → <span class="hl-purple">ADH</span></li>
+          <li>ADH → reabsorción renal de agua → ↓ diuresis</li>
+          <li>Resultado: expansión del volumen → ↑ PA</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Aplicación Clínica</div>
+        <div class="alert alert-red" style="margin:0;">
+          <span class="alert-icon">💊</span>
+          <span class="alert-text">Los <strong>IECA</strong> (captopril, enalapril) y <strong>ARA-II</strong> (losartán) bloquean esta vía — base del tratamiento de la HAS y IC.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 20 ========== -->
+  <section class="section" id="s21">
+    <div class="section-header">
+      <span class="section-num">21</span>
+      <h2 class="section-title">Gasto Cardíaco y Retorno Venoso</h2>
+      <span class="chapter-badge">CAP. 20</span>
+    </div>
+    <div class="guyton-note">Guyton Cap. 20 — El GC y el RV deben ser iguales entre sí en estado estacionario. Si el corazón bombea más de lo que retorna, el ventrículo se vacía. Si el RV supera el GC, ocurre sobrecarga de volumen.</div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Gasto Cardíaco (GC)</div>
+        <div class="stat-box" style="margin:10px 0;">
+          <div class="stat-val" style="color:var(--cyan)">5 L/min</div>
+          <div class="stat-label">Valor normal en reposo</div>
+        </div>
+        <ul class="blist">
+          <li>GC = Volumen Sistólico × FC</li>
+          <li>VS ≈ 70 ml × FC ≈ 72/min = <span class="hl-cyan">≈5 L/min</span></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Retorno Venoso (RV)</div>
+        <ul class="blist">
+          <li>Volumen de sangre que fluye de las venas hacia la aurícula derecha cada minuto</li>
+          <li><span class="hl-cyan">RV = GC</span> en estado estacionario</li>
+          <li>Determinado principalmente por la <span class="hl-purple">presión media de llenado sistémico (PMLS)</span></li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">PMLS (Presión Media de Llenado)</div>
+        <div class="stat-box" style="margin:10px 0;">
+          <div class="stat-val" style="color:var(--purple)">≈ 7 mmHg</div>
+          <div class="stat-label">Presión media sistémica de llenado</div>
+        </div>
+        <ul class="blist">
+          <li>Refleja el "tono" del sistema vascular</li>
+          <li>↑ volemia → ↑ PMLS → ↑ RV → ↑ GC</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S22: Frank-Starling -->
+  <section class="section" id="s22">
+    <div class="section-header">
+      <span class="section-num">22</span>
+      <h2 class="section-title">Curvas de Frank-Starling y Retorno Venoso</h2>
+      <span class="chapter-badge">CAP. 20</span>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Curvas de Gasto Cardíaco y Retorno Venoso simultáneas — Punto de Equilibrio (Guyton, Fig. 20-6)</div>
+      <svg viewBox="0 0 540 240" xmlns="http://www.w3.org/2000/svg">
+        <line x1="60" y1="20" x2="60" y2="200" stroke="#1e2840" stroke-width="1"/>
+        <line x1="60" y1="200" x2="520" y2="200" stroke="#1e2840" stroke-width="1"/>
+        <!-- Y axis -->
+        <text x="54" y="24" text-anchor="end" fill="#64748b" font-size="9">20</text>
+        <text x="54" y="70" text-anchor="end" fill="#64748b" font-size="9">15</text>
+        <text x="54" y="115" text-anchor="end" fill="#64748b" font-size="9">10</text>
+        <text x="54" y="160" text-anchor="end" fill="#64748b" font-size="9">5</text>
+        <text x="54" y="203" text-anchor="end" fill="#64748b" font-size="9">0</text>
+        <text x="18" y="115" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,18,115)">GC y RV (L/min)</text>
+        <!-- Grid -->
+        <line x1="58" y1="115" x2="520" y2="115" stroke="#1e2840" stroke-width="0.5" stroke-dasharray="3,4"/>
+        <!-- X axis -->
+        <text x="110" y="215" text-anchor="middle" fill="#64748b" font-size="9">−4</text>
+        <text x="200" y="215" text-anchor="middle" fill="#64748b" font-size="9">0</text>
+        <text x="295" y="215" text-anchor="middle" fill="#64748b" font-size="9">+4</text>
+        <text x="385" y="215" text-anchor="middle" fill="#64748b" font-size="9">+8</text>
+        <text x="475" y="215" text-anchor="middle" fill="#64748b" font-size="9">+12</text>
+        <text x="290" y="228" text-anchor="middle" fill="#64748b" font-size="9">Presión en la aurícula derecha (mmHg)</text>
+        <!-- Cardiac output curve (Frank-Starling) -->
+        <path d="M 110,185 Q 160,160 190,130 Q 220,110 250,108 Q 290,106 340,106 Q 400,106 480,106"
+          fill="none" stroke="#00e5ff" stroke-width="2.5"/>
+        <!-- Venous return curve -->
+        <path d="M 480,195 Q 400,193 340,165 Q 290,140 250,115 Q 220,98 190,78 Q 160,58 130,38 Q 110,22 90,15"
+          fill="none" stroke="#f97316" stroke-width="2.5"/>
+        <!-- Equilibrium point A (normal) -->
+        <circle cx="250" cy="110" r="6" fill="#22c55e" stroke="none"/>
+        <text x="252" y="96" fill="#22c55e" font-size="9">A (Normal)</text>
+        <!-- Equilibrium point B (expanded volume) -->
+        <path d="M 480,180 Q 400,165 340,130 Q 290,108 250,85 Q 200,60 130,25"
+          fill="none" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+        <circle cx="292" cy="106" r="5" fill="#a855f7" stroke="none"/>
+        <text x="294" y="92" fill="#a855f7" font-size="9">B (+20% vol.)</text>
+        <!-- Legend -->
+        <line x1="350" y1="155" x2="380" y2="155" stroke="#00e5ff" stroke-width="2.5"/>
+        <text x="385" y="159" fill="#c8d4e8" font-size="9">Gasto Cardíaco (Starling)</text>
+        <line x1="350" y1="172" x2="380" y2="172" stroke="#f97316" stroke-width="2.5"/>
+        <text x="385" y="176" fill="#c8d4e8" font-size="9">Retorno Venoso</text>
+      </svg>
+    </div>
+    <div class="alert alert-cyan">
+      <span class="alert-icon">📈</span>
+      <span class="alert-text"><strong>Un aumento súbito de volemia (20%)</strong> desplaza la curva de RV → el equilibrio se mueve al punto B: GC aumenta 2.5–3× → mayor llenado → PMLS sube a ≈16 mmHg.</span>
+    </div>
+    <div class="guyton-note">Guyton Cap. 20 — La Ley de Frank-Starling establece que el corazón bombea toda la sangre que recibe, siempre que la carga no sea excesiva. El corazón es "esclavo del retorno venoso".</div>
+  </section>
+
+  <!-- S23: Regulación GC -->
+  <section class="section" id="s23">
+    <div class="section-header">
+      <span class="section-num">23</span>
+      <h2 class="section-title">Regulación del Gasto Cardíaco</h2>
+      <span class="chapter-badge">CAP. 20</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Factores que ↑ el GC</div>
+        <ul class="blist">
+          <li>↑ Retorno venoso (↑ volemia, ejercicio)</li>
+          <li>↑ Estimulación simpática (catecolaminas)</li>
+          <li>↑ Frecuencia cardíaca</li>
+          <li>Hipertrofia cardíaca (atletas)</li>
+          <li>Fístulas arteriovenosas</li>
+          <li>Beriberi / vasodilatación periférica extrema</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Corazón Hipereferente</div>
+        <ul class="blist">
+          <li><span class="hl-cyan">Estimulación nerviosa:</span> noradrenalina → ↑ contractilidad y FC</li>
+          <li><span class="hl-purple">Hipertrofia cardíaca:</span> atletas de maratón → masa ↑ 50–70%</li>
+          <li>GC puede alcanzar <span class="hl-orange">30–40 L/min</span> en ejercicio máximo</li>
+        </ul>
+        <div class="alert alert-green" style="margin-top:12px;">
+          <span class="alert-icon">🏅</span>
+          <span class="alert-text">En atletas entrenados el GC máximo es 50–100% mayor que en sedentarios. El corazón normal tiene <strong>reserva cardíaca enorme</strong>.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-title" style="margin-top:20px;">Factores que ↓ el GC</div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">IC Cardiogénica</div>
+        <ul class="blist">
+          <li>Músculo cardíaco dañado</li>
+          <li>GC insuficiente → congestión</li>
+          <li>↓ Contractilidad: necrosis, miocarditis</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">↓ Retorno Venoso</div>
+        <ul class="blist">
+          <li>Hemorragia grave → ↓ volemia</li>
+          <li>Vasodilatación extrema (sepsis)</li>
+          <li>Obstrucción venosa</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S24: Angina -->
+  <section class="section" id="s24">
+    <div class="section-header">
+      <span class="section-num">24</span>
+      <h2 class="section-title">Angina de Pecho</h2>
+      <span class="chapter-badge">CAP. 20</span>
+    </div>
+    <div class="alert alert-red">
+      <span class="alert-icon">❤️</span>
+      <span class="alert-text"><strong>Angina de pecho:</strong> aparece cuando la demanda de O₂ del miocardio supera el aporte disponible por las arterias coronarias — generalmente por constricción progresiva (aterosclerosis).</span>
+    </div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Presentación Clínica</div>
+        <ul class="blist">
+          <li>Dolor <span class="hl-orange">subesternal</span> (debajo del esternón)</li>
+          <li>Dolor referido al <span class="hl-red">brazo, hombro IZQ, cuello y cara</span></li>
+          <li>Sensación de opresión/calor intensa</li>
+          <li>Duración: <span class="hl-cyan">minutos</span> (no horas)</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Desencadenantes</div>
+        <ul class="blist">
+          <li>Ejercicio físico</li>
+          <li>Emociones intensas</li>
+          <li>Vasoconstricción simpática</li>
+          <li>Estómago lleno (redistribuye flujo)</li>
+          <li>Frío</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Tratamiento</div>
+        <ul class="blist">
+          <li><span class="hl-cyan">Nitroglicerina</span> — vasodilatación coronaria</li>
+          <li><span class="hl-cyan">Nitratos de larga acción</span></li>
+          <li>β-bloqueadores (↓ demanda O₂)</li>
+          <li>Revascularización quirúrgica (CABG) o PTCA</li>
+        </ul>
+      </div>
+    </div>
+    <div class="guyton-note">Guyton Cap. 20 — La nitroglicerina dilata las venas y arterias coronarias. Su efecto rápido (1–2 min) en la angina es en gran parte por reducción de la precarga (dilatación venosa) → ↓ trabajo cardíaco.</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ========== CAP 21 ========== -->
+
+  <!-- S25: Reajustes Ejercicio -->
+  <section class="section" id="s25">
+    <div class="section-header">
+      <span class="section-num">25</span>
+      <h2 class="section-title">Reajustes Circulatorios durante el Ejercicio</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="guyton-note">Guyton Cap. 21 — Durante el ejercicio físico intenso, el gasto cardíaco puede aumentar hasta 4× en una persona no entrenada y hasta 7× en atletas de maratón, gracias a la integración perfecta del sistema nervioso, muscular y cardiovascular.</div>
+
+    <div class="alert alert-cyan">
+      <span class="alert-icon">💪</span>
+      <span class="alert-text"><strong>3 factores esenciales</strong> para aportar flujo sanguíneo a los músculos durante el ejercicio: (1) Activación simpática generalizada, (2) Aumento de la presión arterial, (3) Aumento del gasto cardíaco.</span>
+    </div>
+
+    <div class="sub-title">① Activación Simpática — 3 efectos sobre el sistema cardiovascular</div>
+    <div class="card-grid">
+      <div class="card-sm" style="border-color:rgba(0,229,255,0.3);">
+        <div class="card-sm-title">Estimulación Cardíaca</div>
+        <ul class="blist">
+          <li>↑ Frecuencia cardíaca (cronotropismo +)</li>
+          <li>↑ Contractilidad (inotropismo +)</li>
+          <li>Se atenúan señales parasimpáticas vagales</li>
+          <li>Resultado: ↑↑ GC</li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(249,115,22,0.3);">
+        <div class="card-sm-title">Vasoconstricción Selectiva</div>
+        <ul class="blist">
+          <li>Contracción de arteriolas en: piel, intestino, riñón, bazo</li>
+          <li><span class="hl-red">EXCEPCIÓN:</span> arteriolas del músculo esquelético activo → vasodilatación</li>
+          <li>Resultado: redistribución del flujo hacia el músculo</li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(168,85,247,0.3);">
+        <div class="card-sm-title">Contracción Venosa</div>
+        <ul class="blist">
+          <li>Las paredes venosas se contraen potentemente</li>
+          <li>↑ Presión media de llenado sistémico (PMLS)</li>
+          <li>↑ Retorno venoso → ↑ GC (Frank-Starling)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-title" style="margin-top:24px;">② Aumento de la Presión Arterial — consecuencias</div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Causas del ↑ PA</div>
+        <ul class="blist">
+          <li>Vasoconstricción arteriolar sistémica (excepto encéfalo, corazón, músculos activos)</li>
+          <li>↑ Contractilidad cardíaca</li>
+          <li>↑ Presión media de llenado sistémico</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">③ Aumento del GC</div>
+        <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-top:8px;">
+          <div class="stat-box"><div class="stat-val" style="color:var(--cyan)">4×</div><div class="stat-label">No entrenado</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--purple)">7×</div><div class="stat-label">Maratonista</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0 0;">Consecuencia de ↑ FC + ↑ contractilidad por estimulación simpática cardíaca.</p>
+      </div>
+    </div>
+
+    <!-- Gráfico: GC durante ejercicio -->
+    <div class="chart-wrap">
+      <div class="chart-title">Curvas GC / Retorno Venoso — Reposo vs. Ejercicio Intenso (Guyton, Fig. 21-2)</div>
+      <svg viewBox="0 0 560 230" xmlns="http://www.w3.org/2000/svg">
+        <line x1="60" y1="20" x2="60" y2="195" stroke="#1e2840" stroke-width="1"/>
+        <line x1="60" y1="195" x2="530" y2="195" stroke="#1e2840" stroke-width="1"/>
+        <!-- Y labels -->
+        <text x="54" y="24" text-anchor="end" fill="#64748b" font-size="9">25</text>
+        <text x="54" y="70" text-anchor="end" fill="#64748b" font-size="9">20</text>
+        <text x="54" y="115" text-anchor="end" fill="#64748b" font-size="9">13</text>
+        <text x="54" y="155" text-anchor="end" fill="#64748b" font-size="9">5</text>
+        <text x="54" y="198" text-anchor="end" fill="#64748b" font-size="9">0</text>
+        <text x="16" y="110" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,16,110)">GC / RV (L/min)</text>
+        <!-- X labels -->
+        <text x="110" y="210" text-anchor="middle" fill="#64748b" font-size="9">−4</text>
+        <text x="200" y="210" text-anchor="middle" fill="#64748b" font-size="9">0</text>
+        <text x="295" y="210" text-anchor="middle" fill="#64748b" font-size="9">+4</text>
+        <text x="385" y="210" text-anchor="middle" fill="#64748b" font-size="9">+8</text>
+        <text x="470" y="210" text-anchor="middle" fill="#64748b" font-size="9">+12</text>
+        <text x="295" y="222" text-anchor="middle" fill="#64748b" font-size="9">Presión aurícula derecha (mmHg)</text>
+        <!-- Reposo GC curve (negro) -->
+        <path d="M 110,180 Q 160,155 200,133 Q 230,120 260,118 Q 310,116 400,116 Q 460,116 520,116" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- Ejercicio GC curve (cyan) -->
+        <path d="M 110,175 Q 150,145 180,110 Q 210,80 240,55 Q 270,38 310,30 Q 370,26 450,24 Q 490,24 520,24" fill="none" stroke="#00e5ff" stroke-width="2.5"/>
+        <!-- Reposo RV curve -->
+        <path d="M 520,188 Q 430,180 360,160 Q 300,140 250,115 Q 200,88 150,55 Q 115,30 90,16" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- Ejercicio RV curve (purple - shifted right) -->
+        <path d="M 520,178 Q 440,160 370,130 Q 310,105 265,80 Q 215,54 170,28 Q 140,14 115,8" fill="none" stroke="#a855f7" stroke-width="2.5"/>
+        <!-- Equilibrium points -->
+        <circle cx="262" cy="118" r="5" fill="#475569"/>
+        <text x="275" y="113" fill="#94a3b8" font-size="9">A (Reposo ≈5 L/min)</text>
+        <circle cx="295" cy="34" r="6" fill="#22c55e"/>
+        <text x="308" y="30" fill="#22c55e" font-size="9">B (Ejercicio ≈20 L/min)</text>
+        <!-- Legend -->
+        <line x1="70" y1="168" x2="95" y2="168" stroke="#00e5ff" stroke-width="2.5"/>
+        <text x="100" y="172" fill="#c8d4e8" font-size="8.5">GC ejercicio</text>
+        <line x1="70" y1="180" x2="95" y2="180" stroke="#a855f7" stroke-width="2.5"/>
+        <text x="100" y="184" fill="#c8d4e8" font-size="8.5">RV ejercicio</text>
+        <line x1="175" y1="168" x2="200" y2="168" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="205" y="172" fill="#64748b" font-size="8.5">GC reposo</text>
+        <line x1="175" y1="180" x2="200" y2="180" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="205" y="184" fill="#64748b" font-size="8.5">RV reposo</text>
+      </svg>
+    </div>
+
+    <!-- Tabla redistribución del flujo -->
+    <div class="sub-title">Redistribución del Flujo Sanguíneo en Ejercicio Intenso</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Órgano / Tejido</th><th>Reposo (ml/min)</th><th>Ejercicio intenso (ml/min)</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Músculo esquelético</strong></td><td>1.200</td><td>12.500</td><td><span class="hl-green">↑↑↑ 10×</span></td></tr>
+          <tr><td>Corazón (coronario)</td><td>250</td><td>750</td><td><span class="hl-green">↑ 3×</span></td></tr>
+          <tr><td>Encéfalo</td><td>750</td><td>750</td><td>Sin cambio</td></tr>
+          <tr><td>Piel</td><td>500</td><td>1.900</td><td><span class="hl-cyan">↑ (termorregulación)</span></td></tr>
+          <tr><td>Riñón</td><td>1.100</td><td>250</td><td><span class="hl-red">↓ vasoconstricción</span></td></tr>
+          <tr><td>Intestino / Bazo</td><td>1.400</td><td>300</td><td><span class="hl-red">↓ vasoconstricción</span></td></tr>
+          <tr><td><strong>GC total</strong></td><td><strong>5.000</strong></td><td><strong>17.500–25.000</strong></td><td><span class="hl-cyan">↑ 4–7×</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- S26: Flujo Coronario Sístole/Diástole -->
+  <section class="section" id="s26">
+    <div class="section-header">
+      <span class="section-num">26</span>
+      <h2 class="section-title">Flujo Coronario: Sístole vs. Diástole</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="alert alert-red">
+      <span class="alert-icon">❤️</span>
+      <span class="alert-text"><strong>El corazón es único:</strong> a diferencia de todos los demás órganos, el flujo coronario <strong>disminuye durante la sístole</strong> y <strong>aumenta durante la diástole</strong> — por la compresión mecánica del miocardio sobre sus propios vasos.</span>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Durante la Sístole</div>
+        <ul class="blist">
+          <li>La contracción del miocardio <span class="hl-red">comprime</span> los vasos intramusculares</li>
+          <li>↑ Presión intramural → colapso parcial de vasos subendocárdicos</li>
+          <li>El flujo coronario izquierdo cae abruptamente (puede llegar a cero brevemente)</li>
+          <li>Solo la <span class="hl-cyan">porción epicárdica</span> recibe algo de flujo en sístole</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Durante la Diástole</div>
+        <ul class="blist">
+          <li>El miocardio se relaja → <span class="hl-green">descompresión</span> vascular</li>
+          <li>Flujo coronario máximo: puede llegar a <span class="hl-cyan">300 ml/min en reposo</span></li>
+          <li>El corazón recibe ~<span class="hl-cyan">75–80%</span> de su flujo total en diástole</li>
+          <li><span class="hl-orange">Relevancia clínica:</span> taquicardia → ↓ tiempo de diástole → riesgo de isquemia subendocárdica</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Gráfico flujo coronario -->
+    <div class="chart-wrap">
+      <div class="chart-title">Flujo Sanguíneo Coronario durante el Ciclo Cardíaco (Guyton, Fig. 21-5)</div>
+      <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg">
+        <line x1="50" y1="20" x2="50" y2="170" stroke="#1e2840" stroke-width="1"/>
+        <line x1="50" y1="170" x2="500" y2="170" stroke="#1e2840" stroke-width="1"/>
+        <text x="44" y="24" text-anchor="end" fill="#64748b" font-size="9">300</text>
+        <text x="44" y="90" text-anchor="end" fill="#64748b" font-size="9">150</text>
+        <text x="44" y="173" text-anchor="end" fill="#64748b" font-size="9">0</text>
+        <text x="14" y="100" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,14,100)">Flujo (ml/min)</text>
+        <!-- Sístole shading -->
+        <rect x="50" y="20" width="140" height="150" fill="rgba(239,68,68,0.05)"/>
+        <text x="120" y="40" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="bold">SÍSTOLE</text>
+        <!-- Diástole shading -->
+        <rect x="190" y="20" width="310" height="150" fill="rgba(34,197,94,0.04)"/>
+        <text x="345" y="40" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">DIÁSTOLE</text>
+        <!-- Divider line -->
+        <line x1="190" y1="20" x2="190" y2="170" stroke="#475569" stroke-width="1" stroke-dasharray="3,3"/>
+        <!-- Coronary flow curve -->
+        <path d="M 55,120 Q 70,100 80,80 Q 90,55 95,28 Q 100,10 110,28 Q 120,55 130,100 Q 145,140 165,160 Q 175,165 190,165 Q 210,120 225,80 Q 250,40 280,28 Q 310,22 340,28 Q 370,35 390,55 Q 420,80 440,100 Q 460,120 480,130 Q 495,140 500,145" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+        <!-- Annotations -->
+        <text x="95" y="15" text-anchor="middle" fill="#ef4444" font-size="8.5">Pico breve</text>
+        <text x="165" y="158" text-anchor="middle" fill="#64748b" font-size="8.5">Mínimo</text>
+        <text x="300" y="15" text-anchor="middle" fill="#22c55e" font-size="8.5">Flujo máximo (≥300 ml/min)</text>
+      </svg>
+    </div>
+
+    <div class="guyton-note">Guyton Cap. 21 — El subendocardio (capa más interna) es la región más vulnerable a la isquemia porque sus vasos están sometidos a la mayor presión de compresión durante la sístole. En aterosclerosis avanzada, el subendocardio es el primero en necrosarse.</div>
+  </section>
+
+  <!-- S27: Control Flujo Coronario -->
+  <section class="section" id="s27">
+    <div class="section-header">
+      <span class="section-num">27</span>
+      <h2 class="section-title">Control del Flujo Sanguíneo Coronario</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="alert alert-cyan">
+      <span class="alert-icon">🎯</span>
+      <span class="alert-text">El principal determinante del flujo coronario es la <strong>demanda de O₂ miocárdica</strong>. El corazón extrae casi todo el O₂ disponible incluso en reposo (extracción de O₂ ≈75%), por lo que la única forma de ↑ aporte es ↑ el flujo.</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Sustancias Vasodilatadoras Coronarias</div>
+        <ul class="blist">
+          <li><span class="hl-cyan">Adenosina</span> — más potente e importante</li>
+          <li>K⁺ (hiperpolarización)</li>
+          <li>H⁺ / CO₂ (acidosis local)</li>
+          <li>Prostaglandinas (PGI₂)</li>
+          <li>Óxido nítrico (NO)</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Mecanismo de la Adenosina</div>
+        <ul class="blist">
+          <li>↓ O₂ → ↑ degradación de ATP → ↑ adenosina</li>
+          <li>Adenosina → receptores A₂ → vasodilatación arteriolar</li>
+          <li>↑ Flujo → ↑ O₂ → ↓ adenosina → vasoconstricción leve</li>
+          <li>Sistema de <span class="hl-green">retroalimentación negativa</span> perfecto</li>
+        </ul>
+      </div>
+      <div class="card-sm">
+        <div class="card-sm-title">Reserva Coronaria</div>
+        <ul class="blist">
+          <li>En reposo: ≈250 ml/min</li>
+          <li>En ejercicio máximo: ≈1.000 ml/min</li>
+          <li><span class="hl-cyan">Reserva: ≈4–5×</span></li>
+          <li>En aterosclerosis: ↓↓ reserva → isquemia de esfuerzo</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S28: Metabolismo cardíaco -->
+  <section class="section" id="s28">
+    <div class="section-header">
+      <span class="section-num">28</span>
+      <h2 class="section-title">Metabolismo Especial del Músculo Cardíaco</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Sustratos Energéticos</div>
+        <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px;">
+          <div class="stat-box"><div class="stat-val" style="color:var(--orange)">70%</div><div class="stat-label">Ácidos grasos (reposo)</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--cyan)">30%</div><div class="stat-label">Glucosa, lactato, cuerpos cetónicos</div></div>
+        </div>
+        <ul class="blist">
+          <li>En reposo: el corazón prefiere <span class="hl-orange">ácidos grasos</span> (β-oxidación)</li>
+          <li>En ejercicio intenso: ↑ uso de glucosa y lactato</li>
+          <li>El corazón es <span class="hl-cyan">prácticamente aeróbico</span> — no soporta deuda de O₂ prolongada</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">En Condiciones Anaeróbicas</div>
+        <div class="alert alert-red">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-text">En isquemia/hipoxia, el corazón recurre a la <strong>glucólisis anaerobia</strong>: poco ATP producido, acumulación de lactato → acidosis intracelular → disfunción contráctil → necrosis si prolongada.</span>
+        </div>
+        <ul class="blist">
+          <li>Las células cardíacas mueren en <span class="hl-red">~20–40 min</span> de isquemia completa</li>
+          <li>Zona de penumbra isquémica: salvable con reperfusión precoz</li>
+          <li>Justifica la urgencia de la <span class="hl-cyan">trombólisis o PTCA</span> en IAM</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S29: Aterosclerosis -->
+  <section class="section" id="s29">
+    <div class="section-header">
+      <span class="section-num">29</span>
+      <h2 class="section-title">Aterosclerosis Coronaria</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="alert alert-orange">
+      <span class="alert-icon">🩸</span>
+      <span class="alert-text"><strong>Aterosclerosis:</strong> causa más frecuente de disminución del flujo coronario — depósito progresivo de colesterol bajo el endotelio formando placas que estenosan la luz arterial.</span>
+    </div>
+
+    <div class="sub-title">Factores de Riesgo (Guyton Cap. 21)</div>
+    <div class="card-grid">
+      <div class="card-sm" style="border-color:rgba(239,68,68,0.3);">
+        <div class="card-sm-title" style="color:var(--red)">No Modificables</div>
+        <ul class="blist">
+          <li>Predisposición genética</li>
+          <li>Edad avanzada</li>
+          <li>Sexo masculino</li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(249,115,22,0.3);">
+        <div class="card-sm-title" style="color:var(--orange)">Modificables Mayores</div>
+        <ul class="blist">
+          <li>Hipertensión arterial</li>
+          <li>Dislipidemia (↑ LDL, ↓ HDL)</li>
+          <li>Tabaquismo</li>
+          <li>Diabetes mellitus</li>
+          <li>Obesidad</li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(168,85,247,0.3);">
+        <div class="card-sm-title" style="color:var(--purple)">Modificables Menores</div>
+        <ul class="blist">
+          <li>Sedentarismo</li>
+          <li>Estrés crónico</li>
+          <li>Dieta rica en grasas saturadas</li>
+          <li>Síndrome metabólico</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-title" style="margin-top:24px;">Progresión de la Placa Aterosclerótica</div>
+    <div class="diagram-box">
+      <svg viewBox="0 0 680 100" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;width:100%;">
+        <!-- Stages -->
+        <rect x="10" y="20" width="100" height="60" rx="6" fill="rgba(0,229,255,0.08)" stroke="rgba(0,229,255,0.3)" stroke-width="1"/>
+        <text x="60" y="45" text-anchor="middle" fill="#00e5ff" font-size="9" font-weight="bold">Disfunción</text>
+        <text x="60" y="57" text-anchor="middle" fill="#00e5ff" font-size="9" font-weight="bold">endotelial</text>
+        <text x="60" y="72" text-anchor="middle" fill="#64748b" font-size="8">Acumulación LDL</text>
+
+        <text x="125" y="53" fill="#475569" font-size="14" text-anchor="middle">→</text>
+
+        <rect x="140" y="20" width="100" height="60" rx="6" fill="rgba(249,115,22,0.08)" stroke="rgba(249,115,22,0.3)" stroke-width="1"/>
+        <text x="190" y="45" text-anchor="middle" fill="#f97316" font-size="9" font-weight="bold">Estría grasa</text>
+        <text x="190" y="57" text-anchor="middle" fill="#64748b" font-size="8">Macrófagos</text>
+        <text x="190" y="69" text-anchor="middle" fill="#64748b" font-size="8">foam cells</text>
+
+        <text x="255" y="53" fill="#475569" font-size="14" text-anchor="middle">→</text>
+
+        <rect x="270" y="20" width="100" height="60" rx="6" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.4)" stroke-width="1"/>
+        <text x="320" y="45" text-anchor="middle" fill="#f97316" font-size="9" font-weight="bold">Placa fibrosa</text>
+        <text x="320" y="57" text-anchor="middle" fill="#64748b" font-size="8">Núcleo lipídico</text>
+        <text x="320" y="69" text-anchor="middle" fill="#64748b" font-size="8">cápsula fibrosa</text>
+
+        <text x="385" y="53" fill="#475569" font-size="14" text-anchor="middle">→</text>
+
+        <rect x="400" y="20" width="100" height="60" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
+        <text x="450" y="45" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">Placa</text>
+        <text x="450" y="57" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">vulnerable</text>
+        <text x="450" y="69" text-anchor="middle" fill="#64748b" font-size="8">Rotura / ruptura</text>
+
+        <text x="515" y="53" fill="#475569" font-size="14" text-anchor="middle">→</text>
+
+        <rect x="530" y="20" width="130" height="60" rx="6" fill="rgba(239,68,68,0.18)" stroke="rgba(239,68,68,0.6)" stroke-width="2"/>
+        <text x="595" y="44" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">Trombosis /</text>
+        <text x="595" y="56" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">Oclusión total</text>
+        <text x="595" y="68" text-anchor="middle" fill="#ef4444" font-size="8">→ INFARTO</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- S30: IAM Recuperación -->
+  <section class="section" id="s30">
+    <div class="section-header">
+      <span class="section-num">30</span>
+      <h2 class="section-title">IAM — Fisiopatología y Etapas de Recuperación</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="guyton-note">Guyton Cap. 21 — El músculo cardíaco muerto es irreversiblemente sustituido por tejido cicatricial fibroso. La extensión del daño depende de (1) la arteria obstruida, (2) la duración de la isquemia y (3) la presencia de circulación colateral.</div>
+
+    <div class="sub-title">Etapas de la Recuperación del IAM</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fase</th><th>Tiempo</th><th>Proceso fisiopatológico</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Isquemia inicial</strong></td><td>0–20 min</td><td>Zona central: fibras musculares comienzan a morir por falta de O₂ y ATP</td></tr>
+          <tr><td><strong>Extensión de la necrosis</strong></td><td>Horas siguientes</td><td>Zona marginal: fibras fronterizas sucumben a isquemia prolongada → necrosis coagulativa</td></tr>
+          <tr><td><strong>Inflamación</strong></td><td>24–72 h</td><td>Neutrófilos, macrófagos → eliminación de debris celular, edema local</td></tr>
+          <tr><td><strong>Cicatrización</strong></td><td>Días–semanas</td><td>Isquemia estimula fibroblastos → tejido fibroso entre fibras muertas</td></tr>
+          <tr><td><strong>Remodelación</strong></td><td>Semanas–meses</td><td>Zonas sanas hipertrofian gradualmente para compensar la pérdida de masa contráctil</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="sub-title">Zona de Penumbra (Isquemia Leve)</div>
+        <ul class="blist">
+          <li>Tejido no funcionante pero aún <span class="hl-orange">viable</span></li>
+          <li>Objetivo principal de la reperfusión precoz</li>
+          <li>Recuperable con PTCA o trombólisis en ventana &lt;6–12h</li>
+          <li>Si no reperfundida → muerte celular adicional</li>
+        </ul>
+      </div>
+      <div>
+        <div class="sub-title">Consecuencias Funcionales</div>
+        <ul class="blist">
+          <li>↓ Contractilidad → ↓ GC → posible shock cardiogénico</li>
+          <li>Dilatación ventricular (remodelación patológica)</li>
+          <li>Riesgo de <span class="hl-red">arritmias</span> (tejido cicatricial es arritmogénico)</li>
+          <li>Insuficiencia cardíaca crónica si pérdida &gt;40% de masa</li>
+        </ul>
+        <div class="alert alert-red" style="margin-top:8px;">
+          <span class="alert-icon">🚑</span>
+          <span class="alert-text"><strong>"Tiempo es músculo"</strong> — cada minuto de isquemia destruye ≈1,9 millones de células cardíacas.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S31: Reposo IAM + Síndrome Robo + Angina -->
+  <section class="section" id="s31">
+    <div class="section-header">
+      <span class="section-num">31</span>
+      <h2 class="section-title">Reposo en el IAM · Síndrome de Robo Coronario · Angina</h2>
+      <span class="chapter-badge">CAP. 21</span>
+    </div>
+
+    <div class="sub-title">Valor del Reposo en el IAM</div>
+    <div class="card-grid">
+      <div class="card-sm">
+        <div class="card-sm-title">Por qué el Reposo es Esencial</div>
+        <ul class="blist">
+          <li>La muerte celular depende de: grado de isquemia + trabajo cardíaco</li>
+          <li>↑ Trabajo cardíaco (ejercicio, estrés) → ↑ demanda O₂ → ↑ necrosis</li>
+          <li>El reposo reduce el consumo de O₂ del miocardio</li>
+        </ul>
+      </div>
+      <div class="card-sm" style="border-color:rgba(239,68,68,0.3);">
+        <div class="card-sm-title" style="color:var(--red)">⚠️ Síndrome de Robo Coronario</div>
+        <ul class="blist">
+          <li>Vasodilatadores potentes → vasos <span class="hl-green">normales se dilatan mucho</span></li>
+          <li>Vasos enfermos (estenóticos) <span class="hl-red">no pueden dilatarse más</span></li>
+          <li>El flujo se desvía hacia zonas normales, "robando" a la zona isquémica</li>
+          <li>Resultado: <span class="hl-red">empeoramiento de la isquemia</span> regional</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-title" style="margin-top:24px;">Angina de Pecho — Resumen Integrador</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspecto</th><th>Angina Estable</th><th>Angina Inestable</th><th>IAM</th></tr></thead>
+        <tbody>
+          <tr><td>Mecanismo</td><td>Demanda &gt; oferta en esfuerzo</td><td>Rotura de placa, vasoespasmo</td><td>Oclusión total aguda</td></tr>
+          <tr><td>Duración</td><td>&lt;5 min con reposo/nitrato</td><td>&gt;20 min, no cede con reposo</td><td>Persistente (&gt;30 min)</td></tr>
+          <tr><td>Troponina</td><td>Negativa</td><td>Puede ser positiva</td><td><span class="hl-red">Positiva (↑↑)</span></td></tr>
+          <tr><td>ECG</td><td>Depresión ST transitoria</td><td>Cambios dinámicos</td><td>Elevación ST o LBBB nuevo</td></tr>
+          <tr><td>Tratamiento urgente</td><td>Nitrato, β-bloqueador</td><td>Anticoagulación, cateterismo urgente</td><td><span class="hl-red">Reperfusión inmediata</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-orange">
+      <span class="alert-icon">💊</span>
+      <span class="alert-text"><strong>Mecanismo de la nitroglicerina:</strong> El NO liberado activa la guanilato ciclasa → ↑ GMPc → relajación de músculo liso vascular → (1) ↓ precarga por venodilatación, (2) ↓ poscarga por vasodilatación arterial leve, (3) dilatación coronaria directa.</span>
+    </div>
+  </section>
+
+  <!-- ========== QUIZ ========== -->
+  <div class="divider"></div>
+
+  <section class="section" id="quiz">
+    <div class="section-header">
+      <span class="section-num">🧠</span>
+      <h2 class="section-title">30 Preguntas de Fijación</h2>
+      <span class="chapter-badge">CAPS. 14–21</span>
+    </div>
+    <div class="guyton-note">Haz clic en cada pregunta para revelar la respuesta comentada. Diseñadas para simular el estilo de las preguntas de examen de Fisiología Médica.</div>
+
+    <div id="quiz-container">
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="divider"></div>
+  <div style="text-align:center;padding:24px 0 40px;">
+    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,#00e5ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;">André Luiz Miranda Suzano</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:3px;">3H · MEDICINA · Interamericana PJC · Guyton & Hall 14ª ed.</div>
+  </div>
+
+</main>
+
+<style>
+  /* Quiz styles */
+  .quiz-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .quiz-item:hover { border-color: rgba(249,115,22,0.3); }
+  .quiz-q {
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .quiz-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--orange);
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.25);
+    border-radius: 6px;
+    padding: 3px 8px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .quiz-text { font-size: 14px; font-weight: 500; line-height: 1.55; flex: 1; }
+  .quiz-toggle {
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform 0.25s;
+    margin-top: 1px;
+  }
+  .quiz-item.open .quiz-toggle { transform: rotate(180deg); color: var(--orange); }
+  .quiz-ans {
+    display: none;
+    padding: 0 20px 18px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .quiz-item.open .quiz-ans { display: block; }
+  .quiz-correct {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 1px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 6px;
+    padding: 6px 12px;
+    display: inline-block;
+    margin: 14px 0 10px;
+  }
+  .quiz-explanation {
+    font-size: 13.5px;
+    color: #c8d4e8;
+    line-height: 1.7;
+  }
+  .quiz-trap {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 1px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quiz-score-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .score-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    color: var(--orange);
+  }
+  .score-label { font-size: 13px; color: var(--muted); }
+  .score-progress {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 100px;
+  }
+  .score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--cyan));
+    border-radius: 3px;
+    transition: width 0.4s;
+  }
+</style>
+
+<script>
+  // =================== QUIZ DATA ===================
+  const quizData = [
+    {
+      q: "¿Cuál es la fórmula que relaciona flujo sanguíneo, presión y resistencia vascular (Ley de Ohm)?",
+      correct: "F = ΔP / R",
+      explanation: "El flujo (F) es directamente proporcional al gradiente de presión (ΔP = P1 − P2) e inversamente proporcional a la resistencia (R). Si la presión en ambos extremos del vaso es igual, el flujo es cero, independientemente de la presión absoluta.",
+      trap: "⚠️ Trampa: No confundir presión absoluta con gradiente de presión — lo que importa es la DIFERENCIA."
+    },
+    {
+      q: "En la Ley de Poiseuille, ¿qué variable tiene mayor impacto sobre el flujo y cómo se relaciona con él?",
+      correct: "El radio (r⁴) — relación directa a la 4ª potencia",
+      explanation: "F = (π·ΔP·r⁴) / (8·η·L). El radio elevado a la 4ª potencia es el factor dominante. Si el radio se reduce a la mitad, el flujo cae a 1/16 del original. Por eso las arteriolas (que regulan su radio activamente) son el principal punto de control de la resistencia.",
+      trap: "⚠️ Trampa: Muchos confunden el radio con el diámetro — la fórmula usa el radio, no el diámetro."
+    },
+    {
+      q: "¿Cuál es la unidad de resistencia periférica total (RPT) normal en reposo y cómo se calcula?",
+      correct: "≈1 PRU (Peripheral Resistance Unit): R = ΔP / F = 100 mmHg / 100 ml/s",
+      explanation: "En reposo: GC = 100 ml/s y ΔP = 100 mmHg → RPT = 1 PRU. En vasoconstricción máxima puede llegar a 4 PRU; en vasodilatación máxima, a 0,2 PRU. La fórmula clave es PA = GC × RPT.",
+      trap: ""
+    },
+    {
+      q: "¿En qué condición el flujo se vuelve turbulento y qué consecuencia clínica tiene?",
+      correct: "Re > 3000 (velocidad alta, diámetro grande, baja viscosidad) → soplos cardíacos",
+      explanation: "El número de Reynolds (Re = v·d·ρ/η) predice la turbulencia. Velocidad alta, vasos anchos, mayor densidad y menor viscosidad favorecen la turbulencia. Clínicamente genera soplos cardíacos y vasculares audibles con fonendoscopio.",
+      trap: "⚠️ Trampa: La anemia grave puede causar soplos por turbulencia a pesar de la menor viscosidad — el mecanismo es la alta velocidad compensadora."
+    },
+    {
+      q: "¿Cuál es la presión arterial media normal en la aorta y cómo disminuye a lo largo de la circulación sistémica?",
+      correct: "≈100 mmHg en aorta, caída progresiva hasta 0 mmHg en venas cavas",
+      explanation: "La caída es progresiva: aorta ≈100 mmHg → arterias grandes ≈90 → arteriolas ≈60 (mayor caída aquí) → capilares ≈17 media → venas → 0 mmHg en venas cavas. La mayor caída ocurre en arteriolas por su alta resistencia.",
+      trap: "⚠️ Trampa: La caída no es lineal — es exponencial en arteriolas."
+    },
+    {
+      q: "¿Cómo se comparan las presiones de la circulación pulmonar con la sistémica y cuál es su importancia fisiológica?",
+      correct: "Pulmonar: ≈25/8 mmHg (media ≈16). Sistémica: 120/80 (media ≈100). Las bajas presiones pulmonares previenen el edema pulmonar.",
+      explanation: "La circulación pulmonar es de baja presión para permitir el intercambio gaseoso sin filtrar líquido hacia los alvéolos. Si la presión capilar pulmonar supera la presión oncótica plasmática (≈28 mmHg), aparece edema pulmonar — como en la IC izquierda avanzada.",
+      trap: ""
+    },
+    {
+      q: "¿Qué es la autorregulación del flujo sanguíneo tisular y en qué rango de presiones arteriales opera?",
+      correct: "Capacidad de mantener flujo constante ajustando resistencia local; opera entre 70–175 mmHg de PAM.",
+      explanation: "La autorregulación integra la teoría metabólica (↓O₂ → vasodilatación) y miogénica (↑presión → contracción del músculo liso). Permite que el flujo tisular permanezca estable a pesar de variaciones de PA, protegiendo los capilares de la hipertensión y los tejidos de la hipoperfusión.",
+      trap: "⚠️ Trampa: Fuera del rango de autorregulación (PA < 70 o > 175 mmHg), el flujo se vuelve presión-dependiente."
+    },
+    {
+      q: "¿Cuál es la diferencia entre distensibilidad y compliancia vascular?",
+      correct: "Distensibilidad = ΔV fraccional / ΔP; Compliancia = Distensibilidad × Volumen",
+      explanation: "Un vaso muy distensible pero pequeño puede tener MENOS compliancia que uno poco distensible con gran volumen. Las venas tienen distensibilidad ≈8× mayor que las arterias, y contienen ≈64% del volumen sanguíneo total, actuando como reservorio (función de capacitancia).",
+      trap: "⚠️ Trampa clásica de examen: mayor distensibilidad NO implica mayor compliancia."
+    },
+    {
+      q: "¿Cuáles son las 4 fuerzas de Starling y qué resultado neto producen en el capilar normal?",
+      correct: "Filtración neta ≈ +6 mmHg → drenado por el sistema linfático (2–4 L/día)",
+      explanation: "Fuerzas: (1) Pc +17 mmHg (filtración), (2) πi +8 mmHg (filtración), (3) πp −28 mmHg (reabsorción), (4) Pi −3 mmHg (reabsorción). Neto: 17+8−28−3 = −6 mmHg de reabsorción, pero los datos exactos de Guyton dan filtración neta positiva (~+6), drenada por la linfa.",
+      trap: "⚠️ Trampa: La presión oncótica plasmática (albúmina) es la fuerza anti-edema más importante — hipoalbuminemia = edema."
+    },
+    {
+      q: "¿Cuáles son las 3 causas principales de edema, según las fuerzas de Starling?",
+      correct: "↑Pc (IC derecha), ↓πp (hipoalbuminemia), ↑permeabilidad capilar (inflamación), obstrucción linfática",
+      explanation: "Mecanismos: (1) ↑presión hidrostática capilar (IC, trombosis venosa) → ↑filtración; (2) ↓presión oncótica plasmática (cirrosis, síndrome nefrótico, desnutrición) → ↓reabsorción; (3) ↑permeabilidad (histamina, quemaduras, anafilaxia); (4) obstrucción linfática (cáncer, filariasis).",
+      trap: ""
+    },
+    {
+      q: "¿Cuál es la principal sustancia vasodilatadora local y cómo actúa el óxido nítrico (NO) en el tono vascular?",
+      correct: "NO activa guanilato ciclasa → ↑GMPc → relajación de músculo liso vascular",
+      explanation: "El NO es producido por el endotelio en respuesta a estrés de cizallamiento y mediadores. Es el vasodilatador endotelial más potente. La reducción de su producción (en aterosclerosis, HAS) contribuye al aumento de resistencia vascular. Es también el mecanismo de acción de la nitroglicerina.",
+      trap: "⚠️ Trampa: El NO relaja el músculo liso vascular (vasodilatación) pero NO es un neurotransmisor clásico — actúa como gas difusible sin receptor de membrana convencional."
+    },
+    {
+      q: "¿Cuáles son los 3 efectos cardiovasculares de la activación simpática durante el ejercicio?",
+      correct: "(1) Estimulación cardíaca (↑FC + ↑contractilidad), (2) Vasoconstricción selectiva (excepto músculo activo), (3) Contracción venosa → ↑PMLS → ↑RV → ↑GC",
+      explanation: "El simpático redistribuye el flujo: vasoconstriñe visceral/renal/cutáneo y permite vasodilatación en músculos activos (por metabolitos locales). La contracción venosa es el mecanismo olvidado: 'exprime' el reservorio venoso, lanzando sangre al corazón y aumentando el gasto.",
+      trap: "⚠️ Trampa: Las arteriolas del músculo esquelético activo son la EXCEPCIÓN a la vasoconstricción simpática."
+    },
+    {
+      q: "¿Cuántas veces puede aumentar el gasto cardíaco durante el ejercicio en una persona no entrenada vs. un maratonista?",
+      correct: "No entrenado: ≈4× (≈20 L/min); Maratonista: ≈7× (≈35 L/min)",
+      explanation: "El mayor GC del atleta se debe a: (1) hipertrofia cardíaca (masa ↑50–70%), (2) mayor volumen sistólico, (3) mayor tolerancia a alta FC. El mecanismo principal que permite al retorno venoso igualar al GC durante el ejercicio es la contracción venosa + bomba muscular + vasodilatación periférica masiva.",
+      trap: ""
+    },
+    {
+      q: "¿Por qué el flujo sanguíneo coronario disminuye durante la sístole y aumenta en la diástole?",
+      correct: "Durante la sístole, la contracción miocárdica comprime los vasos intramusculares → colapso parcial. En diástole, la relajación descomprime los vasos → máximo flujo.",
+      explanation: "El corazón recibe ≈75–80% de su flujo total durante la diástole. Esta particularidad tiene importancia clínica: en taquicardia severa, la diástole se acorta desproporcionadamente, reduciendo el tiempo de perfusión coronaria → riesgo de isquemia subendocárdica. El ventrículo izquierdo es más vulnerable que el derecho.",
+      trap: "⚠️ Trampa clásica: el corazón es el ÚNICO órgano donde el flujo arterial se reduce durante la contracción del músculo correspondiente."
+    },
+    {
+      q: "¿Cuál es la principal sustancia vasodilatadora coronaria y cuál es su mecanismo de retroalimentación?",
+      correct: "Adenosina: ↓O₂ → degradación de ATP → ↑adenosina → vasodilatación → ↑flujo → ↑O₂ → ↓adenosina",
+      explanation: "La adenosina es el mediador más estudiado del control metabólico coronario. Actúa en receptores A₂ arteriolar. El ciclo de retroalimentación negativa regula el flujo proporcionalmente a la demanda: más trabajo cardíaco → más consumo de O₂ → más adenosina → más flujo. K⁺, H⁺, CO₂, prostaglandinas y NO también contribuyen.",
+      trap: ""
+    },
+    {
+      q: "¿Qué porcentaje de su energía obtiene el músculo cardíaco de ácidos grasos en reposo y qué ocurre en isquemia?",
+      correct: "≈70% de ácidos grasos en reposo. En isquemia: glucólisis anaerobia → poco ATP + acidosis → disfunción contráctil → necrosis.",
+      explanation: "El corazón es casi exclusivamente aeróbico. No puede sostener deuda de O₂ prolongada. En isquemia completa, las células cardíacas comienzan a morir en 20–40 minutos. La zona de penumbra (isquemia leve, no muerta) puede recuperarse si se reperfunde en la ventana terapéutica.",
+      trap: "⚠️ Trampa: A diferencia del músculo esquelético, el corazón NO puede compensar con metabolismo anaeróbico prolongado."
+    },
+    {
+      q: "¿Cuáles son los factores de riesgo no modificables y modificables de la aterosclerosis coronaria?",
+      correct: "No modificables: genética, edad, sexo masculino. Modificables: HAS, dislipidemia, tabaco, DM, obesidad, sedentarismo.",
+      explanation: "La aterosclerosis comienza con disfunción endotelial → acumulación de LDL oxidado → macrófagos/células espumosas → estría grasa → placa fibrosa → placa vulnerable → ruptura → trombosis → IAM. El control de factores modificables reduce el riesgo en >50%.",
+      trap: ""
+    },
+    {
+      q: "¿Qué es el 'síndrome de robo coronario' y en qué situación clínica ocurre?",
+      correct: "Vasodilatadores sistémicos dilatan vasos normales pero NO los estenóticos → el flujo se 'roba' de la zona isquémica hacia zonas normales → empeoramiento de la isquemia regional.",
+      explanation: "Ocurre con vasodilatadores potentes (dipiridamol, adenosina IV — usados en pruebas de estrés farmacológico). Los vasos normales responden dilátándose; los vasos enfermos ya están en vasodilatación máxima. Resultado: el gradiente de presión favorece el flujo hacia zonas normales. También ocurre en el IAM con el ejercicio.",
+      trap: "⚠️ Trampa: El dipiridamol IV se USA en pruebas de estrés coronario PORQUE provoca robo selectivo en zonas estenóticas."
+    },
+    {
+      q: "¿Cuáles son las etapas de recuperación de un infarto agudo de miocardio según Guyton?",
+      correct: "1. Necrosis central → 2. Extensión marginal (días) → 3. Inflamación y fibroblastos → 4. Tejido fibroso (cicatriz) → 5. Hipertrofia compensadora del miocardio sano",
+      explanation: "La isquemia estimula los fibroblastos → colágeno → cicatriz fibrosa (no contráctil). Las zonas sanas del corazón sufren hipertrofia compensadora. Si se pierde >40% de la masa ventricular izquierda, el riesgo de shock cardiogénico es muy alto.",
+      trap: ""
+    },
+    {
+      q: "¿Por qué el reposo es fundamental en el tratamiento del IAM?",
+      correct: "La muerte celular depende del grado de isquemia Y del trabajo cardíaco. El reposo ↓ consumo de O₂ → ↓ extensión de la necrosis.",
+      explanation: "El trabajo cardíaco aumenta la demanda de O₂ del miocardio. En el contexto de flujo coronario limitado, cualquier aumento de demanda empeora el balance O₂. Además, el ejercicio activa el simpático → taquicardia → acorta la diástole → ↓ tiempo de perfusión coronaria.",
+      trap: ""
+    },
+    {
+      q: "¿Cuál es la diferencia fisiopatológica entre angina estable, angina inestable e IAM?",
+      correct: "Estable: demanda > oferta en esfuerzo, cede con reposo. Inestable: rotura de placa/vasoespasmo, no cede. IAM: oclusión total aguda, troponina positiva.",
+      explanation: "La angina estable tiene placa fija con estenosis >70%. La inestable tiene placa vulnerable rota con trombo no oclusivo (síndrome coronario agudo sin elevación ST). El IAM tiene oclusión total aguda con necrosis transmural (elevación ST) o subendocárdica (sin elevación ST pero troponina +).",
+      trap: "⚠️ Trampa: Una angina que aparece en reposo o dura >20 min es inestable hasta demostrar lo contrario — es urgencia médica."
+    },
+    {
+      q: "¿Cuál es el mecanismo de acción completo de la nitroglicerina en el tratamiento de la angina?",
+      correct: "NO → ↑GMPc → vasodilatación venosa (↓precarga) + arterial (↓poscarga) + dilatación coronaria directa → ↓trabajo cardíaco y ↑perfusión.",
+      explanation: "La venodilatación es el efecto principal: ↓retorno venoso → ↓volumen diastólico final → ↓tensión de pared → ↓consumo O₂ (Ley de Laplace). La vasodilatación coronaria directo también contribuye, especialmente en vasoespasmo.",
+      trap: "⚠️ Trampa: El efecto principal de la nitroglicerina es la venodilatación (↓precarga), NO la vasodilatación arterial directa."
+    },
+    {
+      q: "En la resistencia vascular, ¿cómo se combina la resistencia de vasos en paralelo vs. en serie?",
+      correct: "Serie: R_total = R₁+R₂+R₃ (suma, mayor resistencia). Paralelo: 1/R_total = 1/R₁+1/R₂+1/R₃ (menor resistencia).",
+      explanation: "La circulación sistémica tiene vasos en paralelo entre sí (cada órgano es un circuito paralelo), lo que reduce la resistencia total. Dentro de un mismo órgano, los vasos van en serie (arteria → arteriola → capilar → vénula → vena), sumando resistencias. La adición de capilares activos (vasodilatación) disminuye la RPT.",
+      trap: ""
+    },
+    {
+      q: "¿Cómo afecta el hematocrito elevado (policitemia) al flujo sanguíneo y qué complicaciones genera?",
+      correct: "↑Hematocrito → ↑viscosidad (hasta 10× el agua) → ↓flujo → riesgo trombótico y ↑trabajo cardíaco.",
+      explanation: "La viscosidad normal es ≈3× la del agua (Hto ≈45%). En policitemia (Hto >60%), la viscosidad puede ser 10× → ↓flujo por Poiseuille → el corazón debe trabajar más → riesgo de ICC. En anemia, la menor viscosidad facilita el flujo pero ↓ transporte de O₂, y la taquicardia compensadora puede generar soplos funcionales.",
+      trap: ""
+    },
+    {
+      q: "¿Qué es la presión media de llenado sistémico (PMLS) y cómo influye en el gasto cardíaco?",
+      correct: "PMLS ≈7 mmHg: refleja el 'tono' del sistema vascular. ↑PMLS → ↑retorno venoso → ↑GC por Frank-Starling.",
+      explanation: "La PMLS es la presión media en todo el circuito cuando el corazón se detiene. Depende del volumen sanguíneo y el tono vasomotor. ↑Volemia o vasoconstricción venosa → ↑PMLS → ↑gradiente de presión hacia la aurícula derecha → ↑RV → ↑GC. Hemorragia → ↓PMLS → ↓GC → shock.",
+      trap: ""
+    },
+    {
+      q: "¿Qué establece la Ley de Frank-Starling y cuál es su relevancia en el ejercicio?",
+      correct: "El corazón bombea toda la sangre que recibe: ↑precarga → ↑longitud de sarcómero → ↑fuerza de contracción → ↑VS.",
+      explanation: "En ejercicio: bomba muscular + contracción venosa → ↑retorno venoso → ↑precarga → ↑VS por Starling, SIN necesidad de señal nerviosa directa. Esto permite que el corazón iguale automáticamente el retorno venoso. En IC sistólica, la curva de Starling está 'aplanada' y desplazada hacia abajo.",
+      trap: "⚠️ Trampa: Frank-Starling no es ilimitado — con exceso de precarga, el sarcómero se sobreestira y la fuerza cae (zona descendente de la curva)."
+    },
+    {
+      q: "¿Cuáles son los barorreceptores arteriales, dónde están ubicados y cuál es su función?",
+      correct: "Seno carotídeo (IX par) y cayado aórtico (X par). Detectan cambios de PA y modulan el tono simpático para normalizar la presión.",
+      explanation: "↑PA → ↑descarga barorreceptora → inhibe centros vasomotores bulbares + activa parasimpático → ↓FC + vasodilatación → ↓PA. ↓PA → efecto opuesto. Responden en segundos. Se adaptan (resetean) en 1–2 días a una nueva presión. Son fundamentales en el control postural (evitan mareo ortostático).",
+      trap: "⚠️ Trampa: Los barorreceptores controlan la PA A CORTO PLAZO. El control definitivo a largo plazo es RENAL (diuresis por presión)."
+    },
+    {
+      q: "¿Cómo actúa el sistema renina-angiotensina-aldosterona (SRAA) sobre la presión arterial a largo plazo?",
+      correct: "↓PA → ↑renina → ↑angiotensina II (vasoconstricción + ↑aldosterona → retención Na⁺/H₂O + ↑ADH → ↑volemia → ↑PA).",
+      explanation: "El SRAA es el principal sistema de control de la PA a largo plazo. La angiotensina II: (1) vasoconstriñe directamente, (2) estimula aldosterona → retención Na⁺ → ↑volumen LEC, (3) estimula ADH → reabsorción H₂O, (4) estimula sed → ↑ingesta hídrica. Los IECA y ARA-II bloquean este sistema.",
+      trap: ""
+    },
+    {
+      q: "¿Qué es la 'diuresis por presión' y cuál es su rol en el control de la PA a largo plazo?",
+      correct: "↑PA → ↑excreción renal de Na⁺/H₂O → ↓volemia → ↓PA al punto de equilibrio (≈100 mmHg).",
+      explanation: "El riñón es el árbitro final de la PA. Con PA de 50 mmHg, la excreción urinaria es casi cero. Con PA de 100 mmHg, es normal. Con 200 mmHg, es 4–6× lo normal. El punto de equilibrio estable ocurre donde la excreción = ingestión de agua y sal. Esta es la razón por la que los riñones controlan la PA indefinidamente.",
+      trap: "⚠️ Trampa: El SRAA desplaza la curva de diuresis por presión — hiperaldosteronismo primario → curva desplazada → HAS sostenida con relativa baja excreción renal."
+    },
+    {
+      q: "¿Cuál es la distribución del flujo sanguíneo en el músculo esquelético durante ejercicio máximo y qué mecanismos lo explican?",
+      correct: "Flujo muscular: ≈1.200 ml/min reposo → ≈12.500 ml/min ejercicio (≈10×). Mecanismos: vasodilatación metabólica + ↑PA + ↑GC.",
+      explanation: "La vasodilatación muscular es producida por: ↓O₂, ↑CO₂, ↑K⁺, ↑H⁺, adenosina, NO endotelial. Al mismo tiempo, el simpático vasoconstriñe visceral/renal (↑PA), y la bomba muscular aumenta el retorno venoso (↑GC). La combinación permite un aumento del flujo muscular de 10× sin disminución crítica del flujo cerebral o coronario.",
+      trap: ""
+    },
+    {
+      q: "¿Cuál de los siguientes NO es un factor que aumenta la tendencia al flujo turbulento? a) Alta viscosidad b) Alta velocidad c) Gran diámetro del vaso d) Baja viscosidad",
+      correct: "a) Alta viscosidad — la ALTA viscosidad REDUCE la turbulencia (Re = v·d·ρ/η, η en el denominador).",
+      explanation: "El número de Reynolds incluye la viscosidad en el denominador: Re = v·d·ρ/η. Mayor viscosidad → menor Re → menos turbulencia. Por eso la policitemia (↑viscosidad) paradójicamente protege contra la turbulencia, aunque perjudica el flujo total por Poiseuille.",
+      trap: "⚠️ Trampa clásica de examen: la anemia genera turbulencia (soplos funcionales) porque ↓viscosidad + ↑velocidad compensadora → ↑Re."
+    }
+  ];
+
+  // =================== QUIZ RENDER ===================
+  function buildQuiz() {
+    const container = document.getElementById('quiz-container');
+    if (!container) return;
+
+    // Score bar
+    const scoreBar = document.createElement('div');
+    scoreBar.className = 'quiz-score-bar';
+    scoreBar.innerHTML = `
+      <div>
+        <div class="score-num" id="scoreNum">0 / 30</div>
+        <div class="score-label">preguntas revisadas</div>
+      </div>
+      <div class="score-progress"><div class="score-fill" id="scoreFill" style="width:0%"></div></div>
+    `;
+    container.appendChild(scoreBar);
+
+    let opened = 0;
+
+    quizData.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'quiz-item';
+      div.innerHTML = `
+        <div class="quiz-q" onclick="toggleQuiz(this)">
+          <span class="quiz-num">Q${String(i+1).padStart(2,'0')}</span>
+          <span class="quiz-text">${item.q}</span>
+          <span class="quiz-toggle">▾</span>
+        </div>
+        <div class="quiz-ans">
+          <div class="quiz-correct">✓ ${item.correct}</div>
+          <div class="quiz-explanation">${item.explanation}</div>
+          ${item.trap ? `<div class="quiz-trap">${item.trap}</div>` : ''}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    window.toggleQuiz = function(btn) {
+      const item = btn.closest('.quiz-item');
+      const wasOpen = item.classList.contains('open');
+      item.classList.toggle('open');
+      if (!wasOpen) {
+        opened++;
+        document.getElementById('scoreNum').textContent = opened + ' / 30';
+        document.getElementById('scoreFill').style.width = (opened/30*100) + '%';
+      }
+    };
+  }
+
+  // =================== NAV + SCROLL ===================
+  const bar = document.getElementById('progressBar');
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('section[id]');
+
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total = document.body.scrollHeight - window.innerHeight;
+    bar.style.transform = `scaleX(${scrolled / total})`;
+
+    let current = '';
+    sections.forEach(s => {
+      const top = s.offsetTop - 80;
+      if (scrolled >= top) current = s.id;
+    });
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + current + "'")) {
+        item.classList.add('active');
+      }
+    });
+  });
+
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Init quiz
+  buildQuiz();
+</script>
+</body>
+</html>

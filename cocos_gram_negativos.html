@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cocos Gram Negativos — Neisseria spp.</title>
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0b0f1a;
+    --surface:   #111827;
+    --surface2:  #1a2235;
+    --border:    #1e3a5f;
+    --accent1:   #00c6ff;   /* cian — gonorrhoeae */
+    --accent2:   #b44fff;   /* violeta — meningitidis */
+    --gold:      #f0c040;
+    --danger:    #ff4c4c;
+    --success:   #22d48a;
+    --text:      #e2e8f0;
+    --muted:     #7f8fa6;
+    --font-head: 'Georgia', 'Times New Roman', serif;
+    --font-body: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #060c1a 0%, #0d1f3c 50%, #0b1528 100%);
+    border-bottom: 2px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0,198,255,.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(180,79,255,.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid var(--accent1);
+    color: var(--accent1);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    font-family: var(--font-mono);
+  }
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: -.01em;
+  }
+  .hero h1 span.cyan  { color: var(--accent1); }
+  .hero h1 span.violet{ color: var(--accent2); }
+  .hero-sub {
+    color: var(--muted);
+    font-size: .95rem;
+    letter-spacing: .04em;
+  }
+  .hero-meta {
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-meta span {
+    font-size: .8rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .hero-meta span b { color: var(--text); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(11,15,26,.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 24px;
+    gap: 2px;
+  }
+  .nav-tabs a {
+    white-space: nowrap;
+    padding: 14px 20px;
+    font-size: .8rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all .25s;
+    font-family: var(--font-mono);
+  }
+  .nav-tabs a:hover { color: var(--text); border-bottom-color: var(--border); }
+  .nav-tabs a.cyan  { }
+  .nav-tabs a.cyan:hover  { color: var(--accent1); border-bottom-color: var(--accent1); }
+  .nav-tabs a.violet:hover { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    margin: 56px 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-header .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-header h2 {
+    font-family: var(--font-head);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    color: #fff;
+  }
+  .section-header .tag {
+    font-size: .65rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .tag-cyan   { background: rgba(0,198,255,.15); color: var(--accent1); border: 1px solid rgba(0,198,255,.3); }
+  .tag-violet { background: rgba(180,79,255,.15); color: var(--accent2); border: 1px solid rgba(180,79,255,.3); }
+  .tag-gold   { background: rgba(240,192,64,.12); color: var(--gold);   border: 1px solid rgba(240,192,64,.3); }
+  .tag-danger { background: rgba(255,76,76,.12);  color: var(--danger); border: 1px solid rgba(255,76,76,.3); }
+
+  /* ── ORGANISM CARD ── */
+  .org-card {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .org-card-header {
+    padding: 28px 32px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .org-icon {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .org-icon.cyan   { background: rgba(0,198,255,.12); border: 1px solid rgba(0,198,255,.25); }
+  .org-icon.violet { background: rgba(180,79,255,.12); border: 1px solid rgba(180,79,255,.25); }
+  .org-card-header h3 {
+    font-family: var(--font-head);
+    font-size: 1.55rem;
+    font-style: italic;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .org-card-header .subtitle {
+    font-size: .82rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    letter-spacing: .06em;
+  }
+  .org-body { padding: 28px 32px; }
+
+  /* ── PROP GRID ── */
+  .prop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .prop-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .prop-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-bottom: 6px;
+  }
+  .prop-value {
+    font-size: .9rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── SUBSECTION TITLE ── */
+  .sub-title {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 28px 0 12px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-cyan   { background: var(--accent1); box-shadow: 0 0 6px var(--accent1); }
+  .dot-violet { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .dot-gold   { background: var(--gold);   box-shadow: 0 0 6px var(--gold); }
+  .dot-danger { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+  /* ── LISTS ── */
+  ul.styled, ol.styled { padding-left: 0; list-style: none; }
+  ul.styled li, ol.styled li {
+    position: relative;
+    padding: 5px 0 5px 22px;
+    font-size: .93rem;
+    color: var(--text);
+    counter-increment: ol-counter;
+  }
+  ul.styled li::before {
+    content: '›';
+    position: absolute; left: 4px;
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  ol.styled { counter-reset: ol-counter; }
+  ol.styled li::before {
+    content: counter(ol-counter) '.';
+    position: absolute; left: 0;
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    line-height: 2.2;
+  }
+
+  /* ── ALERT BOXES ── */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    font-size: .9rem;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .alert-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+  .alert-body { flex: 1; }
+  .alert-body strong { display: block; margin-bottom: 4px; font-size: .85rem; letter-spacing: .04em; }
+
+  .alert-danger  { background: rgba(255,76,76,.08);  border: 1px solid rgba(255,76,76,.25);  }
+  .alert-danger strong  { color: var(--danger); }
+  .alert-gold    { background: rgba(240,192,64,.07); border: 1px solid rgba(240,192,64,.25); }
+  .alert-gold strong    { color: var(--gold); }
+  .alert-cyan    { background: rgba(0,198,255,.07);  border: 1px solid rgba(0,198,255,.25);  }
+  .alert-cyan strong    { color: var(--accent1); }
+  .alert-violet  { background: rgba(180,79,255,.08); border: 1px solid rgba(180,79,255,.25); }
+  .alert-violet strong  { color: var(--accent2); }
+  .alert-success { background: rgba(34,212,138,.07); border: 1px solid rgba(34,212,138,.25); }
+  .alert-success strong { color: var(--success); }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; margin: 20px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: .86rem;
+  }
+  thead tr { background: var(--surface2); }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid rgba(30,58,95,.5); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,.02); }
+  tbody td {
+    padding: 11px 16px;
+    color: var(--text);
+    vertical-align: top;
+  }
+  tbody td:first-child { color: var(--muted); font-size: .82rem; font-family: var(--font-mono); }
+  .cell-cyan   { color: var(--accent1) !important; font-weight: 600; }
+  .cell-violet { color: var(--accent2) !important; font-weight: 600; }
+  .cell-gold   { color: var(--gold)   !important; }
+  .cell-danger { color: var(--danger) !important; }
+  .cell-green  { color: var(--success)!important; }
+
+  /* ── VIRULENCE CHIPS ── */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: .78rem;
+    font-family: var(--font-mono);
+    letter-spacing: .04em;
+    border: 1px solid;
+  }
+  .chip-cyan   { color: var(--accent1); border-color: rgba(0,198,255,.35); background: rgba(0,198,255,.07); }
+  .chip-violet { color: var(--accent2); border-color: rgba(180,79,255,.35); background: rgba(180,79,255,.07); }
+  .chip-danger { color: var(--danger);  border-color: rgba(255,76,76,.35);  background: rgba(255,76,76,.07); }
+  .chip-gold   { color: var(--gold);    border-color: rgba(240,192,64,.35); background: rgba(240,192,64,.07); }
+
+  /* ── TREATMENT ROW ── */
+  .tx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 14px 0; }
+  .tx-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .tx-card .tx-label {
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .12em;
+    color: var(--muted); font-family: var(--font-mono); margin-bottom: 8px;
+  }
+  .tx-card .tx-drug {
+    font-size: .95rem; font-weight: 700; color: var(--success); font-family: var(--font-mono);
+  }
+  .tx-card .tx-note { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── CLINICAL GROUPS ── */
+  .group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  @media(max-width:600px){ .group-row { grid-template-columns: 1fr; } }
+  .group-card {
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+  }
+  .group-card h4 {
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+  }
+  .group-card ul { list-style: none; padding: 0; }
+  .group-card ul li { padding: 3px 0 3px 16px; position: relative; font-size: .88rem; }
+  .group-card ul li::before { content: '–'; position: absolute; left: 0; color: var(--muted); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* ── COMPARISON TABLE SECTION ── */
+  .compare-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 40px 0;
+  }
+  .compare-section .compare-head {
+    padding: 20px 28px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    color: #fff;
+  }
+  .compare-section .tbl-wrap { border: none; border-radius: 0; margin: 0; }
+
+  /* ── EXAM TRAPS ── */
+  .trap-grid { display: grid; gap: 12px; margin: 14px 0; }
+  .trap-item {
+    background: rgba(240,192,64,.05);
+    border: 1px solid rgba(240,192,64,.2);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    font-size: .88rem;
+  }
+  .trap-item strong { color: var(--gold); display: block; margin-bottom: 4px; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; font-family: var(--font-mono); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    text-align: center;
+    font-size: .78rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  footer span { color: var(--text); }
+
+  /* ── MISC ── */
+  b, strong { font-weight: 700; }
+  em { color: var(--accent1); font-style: normal; }
+  .mono { font-family: var(--font-mono); font-size: .85rem; }
+  p { margin-bottom: 10px; font-size: .93rem; }
+
+  .scroll-top {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all .2s;
+    z-index: 200;
+  }
+  .scroll-top:hover { color: var(--accent1); border-color: var(--accent1); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero" id="top">
+  <div class="hero-badge">Microbiología Médica · Gram Negativos</div>
+  <h1>Cocos <span class="cyan">Gram</span> <span class="violet">Negativos</span></h1>
+  <p class="hero-sub">Género <em style="color:var(--text)">Neisseria</em> — Bacteriología Clínica</p>
+  <div class="hero-meta">
+    <span><b>Fuentes:</b> Lange Microbiology · Jawetz · Murray</span>
+    <span><b>Materia:</b> Microbiología Médica — 3er semestre</span>
+    <span><b>Autor:</b> Resumen Premium · André</span>
+  </div>
+</div>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav class="nav-tabs">
+  <a href="#gonorrhoeae" class="cyan">N. gonorrhoeae</a>
+  <a href="#meningitidis" class="violet">N. meningitidis</a>
+  <a href="#comparativa">Tabla Comparativa</a>
+  <a href="#trampas">Puntos de Examen</a>
+</nav>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="container">
+
+  <!-- ══ INTRO ══ -->
+  <div class="section-header" style="margin-top:44px">
+    <div class="line"></div>
+    <h2>Género Neisseria — Características Generales</h2>
+    <div class="line"></div>
+  </div>
+
+  <p>El género <strong>Neisseria</strong> comprende diplococos Gram negativos aerobios estrictos que se disponen en pares con los lados planos enfrentados, semejando granos de café. De las numerosas especies que colonizan mucosas humanas, solo dos son patógenas primarias: <em style="color:var(--accent1)">N. gonorrhoeae</em> (gonococo) y <em style="color:var(--accent2)">N. meningitidis</em> (meningococo).</p>
+
+  <div class="prop-grid">
+    <div class="prop-item">
+      <div class="prop-label">Morfología</div>
+      <div class="prop-value">Diplococo Gram (−), forma de grano de café</div>
+    </div>
+    <div class="prop-item">
+      <div class="prop-label">Metabolismo</div>
+      <div class="prop-value">Aerobio estricto, oxidasa (+), catalasa (+)</div>
+    </div>
+    <div class="prop-item">
+      <div class="prop-label">Temperatura óptima</div>
+      <div class="prop-value">35 – 37 °C; exigentes en CO₂ (5–10%)</div>
+    </div>
+    <div class="prop-item">
+      <div class="prop-label">Nutrición</div>
+      <div class="prop-value">Fastidiosos; requieren medios enriquecidos</div>
+    </div>
+    <div class="prop-item">
+      <div class="prop-label">Pared celular</div>
+      <div class="prop-value">LPS (endotoxina lipooligosacárido = LOS)</div>
+    </div>
+    <div class="prop-item">
+      <div class="prop-label">Resistencia</div>
+      <div class="prop-value">Muy frágiles fuera del huésped</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       N. GONORRHOEAE
+  ════════════════════════════════════════ -->
+  <div class="section-header" id="gonorrhoeae">
+    <div class="line"></div>
+    <h2>Neisseria gonorrhoeae</h2>
+    <span class="tag tag-cyan">Gonococo</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="org-card">
+    <div class="org-card-header">
+      <div class="org-icon cyan">🔵</div>
+      <div>
+        <h3>Neisseria gonorrhoeae</h3>
+        <div class="subtitle">AGENTE ETIOLÓGICO DE LA GONORREA · ETS MÁS PREVALENTE A NIVEL MUNDIAL</div>
+      </div>
+    </div>
+    <div class="org-body">
+
+      <!-- Características -->
+      <div class="sub-title"><span class="dot dot-cyan"></span> 1. Características Microbiológicas</div>
+      <div class="prop-grid">
+        <div class="prop-item">
+          <div class="prop-label">Forma / disposición</div>
+          <div class="prop-value">Diplococo, Gram (−), intracelular dentro de PMN</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Cápsula</div>
+          <div class="prop-value">❌ No posee (a diferencia del meningococo)</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Oxidasa / Catalasa</div>
+          <div class="prop-value">Ambas positivas ✓</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Fermentación</div>
+          <div class="prop-value">Solo glucosa (no maltosa)</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Cultivo</div>
+          <div class="prop-value">Agar Thayer-Martin (chocolate + antibióticos)</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Variación antigénica</div>
+          <div class="prop-value">Muy alta — evade la inmunidad adaptativa</div>
+        </div>
+      </div>
+
+      <!-- Transmisión -->
+      <div class="sub-title"><span class="dot dot-cyan"></span> 2. Transmisión</div>
+      <ul class="styled">
+        <li><strong>Contacto sexual directo</strong> (vaginal, anal, oral) — principal vía; la bacteria no sobrevive en superficies secas.</li>
+        <li><strong>Transmisión vertical</strong> (perinatal): paso por el canal del parto → oftalmía neonatal (conjuntivitis gonocócica del recién nacido).</li>
+        <li>No existe transmisión por fómites ni por agua.</li>
+        <li>Periodo de incubación: <strong>2 – 7 días</strong> post-exposición.</li>
+      </ul>
+
+      <div class="alert alert-cyan">
+        <div class="alert-icon">💡</div>
+        <div class="alert-body">
+          <strong>Dato clave</strong>
+          La probabilidad de transmisión varón → mujer en un solo contacto sexual es ≈ 50–70%; mujer → varón ≈ 20–30%. La mujer tiene mayor riesgo de infección y mayor probabilidad de permanecer asintomática.
+        </div>
+      </div>
+
+      <!-- Factores de virulencia -->
+      <div class="sub-title"><span class="dot dot-danger"></span> 3. Factores de Virulencia</div>
+      <div class="chip-row">
+        <span class="chip chip-danger">Pili (fimbrias)</span>
+        <span class="chip chip-danger">Proteína Opa (II)</span>
+        <span class="chip chip-danger">Proteína Por (I)</span>
+        <span class="chip chip-danger">LOS (endotoxina)</span>
+        <span class="chip chip-danger">IgA proteasa</span>
+        <span class="chip chip-danger">β-lactamasa (PPNG)</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Factor</th>
+              <th>Función</th>
+              <th>Relevancia clínica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cell-danger">Pili (fimbrias)</td>
+              <td>Adhesión a células epiteliales no ciliadas; antifagocítico; permite variación antigénica</td>
+              <td>Esencial para colonización inicial; inmunoevasión</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">Proteína Opa (II)</td>
+              <td>Media adhesión a receptores CD66 de PMN y células epiteliales; favorece invasión</td>
+              <td>Invasión tisular; varía antigénicamente</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">Proteína Por (I)</td>
+              <td>Porina de membrana externa; inhibe fusión fagolisosomal → sobrevive en PMN</td>
+              <td>Resistencia a la destrucción por fagocitos</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">LOS (lipooligosacárido)</td>
+              <td>Endotoxina; daño tisular directo; activa complemento e inflamación</td>
+              <td>Inflamación intensa; secreción purulenta</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">IgA1 proteasa</td>
+              <td>Cleave IgA secretora → evade inmunidad de mucosas</td>
+              <td>Facilita colonización de mucosas</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">β-lactamasa (plasmídica)</td>
+              <td>Hidroliza penicilinas → resistencia</td>
+              <td>PPNG (Penicillinase-Producing N. gonorrhoeae): fracaso al tratamiento con penicilina</td>
+            </tr>
+            <tr>
+              <td>Proteína Rmp (III)</td>
+              <td>Induce anticuerpos bloqueadores (bloquean anticuerpos bactericidas)</td>
+              <td>Inmunoevasión; reinfecciones frecuentes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cuadro clínico -->
+      <div class="sub-title"><span class="dot dot-cyan"></span> 4. Cuadro Clínico</div>
+
+      <div class="group-row">
+        <div class="group-card">
+          <h4 style="color:var(--accent1)">♂ Hombre (más sintomático)</h4>
+          <ul>
+            <li>Uretritis aguda: disuria intensa + secreción purulenta amarillo-verdosa (2–7 días post-exposición)</li>
+            <li>Epididimitis (complicación)</li>
+            <li>Prostatitis (rara)</li>
+            <li>10% son asintomáticos</li>
+          </ul>
+        </div>
+        <div class="group-card">
+          <h4 style="color:var(--accent2)">♀ Mujer (más asintomática)</h4>
+          <ul>
+            <li>50–80% asintomáticas</li>
+            <li>Cervicitis mucopurulenta</li>
+            <li>Uretritis leve</li>
+            <li>Enfermedad pélvica inflamatoria — EPI (principal complicación)</li>
+            <li>Infertilidad, embarazo ectópico</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="group-row">
+        <div class="group-card">
+          <h4 style="color:var(--gold)">👶 Neonato</h4>
+          <ul>
+            <li>Oftalmía neonatal (conjuntivitis gonocócica)</li>
+            <li>Aparece en los primeros 2–5 días de vida</li>
+            <li>Puede progresar a ceguera si no se trata</li>
+            <li>Profilaxis: colirio de eritromicina o nitrato de plata al nacer</li>
+          </ul>
+        </div>
+        <div class="group-card">
+          <h4 style="color:var(--danger)">⚠️ Infección Gonocócica Diseminada (IGD)</h4>
+          <ul>
+            <li>1–3% de casos (deficiencia de complemento = factor de riesgo)</li>
+            <li>Tríada: artritis séptica + tenosinovitis + lesiones cutáneas (pústulas hemorrágicas)</li>
+            <li>Más frecuente en mujeres durante menstruación</li>
+            <li>Perihepatitis (síndrome de Fitz-Hugh-Curtis)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="group-row">
+        <div class="group-card">
+          <h4 style="color:var(--muted)">🗣️ Faringitis gonocócica</h4>
+          <ul>
+            <li>Por contacto orogenital</li>
+            <li>Generalmente asintomática o leve</li>
+            <li>Importante para el diagnóstico diferencial</li>
+          </ul>
+        </div>
+        <div class="group-card">
+          <h4 style="color:var(--muted)">🔴 Conjuntivitis en adulto</h4>
+          <ul>
+            <li>Por autoinoculación de secreciones genitales</li>
+            <li>Cuadro muy severo, puede perforar córnea</li>
+            <li>Requiere tratamiento sistémico urgente</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert-danger">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-body">
+          <strong>Grupos de riesgo para infección diseminada</strong>
+          Deficiencia de componentes del complemento terminal (C5–C9) — propensión tanto a infección gonocócica diseminada como a meningococcemia recurrente. Siempre investigar en pacientes con Neisseria invasiva.
+        </div>
+      </div>
+
+      <!-- Diagnóstico -->
+      <div class="sub-title"><span class="dot dot-gold"></span> 5. Diagnóstico</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Método</th><th>Muestra</th><th>Resultado esperado / Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cell-gold">Tinción de Gram</td>
+              <td>Exudado uretral (♂) / endocervical (♀)</td>
+              <td>Diplococos Gram (−) intraleucocitarios (PMN). Alta sensibilidad en ♂ sintomático (95%); baja en ♀ (50–70%)</td>
+            </tr>
+            <tr>
+              <td class="cell-gold">Cultivo — Agar Thayer-Martin</td>
+              <td>Uretra, endocérvix, recto, faringe, conjuntiva</td>
+              <td>Colonias grises pequeñas, oxidasa (+). Gold standard. Permite antibiograma</td>
+            </tr>
+            <tr>
+              <td class="cell-gold">NAAT (PCR)</td>
+              <td>Primer chorro de orina, hisopo endocervical/vaginal</td>
+              <td>Mayor sensibilidad y especificidad. Detecta N. gonorrhoeae + C. trachomatis simultáneamente. Estándar actual</td>
+            </tr>
+            <tr>
+              <td>Oxidasa</td>
+              <td>Colonias en cultivo</td>
+              <td>Positiva (confirma género Neisseria)</td>
+            </tr>
+            <tr>
+              <td>Fermentación de azúcares</td>
+              <td>Colonia aislada</td>
+              <td>Solo glucosa (+) → diferencia de N. meningitidis (glucosa + maltosa)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-gold">
+        <div class="alert-icon">🔬</div>
+        <div class="alert-body">
+          <strong>Importante — manejo de muestras</strong>
+          N. gonorrhoeae es extremadamente frágil (temperatura, desecación, pH). Las muestras deben sembrarse inmediatamente o transportarse en medio de Stuart/Amies. Nunca refrigerar.
+        </div>
+      </div>
+
+      <!-- Tratamiento -->
+      <div class="sub-title"><span class="dot dot-cyan"></span> 6. Tratamiento</div>
+
+      <div class="alert alert-danger">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-body">
+          <strong>Crisis de resistencia antibiótica</strong>
+          N. gonorrhoeae ha desarrollado resistencia secuencial a penicilinas → tetraciclinas → fluoroquinolonas → cefalosporinas orales. Actualmente, la ceftriaxona IM en dosis única es el único agente confiable universalmente.
+        </div>
+      </div>
+
+      <div class="tx-grid">
+        <div class="tx-card">
+          <div class="tx-label">🥇 Primera línea — Infección no complicada</div>
+          <div class="tx-drug">Ceftriaxona 500 mg IM × 1 dosis</div>
+          <div class="tx-note">+ Azitromicina 1 g VO (si coinfección por Chlamydia no descartada)</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Alternativa (si alergia a cefalosporinas)</div>
+          <div class="tx-drug">Gentamicina 240 mg IM + Azitromicina 2 g VO</div>
+          <div class="tx-note">Usar solo cuando ceftriaxona está contraindicada</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Infección diseminada (IGD)</div>
+          <div class="tx-drug">Ceftriaxona 1 g IV/IM c/24h × 7–14 días</div>
+          <div class="tx-note">Hospitalización inicial; transición a oral según evolución</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Oftalmía neonatal</div>
+          <div class="tx-drug">Ceftriaxona 25–50 mg/kg IV/IM (dosis única)</div>
+          <div class="tx-note">+ irrigación ocular con suero fisiológico</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Profilaxis neonatal (al nacer)</div>
+          <div class="tx-drug">Ungüento de eritromicina 0,5% ocular</div>
+          <div class="tx-note">O nitrato de plata 1% (menos usado actualmente)</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Conducta adicional</div>
+          <div class="tx-drug">Notificación + rastreo de contactos</div>
+          <div class="tx-note">ETS de notificación obligatoria. Tratar contactos sexuales</div>
+        </div>
+      </div>
+
+    </div><!-- /org-body -->
+  </div><!-- /org-card -->
+
+  <!-- ════════════════════════════════════════
+       N. MENINGITIDIS
+  ════════════════════════════════════════ -->
+  <div class="section-header" id="meningitidis">
+    <div class="line"></div>
+    <h2>Neisseria meningitidis</h2>
+    <span class="tag tag-violet">Meningococo</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="org-card">
+    <div class="org-card-header">
+      <div class="org-icon violet">🟣</div>
+      <div>
+        <h3>Neisseria meningitidis</h3>
+        <div class="subtitle">MENINGOCOCO · CAUSA LÍDER DE MENINGITIS BACTERIANA EN JÓVENES · POTENCIALMENTE LETAL EN HORAS</div>
+      </div>
+    </div>
+    <div class="org-body">
+
+      <!-- Características -->
+      <div class="sub-title"><span class="dot dot-violet"></span> 1. Características Microbiológicas</div>
+      <div class="prop-grid">
+        <div class="prop-item">
+          <div class="prop-label">Forma / disposición</div>
+          <div class="prop-value">Diplococo Gram (−), riñón/grano de café</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Cápsula polisacárida</div>
+          <div class="prop-value">✅ POSEE — factor de virulencia clave</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Serogrupos importantes</div>
+          <div class="prop-value">A, B, C, W-135, X, Y</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Fermentación</div>
+          <div class="prop-value">Glucosa Y maltosa (+)</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Oxidasa / Catalasa</div>
+          <div class="prop-value">Ambas positivas ✓</div>
+        </div>
+        <div class="prop-item">
+          <div class="prop-label">Cultivo</div>
+          <div class="prop-value">Agar sangre / chocolate con CO₂ al 5%</div>
+        </div>
+      </div>
+
+      <div class="alert alert-violet">
+        <div class="alert-icon">🧬</div>
+        <div class="alert-body">
+          <strong>Serogrupos y distribución geográfica</strong>
+          <strong>Serogrupo A:</strong> África subsahariana ("cinturón de la meningitis") y Asia. <strong>B:</strong> Europa y América del Norte (no vacunable con polisacárido puro; requiere vacuna proteica). <strong>C:</strong> Europa occidental y América. <strong>W-135 e Y:</strong> en ascenso global. <strong>X:</strong> África.
+        </div>
+      </div>
+
+      <!-- Transmisión -->
+      <div class="sub-title"><span class="dot dot-violet"></span> 2. Transmisión</div>
+      <ul class="styled">
+        <li><strong>Gotitas respiratorias</strong> (droplets) — contacto estrecho; la bacteria vive en nasofaringe.</li>
+        <li>El ser humano es el <strong>único reservorio</strong>.</li>
+        <li><strong>Portadores sanos nasofaríngeos:</strong> 5–10% de la población general; 25–30% en comunidades cerradas (residencias universitarias, cuarteles).</li>
+        <li>Periodo de incubación: <strong>2 – 10 días</strong> (promedio 3–4 días).</li>
+        <li>La transmisión ocurre principalmente en convivientes estrechos y contactos de menos de 1 metro por más de 1 hora.</li>
+      </ul>
+
+      <!-- Virulencia -->
+      <div class="sub-title"><span class="dot dot-danger"></span> 3. Factores de Virulencia</div>
+      <div class="chip-row">
+        <span class="chip chip-danger">Cápsula polisacárida</span>
+        <span class="chip chip-danger">Pili (fimbrias)</span>
+        <span class="chip chip-danger">LOS (endotoxina)</span>
+        <span class="chip chip-danger">IgA1 proteasa</span>
+        <span class="chip chip-danger">Proteína Opa</span>
+        <span class="chip chip-danger">Lipo-oligosacárido</span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Factor</th><th>Función</th><th>Relevancia clínica</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cell-danger">Cápsula polisacárida</td>
+              <td>Inhibe opsonización y fagocitosis; principal factor antifagocítico; base de las vacunas</td>
+              <td>Esencial para invasión sistémica; permite bacteriemia; los serogrupos se diferencian por su composición</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">LOS (lipooligosacárido)</td>
+              <td>Endotoxina potente; activa complemento por vía alternativa; desencadena tormenta de citocinas (TNF-α, IL-1, IL-6)</td>
+              <td>Responsable del shock séptico; CID; púrpura fulminante; la gravedad se correlaciona con los niveles de LOS en sangre</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">Pili</td>
+              <td>Adhesión a células nasofaríngeas no ciliadas; permite colonización</td>
+              <td>Primer paso para la invasión sistémica</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">IgA1 proteasa</td>
+              <td>Cleava IgA secretora → evade la primera línea de defensa de mucosas</td>
+              <td>Colonización persistente de nasofaringe</td>
+            </tr>
+            <tr>
+              <td class="cell-danger">Proteínas de membrana externa (Opc, Opa)</td>
+              <td>Adhesión e invasión de células endoteliales y epiteliales</td>
+              <td>Cruce de la barrera hematoencefálica</td>
+            </tr>
+            <tr>
+              <td>Sideróforos</td>
+              <td>Captura de hierro del huésped (transferrina/lactoferrina)</td>
+              <td>Sobrevivencia y multiplicación en sangre</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cuadro clínico -->
+      <div class="sub-title"><span class="dot dot-violet"></span> 4. Cuadro Clínico</div>
+      <p>El espectro varía desde la colonización nasofaríngea asintomática hasta la sepsis fulminante mortal. La evolución puede ser <strong>fulminante en 12–24 horas</strong>.</p>
+
+      <div class="group-row">
+        <div class="group-card">
+          <h4 style="color:var(--accent2)">🧠 Meningitis bacteriana</h4>
+          <ul>
+            <li>Tríada clásica: <strong>fiebre + cefalea intensa + rigidez de nuca</strong></li>
+            <li>Fotofobia, fonofobia, náuseas</li>
+            <li>Signos de Kernig y Brudzinski (+)</li>
+            <li>Alteración del sensorio (confusión, estupor)</li>
+            <li>Inicio en horas; progresa rápidamente</li>
+          </ul>
+        </div>
+        <div class="group-card">
+          <h4 style="color:var(--danger)">💀 Meningococcemia (Sepsis meningocócica)</h4>
+          <ul>
+            <li>Fiebre alta, escalofríos, malestar general</li>
+            <li><strong>Petequias y púrpura</strong> (rash no blanqueable) — patognomónico</li>
+            <li>Shock séptico (hipotensión, taquicardia)</li>
+            <li>CID (Coagulación Intravascular Diseminada)</li>
+            <li>Puede ser sin meningitis</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="group-row">
+        <div class="group-card">
+          <h4 style="color:var(--danger)">🔴 Púrpura Fulminante</h4>
+          <ul>
+            <li>Forma más grave; mortalidad &gt; 50%</li>
+            <li>Lesiones purpúricas confluentes, grandes</li>
+            <li>Necrosis tisular, gangrena de extremidades</li>
+            <li>CID, fallo multiorgánico</li>
+            <li>Secuela: amputación de extremidades</li>
+          </ul>
+        </div>
+        <div class="group-card">
+          <h4 style="color:var(--gold)">📊 Grupos de riesgo</h4>
+          <ul>
+            <li><strong>Lactantes:</strong> 6–12 meses (pérdida de Ac maternos)</li>
+            <li><strong>Adolescentes/adultos jóvenes:</strong> 15–24 años</li>
+            <li>Asplénicos (esplenectomizados)</li>
+            <li>Deficiencia de complemento (C5–C9)</li>
+            <li>Inmunodeficiencia humoral</li>
+            <li>Comunidades cerradas (cuarteles, residencias)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert-danger">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-body">
+          <strong>EMERGENCIA MÉDICA — Reconocimiento del rash</strong>
+          Un paciente con fiebre + rash petequial/purpúrico que NO blanquea con presión digital = meningococcemia hasta demostrar lo contrario. <strong>Iniciar antibióticos empíricos INMEDIATAMENTE, incluso antes de la punción lumbar</strong>. El retraso de 1 hora aumenta la mortalidad significativamente.
+        </div>
+      </div>
+
+      <div class="sub-title" style="margin-top:28px">Otras formas clínicas</div>
+      <ul class="styled">
+        <li><strong>Artritis séptica:</strong> más frecuente en formas crónicas</li>
+        <li><strong>Pericarditis meningocócica</strong></li>
+        <li><strong>Conjuntivitis primaria</strong> (rara, pero puede causar sepsis)</li>
+        <li><strong>Neumonía:</strong> principalmente por serogrupo Y</li>
+      </ul>
+
+      <div class="sub-title" style="margin-top:24px">Secuelas de la meningitis meningocócica</div>
+      <ul class="styled">
+        <li>Pérdida auditiva sensorineural (10–15%)</li>
+        <li>Deterioro cognitivo y problemas de aprendizaje</li>
+        <li>Hidrocefalia (rara)</li>
+        <li>Amputación de extremidades (por necrosis en púrpura fulminante)</li>
+        <li>Cicatrices cutáneas por lesiones purpúricas</li>
+      </ul>
+
+      <!-- Diagnóstico -->
+      <div class="sub-title"><span class="dot dot-gold"></span> 5. Diagnóstico</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Método</th><th>Muestra</th><th>Resultado / Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cell-gold">Punción lumbar — LCR</td>
+              <td>LCR</td>
+              <td>
+                <strong>Aspecto:</strong> turbio/purulento<br>
+                <strong>Células:</strong> &gt;1000 leucocitos (PMN predominante)<br>
+                <strong>Glucosa:</strong> baja (&lt;40 mg/dL)<br>
+                <strong>Proteínas:</strong> elevadas (&gt;100 mg/dL)
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-gold">Tinción de Gram en LCR</td>
+              <td>LCR</td>
+              <td>Diplococos Gram (−) intraleucocitarios. Positivo en 80–90% sin antibióticos previos</td>
+            </tr>
+            <tr>
+              <td class="cell-gold">Hemocultivo</td>
+              <td>Sangre (2 muestras)</td>
+              <td>Positivo en 50–80% de los casos. Obtener ANTES de iniciar antibióticos si es posible sin retrasar tratamiento</td>
+            </tr>
+            <tr>
+              <td class="cell-gold">Cultivo de LCR</td>
+              <td>LCR en Agar sangre/chocolate</td>
+              <td>Gold standard; permite serotipificación y sensibilidad. Colonias oxidasa (+), fermentan glucosa + maltosa</td>
+            </tr>
+            <tr>
+              <td class="cell-gold">PCR en LCR / sangre</td>
+              <td>LCR, sangre</td>
+              <td>Muy sensible; útil en casos con antibióticos previos. Identifica serogrupo</td>
+            </tr>
+            <tr>
+              <td>Prueba de látex / aglutinación</td>
+              <td>LCR, orina</td>
+              <td>Detección rápida de antígenos capsulares; resultado en minutos. Útil cuando cultivo puede ser negativo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-violet">
+        <div class="alert-icon">💡</div>
+        <div class="alert-body">
+          <strong>Perfil del LCR — Comparación rápida</strong>
+          En meningitis bacteriana: glucosa LCR/suero &lt; 0.4, proteínas &gt;100 mg/dL, leucocitos &gt;1000/mm³ con predominio de PMN. En meningitis viral: glucosa normal, proteínas ligeramente elevadas, linfocitos predominantes.
+        </div>
+      </div>
+
+      <!-- Tratamiento -->
+      <div class="sub-title"><span class="dot dot-violet"></span> 6. Tratamiento</div>
+
+      <div class="tx-grid">
+        <div class="tx-card">
+          <div class="tx-label">🥇 Primera línea — Meningitis / Sepsis</div>
+          <div class="tx-drug">Penicilina G IV (en zonas sin resistencia)</div>
+          <div class="tx-note">o Ceftriaxona 2 g IV c/12h × 5–7 días (estándar actual más seguro)</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Tratamiento empírico inicial (mientras espera cultivo)</div>
+          <div class="tx-drug">Ceftriaxona 2 g IV c/12h</div>
+          <div class="tx-note">+ Dexametasona 0.15 mg/kg IV c/6h × 4 días (reduce inflamación y secuelas)</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Si alergia a penicilina/cefalosporina</div>
+          <div class="tx-drug">Cloranfenicol 1 g IV c/6h</div>
+          <div class="tx-note">Alternativa válida; monitorear mielosupresión</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Profilaxis de contactos (quimioprofilaxis)</div>
+          <div class="tx-drug">Rifampicina 600 mg VO c/12h × 2 días</div>
+          <div class="tx-note">Alternativa: Ciprofloxacino 500 mg VO dosis única, o Ceftriaxona 250 mg IM dosis única</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Vacunación (prevención)</div>
+          <div class="tx-drug">Vacuna conjugada MenACWY / MenB</div>
+          <div class="tx-note">Recomendada en adolescentes, asplénicos, viajeros al "cinturón de meningitis"</div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-label">Soporte en Shock / CID</div>
+          <div class="tx-drug">UTI: fluidoterapia, vasopresores, plasma fresco</div>
+          <div class="tx-note">Corticoides en shock; manejo de la CID con hematología</div>
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-body">
+          <strong>Corticoides adyuvantes</strong>
+          La dexametasona administrada justo antes o con la primera dosis de antibiótico reduce la inflamación de la meningitis bacteriana y disminuye el riesgo de pérdida auditiva y otras secuelas neurológicas, especialmente en meningitis por H. influenzae y neumococo. En meningocócica también se usa, pero la evidencia es más sólida en las otras etiologías.
+        </div>
+      </div>
+
+    </div><!-- /org-body -->
+  </div><!-- /org-card -->
+
+  <!-- ════════════════════════════════════════
+       TABLA COMPARATIVA
+  ════════════════════════════════════════ -->
+  <div class="section-header" id="comparativa">
+    <div class="line"></div>
+    <h2>Tabla Comparativa</h2>
+    <span class="tag tag-gold">N. gonorrhoeae vs N. meningitidis</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="compare-section">
+    <div class="compare-head">⚖️ Comparación diferencial — Neisseria spp.</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th style="color:var(--accent1)">N. gonorrhoeae</th>
+            <th style="color:var(--accent2)">N. meningitidis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nombre común</td>
+            <td class="cell-cyan">Gonococo</td>
+            <td class="cell-violet">Meningococo</td>
+          </tr>
+          <tr>
+            <td>Cápsula</td>
+            <td>❌ NO tiene</td>
+            <td class="cell-violet">✅ SÍ tiene — base de vacunas</td>
+          </tr>
+          <tr>
+            <td>Fermentación</td>
+            <td class="cell-cyan">Solo glucosa</td>
+            <td class="cell-violet">Glucosa + maltosa</td>
+          </tr>
+          <tr>
+            <td>Vía de transmisión</td>
+            <td class="cell-cyan">Sexual / perinatal</td>
+            <td class="cell-violet">Gotitas respiratorias</td>
+          </tr>
+          <tr>
+            <td>Reservorio</td>
+            <td>Humano (mucosas genitales)</td>
+            <td>Humano (nasofaringe)</td>
+          </tr>
+          <tr>
+            <td>Portadores sanos</td>
+            <td>Relativamente poco frecuente</td>
+            <td class="cell-violet">5–10% población general; hasta 30% en comunidades</td>
+          </tr>
+          <tr>
+            <td>Grupo etario principal</td>
+            <td>Adultos sexualmente activos</td>
+            <td>Lactantes, adolescentes y jóvenes</td>
+          </tr>
+          <tr>
+            <td>Enfermedad principal</td>
+            <td class="cell-cyan">Gonorrea (uretritis, cervicitis)</td>
+            <td class="cell-violet">Meningitis + sepsis meningocócica</td>
+          </tr>
+          <tr>
+            <td>Rash hemorrágico</td>
+            <td>Solo en IGD (inusual)</td>
+            <td class="cell-danger">Clásico — petequias/púrpura (patognomónico)</td>
+          </tr>
+          <tr>
+            <td>Cultivo principal</td>
+            <td>Agar Thayer-Martin</td>
+            <td>Agar sangre / chocolate</td>
+          </tr>
+          <tr>
+            <td>Tratamiento 1ª línea</td>
+            <td class="cell-cyan">Ceftriaxona 500 mg IM × 1 dosis</td>
+            <td class="cell-violet">Ceftriaxona 2 g IV c/12h × 5–7 días</td>
+          </tr>
+          <tr>
+            <td>Profilaxis disponible</td>
+            <td>No hay vacuna</td>
+            <td class="cell-green">✅ Vacuna conjugada MenACWY / MenB</td>
+          </tr>
+          <tr>
+            <td>Deficiencia de complemento</td>
+            <td>IGD recurrente</td>
+            <td>Meningococcemia recurrente</td>
+          </tr>
+          <tr>
+            <td>Coinfección frecuente</td>
+            <td>Chlamydia trachomatis (25–50%)</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Urgencia terapéutica</td>
+            <td>Alta (pero horas-días)</td>
+            <td class="cell-danger">CRÍTICA — minutos a horas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TRAMPAS DE EXAMEN
+  ════════════════════════════════════════ -->
+  <div class="section-header" id="trampas">
+    <div class="line"></div>
+    <h2>Puntos de Examen &amp; Trampas Clásicas</h2>
+    <span class="tag tag-gold">⚠️ High Yield</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="trap-grid">
+    <div class="trap-item">
+      <strong>🎯 Trampa #1 — Fermentación de maltosa</strong>
+      La diferenciación bioquímica clave: <em style="color:var(--accent1)">N. gonorrhoeae</em> fermenta <strong>solo glucosa</strong>; <em style="color:var(--accent2)">N. meningitidis</em> fermenta <strong>glucosa + maltosa</strong>. Esta es la pregunta de examen más frecuente sobre el género.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #2 — Cápsula</strong>
+      <em style="color:var(--accent1)">N. gonorrhoeae</em> NO tiene cápsula polisacárida. <em style="color:var(--accent2)">N. meningitidis</em> SÍ tiene. La cápsula es la base de las vacunas del meningococo y el principal factor antifagocítico.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #3 — Mujer asintomática</strong>
+      La gonorrea en la mujer es asintomática en el 50–80% de los casos. La gran peligro: EPI silenciosa → infertilidad por cicatrización tubárica. Siempre investigar en mujeres con ETS de pareja.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #4 — Rash + fiebre = emergencia</strong>
+      Fiebre + rash petequial que NO blanquea con presión = meningococcemia. La antibioticoterapia debe iniciarse ANTES de la punción lumbar si hay signos de herniación o el PL se va a demorar.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #5 — Deficiencia de complemento terminal</strong>
+      Paciente con infecciones recurrentes por Neisseria → investigar deficiencia de C5–C9 (vía del complemento lítico). Aplica tanto para gonorrea diseminada como meningococcemia recurrente.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #6 — Oftalmía neonatal</strong>
+      Conjuntivitis neonatal en las primeras 24–48h de vida sugiere N. gonorrhoeae. Entre 5–14 días, sugiere Chlamydia trachomatis. El timing es clave para el diagnóstico diferencial en el examen.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #7 — Resistencia antibiótica del gonococo</strong>
+      N. gonorrhoeae ya NO se trata con penicilina ni fluoroquinolonas (alta resistencia). El tratamiento actual es <strong>ceftriaxona IM dosis única</strong>. Las preguntas de examen pueden mencionar tratamientos viejos como trampas.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #8 — Meningococo puede dar sepsis SIN meningitis</strong>
+      La meningococcemia puede presentarse como sepsis sin signos meníngeos. No descartar por ausencia de rigidez de nuca si hay fiebre + rash purpúrico.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #9 — Profilaxis de contactos</strong>
+      La quimioprofilaxis del meningococo (rifampicina, ciprofloxacino o ceftriaxona) es para contactos íntimos del caso. NO es para gonorrea; en gonorrea se trata al caso + rastreo de contactos.
+    </div>
+    <div class="trap-item">
+      <strong>🎯 Trampa #10 — Serogrupo B y vacunas</strong>
+      El serogrupo B no puede vacunarse con polisacárido puro (mimetiza antígenos del SNC del huésped → tolerancia). Requiere vacunas proteicas de membrana externa. El serogrupo B es el más prevalente en Europa y América del Norte.
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <span>Microbiología Médica — Cocos Gram Negativos · Neisseria spp.</span><br>
+  Fuentes: Lange Medical Microbiology · Jawetz, Melnick &amp; Adelberg · Murray et al. · Mandell, Douglas &amp; Bennett<br>
+  Resumen preparado para André · Universidad Central del Paraguay · 3er Semestre · 2025–2026
+</footer>
+
+<a href="#top" class="scroll-top" title="Volver al inicio">↑</a>
+
+</body>
+</html>

@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fisiología Cardiovascular — Caps. 14, 15 y 16</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #e63946;
+    --accent2: #457b9d;
+    --accent3: #f4a261;
+    --accent4: #2a9d8f;
+    --text: #e2e8f0;
+    --muted: #7f8fa6;
+    --highlight: #f1faee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 80px 48px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(230,57,70,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--highlight);
+    max-width: 700px;
+  }
+
+  .subtitle {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* NAV TABS */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    padding: 18px 28px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* SECTIONS */
+  .section { display: none; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CHAPTER HEADING */
+  .chapter-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chap-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .chapter-meta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--highlight);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .chapter-meta p {
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  /* CONTENT CARDS */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent2); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--card-accent, var(--accent2));
+  }
+
+  .card-red::before { --card-accent: var(--accent); }
+  .card-orange::before { --card-accent: var(--accent3); }
+  .card-teal::before { --card-accent: var(--accent4); }
+  .card-blue::before { --card-accent: var(--accent2); }
+
+  .card-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: var(--card-accent, var(--accent2));
+  }
+
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--highlight);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .card p, .card li {
+    font-size: 13.5px;
+    color: #a0aec0;
+    line-height: 1.65;
+  }
+
+  .card ul { list-style: none; }
+  .card li { padding: 4px 0; padding-left: 14px; position: relative; }
+  .card li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--card-accent, var(--accent2));
+    font-size: 11px;
+  }
+
+  /* FORMULA BOX */
+  .formula-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+  }
+
+  .formula {
+    font-size: 1.4rem;
+    color: var(--accent3);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .formula-desc {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* HIGHLIGHT BOX */
+  .highlight-box {
+    background: rgba(230,57,70,0.06);
+    border: 1px solid rgba(230,57,70,0.25);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .highlight-box p {
+    font-size: 13.5px;
+    color: #cbd5e0;
+    line-height: 1.7;
+  }
+
+  .highlight-box strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(31,45,69,0.5);
+    color: #a0aec0;
+  }
+
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+
+  .val {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent3);
+    font-size: 12px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--highlight);
+    margin: 36px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* KEY CONCEPT */
+  .key-concept {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(31,45,69,0.4);
+  }
+
+  .key-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .key-concept h4 {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--highlight);
+    margin-bottom: 4px;
+  }
+
+  .key-concept p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* STARLING TABLE */
+  .starling {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .starling-header {
+    background: var(--surface2);
+    padding: 14px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .starling-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(31,45,69,0.4);
+    font-size: 13px;
+  }
+
+  .starling-row:last-child { border-bottom: none; }
+  .starling-row .label { color: #a0aec0; }
+  .starling-row .num { font-family: 'IBM Plex Mono', monospace; color: var(--accent3); font-size: 12px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .badge-red { background: rgba(230,57,70,0.15); color: var(--accent); border: 1px solid rgba(230,57,70,0.3); }
+  .badge-teal { background: rgba(42,157,143,0.12); color: var(--accent4); border: 1px solid rgba(42,157,143,0.3); }
+  .badge-orange { background: rgba(244,162,97,0.12); color: var(--accent3); border: 1px solid rgba(244,162,97,0.3); }
+  .badge-blue { background: rgba(69,123,157,0.12); color: var(--accent2); border: 1px solid rgba(69,123,157,0.3); }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    font-size: 12.5px;
+  }
+
+  .flow-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 13px;
+    color: #a0aec0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .flow-arrow {
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  /* QUIZ */
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .quiz-q {
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .quiz-q:hover { background: rgba(255,255,255,0.03); }
+
+  .quiz-icon {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .quiz-a {
+    display: none;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: #a0aec0;
+    line-height: 1.7;
+    background: rgba(42,157,143,0.04);
+  }
+
+  .quiz-a.open { display: block; }
+  .quiz-a strong { color: var(--accent4); }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    header { padding: 48px 24px 40px; }
+    main { padding: 32px 20px 60px; }
+    .chap-num { font-size: 3rem; }
+    .chapter-meta h2 { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag">Fisiología Médica · Dra. Michele Reis · UCP Pedro Juan Caballero</span>
+  <h1>Sistema Circulatorio</h1>
+  <p class="subtitle">Caps. 14 → 15 → 16 &nbsp;|&nbsp; Guyton y Hall, 14ª ed.</p>
+</header>
+
+<nav id="nav">
+  <button class="nav-btn active" onclick="showSection('s14')">Cap. 14 — Presión, Flujo y Resistencia</button>
+  <button class="nav-btn" onclick="showSection('s15')">Cap. 15 — Distensibilidad Vascular</button>
+  <button class="nav-btn" onclick="showSection('s16')">Cap. 16 — Microcirculación y Linfa</button>
+  <button class="nav-btn" onclick="showSection('quiz')">Preguntas Clave</button>
+</nav>
+
+<main>
+
+<!-- ======================================================
+     CAP. 14
+     ====================================================== -->
+<div id="s14" class="section active">
+  <div class="chapter-header">
+    <div class="chap-num">14</div>
+    <div class="chapter-meta">
+      <h2>Visión general de la circulación: presión, flujo y resistencia</h2>
+      <p>Fundamentos físicos · Ley de Ohm · Flujo laminar/turbulento · Autorregulación</p>
+    </div>
+  </div>
+
+  <!-- FUNCTIONS -->
+  <p class="section-title">Funciones de la circulación</p>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <span class="card-label">Función principal</span>
+      <ul>
+        <li>Transportar <strong>nutrientes</strong> a los tejidos</li>
+        <li>Eliminar <strong>productos de desecho</strong> metabólico</li>
+        <li>Transportar <strong>hormonas</strong> entre órganos</li>
+        <li>Mantener el <strong>entorno apropiado</strong> del líquido tisular</li>
+      </ul>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Control del flujo</span>
+      <p>La tasa de flujo sanguíneo en cada tejido se regula según su <strong>necesidad de nutrientes</strong> y la eliminación de desechos. El corazón y los vasos proporcionan el gasto cardíaco y la presión necesarios.</p>
+    </div>
+  </div>
+
+  <!-- DISTRIBUTION -->
+  <p class="section-title">Distribución del volumen sanguíneo</p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Compartimento</th>
+        <th>% Sangre total</th>
+        <th>Nota clínica</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circulación sistémica</td><td class="val">84%</td><td>Principal reserva</td></tr>
+      <tr><td>Venas, vénulas, senos venosos</td><td class="val">64%</td><td>Reservorio de alta capacitancia</td></tr>
+      <tr><td>Arterias</td><td class="val">13%</td><td>Alta presión</td></tr>
+      <tr><td>Arteriolas + capilares</td><td class="val">7%</td><td>Intercambio metabólico</td></tr>
+      <tr><td>Corazón</td><td class="val">7%</td><td>Bomba</td></tr>
+      <tr><td>Circulación pulmonar</td><td class="val">9%</td><td>Baja presión</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <p>⚑ Las <strong>venas actúan como gran reservorio</strong>: alojan ~2/3 de toda la sangre gracias a su alta capacitancia. A mayor presión de distensión → mayor volumen venoso almacenado.</p>
+  </div>
+
+  <!-- COMPONENTS -->
+  <p class="section-title">Componentes funcionales: características clave</p>
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Arterias</span>
+      <h3>Alta presión · Paredes gruesas</h3>
+      <p>Transportan sangre con alta presión. Flujos rápidos. Resisten el impacto sistólico.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Arteriolas ★ CLAVE</span>
+      <h3>Válvulas biológicas del flujo</h3>
+      <p>Última rama pequeña del sistema arterial. Pueden <strong>cerrar o dilatar el vaso hasta 4 veces</strong>. Son el principal punto de regulación de la resistencia periférica.</p>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Capilares ★ CLAVE</span>
+      <h3>Zona de intercambio</h3>
+      <p>Paredes ultrafinas. Poros permeables al agua y moléculas pequeñas. Intercambio de O₂, CO₂, nutrientes y metabolitos.</p>
+    </div>
+    <div class="card card-blue">
+      <span class="card-label">Venas</span>
+      <h3>Baja presión · Reservorio</h3>
+      <p>Conductos de retorno + reserva de sangre extra. Paredes finas pero con fuerza muscular suficiente para contraerse.</p>
+    </div>
+  </div>
+
+  <!-- VELOCIDADES -->
+  <p class="section-title">Superficie transversal vs. velocidad</p>
+  <div class="highlight-box">
+    <p><strong>Regla fundamental:</strong> La velocidad del flujo es <strong>inversamente proporcional a la superficie transversal</strong>.</p>
+    <p style="margin-top:8px">Mayor calibre → Mayor volumen, MENOR velocidad.<br>
+    Menor calibre → MAYOR presión y velocidad.<br>
+    Los capilares (2.500 cm²) son la zona más lenta = tiempo para intercambio.</p>
+  </div>
+
+  <!-- PRESIONES -->
+  <p class="section-title">Presiones sanguíneas en la circulación</p>
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Circulación sistémica</span>
+      <ul>
+        <li>Presión media aorta: <span class="val">100 mmHg</span> (120/80)</li>
+        <li>Caída progresiva hasta 0 mmHg en venas cavas</li>
+        <li>Capilares sistémicos: 35 → 10 mmHg</li>
+        <li>Presión media funcional capilar: <span class="val">≈17 mmHg</span></li>
+      </ul>
+    </div>
+    <div class="card card-blue">
+      <span class="card-label">Circulación pulmonar</span>
+      <ul>
+        <li>Presión sistólica: <span class="val">≈25 mmHg</span></li>
+        <li>Presión diastólica: <span class="val">≈8 mmHg</span></li>
+        <li>Presión media arterial pulmonar: <span class="val">≈16 mmHg</span></li>
+        <li>Presión media capilar pulmonar: <span class="val">≈7 mmHg</span></li>
+        <li>Bajas presiones → intercambio gaseoso sin edema pulmonar</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LEY DE OHM -->
+  <p class="section-title">Ley de Ohm aplicada a la circulación ★</p>
+  <div class="formula-box">
+    <span class="formula">F = ΔP / R</span>
+    <span class="formula-desc">F = flujo sanguíneo (ml/min) · ΔP = diferencia de presión (mmHg) · R = resistencia vascular</span>
+  </div>
+  <div class="formula-box">
+    <span class="formula">ΔP = F × R &nbsp;&nbsp;&nbsp;&nbsp; R = ΔP / F</span>
+    <span class="formula-desc">Derivaciones de la misma ecuación — dominándolas se responde cualquier pregunta de flujo/resistencia</span>
+  </div>
+  <div class="highlight-box">
+    <p>⚑ Es la <strong>DIFERENCIA de presión</strong> (gradiente), no el valor absoluto, lo que determina el flujo. Si P₁ = P₂ = 100 mmHg, el flujo es <strong>0</strong>.</p>
+  </div>
+
+  <!-- RPT -->
+  <p class="section-title">Resistencia Periférica Total (RPT)</p>
+  <div class="grid-2">
+    <div class="card card-orange">
+      <span class="card-label">Valor normal</span>
+      <h3>≈ 1 PRU</h3>
+      <p>Adulto en reposo: DC = 100 ml/s, ΔP = 100 mmHg → RPT = 1 PRU.<br>
+      <strong>PA = DC × RPT</strong> es la ecuación maestra de la hemodinamia.</p>
+    </div>
+    <div class="card card-red">
+      <span class="card-label">Rangos clínicos</span>
+      <ul>
+        <li>Vasoconstricción máxima: <span class="val">hasta 4 PRU</span></li>
+        <li>Vasodilatación máxima: <span class="val">hasta 0.2 PRU</span></li>
+        <li>Resistencias en serie: se <strong>suman</strong></li>
+        <li>Resistencias en paralelo: cada tejido regula su flujo independientemente</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ECUACION POISEUILLE -->
+  <p class="section-title">Ley de Poiseuille y Ley de la Cuarta Potencia ★</p>
+  <div class="formula-box">
+    <span class="formula">F = π·ΔP·r⁴ / (8η·l)</span>
+    <span class="formula-desc">η = viscosidad · l = longitud · r = radio del vaso</span>
+  </div>
+  <div class="highlight-box">
+    <p><strong>Ley de la cuarta potencia:</strong> el flujo varía con la 4ª potencia del radio. Duplicar el diámetro multiplica el flujo ×16. Cuadruplicar → ×256. Pequeños cambios en el radio tienen efectos enormes.</p>
+    <p style="margin-top:6px">D=1 → 1 ml/min | D=2 → <strong>16 ml/min</strong> | D=4 → <strong>256 ml/min</strong></p>
+  </div>
+
+  <!-- REYNOLDS -->
+  <p class="section-title">Flujo laminar vs. turbulento — Ecuación de Reynolds</p>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <span class="card-label">Flujo laminar (normal)</span>
+      <p>Capas concéntricas. Centro se mueve más rápido. La capa junto a la pared es casi estática. Sin ruidos (Korotkoff ausentes).</p>
+    </div>
+    <div class="card card-red">
+      <span class="card-label">Flujo turbulento</span>
+      <p>Mezcla caótica. Ocurre cuando velocidad es excesiva, hay obstrucciones o superficies rugosas. Genera ruidos audibles (soplos). Mayor resistencia.</p>
+    </div>
+  </div>
+  <div class="formula-box">
+    <span class="formula">Re = (v · d · ρ) / η</span>
+    <span class="formula-desc">v=velocidad · d=diámetro · ρ=densidad · η=viscosidad | Re &gt; 2000 → tendencia a turbulencia</span>
+  </div>
+
+  <!-- VISCOSIDAD / HEMATOCRITO -->
+  <p class="section-title">Hematocrito y viscosidad</p>
+  <div class="grid-2">
+    <div class="card card-teal">
+      <span class="card-label">Normal</span>
+      <p>Hematocrito masculino <span class="val">45%</span>. Viscosidad sanguínea ≈ 3× la del agua.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Patológico ★</span>
+      <ul>
+        <li><strong>Anemia:</strong> HTC bajo → viscosidad ↓ → flujo ↑</li>
+        <li><strong>Policitemia:</strong> HTC alto → viscosidad hasta 10× agua → flujo ↓</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PRINCIPIOS -->
+  <p class="section-title">Tres principios básicos de la función circulatoria</p>
+  <div class="key-concept">
+    <span class="key-num">P1</span>
+    <div>
+      <h4>Control local del flujo</h4>
+      <p>El flujo en cada tejido se regula según la necesidad metabólica tisular, no de manera centralizada.</p>
+    </div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num">P2</span>
+    <div>
+      <h4>Gasto cardíaco = suma de flujos locales</h4>
+      <p>El DC es la sumatoria de todos los flujos tisulares. Cuando los tejidos demandan más, el corazón debe aumentar su output.</p>
+    </div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num">P3</span>
+    <div>
+      <h4>Regulación de la presión arterial es independiente</h4>
+      <p>La PA se regula independientemente del flujo local o del DC. El Sistema Nervioso Autónomo es el principal controlador de la PA a corto plazo.</p>
+    </div>
+  </div>
+
+  <!-- AUTORREGULACION -->
+  <div class="highlight-box" style="margin-top:24px">
+    <p><strong>Autorregulación:</strong> capacidad de cada tejido para ajustar su resistencia vascular y mantener flujo constante ante cambios de PA entre <strong>70 y 175 mmHg</strong>. Fundamental en riñón, cerebro y corazón.</p>
+  </div>
+</div>
+
+<!-- ======================================================
+     CAP. 15
+     ====================================================== -->
+<div id="s15" class="section">
+  <div class="chapter-header">
+    <div class="chap-num">15</div>
+    <div class="chapter-meta">
+      <h2>Distensibilidad vascular y funciones de los sistemas arterial y venoso</h2>
+      <p>Compliancia · Pulso arterial · Korotkoff · Presión venosa · Bomba venosa</p>
+    </div>
+  </div>
+
+  <!-- DISTENSIBILIDAD -->
+  <p class="section-title">Distensibilidad vascular</p>
+  <div class="grid-2">
+    <div class="card card-teal">
+      <span class="card-label">Concepto</span>
+      <p>Todos los vasos son distensibles. La elasticidad arterial amortigua el flujo pulsátil → transforma flujo intermitente en flujo continuo hacia los tejidos. Sin esta propiedad, la sangre solo fluiría en sístole.</p>
+    </div>
+    <div class="card card-red">
+      <span class="card-label">¿Cuáles son más distensibles?</span>
+      <p>Las <strong>venas son ≈8 veces más distensibles</strong> que arterias de igual diámetro. Pequeños aumentos de presión venosa almacenan 0.5–1 L adicional de sangre.</p>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <span class="formula">Distensibilidad = ΔVol / (ΔP × Vol₀)</span>
+    <span class="formula-desc">Cambio fraccional de volumen por mmHg de presión</span>
+  </div>
+
+  <!-- DISTENSIBILIDAD vs COMPLIANCIA -->
+  <p class="section-title">Distensibilidad vs. Compliancia (conceptos distintos) ★</p>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <span class="card-label">Distensibilidad</span>
+      <h3>Propiedad intrínseca de la pared</h3>
+      <p>Cambio fraccional de volumen por mmHg. Independiente del tamaño del vaso.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Compliancia (C)</span>
+      <h3>Capacidad de almacenamiento total</h3>
+      <p><strong>C = Distensibilidad × Volumen</strong><br>Un vaso muy distensible pero pequeño puede tener MENOS compliancia que uno poco distensible pero grande. Las venas tienen alta compliancia por su volumen.</p>
+    </div>
+  </div>
+
+  <!-- PRESION PULSO -->
+  <p class="section-title">Tipos de presión arterial ★</p>
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Presión sistólica</span>
+      <h3>120 mmHg</h3>
+      <p>Valor máximo. Se alcanza durante la eyección ventricular izquierda.</p>
+    </div>
+    <div class="card card-blue">
+      <span class="card-label">Presión diastólica</span>
+      <h3>80 mmHg</h3>
+      <p>Valor mínimo entre latidos. Depende de la resistencia periférica y la compliancia arterial.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Presión de Pulso ★</span>
+      <h3>40 mmHg (PAS - PAD)</h3>
+      <p>Determinada por: <strong>Volumen sistólico / Compliancia arterial</strong>.<br>Inversamente proporcional a la compliancia. Indica función de bomba y estado arterial.</p>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Presión Arterial Media (PAM)</span>
+      <h3>≈93 mmHg</h3>
+      <p><strong>PAM = (2×PAD + PAS) / 3</strong><br>Se acerca más a la PAD porque la diástole ocupa 2/3 del ciclo cardíaco.</p>
+    </div>
+  </div>
+
+  <!-- CAMBIOS EN COMPLIANCIA -->
+  <p class="section-title">Condiciones que alteran la presión de pulso</p>
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Pulso amplio (↑ presión de pulso)</span>
+      <ul>
+        <li><strong>Arterioesclerosis:</strong> vasos rígidos, menor compliancia</li>
+        <li><strong>Insuficiencia aórtica:</strong> válvula no cierra → regurgitación diastólica → PAD ↓↓</li>
+        <li><strong>Persistencia del conducto arterial:</strong> derivación Ao→arteria pulmonar</li>
+      </ul>
+    </div>
+    <div class="card card-blue">
+      <span class="card-label">Pulso reducido (↓ presión de pulso)</span>
+      <ul>
+        <li><strong>Estenosis aórtica:</strong> la válvula no abre bien → bajo volumen sistólico → PAS ↓</li>
+        <li><strong>Bajo gasto cardíaco:</strong> cualquier causa</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TRANSMISION PULSO -->
+  <p class="section-title">Transmisión del pulso de presión</p>
+  <table class="data-table">
+    <thead><tr><th>Segmento</th><th>Velocidad de onda</th></tr></thead>
+    <tbody>
+      <tr><td>Aorta normal</td><td class="val">3–5 m/s</td></tr>
+      <tr><td>Grandes ramas arteriales</td><td class="val">7–10 m/s</td></tr>
+      <tr><td>Arterias pequeñas</td><td class="val">15–35 m/s</td></tr>
+    </tbody>
+  </table>
+  <div class="highlight-box">
+    <p>⚑ Mayor compliancia del segmento → <strong>más lenta</strong> la velocidad de propagación del pulso. Arterias rígidas (arterioesclerosis) conducen el pulso más rápido.</p>
+  </div>
+
+  <!-- KOROTKOFF -->
+  <p class="section-title">Método auscultatorio de Korotkoff ★</p>
+  <div class="card card-teal" style="margin-bottom:20px">
+    <span class="card-label">Principio</span>
+    <p>Al desinflar el manguito sobre la arteria braquial, el flujo turbulento intermitente genera ruidos audibles por el estetoscopio posicionado sobre la arteria antecubital.</p>
+  </div>
+  <div class="key-concept">
+    <span class="key-num" style="color:var(--accent)">F1</span>
+    <div><h4>Primer ruido → <span class="badge badge-red">Presión Sistólica</span></h4>
+    <p>Primer golpe audible al desinflar. El flujo pasa parcialmente a través del vaso comprimido.</p></div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num" style="color:var(--muted)">F2</span>
+    <div><h4>El ruido pierde intensidad y se amortigua</h4></div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num" style="color:var(--muted)">F3</span>
+    <div><h4>Ruido sordo y suave</h4></div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num" style="color:var(--muted)">F4</span>
+    <div><h4>Ruido se debilita notablemente</h4></div>
+  </div>
+  <div class="key-concept">
+    <span class="key-num" style="color:var(--accent4)">F5</span>
+    <div><h4>Silencio total → <span class="badge badge-teal">Presión Diastólica</span></h4>
+    <p>Flujo laminar libre. Si F5 es ausente (ej. embarazo, anemia), se usa F4.</p></div>
+  </div>
+
+  <!-- VENAS -->
+  <p class="section-title">Funciones de las venas</p>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <span class="card-label">Reservorio</span>
+      <h3>Más del 60% de la sangre</h3>
+      <p>Almacenan sangre disponible para redistribución. El tono venoso (simpático) regula cuánta sangre se moviliza hacia el corazón.</p>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Bomba venosa</span>
+      <h3>Válvulas + músculo esquelético</h3>
+      <p>Las válvulas venosas impiden el reflujo. La contracción muscular comprime las venas → sangre solo puede ir hacia el corazón. Sin válvulas: presión venosa en pies = +90 mmHg permanentemente.</p>
+    </div>
+  </div>
+
+  <!-- PRESION GRAVITACIONAL -->
+  <p class="section-title">Efecto de la gravedad sobre la presión venosa</p>
+  <table class="data-table">
+    <thead><tr><th>Localización (persona de pie)</th><th>Presión venosa</th></tr></thead>
+    <tbody>
+      <tr><td>Seno sagital (cabeza)</td><td class="val">−10 mmHg</td></tr>
+      <tr><td>Nivel del corazón</td><td class="val">0 mmHg</td></tr>
+      <tr><td>Vena yugular</td><td class="val">+6–8 mmHg</td></tr>
+      <tr><td>Vena cava inferior</td><td class="val">+22 mmHg</td></tr>
+      <tr><td>Vena ilíaca</td><td class="val">+35–40 mmHg</td></tr>
+      <tr><td>Pies</td><td class="val">+90 mmHg</td></tr>
+    </tbody>
+  </table>
+
+  <!-- PRESION AURICULA -->
+  <p class="section-title">Presión auricular derecha (presión venosa central)</p>
+  <div class="grid-2">
+    <div class="card card-orange">
+      <span class="card-label">Normal</span>
+      <h3>≈ 0 mmHg</h3>
+      <p>Equilibrio entre capacidad de bombeo del corazón derecho y retorno venoso.</p>
+    </div>
+    <div class="card card-red">
+      <span class="card-label">Elevada → Clínica</span>
+      <ul>
+        <li>Puede llegar a <span class="val">20–30 mmHg</span> en:</li>
+        <li>Insuficiencia cardíaca grave</li>
+        <li>Transfusión masiva de sangre</li>
+        <li>Cuando &gt;+4–6 mmHg: los puntos de colapso venoso se abren → ingurgitación yugular</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     CAP. 16
+     ====================================================== -->
+<div id="s16" class="section">
+  <div class="chapter-header">
+    <div class="chap-num">16</div>
+    <div class="chapter-meta">
+      <h2>La microcirculación y el sistema linfático</h2>
+      <p>Capilares · Fuerzas de Starling · Edema · Sistema linfático</p>
+    </div>
+  </div>
+
+  <!-- MICROCIRCULACION -->
+  <p class="section-title">Estructura de la microcirculación</p>
+  <div class="flow">
+    <span class="flow-item">Arteria nutricia</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Arteriola (6–8 ram.)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Metaarteriola (2–5 ram.)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Esfínter precapilar</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Capilar (5–9 µm)</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Vénula</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-item">Vena</span>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px">
+    <div class="card card-orange">
+      <span class="card-label">Arteriolas ★</span>
+      <h3>Reguladoras maestras del flujo</h3>
+      <p>Alta musculatura. Pueden abrir o cerrar el vaso completamente. Controlan la resistencia periférica local.</p>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Metaarteriolas + Esfínter precapilar</span>
+      <h3>Vasomotilidad</h3>
+      <p>El esfínter precapilar se contrae y relaja intermitentemente (cada segundos/minutos). Controla el flujo hacia cada capilar individual → flujo intermitente, no continuo.</p>
+    </div>
+  </div>
+
+  <!-- PARED CAPILAR -->
+  <p class="section-title">Estructura de la pared capilar</p>
+  <div class="card card-blue" style="margin-bottom:20px">
+    <span class="card-label">Dimensiones</span>
+    <ul>
+      <li>Pared: monocapa de células endoteliales + membrana basal</li>
+      <li>Espesor total de la pared: <span class="val">≈0.5 µm</span></li>
+      <li>Diámetro interno: <span class="val">4–9 µm</span> (barely suficiente para 1 eritrocito)</li>
+    </ul>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-teal">
+      <span class="card-label">Poro 1: Espacio intercelular</span>
+      <p>Canal curvo entre células endoteliales adyacentes. Permite paso de <strong>agua, iones y moléculas pequeñas hidrosolubles</strong>.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Poro 2: Cavéolas / Vesículas de plasmalema</span>
+      <p>Formadas por caveolinas. Función de <strong>endocitosis y transcitosis</strong>. Permiten paso de macromoléculas.</p>
+    </div>
+  </div>
+
+  <!-- PERMEABILIDAD ORGANOS -->
+  <p class="section-title">Permeabilidad capilar según órgano ★</p>
+  <table class="data-table">
+    <thead><tr><th>Órgano</th><th>Permeabilidad</th><th>Nota clínica</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Cerebro</strong></td><td class="val">Mínima (BHE)</td><td>Solo O₂, CO₂, moléculas muy pequeñas. Barrera hematoencefálica.</td></tr>
+      <tr><td><strong>Hígado</strong></td><td class="val">Máxima</td><td>Casi todas las sustancias pasan. Fundamental para metabolismo.</td></tr>
+      <tr><td><strong>Intestino</strong></td><td class="val">Media</td><td>Absorción de nutrientes post-digestivos.</td></tr>
+      <tr><td><strong>Glomérulo renal</strong></td><td class="val">Alta (fenestraciones)</td><td>Filtración masiva. Barrera: podocitos + MB + endotelio.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- INTERCAMBIO SUSTANCIAS -->
+  <p class="section-title">Mecanismos de intercambio capilar</p>
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Sustancias liposolubles</span>
+      <h3>Difusión directa a través de la membrana</h3>
+      <p>O₂, CO₂: difunden directamente a través de la membrana lipídica de las células endoteliales. No requieren poros.</p>
+    </div>
+    <div class="card card-blue">
+      <span class="card-label">Sustancias hidrosolubles</span>
+      <h3>Solo por los poros</h3>
+      <p>Agua, Na⁺, Cl⁻, glucosa. Paso en función de tamaño molecular y gradiente de concentración. Las proteínas NO cruzan fácilmente.</p>
+    </div>
+  </div>
+
+  <!-- INTERSTICIO -->
+  <p class="section-title">El intersticio y el líquido intersticial</p>
+  <div class="grid-2">
+    <div class="card card-teal">
+      <span class="card-label">Fibras de colágeno</span>
+      <p>Proporcionan la mayor parte de la fuerza tensional tisular.</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Filamentos de proteoglucanos ★</span>
+      <p>Compuestos en <strong>98% de ácido hialurónico</strong> y 2% proteínas. Atrapan agua y la convierten en <strong>gel</strong>. En edema, el líquido libre aumenta drásticamente.</p>
+    </div>
+  </div>
+
+  <!-- FUERZAS STARLING -->
+  <p class="section-title">Fuerzas de Starling ★★★</p>
+  <div class="formula-box">
+    <span class="formula">PFN = Pc − Pif − Πp + Πif</span>
+    <span class="formula-desc">PFN = Presión Filtración Neta | Pc = presión hidrostática capilar | Pif = presión hidrostática intersticial (negativa) | Πp = presión oncótica plasmática | Πif = presión oncótica intersticial</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-red">
+      <span class="card-label">Fuerzas de SALIDA (filtración)</span>
+      <ul>
+        <li>Presión capilar hidrostática: <span class="val">+25 mmHg</span></li>
+        <li>Pres. hidrostática intersticial negativa: <span class="val">+3 mmHg</span></li>
+        <li>Presión oncótica intersticial (Πif): <span class="val">+8 mmHg</span></li>
+        <li><strong>Total salida: 41 mmHg</strong></li>
+      </ul>
+    </div>
+    <div class="card card-teal">
+      <span class="card-label">Fuerzas de ENTRADA (absorción)</span>
+      <ul>
+        <li>Presión oncótica plasmática (Πp): <span class="val">+28 mmHg</span></li>
+        <li><strong>Total entrada: 28 mmHg</strong></li>
+        <li>→ PFN extremo arterial: <span class="val">+13 mmHg</span> (filtración)</li>
+        <li>→ PFN extremo venoso: <span class="val">−7 mmHg</span> (absorción)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- EQUILIBRIO STARLING -->
+  <p class="section-title">Equilibrio de Starling</p>
+  <div class="starling">
+    <div class="starling-header">VALORES MEDIOS — EQUILIBRIO GLOBAL</div>
+    <div class="starling-row"><span class="label">Presión capilar media</span><span class="num">17.3 mmHg</span></div>
+    <div class="starling-row"><span class="label">Presión hidrostática intersticial (negativa)</span><span class="num">3 mmHg</span></div>
+    <div class="starling-row"><span class="label">Presión oncótica intersticial</span><span class="num">8 mmHg</span></div>
+    <div class="starling-row"><span class="label"><strong>TOTAL FUERZAS DE SALIDA</strong></span><span class="num">28.3 mmHg</span></div>
+    <div class="starling-row"><span class="label">Presión oncótica plasmática (albumina 80%)</span><span class="num">28 mmHg</span></div>
+    <div class="starling-row"><span class="label"><strong>TOTAL FUERZAS DE ENTRADA</strong></span><span class="num">28 mmHg</span></div>
+    <div class="starling-row"><span class="label" style="color:var(--accent3)"><strong>FUERZA DE SALIDA NETA</strong></span><span class="num" style="color:var(--accent3)">≈ 0.3 mmHg</span></div>
+  </div>
+
+  <div class="highlight-box">
+    <p>⚑ El ligero exceso de filtración neta (0.3 mmHg) es <strong>reabsorbido por el sistema linfático</strong>. Si la presión capilar sube más de 17 mmHg → filtración supera capacidad linfática → <strong>EDEMA</strong>.</p>
+    <p style="margin-top:8px">Un aumento de <strong>20 mmHg</strong> en la presión capilar genera una filtración <strong>68 veces mayor</strong> que la normal.</p>
+  </div>
+
+  <!-- PRESION ONCOTICA -->
+  <p class="section-title">Presión coloidosmótica plasmática ★</p>
+  <table class="data-table">
+    <thead><tr><th>Proteína</th><th>Concentración (g/dl)</th><th>Presión oncótica (mmHg)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Albúmina</strong></td><td class="val">4.5</td><td class="val">21.8</td></tr>
+      <tr><td>Globulinas</td><td class="val">2.5</td><td class="val">6.0</td></tr>
+      <tr><td>Fibrinógeno</td><td class="val">0.3</td><td class="val">0.2</td></tr>
+      <tr><td><strong>Total</strong></td><td class="val">7.3</td><td class="val"><strong>28</strong></td></tr>
+    </tbody>
+  </table>
+  <div class="highlight-box">
+    <p>⚑ La <strong>albúmina representa ~80%</strong> de la presión oncótica total. En hipoalbuminemia (cirrosis, desnutrición, síndrome nefrótico) → Πp cae → balance favorece filtración → <strong>edema</strong>.</p>
+    <p style="margin-top:6px">Plasma: 7.3 g/dl proteínas | Intersticio: 2–3 g/dl (3× menor) — gracias al sistema linfático.</p>
+  </div>
+
+  <!-- SISTEMA LINFATICO -->
+  <p class="section-title">Sistema linfático ★</p>
+  <div class="grid-2">
+    <div class="card card-blue">
+      <span class="card-label">Función</span>
+      <h3>Mecanismo de desbordamiento</h3>
+      <p>Devuelve a la circulación el exceso de proteínas y volumen de los espacios tisulares. Aproximadamente <strong>1/10 del fluido filtrado</strong> entra a los capilares linfáticos (resto se reabsorbe en el extremo venoso).</p>
+    </div>
+    <div class="card card-orange">
+      <span class="card-label">Flujo linfático</span>
+      <h3>Datos cuantitativos</h3>
+      <ul>
+        <li>Velocidad en reposo: <span class="val">120 ml/h</span></li>
+        <li>Producción total diaria: <span class="val">2–3 L/día</span></li>
+        <li>Se vacía en la vena subclavia (conducto torácico)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-teal">
+      <span class="card-label">Bomba linfática intrínseca</span>
+      <p>El llenado de un segmento linfático provoca su contracción automática → bombea linfa al siguiente segmento (válvulas impiden reflujo).</p>
+    </div>
+    <div class="card card-red">
+      <span class="card-label">Bombeo extrínseco</span>
+      <ul>
+        <li>Contracción de músculos esqueléticos</li>
+        <li>Movimientos corporales</li>
+        <li>Pulsaciones de arterias adyacentes</li>
+        <li>Compresión externa (vendajes, masajes)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>El sistema linfático controla:</strong> (1) concentración de proteínas intersticiales, (2) volumen del líquido intersticial, (3) presión del líquido intersticial.</p>
+    <p style="margin-top:6px"><strong>Linfedema:</strong> cuando los vasos linfáticos se obstruyen o se extirpan (ej. mastectomía) → acumulación de proteínas en intersticio → edema rico en proteínas, duro, crónico.</p>
+  </div>
+</div>
+
+<!-- ======================================================
+     QUIZ
+     ====================================================== -->
+<div id="quiz" class="section">
+  <div class="chapter-header">
+    <div class="chap-num" style="font-size:3rem">?</div>
+    <div class="chapter-meta">
+      <h2>Preguntas clave de repaso</h2>
+      <p>Haz clic en cada pregunta para revelar la respuesta</p>
+    </div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q01]</span>
+      Si la presión en ambos extremos de un vaso es de 100 mmHg, ¿cuál es el flujo sanguíneo?
+    </div>
+    <div class="quiz-a"><strong>Flujo = 0.</strong> Según la Ley de Ohm (F = ΔP/R), el flujo depende de la DIFERENCIA de presión. Si P₁ = P₂ = 100 mmHg, entonces ΔP = 0 y por lo tanto F = 0, sin importar el valor absoluto de presión.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q02]</span>
+      Si el radio de una arteriola se duplica, ¿cuánto aumenta el flujo? (Ley de la cuarta potencia)
+    </div>
+    <div class="quiz-a"><strong>El flujo aumenta 16 veces (2⁴ = 16).</strong> Esto explica por qué las arteriolas son tan efectivas controlando el flujo: pequeños cambios en su calibre producen enormes cambios en el flujo tisular.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q03]</span>
+      Un paciente tiene hematocrito de 65% (policitemia). ¿Cómo afecta esto al flujo sanguíneo y por qué?
+    </div>
+    <div class="quiz-a"><strong>El flujo disminuye.</strong> Mayor HTC → mayor viscosidad sanguínea (hasta 10× el agua). Por la Ley de Poiseuille, flujo es inversamente proporcional a la viscosidad (η). Mayor viscosidad → mayor resistencia → menor flujo. Riesgo de trombosis.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q04]</span>
+      ¿Qué diferencia a distensibilidad de compliancia vascular?
+    </div>
+    <div class="quiz-a"><strong>Distensibilidad</strong> es el cambio fraccional de volumen por mmHg (propiedad intrínseca de la pared). <strong>Compliancia = Distensibilidad × Volumen</strong> (capacidad de almacenamiento real). Un vaso muy distensible pero pequeño puede tener MENOS compliancia que uno poco distensible pero de gran volumen.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q05]</span>
+      ¿Por qué la PAM no es el promedio aritmético simple de PAS y PAD?
+    </div>
+    <div class="quiz-a"><strong>Porque la diástole ocupa más tiempo del ciclo cardíaco.</strong> En frecuencia normal, ~2/3 del ciclo es diástole. Por eso PAM = (2×PAD + PAS) / 3, y se acerca más a la PAD que a la PAS.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q06]</span>
+      ¿Qué indica el primer y el último ruido de Korotkoff?
+    </div>
+    <div class="quiz-a"><strong>Primer ruido (Fase 1) → Presión Sistólica.</strong> Es el primer golpe audible al desinflar el manguito. <strong>Último ruido (Fase 5) → Presión Diastólica.</strong> Cuando el ruido cesa completamente, la arteria está libre de compresión durante todo el ciclo. Si no hay Fase 5 (ej. embarazo), se usa la Fase 4.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q07]</span>
+      Enumera las cuatro fuerzas de Starling y la dirección de acción de cada una.
+    </div>
+    <div class="quiz-a">
+      <strong>Fuerzas de salida (filtración):</strong><br>
+      1. Presión hidrostática capilar (Pc): empuja líquido hacia fuera — normal 17–30 mmHg.<br>
+      2. Presión hidrostática intersticial negativa (Pif): succiona líquido hacia fuera — normal −3 mmHg.<br>
+      3. Presión oncótica intersticial (Πif): atrae líquido hacia fuera — normal 8 mmHg.<br><br>
+      <strong>Fuerza de entrada (absorción):</strong><br>
+      4. Presión oncótica plasmática (Πp): atrae líquido hacia el interior — normal 28 mmHg (80% albúmina).
+    </div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q08]</span>
+      Un paciente con cirrosis hepática desarrolla ascitis (líquido en peritoneo). ¿Qué fuerza de Starling está alterada?
+    </div>
+    <div class="quiz-a"><strong>Presión oncótica plasmática (Πp) disminuida.</strong> El hígado cirrótico no sintetiza suficiente albúmina → hipoalbuminemia → Πp cae → las fuerzas de filtración predominan sobre las de absorción → edema generalizado y ascitis. Además puede haber hipertensión portal (↑ Pc) que agrava el cuadro.</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q09]</span>
+      ¿Por qué los capilares del hígado tienen mayor permeabilidad que los del cerebro?
+    </div>
+    <div class="quiz-a">El <strong>hígado</strong> necesita recibir y procesar casi todas las sustancias absorbidas desde el intestino → sus capilares tienen amplias aperturas (sinusoides) para permitir el paso libre. El <strong>cerebro</strong> requiere un microambiente muy controlado → la barrera hematoencefálica tiene uniones endoteliales extremadamente estrechas, permitiendo solo moléculas muy pequeñas y liposolubles (O₂, CO₂, glucosa por transportadores).</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-q" onclick="toggleQuiz(this)">
+      <span class="quiz-icon">[Q10]</span>
+      ¿Cómo se relacionan el gasto cardíaco (DC), la presión arterial (PA) y la resistencia periférica total (RPT)?
+    </div>
+    <div class="quiz-a"><strong>PA = DC × RPT.</strong> Esta es la ecuación fundamental de la hemodinamia. Si la RPT aumenta sin cambio en DC → PA aumenta. Si el DC aumenta sin cambio en RPT → PA aumenta. El organismo puede manipular cualquiera de las dos variables para regular la PA (SNS controla RPT a corto plazo; riñón controla volemia y DC a largo plazo).</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const btns = document.querySelectorAll('.nav-btn');
+    const map = { s14: 0, s15: 1, s16: 2, quiz: 3 };
+    btns[map[id]].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleQuiz(el) {
+    const ans = el.nextElementSibling;
+    ans.classList.toggle('open');
+    el.style.color = ans.classList.contains('open') ? 'var(--accent4)' : '';
+  }
+</script>
+
+</body>
+</html>

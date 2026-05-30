@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLETA.AI — Seu Coach Pessoal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111418;
+    --surface2: #181c22;
+    --border: #1e2530;
+    --accent-run: #ff4d1c;
+    --accent-swim: #00b4d8;
+    --accent-gym: #a259ff;
+    --accent-bike: #f7c948;
+    --accent-nutri: #2dce89;
+    --text: #e8ecf0;
+    --text-dim: #6b7685;
+    --text-mid: #9aa3ae;
+    --glow-run: rgba(255,77,28,0.18);
+    --glow-swim: rgba(0,180,216,0.18);
+    --glow-gym: rgba(162,89,255,0.18);
+    --glow-bike: rgba(247,201,72,0.18);
+    --glow-nutri: rgba(45,206,137,0.18);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    overflow: hidden;
+  }
+
+  /* LAYOUT */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 100vh;
+    height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+  .logo span { color: var(--accent-run); }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* MODE SELECTOR */
+  .mode-section {
+    padding: 16px 12px 8px;
+  }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-mid);
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+  .mode-btn:hover { background: var(--surface2); color: var(--text); }
+  .mode-btn.active { color: var(--text); font-weight: 600; }
+
+  .mode-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .mode-btn[data-mode="run"] .mode-icon    { background: var(--glow-run);  color: var(--accent-run); }
+  .mode-btn[data-mode="swim"] .mode-icon   { background: var(--glow-swim); color: var(--accent-swim); }
+  .mode-btn[data-mode="gym"] .mode-icon    { background: var(--glow-gym);  color: var(--accent-gym); }
+  .mode-btn[data-mode="bike"] .mode-icon   { background: var(--glow-bike); color: var(--accent-bike); }
+  .mode-btn[data-mode="nutri"] .mode-icon  { background: var(--glow-nutri);color: var(--accent-nutri);}
+
+  .mode-btn[data-mode="run"].active    { background: var(--glow-run); }
+  .mode-btn[data-mode="swim"].active   { background: var(--glow-swim); }
+  .mode-btn[data-mode="gym"].active    { background: var(--glow-gym); }
+  .mode-btn[data-mode="bike"].active   { background: var(--glow-bike); }
+  .mode-btn[data-mode="nutri"].active  { background: var(--glow-nutri); }
+
+  .mode-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .mode-btn.active .mode-dot { opacity: 1; }
+  .mode-btn[data-mode="run"].active .mode-dot    { background: var(--accent-run); }
+  .mode-btn[data-mode="swim"].active .mode-dot   { background: var(--accent-swim); }
+  .mode-btn[data-mode="gym"].active .mode-dot    { background: var(--accent-gym); }
+  .mode-btn[data-mode="bike"].active .mode-dot   { background: var(--accent-bike); }
+  .mode-btn[data-mode="nutri"].active .mode-dot  { background: var(--accent-nutri); }
+
+  /* PROFILE */
+  .profile-section {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .profile-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .profile-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .profile-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+  }
+  .profile-field label {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+  .profile-field input, .profile-field select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: 'Barlow', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .profile-field input:focus, .profile-field select:focus {
+    border-color: var(--accent-swim);
+  }
+  .profile-field select option { background: var(--surface); }
+
+  .save-profile-btn {
+    width: 100%;
+    padding: 7px;
+    background: var(--accent-swim);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+  }
+  .save-profile-btn:hover { opacity: 0.85; }
+
+  /* MAIN CHAT */
+  .main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* CHAT HEADER */
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .chat-mode-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 8px;
+    border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .chat-mode-badge .badge-icon { font-size: 16px; }
+
+  #badge-run    { background: var(--glow-run);  color: var(--accent-run); }
+  #badge-swim   { background: var(--glow-swim); color: var(--accent-swim); }
+  #badge-gym    { background: var(--glow-gym);  color: var(--accent-gym); }
+  #badge-bike   { background: var(--glow-bike); color: var(--accent-bike); }
+  #badge-nutri  { background: var(--glow-nutri);color: var(--accent-nutri);}
+
+  .chat-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.3px;
+  }
+
+  .clear-btn {
+    margin-left: auto;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .clear-btn:hover { border-color: var(--text-mid); color: var(--text); }
+
+  /* MESSAGES */
+  .messages-wrap {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  .messages-wrap::-webkit-scrollbar { width: 4px; }
+  .messages-wrap::-webkit-scrollbar-track { background: transparent; }
+  .messages-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* WELCOME */
+  .welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    text-align: center;
+    flex: 1;
+    min-height: 300px;
+  }
+
+  .welcome-icon {
+    font-size: 52px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 20px currentColor);
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
+  .welcome-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .welcome-sub {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 380px;
+    margin-bottom: 24px;
+  }
+
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 500px;
+  }
+
+  .chip {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-mid);
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Barlow', sans-serif;
+  }
+  .chip:hover {
+    border-color: var(--accent-swim);
+    color: var(--accent-swim);
+    background: var(--glow-swim);
+  }
+
+  /* MESSAGE BUBBLES */
+  .message {
+    display: flex;
+    gap: 12px;
+    animation: msgIn 0.25s ease-out;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .avatar.ai {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+
+  .avatar.user-av {
+    background: var(--glow-swim);
+    border: 1px solid var(--accent-swim);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-swim);
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .bubble {
+    max-width: 680px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .message.ai .bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--text);
+  }
+
+  .message.user .bubble {
+    background: var(--glow-swim);
+    border: 1px solid rgba(0,180,216,0.3);
+    border-top-right-radius: 4px;
+    color: var(--text);
+  }
+
+  .bubble strong { color: inherit; font-weight: 600; }
+  .bubble em { color: var(--text-mid); font-style: normal; }
+  .bubble code {
+    background: rgba(255,255,255,0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  /* Markdown-like rendering */
+  .bubble ul, .bubble ol {
+    padding-left: 18px;
+    margin: 6px 0;
+  }
+  .bubble li { margin-bottom: 3px; }
+  .bubble h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    margin: 10px 0 4px;
+  }
+  .bubble p { margin-bottom: 6px; }
+  .bubble p:last-child { margin-bottom: 0; }
+
+  .mode-stripe {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* TYPING */
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .typing-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    animation: typingBounce 1.2s ease-in-out infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-box {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    min-height: 46px;
+    max-height: 140px;
+    overflow-y: auto;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+  .input-box:focus { border-color: var(--accent-swim); }
+  .input-box::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .send-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* Mode-specific send button color */
+  .send-run   { background: var(--accent-run);  color: #fff; }
+  .send-swim  { background: var(--accent-swim); color: #000; }
+  .send-gym   { background: var(--accent-gym);  color: #fff; }
+  .send-bike  { background: var(--accent-bike); color: #000; }
+  .send-nutri { background: var(--accent-nutri);color: #000; }
+
+  .send-run:hover:not(:disabled)   { filter: brightness(1.1); }
+  .send-swim:hover:not(:disabled)  { filter: brightness(1.1); }
+  .send-gym:hover:not(:disabled)   { filter: brightness(1.1); }
+  .send-bike:hover:not(:disabled)  { filter: brightness(1.1); }
+  .send-nutri:hover:not(:disabled) { filter: brightness(1.1); }
+
+  /* ACCENT COLORS PER MODE */
+  .color-run   { color: var(--accent-run); }
+  .color-swim  { color: var(--accent-swim); }
+  .color-gym   { color: var(--accent-gym); }
+  .color-bike  { color: var(--accent-bike); }
+  .color-nutri { color: var(--accent-nutri); }
+
+  .stripe-run   { background: var(--glow-run);  color: var(--accent-run); }
+  .stripe-swim  { background: var(--glow-swim); color: var(--accent-swim); }
+  .stripe-gym   { background: var(--glow-gym);  color: var(--accent-gym); }
+  .stripe-bike  { background: var(--glow-bike); color: var(--accent-bike); }
+  .stripe-nutri { background: var(--glow-nutri);color: var(--accent-nutri);}
+
+  /* API KEY MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    width: 420px;
+    max-width: 90vw;
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .modal-desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus { border-color: var(--accent-swim); }
+
+  .modal-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent-swim);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .modal-btn:hover { opacity: 0.85; }
+  .modal-note {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 10px;
+  }
+  .modal-note a { color: var(--accent-swim); text-decoration: none; }
+
+  /* HISTORY SECTION */
+  .history-section {
+    padding: 8px 12px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .history-section::-webkit-scrollbar { width: 3px; }
+  .history-section::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .history-item {
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .history-item:hover { background: var(--surface2); color: var(--text-mid); }
+  .history-icon { font-size: 11px; flex-shrink: 0; }
+
+  .error-bubble {
+    background: rgba(255,77,28,0.1);
+    border: 1px solid rgba(255,77,28,0.3);
+    color: var(--accent-run);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <div class="modal-title">🔑 Chave da API</div>
+    <div class="modal-desc">Cole sua chave da API Anthropic abaixo para ativar o coach. Ela fica salva localmente no seu navegador.</div>
+    <input type="password" class="modal-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
+    <button class="modal-btn" onclick="saveApiKey()">ATIVAR COACH →</button>
+    <div class="modal-note">
+      Não tem uma chave? <a href="https://console.anthropic.com" target="_blank">Crie em console.anthropic.com</a>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">ATLETA<span>.</span>AI</div>
+      <div class="logo-sub">Personal Coach</div>
+    </div>
+
+    <div class="mode-section">
+      <div class="section-label">Modalidade</div>
+      <button class="mode-btn active" data-mode="run" onclick="setMode('run')">
+        <span class="mode-icon">🏃</span>
+        Corrida
+        <span class="mode-dot"></span>
+      </button>
+      <button class="mode-btn" data-mode="swim" onclick="setMode('swim')">
+        <span class="mode-icon">🏊</span>
+        Natação
+        <span class="mode-dot"></span>
+      </button>
+      <button class="mode-btn" data-mode="gym" onclick="setMode('gym')">
+        <span class="mode-icon">🏋️</span>
+        Musculação
+        <span class="mode-dot"></span>
+      </button>
+      <button class="mode-btn" data-mode="bike" onclick="setMode('bike')">
+        <span class="mode-icon">🚴</span>
+        Bike
+        <span class="mode-dot"></span>
+      </button>
+      <button class="mode-btn" data-mode="nutri" onclick="setMode('nutri')">
+        <span class="mode-icon">🥗</span>
+        Nutrição
+        <span class="mode-dot"></span>
+      </button>
+    </div>
+
+    <div style="border-top: 1px solid var(--border); margin: 0 12px;"></div>
+
+    <div class="history-section" id="historySection">
+      <div class="section-label" style="padding: 10px 8px 6px;">Histórico</div>
+      <div id="historyList"></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-card">
+        <div class="profile-label">Perfil do Atleta</div>
+        <div class="profile-field">
+          <label>Nome</label>
+          <input type="text" id="pNome" placeholder="André" value="">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div class="profile-field">
+            <label>Idade</label>
+            <input type="number" id="pIdade" placeholder="21" min="10" max="99">
+          </div>
+          <div class="profile-field">
+            <label>Peso (kg)</label>
+            <input type="number" id="pPeso" placeholder="75" step="0.1">
+          </div>
+        </div>
+        <div class="profile-field">
+          <label>Objetivo Principal</label>
+          <select id="pObjetivo">
+            <option value="performance">Performance / Competição</option>
+            <option value="hipertrofia">Hipertrofia</option>
+            <option value="emagrecimento">Emagrecimento</option>
+            <option value="saude">Saúde Geral</option>
+            <option value="resistencia">Resistência</option>
+          </select>
+        </div>
+        <button class="save-profile-btn" onclick="saveProfile()">SALVAR PERFIL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="chat-header">
+      <div class="chat-mode-badge" id="modeBadge">
+        <span class="badge-icon" id="badgeIcon">🏃</span>
+        <span id="badgeText">CORRIDA</span>
+      </div>
+      <div class="chat-title" id="chatTitle">Coach de Corrida</div>
+      <button class="clear-btn" onclick="clearChat()">
+        <span>⊘</span> Nova conversa
+      </button>
+    </div>
+
+    <div class="messages-wrap" id="messagesWrap">
+      <div class="welcome-card" id="welcomeCard">
+        <div class="welcome-icon color-run" id="welcomeIcon">🏃</div>
+        <div class="welcome-title" id="welcomeTitle">Coach de Corrida</div>
+        <div class="welcome-sub" id="welcomeSub">Pergunte sobre treinos, planilhas, pacing, recuperação — estou aqui para turbinar sua performance.</div>
+        <div class="quick-chips" id="quickChips"></div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <textarea
+          class="input-box"
+          id="msgInput"
+          placeholder="Manda sua dúvida…"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn send-run" id="sendBtn" onclick="sendMessage()" disabled>
+          ➤
+        </button>
+      </div>
+      <div class="input-hint">Enter para enviar · Shift+Enter para nova linha</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+let apiKey = localStorage.getItem('atleta_ai_key') || '';
+let currentMode = 'run';
+let conversations = {};  // mode -> [{role, content}]
+let profile = JSON.parse(localStorage.getItem('atleta_profile') || '{}');
+let sessionHistory = {};  // mode -> [{icon, preview}]
+
+// ==================== MODE CONFIG ====================
+const MODES = {
+  run: {
+    label: 'CORRIDA', title: 'Coach de Corrida',
+    icon: '🏃', color: 'run',
+    badge: 'badge-run',
+    chips: [
+      'Monte uma planilha de 8 semanas para 5km',
+      'Como calcular meu pace ideal?',
+      'Treino intervalado para iniciantes',
+      'Como evitar lesões no joelho?'
+    ],
+    sub: 'Pergunte sobre treinos, planilhas, pacing, recuperação — estou aqui para turbinar sua performance.',
+    system: `Você é um coach especialista em corrida de rua e atletismo. Você ajuda atletas com:
+- Planilhas de treino periodizadas (base, específico, competição)
+- Cálculo de paces e zonas de frequência cardíaca
+- Técnica de corrida e economia de movimento
+- Prevenção e recuperação de lesões
+- Estratégias de prova e periodização anual
+- Treinos intervalados, longões, fartleks, tempo runs
+Use sempre linguagem clara e prática. Quando criar planilhas, use tabelas organizadas. Dê exemplos concretos com distâncias, paces e tempos. Adapte as recomendações ao perfil do atleta quando fornecido.`
+  },
+  swim: {
+    label: 'NATAÇÃO', title: 'Coach de Natação',
+    icon: '🏊', color: 'swim',
+    badge: 'badge-swim',
+    chips: [
+      'Planilha para os 100m livre',
+      'Como melhorar a virada',
+      'Exercícios de pernada',
+      'Treino de velocidade explosiva'
+    ],
+    sub: 'Especialista em natação competitiva — técnica, planilhas e performance para o seu sprint.',
+    system: `Você é um coach especialista em natação competitiva, com foco em provas de velocidade (50m, 100m, 200m). Você ajuda atletas com:
+- Planilhas de treino periorizadas para provas de velocidade e fundo
+- Técnica dos quatro estilos: crawl, costas, peito, borboleta
+- Trabalho de saída (largada), virada (flip turn) e chegada
+- Séries de resistência e velocidade com metragem e pausas
+- Desenvolvimento da pernada, braçada e respiração
+- Treino de potência e explosão para sprinters
+- Periodização e tapering pré-competição
+Use linguagem técnica mas acessível. Detalhe séries com metragem, pausas e intensidade (ex: 8x50m c/ 30s de pausa, 85% esforço). Adapte ao perfil do atleta.`
+  },
+  gym: {
+    label: 'MUSCULAÇÃO', title: 'Coach de Musculação',
+    icon: '🏋️', color: 'gym',
+    badge: 'badge-gym',
+    chips: [
+      'Treino de força para natador',
+      'Série ABC para hipertrofia',
+      'Exercícios de core para nadadores',
+      'Como estruturar minha semana?'
+    ],
+    sub: 'Programação de força, hipertrofia e potência — treinos inteligentes para seu objetivo.',
+    system: `Você é um coach especialista em musculação, treinamento de força e condicionamento físico. Você ajuda atletas com:
+- Programação de treinos (ABC, ABCDE, Upper/Lower, Push/Pull/Legs, Full Body)
+- Periodização linear, ondulatória e em bloco
+- Hipertrofia, força máxima, potência e resistência muscular
+- Exercícios específicos para cada grupo muscular com técnica correta
+- Complementação de musculação para atletas de outras modalidades (natação, corrida, ciclismo)
+- Core training, mobilidade e prevenção de lesões
+- Volume, intensidade, frequência e progressão de cargas
+Quando criar treinos, liste exercícios com séries, repetições, tempo de descanso e observações de técnica. Adapte ao perfil e objetivo do atleta.`
+  },
+  bike: {
+    label: 'BIKE', title: 'Coach de Ciclismo',
+    icon: '🚴', color: 'bike',
+    badge: 'badge-bike',
+    chips: [
+      'Treino de potência para iniciantes',
+      'Como calcular meu FTP?',
+      'Planilha de 4 semanas base aeróbica',
+      'Pedalada eficiente: dicas de técnica'
+    ],
+    sub: 'Ciclismo, mountain bike, gravel — treinamento baseado em potência e performance.',
+    system: `Você é um coach especialista em ciclismo (road, MTB, gravel, triathlon). Você ajuda atletas com:
+- Treinamento baseado em potência (watts) e frequência cardíaca
+- Cálculo e teste de FTP (Functional Threshold Power)
+- Zonas de treinamento (Z1-Z7) e como usá-las
+- Planilhas periodizadas: base aeróbica, desenvolvimento, pico
+- Treinos em rolo/trainer e ao ar livre
+- Trabalho de cadência, subidas, sprints e contrarrelógio
+- Posição na bicicleta e fit
+- Nutrição e hidratação em longas distâncias
+Use linguagem técnica com métricas reais (watts, cadência, %FTP). Crie séries detalhadas com durações e intensidades.`
+  },
+  nutri: {
+    label: 'NUTRIÇÃO', title: 'Nutrição Esportiva',
+    icon: '🥗', color: 'nutri',
+    badge: 'badge-nutri',
+    chips: [
+      'O que comer antes de treinar?',
+      'Plano alimentar para ganho de massa',
+      'Suplementação para nadadores',
+      'Hidratação durante treinos intensos'
+    ],
+    sub: 'Nutrição esportiva funcional — combustível certo para performance e recuperação.',
+    system: `Você é um nutricionista esportivo especialista em nutrição para atletas de diversas modalidades. Você ajuda com:
+- Planejamento alimentar para performance, hipertrofia, emagrecimento ou saúde
+- Timing nutricional: pré-treino, intra-treino e pós-treino
+- Macronutrientes e micronutrientes essenciais para atletas
+- Suplementação esportiva baseada em evidências (creatina, cafeína, proteína, BCAAs, carboidratos)
+- Hidratação e estratégias de eletrólitos
+- Refeições práticas e saborosas para rotina de atleta
+- Nutrição específica por modalidade (corrida, natação, ciclismo, musculação)
+- Dieta periódica e ciclagem de carboidratos
+Seja sempre prático: dê exemplos de refeições com ingredientes reais, quantidades em gramas/colheres e macros aproximados quando relevante. Baseie-se em evidências científicas.`
+  }
+};
+
+// ==================== INIT ====================
+window.onload = () => {
+  loadProfile();
+  updateUI();
+  if (!apiKey) {
+    document.getElementById('apiModal').style.display = 'flex';
+  } else {
+    document.getElementById('apiModal').style.display = 'none';
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('msgInput').disabled = false;
+  }
+  document.getElementById('msgInput').addEventListener('input', () => {
+    document.getElementById('sendBtn').disabled = document.getElementById('msgInput').value.trim() === '' || !apiKey;
+  });
+};
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-')) {
+    document.getElementById('apiKeyInput').style.borderColor = 'var(--accent-run)';
+    return;
+  }
+  apiKey = key;
+  localStorage.setItem('atleta_ai_key', key);
+  document.getElementById('apiModal').style.display = 'none';
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('msgInput').disabled = false;
+}
+
+function loadProfile() {
+  if (profile.nome) document.getElementById('pNome').value = profile.nome;
+  if (profile.idade) document.getElementById('pIdade').value = profile.idade;
+  if (profile.peso) document.getElementById('pPeso').value = profile.peso;
+  if (profile.objetivo) document.getElementById('pObjetivo').value = profile.objetivo;
+}
+
+function saveProfile() {
+  profile = {
+    nome: document.getElementById('pNome').value,
+    idade: document.getElementById('pIdade').value,
+    peso: document.getElementById('pPeso').value,
+    objetivo: document.getElementById('pObjetivo').value
+  };
+  localStorage.setItem('atleta_profile', JSON.stringify(profile));
+  const btn = document.querySelector('.save-profile-btn');
+  btn.textContent = '✓ SALVO!';
+  setTimeout(() => btn.textContent = 'SALVAR PERFIL', 1500);
+}
+
+// ==================== MODE ====================
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+  updateUI();
+  renderMessages();
+}
+
+function updateUI() {
+  const m = MODES[currentMode];
+
+  // Badge
+  const badge = document.getElementById('modeBadge');
+  badge.className = 'chat-mode-badge';
+  badge.id = `badge-${currentMode}`;
+  badge.style.cssText = '';
+  badge.setAttribute('id', `badge-${currentMode}`);
+  // force inline style for badge
+  const colors = {
+    run:   ['var(--glow-run)',  'var(--accent-run)'],
+    swim:  ['var(--glow-swim)', 'var(--accent-swim)'],
+    gym:   ['var(--glow-gym)',  'var(--accent-gym)'],
+    bike:  ['var(--glow-bike)', 'var(--accent-bike)'],
+    nutri: ['var(--glow-nutri)','var(--accent-nutri)'],
+  };
+  badge.style.background = colors[currentMode][0];
+  badge.style.color = colors[currentMode][1];
+
+  document.getElementById('badgeIcon').textContent = m.icon;
+  document.getElementById('badgeText').textContent = m.label;
+  document.getElementById('chatTitle').textContent = m.title;
+
+  // Send button
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.className = `send-btn send-${currentMode}`;
+
+  // Welcome
+  document.getElementById('welcomeIcon').textContent = m.icon;
+  document.getElementById('welcomeIcon').className = `welcome-icon color-${currentMode}`;
+  document.getElementById('welcomeTitle').textContent = m.title;
+  document.getElementById('welcomeSub').textContent = m.sub;
+
+  // Chips
+  const chips = document.getElementById('quickChips');
+  chips.innerHTML = m.chips.map(c =>
+    `<div class="chip" onclick="sendChip(this)">${c}</div>`
+  ).join('');
+
+  // Input placeholder
+  document.getElementById('msgInput').placeholder = `Pergunte sobre ${m.title.toLowerCase()}…`;
+}
+
+// ==================== MESSAGES ====================
+function renderMessages() {
+  const wrap = document.getElementById('messagesWrap');
+  const msgs = conversations[currentMode] || [];
+
+  if (msgs.length === 0) {
+    wrap.innerHTML = `<div class="welcome-card" id="welcomeCard">
+      <div class="welcome-icon color-${currentMode}" id="welcomeIcon">${MODES[currentMode].icon}</div>
+      <div class="welcome-title" id="welcomeTitle">${MODES[currentMode].title}</div>
+      <div class="welcome-sub" id="welcomeSub">${MODES[currentMode].sub}</div>
+      <div class="quick-chips" id="quickChips">${MODES[currentMode].chips.map(c=>`<div class="chip" onclick="sendChip(this)">${c}</div>`).join('')}</div>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = '';
+  msgs.forEach(msg => {
+    if (msg.role === 'system') return;
+    const div = document.createElement('div');
+    div.className = `message ${msg.role === 'user' ? 'user' : 'ai'}`;
+
+    if (msg.role === 'user') {
+      const initials = profile.nome ? profile.nome[0].toUpperCase() : 'A';
+      div.innerHTML = `
+        <div class="avatar user-av">${initials}</div>
+        <div class="bubble">${escapeHtml(msg.content)}</div>`;
+    } else {
+      div.innerHTML = `
+        <div class="avatar ai">${MODES[currentMode].icon}</div>
+        <div class="bubble">
+          <span class="mode-stripe stripe-${currentMode}">${MODES[currentMode].label}</span><br>
+          ${renderMarkdown(msg.content)}
+        </div>`;
+    }
+    wrap.appendChild(div);
+  });
+
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n{2,}/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.+)$/s, '<p>$1</p>');
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function addTyping() {
+  const wrap = document.getElementById('messagesWrap');
+  const div = document.createElement('div');
+  div.className = 'message ai';
+  div.id = 'typingMsg';
+  div.innerHTML = `
+    <div class="avatar ai">${MODES[currentMode].icon}</div>
+    <div class="bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingMsg');
+  if (t) t.remove();
+}
+
+// ==================== SEND ====================
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !apiKey) return;
+
+  // Hide welcome
+  const wc = document.getElementById('welcomeCard');
+  if (wc) wc.remove();
+
+  // Init conversation
+  if (!conversations[currentMode]) conversations[currentMode] = [];
+
+  const m = MODES[currentMode];
+  const profileContext = buildProfileContext();
+
+  // Build messages for API
+  const msgs = conversations[currentMode].filter(m => m.role !== 'system');
+
+  conversations[currentMode].push({ role: 'user', content: text });
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  renderMessages();
+  addTyping();
+
+  // Build API payload
+  const systemPrompt = m.system + (profileContext ? `\n\n${profileContext}` : '');
+
+  const apiMessages = [...msgs, { role: 'user', content: text }];
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        system: systemPrompt,
+        messages: apiMessages
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || `Erro ${response.status}`);
+    }
+
+    const reply = data.content[0].text;
+    conversations[currentMode].push({ role: 'assistant', content: reply });
+
+    // Update history
+    if (!sessionHistory[currentMode]) sessionHistory[currentMode] = [];
+    sessionHistory[currentMode].unshift({ icon: m.icon, preview: text.slice(0,40) });
+    updateHistory();
+
+    removeTyping();
+    renderMessages();
+
+  } catch (err) {
+    removeTyping();
+    conversations[currentMode].pop(); // remove user msg on error
+    renderMessages();
+
+    const wrap = document.getElementById('messagesWrap');
+    const errDiv = document.createElement('div');
+    errDiv.className = 'error-bubble';
+    errDiv.style.margin = '0 0 8px';
+    errDiv.innerHTML = `⚠ ${err.message}. Verifique sua API key ou tente novamente.`;
+    wrap.appendChild(errDiv);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function buildProfileContext() {
+  const parts = [];
+  if (profile.nome) parts.push(`Nome: ${profile.nome}`);
+  if (profile.idade) parts.push(`Idade: ${profile.idade} anos`);
+  if (profile.peso) parts.push(`Peso: ${profile.peso} kg`);
+  if (profile.objetivo) {
+    const labels = {
+      performance:'Performance/Competição', hipertrofia:'Hipertrofia',
+      emagrecimento:'Emagrecimento', saude:'Saúde Geral', resistencia:'Resistência'
+    };
+    parts.push(`Objetivo: ${labels[profile.objetivo]}`);
+  }
+  if (parts.length === 0) return '';
+  return `Perfil do atleta:\n${parts.join('\n')}`;
+}
+
+function sendChip(el) {
+  document.getElementById('msgInput').value = el.textContent;
+  sendMessage();
+}
+
+function clearChat() {
+  conversations[currentMode] = [];
+  renderMessages();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  document.getElementById('sendBtn').disabled = el.value.trim() === '' || !apiKey;
+}
+
+function updateHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  Object.entries(sessionHistory).forEach(([mode, items]) => {
+    items.slice(0,3).forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'history-item';
+      d.innerHTML = `<span class="history-icon">${item.icon}</span>${item.preview}…`;
+      d.onclick = () => setMode(mode);
+      list.appendChild(d);
+    });
+  });
+}
+</script>
+</body>
+</html>

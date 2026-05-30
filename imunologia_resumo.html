@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imunologia – Resumo Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2e;
+    --cyan: #00e5ff;
+    --purple: #a855f7;
+    --rose: #f43f5e;
+    --amber: #fbbf24;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --sidebar-w: 270px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 2px; }
+
+  .sidebar-brand {
+    padding: 22px 18px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0d0d1a 0%, #111128 100%);
+  }
+
+  .sidebar-brand .course-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-brand .book-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1.3;
+  }
+
+  .nav-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 14px 18px 6px;
+  }
+
+  .nav-item {
+    display: block;
+    padding: 8px 18px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    color: var(--cyan);
+    background: rgba(0,229,255,0.06);
+    border-left-color: var(--cyan);
+  }
+
+  .nav-item .nav-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .nav-quiz-btn {
+    margin: 16px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, var(--purple), #6366f1);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.2s;
+    width: calc(100% - 32px);
+  }
+  .nav-quiz-btn:hover { opacity: 0.85; }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 48px 80px;
+  }
+
+  /* ── BADGE MARCA PESSOAL ── */
+  .brand-badge {
+    background: linear-gradient(135deg, #0b1120 0%, #12112a 100%);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 14px;
+    padding: 20px 28px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
+  }
+
+  .brand-badge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,229,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .brand-course {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: linear-gradient(90deg, var(--cyan) 0%, #818cf8 50%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .brand-3h {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.25em;
+    margin-top: 4px;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #c7d2fe;
+    margin: 20px 0 10px;
+  }
+
+  p { margin-bottom: 12px; color: #cbd5e1; }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card.cyan::before { background: var(--cyan); }
+  .card.purple::before { background: var(--purple); }
+  .card.rose::before { background: var(--rose); }
+  .card.amber::before { background: var(--amber); }
+  .card.green::before { background: var(--green); }
+  .card.blue::before { background: var(--blue); }
+
+  .card-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .card.cyan .card-label { color: var(--cyan); }
+  .card.purple .card-label { color: var(--purple); }
+  .card.rose .card-label { color: var(--rose); }
+  .card.amber .card-label { color: var(--amber); }
+  .card.green .card-label { color: var(--green); }
+  .card.blue .card-label { color: var(--blue); }
+
+  .card p { font-size: 13px; margin: 0; color: #94a3b8; }
+
+  /* ── INFO BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    background: var(--surface2);
+  }
+
+  .info-box.danger { border-color: var(--rose); }
+  .info-box.warning { border-color: var(--amber); }
+  .info-box.success { border-color: var(--green); }
+  .info-box.info { border-color: var(--blue); }
+  .info-box.purple { border-color: var(--purple); }
+
+  .info-box .ib-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .info-box.danger .ib-label { color: var(--rose); }
+  .info-box.warning .ib-label { color: var(--amber); }
+  .info-box.success .ib-label { color: var(--green); }
+  .info-box.info .ib-label { color: var(--blue); }
+  .info-box.purple .ib-label { color: var(--purple); }
+
+  .info-box p { font-size: 13.5px; color: #cbd5e1; margin: 0; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface2);
+    color: var(--cyan);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: #cbd5e1;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 2px;
+  }
+
+  .tag.cyan { background: rgba(0,229,255,0.12); color: var(--cyan); }
+  .tag.rose { background: rgba(244,63,94,0.12); color: var(--rose); }
+  .tag.amber { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .tag.green { background: rgba(34,197,94,0.12); color: var(--green); }
+  .tag.purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+  .tag.blue { background: rgba(59,130,246,0.12); color: var(--blue); }
+
+  ul {
+    padding-left: 20px;
+    margin: 8px 0 12px;
+  }
+
+  ul li {
+    color: #94a3b8;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  ul li strong { color: #e2e8f0; }
+
+  /* ── QUIZ SECTION ── */
+  #quiz-section {
+    display: none;
+  }
+
+  #quiz-section.visible {
+    display: block;
+  }
+
+  .quiz-header {
+    background: linear-gradient(135deg, #0f0720 0%, #120b28 100%);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quiz-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--purple), #818cf8, var(--cyan));
+  }
+
+  .quiz-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--purple);
+  }
+
+  .quiz-header p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .quiz-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .quiz-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .quiz-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .quiz-progress-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .question-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    color: #94a3b8;
+    font-size: 13.5px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--purple);
+    color: var(--text);
+    background: rgba(168,85,247,0.06);
+  }
+
+  .option-btn .opt-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    min-width: 18px;
+    margin-top: 2px;
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(34,197,94,0.08);
+    color: var(--green);
+  }
+
+  .option-btn.correct .opt-letter { color: var(--green); }
+
+  .option-btn.wrong {
+    border-color: var(--rose);
+    background: rgba(244,63,94,0.08);
+    color: var(--rose);
+  }
+
+  .option-btn.wrong .opt-letter { color: var(--rose); }
+
+  .option-btn:disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(34,197,94,0.08); color: #86efac; border: 1px solid rgba(34,197,94,0.2); }
+  .feedback.wrong { background: rgba(244,63,94,0.08); color: #fda4af; border: 1px solid rgba(244,63,94,0.2); }
+
+  .quiz-result {
+    background: var(--surface);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+    display: none;
+    margin-top: 24px;
+  }
+
+  .quiz-result.show { display: block; }
+
+  .quiz-result .score {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin: 12px 0;
+  }
+
+  .quiz-result p { color: var(--muted); font-size: 14px; margin: 8px 0; }
+
+  .btn-restart {
+    margin-top: 20px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--purple), #6366f1);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-restart:hover { opacity: 0.85; }
+
+  /* ── PAGE TITLE ── */
+  .page-title-wrap {
+    margin-bottom: 36px;
+  }
+
+  .page-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .page-title-wrap h1 {
+    font-size: 32px;
+    background: linear-gradient(135deg, #fff 40%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── HIGHLIGHT ── */
+  mark {
+    background: rgba(0,229,255,0.12);
+    color: var(--cyan);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+    #sidebar { transform: translateX(-100%); }
+    #main { margin-left: 0; padding: 24px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <div class="course-tag">Universidad Central del Paraguay</div>
+    <div class="book-title">Abbas · Lichtman · Pillai<br>Imunologia Celular e Molecular · 10ª ed.</div>
+  </div>
+
+  <div class="nav-section-label">Resumo</div>
+  <a class="nav-item active" onclick="showSummary(); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--cyan)"></span>Início
+  </a>
+  <a class="nav-item" onclick="scrollTo('linfocito-t'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:#818cf8"></span>Linfócito T CD4⁺
+  </a>
+  <a class="nav-item" onclick="scrollTo('th1'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--blue)"></span>Th1 – Intracelulares
+  </a>
+  <a class="nav-item" onclick="scrollTo('th2'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--green)"></span>Th2 – Parasitas
+  </a>
+  <a class="nav-item" onclick="scrollTo('th17'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--amber)"></span>Th17 – Fungos/Extra
+  </a>
+  <a class="nav-item" onclick="scrollTo('tfh-treg'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--purple)"></span>Tfh e Treg
+  </a>
+  <a class="nav-item" onclick="scrollTo('tolerancia'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--rose)"></span>Tolerância Imunológica
+  </a>
+  <a class="nav-item" onclick="scrollTo('defesas'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--cyan)"></span>Defesas contra Invasores
+  </a>
+  <a class="nav-item" onclick="scrollTo('intestino'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--green)"></span>Imunidade Intestinal
+  </a>
+  <a class="nav-item" onclick="scrollTo('respiratorio'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--blue)"></span>Sistema Respiratório
+  </a>
+  <a class="nav-item" onclick="scrollTo('cutaneo'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--amber)"></span>Sistema Cutâneo
+  </a>
+  <a class="nav-item" onclick="scrollTo('privilegio'); setActive(this)" href="#">
+    <span class="nav-dot" style="background:var(--purple)"></span>Privilégio Imunitário
+  </a>
+
+  <div class="nav-section-label">Avaliação</div>
+  <button class="nav-quiz-btn" onclick="showQuiz()">⚡ Abrir Questionário (30 questões)</button>
+</nav>
+
+<!-- ═══════════════════════════════ MAIN CONTENT ═══════════════════════════════ -->
+<main id="main">
+
+  <!-- RESUMO SECTION -->
+  <div id="summary-section">
+
+    <!-- MARCA PESSOAL -->
+    <div class="brand-badge">
+      <div class="brand-course">Imunologia · Aulão de Revisão</div>
+      <div class="brand-name">André Luiz Miranda Suzano</div>
+      <div class="brand-3h">3H</div>
+    </div>
+
+    <div class="page-title-wrap">
+      <div class="page-subtitle">Resumo Baseado em Abbas · Lichtman · Pillai · 10ª Ed.</div>
+      <h1>Imunologia — Resumo Completo</h1>
+    </div>
+
+    <!-- SEÇÃO 1: LINFÓCITO T -->
+    <section id="linfocito-t">
+      <div class="section-header">
+        <span class="section-number">CAP. 09–11</span>
+        <h2>Diferenciação do Linfócito T</h2>
+      </div>
+
+      <p>O linfócito T nasce na medula óssea e amadurece no timo. Após a maturação, ele se diferencia em duas grandes populações: <mark>CD4⁺</mark> (helper/auxiliar) e <mark>CD8⁺</mark> (citotóxico). O foco principal deste resumo é o <strong>linfócito T CD4⁺</strong>, que pode se diferenciar em subtipos funcionais distintos conforme o sinal inflamatório do microambiente.</p>
+
+      <div class="card-grid">
+        <div class="card blue">
+          <div class="card-label">Th1</div>
+          <p>Microrganismos intracelulares — IFN-γ e ativação clássica de macrófagos</p>
+        </div>
+        <div class="card green">
+          <div class="card-label">Th2</div>
+          <p>Parasitas e helmintos — IL-4, IL-5, IL-13; ativação alternativa</p>
+        </div>
+        <div class="card amber">
+          <div class="card-label">Th17</div>
+          <p>Fungos e bactérias extracelulares — IL-17, IL-22; recrutamento de neutrófilos</p>
+        </div>
+        <div class="card purple">
+          <div class="card-label">Tfh</div>
+          <p>Auxilia linfócitos B — determina classe de anticorpo (IgG ou IgE)</p>
+        </div>
+        <div class="card rose">
+          <div class="card-label">Treg</div>
+          <p>Regulação da resposta — FoxP3⁺; supressão de autoimunidade</p>
+        </div>
+        <div class="card cyan">
+          <div class="card-label">CD8⁺</div>
+          <p>Citotoxicidade — reconhece MHC I; mata células infectadas</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 2: Th1 -->
+    <section id="th1">
+      <div class="section-header">
+        <span class="section-number">Subtipo 01</span>
+        <h2>Linfócito Th1 — Resposta Intracelular</h2>
+      </div>
+
+      <p>O <strong>Th1</strong> é especializado no combate a <mark>microrganismos intracelulares</mark> — bactérias, vírus e fungos com comportamento intracelular. Sua citocina-chave é o <strong>IFN-γ (Interferon-gama)</strong>.</p>
+
+      <h3>Mecanismo de Ação</h3>
+      <table>
+        <tr>
+          <th>Elemento</th>
+          <th>Papel</th>
+        </tr>
+        <tr>
+          <td><span class="tag cyan">IFN-γ</span></td>
+          <td>Principal citocina secretada; ativa macrófagos via via clássica (M1)</td>
+        </tr>
+        <tr>
+          <td><span class="tag blue">Macrófago M1</span></td>
+          <td>Via clássica — capacidade microbicida aumentada, produção de óxido nítrico</td>
+        </tr>
+        <tr>
+          <td><span class="tag amber">TNF</span></td>
+          <td>Co-secretado; amplifica a resposta inflamatória e formação de granuloma</td>
+        </tr>
+      </table>
+
+      <div class="info-box danger">
+        <div class="ib-label">⚠ Efeito Deletério</div>
+        <p><strong>Lesão Tissular</strong> — quando o Th1 é hiperestimulado, a ativação excessiva de macrófagos gera destruição do tecido do hospedeiro. Base das doenças inflamatórias crônicas (tuberculose, doença de Crohn).</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 3: Th2 -->
+    <section id="th2">
+      <div class="section-header">
+        <span class="section-number">Subtipo 02</span>
+        <h2>Linfócito Th2 — Resposta Anti-parasitária</h2>
+      </div>
+
+      <p>O <strong>Th2</strong> é altamente eficiente contra <mark>parasitas (helmintos)</mark>. Suas citocinas principais são a <strong>IL-4, IL-5 e IL-13</strong>.</p>
+
+      <h3>Citocinas e Efeitos</h3>
+      <table>
+        <tr>
+          <th>Citocina</th>
+          <th>Célula-Alvo</th>
+          <th>Efeito</th>
+        </tr>
+        <tr>
+          <td><span class="tag green">IL-4</span></td>
+          <td>Linfócito B / Tfh</td>
+          <td>Troca de isotipo para IgE; diferenciação Th2</td>
+        </tr>
+        <tr>
+          <td><span class="tag green">IL-5</span></td>
+          <td>Eosinófilos</td>
+          <td>Diferenciação, sobrevida e ativação de eosinófilos</td>
+        </tr>
+        <tr>
+          <td><span class="tag green">IL-13</span></td>
+          <td>Epitélio / músculo liso</td>
+          <td>Produção de muco, peristaltismo, ativação alternativa (M2)</td>
+        </tr>
+      </table>
+
+      <h3>Células Recrutadas pelo Th2</h3>
+      <ul>
+        <li><strong>Eosinófilos</strong> — atacam helmintos via degranulação (MBP, ECP)</li>
+        <li><strong>Mastócitos</strong> — via IgE; degranulação com histamina e heparina</li>
+        <li><strong>Macrófagos M2</strong> — via alternativa; remodelamento tecidual</li>
+        <li><strong>Peristaltismo aumentado</strong> — IL-13 → expulsão de parasitas do intestino</li>
+      </ul>
+
+      <div class="info-box danger">
+        <div class="ib-label">⚠ Efeito Deletério</div>
+        <p><strong>Reações Alérgicas</strong> — quando ativado de forma inadequada por alérgenos (ex: pólen, pelo de animal), o Th2 deflagra hipersensibilidade tipo I mediada por IgE. Resulta em asma, rinite alérgica, anafilaxia.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 4: Th17 -->
+    <section id="th17">
+      <div class="section-header">
+        <span class="section-number">Subtipo 03</span>
+        <h2>Linfócito Th17 — Fungos e Extracelulares</h2>
+      </div>
+
+      <p>O <strong>Th17</strong> coopera com o Th1 e é especializado no combate a <mark>fungos</mark> e <mark>microrganismos extracelulares</mark>. Suas citocinas-chave são a <strong>IL-17</strong> e a <strong>IL-22</strong>.</p>
+
+      <div class="card-grid">
+        <div class="card amber">
+          <div class="card-label">IL-17</div>
+          <p>Recruta neutrófilos e monócitos; promove resposta inflamatória local</p>
+        </div>
+        <div class="card amber">
+          <div class="card-label">IL-22</div>
+          <p>Fortalece barreiras epiteliais; estimula produção de peptídeos antimicrobianos</p>
+        </div>
+      </div>
+
+      <h3>Ações do Th17</h3>
+      <ul>
+        <li>Recrutamento de <strong>neutrófilos</strong> (principal célula contra fungos)</li>
+        <li>Recrutamento de <strong>monócitos</strong></li>
+        <li>Fortalecimento da <strong>imunidade de barreira</strong> (epitélio, mucosas)</li>
+        <li>Cooperação sinérgica com <strong>Th1</strong></li>
+      </ul>
+
+      <div class="info-box danger">
+        <div class="ib-label">⚠ Efeito Deletério</div>
+        <p><strong>Inflamação crônica</strong> — a persistência do processo inflamatório mediado por IL-17 é associada a doenças autoimunes como psoríase, artrite reumatoide e espondilite anquilosante.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 5: Tfh e Treg -->
+    <section id="tfh-treg">
+      <div class="section-header">
+        <span class="section-number">Subtipo 04–05</span>
+        <h2>Tfh e Linfócito Regulador (Treg)</h2>
+      </div>
+
+      <h3>T Folicular Humoral (Tfh)</h3>
+      <p>O <strong>Tfh</strong> reside nos folículos linfoides e determina o <mark>tipo de anticorpo</mark> produzido pelo linfócito B, conforme o sinal recebido:</p>
+
+      <table>
+        <tr>
+          <th>Estímulo</th>
+          <th>Anticorpo Produzido</th>
+        </tr>
+        <tr>
+          <td><span class="tag blue">Th1 → Tfh</span></td>
+          <td>IgG (resposta opsonizante e ativação do complemento)</td>
+        </tr>
+        <tr>
+          <td><span class="tag green">Th2 → Tfh</span></td>
+          <td>IgE (resposta antiparasitária e alérgica)</td>
+        </tr>
+        <tr>
+          <td><span class="tag amber">Th17</span></td>
+          <td>Não realiza este estímulo diretamente</td>
+        </tr>
+      </table>
+
+      <h3>Linfócito T Regulador (Treg) — FoxP3⁺</h3>
+      <p>A função do <strong>Treg</strong> é <mark>regular e suprimir a resposta imunológica</mark>, prevenindo autoimunidade. Sua diferenciação é determinada pelo fator de transcrição <strong>FoxP3</strong>. Produz as citocinas supressoras <strong>IL-10</strong> e <strong>TGF-β</strong>.</p>
+
+      <div class="info-box purple">
+        <div class="ib-label">Mecanismos de Supressão do Treg</div>
+        <p>• Secreção de <strong>IL-10</strong> e <strong>TGF-β</strong> (inibição de células efetoras)<br>
+        • Competição por co-estimuladores (captura de B7 → anergiza células autoimunes via CTLA-4)<br>
+        • Consumo de IL-2 (privação de fator de sobrevivência)</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 6: TOLERÂNCIA -->
+    <section id="tolerancia">
+      <div class="section-header">
+        <span class="section-number">CAP. 14–15</span>
+        <h2>Tolerância Imunológica</h2>
+      </div>
+
+      <p>A tolerância imunológica é o mecanismo que impede que células do sistema imune ataquem os <mark>antígenos próprios do organismo</mark>. Divide-se em tolerância central e periférica.</p>
+
+      <h3>Tolerância Central — Timo (Linfócito T)</h3>
+      <p>Ocorre no timo durante a maturação do linfócito T. Células que reconhecem antígenos próprios sofrem <strong>apoptose (deleção clonal)</strong>. Mecanismo mediado pela proteína <strong>AIRE</strong>, que apresenta antígenos periféricos no timo.</p>
+
+      <h3>Tolerância Periférica — Três Mecanismos</h3>
+      <div class="card-grid">
+        <div class="card rose">
+          <div class="card-label">1. Anergia</div>
+          <p>Ausência do sinal co-estimulatório (B7/CD28) → linfócito fica anérgico (sem atividade)</p>
+        </div>
+        <div class="card purple">
+          <div class="card-label">2. Supressão</div>
+          <p>Treg captura B7 via CTLA-4, impedindo ativação do linfócito autorreativo</p>
+        </div>
+        <div class="card amber">
+          <div class="card-label">3. Eliminação</div>
+          <p>Apoptose da célula autorreativa (deleção clonal periférica)</p>
+        </div>
+      </div>
+
+      <div class="info-box info">
+        <div class="ib-label">Conceito Abbas — Anergia em Detalhe</div>
+        <p>Para ativar um linfócito T, são necessários <strong>dois sinais</strong>:<br>
+        <strong>Sinal 1:</strong> TCR + MHC-antígeno (reconhecimento do antígeno)<br>
+        <strong>Sinal 2:</strong> CD28 (linfócito T) + B7/CD80/CD86 (CPA) — co-estimulação<br>
+        Na ausência do Sinal 2 → <strong>Anergia</strong> (tolerância sem morte celular)</p>
+      </div>
+
+      <h3>Tolerância do Linfócito B — Medula Óssea</h3>
+      <ul>
+        <li>Se o linfócito B reconhecer antígeno próprio: <strong>mudança de receptor</strong> (receptor editing) ou <strong>apoptose</strong></li>
+        <li>Se reconhecer antígeno próprio fraco: permanece <strong>anérgico</strong> na periferia</li>
+      </ul>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 7: DEFESAS -->
+    <section id="defesas">
+      <div class="section-header">
+        <span class="section-number">CAP. 16</span>
+        <h2>Defesas contra Invasores Microbianos</h2>
+      </div>
+
+      <p>O capítulo 16 de Abbas sistematiza as respostas imunológicas conforme o tipo de patógeno. A tabela abaixo consolida os principais mecanismos.</p>
+
+      <table>
+        <tr>
+          <th>Patógeno</th>
+          <th>Imunidade Inata</th>
+          <th>Imunidade Adaptativa</th>
+        </tr>
+        <tr>
+          <td><strong>Bactérias Extracelulares</strong></td>
+          <td>Complemento (via alternativa/lectina); Fagocitose</td>
+          <td>Anticorpos: IgG, IgM, IgA</td>
+        </tr>
+        <tr>
+          <td><strong>Bactérias Intracelulares</strong></td>
+          <td>Fagócitos; NK (células natural killer)</td>
+          <td>CD8⁺ (citotóxico); ADCC</td>
+        </tr>
+        <tr>
+          <td><strong>Vírus</strong></td>
+          <td>NK; IFN tipo I (IFN-α e IFN-β)</td>
+          <td>Anticorpos neutralizantes; CD8⁺</td>
+        </tr>
+        <tr>
+          <td><strong>Fungos</strong></td>
+          <td>Neutrófilos; Macrófagos</td>
+          <td>Th17 (IL-17/IL-22); Th1</td>
+        </tr>
+        <tr>
+          <td><strong>Parasitas intracelulares</strong> (protozoários)</td>
+          <td>NK; Macrófagos</td>
+          <td>Th1 → IFN-γ</td>
+        </tr>
+        <tr>
+          <td><strong>Helmintos</strong></td>
+          <td>Eosinófilos; Mastócitos</td>
+          <td>Th2 → IL-5/IgE → Eosinófilos/ADCC</td>
+        </tr>
+      </table>
+
+      <h3>Superantígenos — Mecanismo de Evasão Bacteriana</h3>
+      <p>Superantígenos são proteínas bacterianas que ativam <mark>massivamente linfócitos T</mark> ao ligar-se externamente ao MHC II e ao TCR (sem processamento normal). Isso gera liberação excessiva de citocinas (tempestade de citocinas — síndrome do choque tóxico).</p>
+
+      <h3>Estratégias de Evasão Bacteriana</h3>
+      <ul>
+        <li><strong>Cápsula polissacarídica</strong> → resistência à fagocitose</li>
+        <li><strong>Ácido siálico</strong> → resistência ao sistema complemento</li>
+        <li><strong>Variação antigênica</strong> → impede produção de anticorpos eficazes</li>
+        <li><strong>Superantígenos</strong> → ativação policlonal descontrolada de T</li>
+      </ul>
+
+      <div class="info-box info">
+        <div class="ib-label">ADCC — Citotoxicidade Dependente de Anticorpo</div>
+        <p>A célula NK reconhece anticorpos (IgG) que opsonizaram células-alvo infectadas ou tumorais → lise celular via receptores Fc (CD16). Fundamental na resposta a bactérias intracelulares e vírus.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 8: INTESTINO -->
+    <section id="intestino">
+      <div class="section-header">
+        <span class="section-number">CAP. 17</span>
+        <h2>Imunidade do Sistema Gastrointestinal</h2>
+      </div>
+
+      <p>O intestino representa a maior área de superfície imunológica do corpo. Precisa estabelecer <mark>tolerância com a microbiota</mark> enquanto mantém vigilância ativa contra patógenos.</p>
+
+      <h3>Mecanismo Anti-inflamatório Intestinal</h3>
+      <div class="info-box success">
+        <div class="ib-label">IL-10 — O Guardião Intestinal</div>
+        <p>Macrófagos intestinais secretam abundantemente <strong>IL-10</strong>, que inibe o recrutamento de células efetoras e evita inflamação excessiva. A quebra desse mecanismo está associada à DII (doença inflamatória intestinal).</p>
+      </div>
+
+      <h3>Estruturas Especializadas do MALT Intestinal</h3>
+      <table>
+        <tr>
+          <th>Estrutura</th>
+          <th>Função</th>
+        </tr>
+        <tr>
+          <td><strong>Placas de Peyer</strong></td>
+          <td>Tecido linfoide organizado; rico em células dendríticas; captura antígenos luminais</td>
+        </tr>
+        <tr>
+          <td><strong>Células de Paneth</strong></td>
+          <td>Liberam defensinas (peptídeos antimicrobianos) nas criptas</td>
+        </tr>
+        <tr>
+          <td><strong>Células M</strong></td>
+          <td>Capturam e transportam antígenos do lúmen para as Placas de Peyer</td>
+        </tr>
+        <tr>
+          <td><strong>Macrófagos subepiteliais</strong></td>
+          <td>Principal fonte de IL-10; manutenção da homeostase</td>
+        </tr>
+      </table>
+
+      <h3>Anticorpo Predominante no Intestino</h3>
+      <p>O anticorpo principal do intestino é a <mark>IgA secretória (sIgA)</mark>, produzida localmente e transportada para o lúmen. Neutraliza patógenos sem gerar inflamação.</p>
+
+      <div class="info-box warning">
+        <div class="ib-label">Atenção Clínica</div>
+        <p>A inflamação intestinal crônica (DII) reduz peristaltismo, compromete absorção e pode evoluir para câncer colorretal. Condições como intestino irritável requerem manejo precoce.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 9: RESPIRATÓRIO -->
+    <section id="respiratorio">
+      <div class="section-header">
+        <span class="section-number">CAP. 17</span>
+        <h2>Imunidade do Sistema Respiratório</h2>
+      </div>
+
+      <p>O sistema respiratório precisa distinguir entre <mark>partículas inócuas</mark> (poeira, ácaros, pólen) e <mark>microrganismos patogênicos</mark>. A falha nessa distinção resulta em processo alérgico.</p>
+
+      <h3>Estruturas de Defesa Respiratória</h3>
+      <ul>
+        <li><strong>Epitélio ciliado pseudoestratificado</strong> — varredura mucociliar de partículas</li>
+        <li><strong>Células caliciformes</strong> — produção de muco que aprisiona partículas e microrganismos</li>
+        <li><strong>Macrófagos alveolares</strong> — fagocitose de partículas que chegam aos alvéolos</li>
+        <li><strong>IgA secretória</strong> — presente nas mucosas respiratórias para neutralização viral</li>
+        <li><strong>IgE (quando patológica)</strong> — desencadeia asma alérgica via mastócitos</li>
+      </ul>
+
+      <div class="info-box warning">
+        <div class="ib-label">Processo Alérgico Respiratório</div>
+        <p>Reação a partículas inócuas → ativação de Th2 → IgE → sensibilização de mastócitos → re-exposição → degranulação → broncoespasmo, edema, hipersecreção de muco = <strong>Asma</strong>.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 10: CUTÂNEO -->
+    <section id="cutaneo">
+      <div class="section-header">
+        <span class="section-number">CAP. 17</span>
+        <h2>Imunidade do Sistema Cutâneo</h2>
+      </div>
+
+      <p>A pele é a primeira barreira física do organismo e possui imunidade especializada.</p>
+
+      <h3>Características do Epitélio Cutâneo</h3>
+      <ul>
+        <li><strong>Epitélio escamoso queratinizado</strong> — barreira mecânica impermeável</li>
+        <li>Queratinócitos sofrem <strong>morte celular programada</strong> → liberação de proteínas que impermeabilizam a camada córnea</li>
+        <li>pH ácido da superfície + lipídios antimicrobianos inibem colonização</li>
+      </ul>
+
+      <h3>Células Imunes da Pele</h3>
+      <table>
+        <tr>
+          <th>Célula</th>
+          <th>Localização</th>
+          <th>Função</th>
+        </tr>
+        <tr>
+          <td><strong>Células de Langerhans</strong></td>
+          <td>Epiderme</td>
+          <td>Células dendríticas epidérmicas; capturam e apresentam antígenos</td>
+        </tr>
+        <tr>
+          <td><strong>Macrófagos dérmicos</strong></td>
+          <td>Derme</td>
+          <td>Fagocitose e apresentação de antígenos; inflamação local</td>
+        </tr>
+        <tr>
+          <td><strong>Linfócitos T residentes</strong></td>
+          <td>Derme/epiderme</td>
+          <td>Vigilância imunológica permanente</td>
+        </tr>
+        <tr>
+          <td><strong>Mastócitos</strong></td>
+          <td>Derme</td>
+          <td>Resposta rápida; degranulação na presença de patógenos</td>
+        </tr>
+      </table>
+
+      <div class="info-box info">
+        <div class="ib-label">Diferença pele × intestino</div>
+        <p>Ao contrário do intestino (onde a inflamação é minimizada), na pele a inflamação é um <strong>mecanismo necessário</strong> e benéfico para recrutar células de defesa após lesões e infecções locais.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SEÇÃO 11: PRIVILÉGIO IMUNITÁRIO -->
+    <section id="privilegio">
+      <div class="section-header">
+        <span class="section-number">CAP. 17</span>
+        <h2>Privilégio Imunitário</h2>
+      </div>
+
+      <p>Regiões de <mark>privilégio imunitário</mark> são locais onde a resposta inflamatória é suprimida ou controlada para proteger estruturas essenciais à <strong>sobrevivência e reprodução</strong> do indivíduo. Possuem barreiras especializadas.</p>
+
+      <div class="card-grid">
+        <div class="card cyan">
+          <div class="card-label">Barreira H-Ocular</div>
+          <p>Ausência de vasos linfáticos nas córneas; proteção por humor aquoso rico em neuropeptídeos e indolamina + secreção de PDL-1</p>
+        </div>
+        <div class="card purple">
+          <div class="card-label">Barreira H-Encefálica</div>
+          <p>Hermeticamente fechada; NÃO tem privilégio estrito — pode se abrir para passagem de células de defesa; protegida por microglia</p>
+        </div>
+        <div class="card amber">
+          <div class="card-label">Barreira H-Testicular</div>
+          <p>Rica em TGF-β; testosterona tem ação anti-inflamatória local; protege espermatozoides (antígenos neoantigênicos)</p>
+        </div>
+        <div class="card rose">
+          <div class="card-label">Barreira H-Placentária</div>
+          <p>Rica em PDL-1 (PD-L1); inibe linfócitos T maternos que poderiam atacar o feto (semi-alogênico)</p>
+        </div>
+      </div>
+
+      <h3>Mecanismos do Humor Aquoso (Olho)</h3>
+      <ul>
+        <li><strong>Neuropeptídeos</strong> → ação antimicrobiana e supressora de inflamação</li>
+        <li><strong>Indolamina (IDO)</strong> → cataboliza triptofano → inibe proliferação de linfócitos T</li>
+        <li><strong>PDL-1 / PD-L1</strong> → "freio" dos linfócitos T (checkpoint imunológico)</li>
+      </ul>
+
+      <h3>Microglia — Defesa do SNC</h3>
+      <p>As células da microglia são os macrófagos residentes do sistema nervoso central. Realizam:</p>
+      <ul>
+        <li><strong>Defesa</strong> — fagocitose de microrganismos e debris celulares</li>
+        <li><strong>Reparo</strong> — poda sináptica e plasticidade neural</li>
+      </ul>
+
+      <div class="info-box purple">
+        <div class="ib-label">PD-L1 — Checkpoint Imunológico</div>
+        <p>PDL-1 (Programmed Death Ligand 1) é expresso em células de privilégio imunitário (olho, placenta) e também em células tumorais para evasão. Base dos imunoterápicos anti-PD1/anti-PD-L1 no tratamento do câncer.</p>
+      </div>
+    </section>
+
+  </div><!-- fim summary-section -->
+
+  <!-- ═══════════════ QUIZ SECTION ═══════════════ -->
+  <div id="quiz-section">
+
+    <!-- MARCA PESSOAL NO QUIZ -->
+    <div class="brand-badge" style="margin-bottom:24px">
+      <div class="brand-course">Imunologia · Questionário de Avaliação</div>
+      <div class="brand-name">André Luiz Miranda Suzano</div>
+      <div class="brand-3h">3H</div>
+    </div>
+
+    <div class="quiz-header">
+      <h2>Questionário de Imunologia</h2>
+      <p>30 questões baseadas no aulão · Abbas, Lichtman & Pillai 10ª ed.</p>
+    </div>
+
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill"></div></div>
+      <span class="quiz-progress-text" id="progress-text">0 / 30</span>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="quiz-result" id="quiz-result">
+      <div class="brand-course">Resultado Final</div>
+      <div class="score" id="final-score">--</div>
+      <p id="result-message"></p>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px">de 30 questões</p>
+      <button class="btn-restart" onclick="restartQuiz()">↺ Refazer Questionário</button>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+const questions = [
+  {
+    q: "Qual a principal citocina secretada pelo linfócito Th1?",
+    opts: ["IL-4","IL-17","IFN-γ (Interferon-gama)","IL-10"],
+    ans: 2,
+    exp: "O Th1 é especializado na secreção de IFN-γ, que ativa macrófagos pela via clássica (M1) para combater microrganismos intracelulares."
+  },
+  {
+    q: "O efeito deletério do linfócito Th1, quando hiperestimulado, é denominado:",
+    opts: ["Reação alérgica","Lesão tissular","Inflamação crônica por IL-17","Apoptose celular massiva"],
+    ans: 1,
+    exp: "A hiperestimulação do Th1 leva à ativação excessiva de macrófagos M1, resultando em lesão tissular (dano ao tecido do hospedeiro)."
+  },
+  {
+    q: "As citocinas IL-4, IL-5 e IL-13 são características do subtipo:",
+    opts: ["Th1","Th17","Treg","Th2"],
+    ans: 3,
+    exp: "IL-4, IL-5 e IL-13 são as principais citocinas do Th2, que combate parasitas (helmintos) e media reações alérgicas."
+  },
+  {
+    q: "Qual célula é ativada pela IL-5 secretada pelo Th2?",
+    opts: ["Neutrófilo","Eosinófilo","Macrófago M1","Célula NK"],
+    ans: 1,
+    exp: "A IL-5 é responsável pela diferenciação, sobrevida e ativação de eosinófilos, células essenciais na defesa contra helmintos."
+  },
+  {
+    q: "O efeito deletério do Th2 está relacionado a:",
+    opts: ["Lesão tissular mediada por IFN-γ","Inflamação crônica via IL-17","Reações alérgicas mediadas por IgE","Granuloma infeccioso"],
+    ans: 2,
+    exp: "O Th2 causa reações alérgicas quando ativado inadequadamente por alérgenos, gerando hipersensibilidade tipo I via IgE e mastócitos."
+  },
+  {
+    q: "O linfócito Th17 trabalha em cooperação com qual outro subtipo de T auxiliar?",
+    opts: ["Th2","Treg","Th1","Tfh"],
+    ans: 2,
+    exp: "Th17 e Th1 trabalham de forma sinérgica, especialmente no combate a microrganismos intracelulares e fungos."
+  },
+  {
+    q: "Qual das citocinas secretadas pelo Th17 é responsável por recrutar neutrófilos?",
+    opts: ["IL-4","IL-10","IFN-γ","IL-17"],
+    ans: 3,
+    exp: "A IL-17 é a principal citocina do Th17 e tem como função recrutar neutrófilos e monócitos para o sítio de infecção."
+  },
+  {
+    q: "O fator de transcrição que determina a diferenciação do linfócito T regulador (Treg) é:",
+    opts: ["T-bet","GATA-3","RORγt","FoxP3"],
+    ans: 3,
+    exp: "FoxP3 é o fator de transcrição master do Treg. Sua expressão é necessária e suficiente para a diferenciação do Treg."
+  },
+  {
+    q: "O linfócito T Folicular Humoral (Tfh) estimulado pelo Th1 induz o linfócito B a produzir qual anticorpo?",
+    opts: ["IgE","IgA","IgM","IgG"],
+    ans: 3,
+    exp: "O sinal do Th1 via Tfh direciona a troca de isotipo para IgG, importante para opsonização e ativação do complemento."
+  },
+  {
+    q: "Quando o Tfh é estimulado pelo Th2, qual anticorpo é produzido pelo linfócito B?",
+    opts: ["IgG","IgM","IgA","IgE"],
+    ans: 3,
+    exp: "O Th2, via Tfh, direciona a produção de IgE, fundamental nas respostas antiparasitárias e nas reações alérgicas."
+  },
+  {
+    q: "Na tolerância periférica, a anergia ocorre quando:",
+    opts: ["O TCR não reconhece o antígeno","Há ausência do sinal co-estimulatório (B7/CD28)","O linfócito T sofre apoptose","O Treg secreta TGF-β"],
+    ans: 1,
+    exp: "A anergia ocorre quando o Sinal 1 (TCR+MHC-antígeno) está presente, mas o Sinal 2 (CD28+B7) está ausente → linfócito fica funcionalmente inativo."
+  },
+  {
+    q: "Na supressão da tolerância periférica, o Treg utiliza principalmente qual molécula para competir com o linfócito T autorreativo?",
+    opts: ["CD28","TCR","CTLA-4","CD4"],
+    ans: 2,
+    exp: "O Treg expressa CTLA-4 (receptor de alta afinidade por B7), que compete com CD28 do linfócito autorreativo, capturando B7 e induzindo anergia."
+  },
+  {
+    q: "Na tolerância central do linfócito B, quando ele reconhece um antígeno próprio forte, pode ocorrer:",
+    opts: ["Anergia apenas","Mudança de receptor ou apoptose","Diferenciação em plasmócito","Ativação via TLR"],
+    ans: 1,
+    exp: "Linfócito B que reconhece antígeno próprio forte pode sofrer receptor editing (mudança do receptor) ou apoptose (deleção clonal)."
+  },
+  {
+    q: "Na defesa contra bactérias extracelulares, o sistema adaptativo age principalmente por meio de:",
+    opts: ["CD8⁺ e IFN-γ","Células NK e complemento","Anticorpos IgG, IgM e IgA","Th17 e IL-22"],
+    ans: 2,
+    exp: "Bactérias extracelulares são combatidas principalmente pelos anticorpos IgG, IgM e IgA, que opsonizam e ativam o complemento."
+  },
+  {
+    q: "ADCC significa:",
+    opts: ["Anticorpo Dependente de Complemento Citotóxico","Citotoxicidade Celular Dependente de Anticorpo","Ativação Dependente de CD4 Citotóxico","Anticorpo Duplo Cadeia Curta"],
+    ans: 1,
+    exp: "ADCC = Antibody-Dependent Cellular Cytotoxicity (Citotoxicidade Celular Dependente de Anticorpo). Células NK lisam alvéolos opsonizados por IgG via CD16 (FcγRIII)."
+  },
+  {
+    q: "Os superantígenos bacterianos causam dano porque:",
+    opts: ["Inibem completamente a resposta imune","Ativam massivamente linfócitos T policlonalmente, gerando tempestade de citocinas","Bloqueiam especificamente o complemento","Produzem IgE em excesso"],
+    ans: 1,
+    exp: "Superantígenos ligam-se externamente ao MHC II e TCR (sem processamento normal), ativando até 20% de todos os linfócitos T → choque séptico."
+  },
+  {
+    q: "Qual estratégia bacteriana confere resistência ao sistema complemento?",
+    opts: ["Cápsula polissacarídica","Variação antigênica","Ácido siálico","Superantígenos"],
+    ans: 2,
+    exp: "O ácido siálico na superfície bacteriana mimetiza antígenos próprios humanos, impedindo a ativação do complemento pela via alternativa."
+  },
+  {
+    q: "Na defesa contra bactérias intracelulares, o sistema adaptativo principal é:",
+    opts: ["Anticorpos IgM e IgG","Th2 e IL-5","Linfócito T CD8⁺ e ADCC","Placas de Peyer e células M"],
+    ans: 2,
+    exp: "Bactérias intracelulares escapam de anticorpos. A resposta adaptativa depende de CD8⁺ (mata células infectadas) e ADCC (via NK + IgG)."
+  },
+  {
+    q: "No intestino, qual molécula é produzida pelos macrófagos para evitar inflamação excessiva?",
+    opts: ["IL-17","IFN-γ","IL-10","TNF-α"],
+    ans: 2,
+    exp: "IL-10 é a principal citocina anti-inflamatória intestinal, secretada por macrófagos subepiteliais para manter a homeostase com a microbiota."
+  },
+  {
+    q: "As células de Paneth liberam, nas criptas intestinais:",
+    opts: ["IgA secretória","Defensinas (peptídeos antimicrobianos)","IL-10","Histamina"],
+    ans: 1,
+    exp: "Células de Paneth secretam defensinas e outras proteínas antimicrobianas que controlam a composição da microbiota nas criptas intestinais."
+  },
+  {
+    q: "Qual é o anticorpo predominante na mucosa intestinal?",
+    opts: ["IgM","IgG","IgE","IgA secretória"],
+    ans: 3,
+    exp: "A IgA secretória (sIgA) é o anticorpo predominante nas mucosas intestinais. Neutraliza patógenos sem ativar complemento, evitando inflamação."
+  },
+  {
+    q: "As células M do intestino têm como função principal:",
+    opts: ["Produzir IL-10","Secretar defensinas","Capturar e transportar antígenos luminais para as Placas de Peyer","Produzir muco protetor"],
+    ans: 2,
+    exp: "Células M são células epiteliais especializadas que capturam antígenos do lúmen intestinal e os transportam para as Placas de Peyer para processamento imune."
+  },
+  {
+    q: "No sistema respiratório, a produção de muco é função principalmente de quais células?",
+    opts: ["Macrófagos alveolares","Células caliciformes","Células de Langerhans","Mastócitos"],
+    ans: 1,
+    exp: "Células caliciformes (goblet cells) são responsáveis pela produção de muco no epitélio respiratório, essencial para a varredura mucociliar."
+  },
+  {
+    q: "A barreira de defesa do epitélio cutâneo é caracterizada histologicamente como:",
+    opts: ["Epitélio simples colunar","Epitélio pseudoestratificado ciliado","Epitélio escamoso queratinizado","Epitélio de transição"],
+    ans: 2,
+    exp: "A pele possui epitélio escamoso estratificado queratinizado, que confere a principal barreira física impermeável do organismo."
+  },
+  {
+    q: "As células de Langerhans, presentes na epiderme, são funcionalmente equivalentes a:",
+    opts: ["Mastócitos","Eosinófilos","Células dendríticas","Células NK"],
+    ans: 2,
+    exp: "Células de Langerhans são células dendríticas especializadas residentes na epiderme. Capturam antígenos e migram para linfonodos para ativação de linfócitos T."
+  },
+  {
+    q: "Qual região de privilégio imunitário NÃO apresenta privilégio estrito e pode se abrir para passagem de células de defesa?",
+    opts: ["Barreira hemato-ocular","Barreira hemato-testicular","Barreira hemato-encefálica","Barreira hemato-placentária"],
+    ans: 2,
+    exp: "A barreira hemato-encefálica não tem privilégio estrito — pode se abrir parcialmente em situações de necessidade para passagem de células de defesa."
+  },
+  {
+    q: "O humor aquoso do olho protege o privilégio imunitário ocular por meio de qual substância que cataboliza o triptofano?",
+    opts: ["PDL-1","Neuropeptídeos","Indolamina (IDO)","TGF-β"],
+    ans: 2,
+    exp: "A IDO (indoleamina 2,3-dioxigenase) presente no humor aquoso cataboliza triptofano, privando os linfócitos T desse aminoácido essencial para sua proliferação."
+  },
+  {
+    q: "Na barreira hemato-testicular, qual hormônio exerce ação anti-inflamatória?",
+    opts: ["Estrogênio","Testosterona","Cortisol","Progesterona"],
+    ans: 1,
+    exp: "A testosterona, produzida localmente, possui ação anti-inflamatória na barreira hemato-testicular, protegendo os espermatozoides do ataque imune."
+  },
+  {
+    q: "A barreira hemato-placentária é rica em PDL-1 principalmente para:",
+    opts: ["Ativar linfócitos NK contra patógenos fetais","Impedir que linfócitos T maternos ataquem o feto semi-alogênico","Aumentar a produção de IgG pela placenta","Estimular a diferenciação de Treg fetais"],
+    ans: 1,
+    exp: "PDL-1 (PD-L1) na placenta inibe linfócitos T maternos que poderiam reconhecer antígenos paternos do feto (semi-alogênico), prevenindo abortamento imunológico."
+  },
+  {
+    q: "As células da microglia, no sistema nervoso central, realizam qual processo relacionado à plasticidade neural?",
+    opts: ["Secreção de mielina","Poda sináptica","Produção de LCR","Geração de potencial de ação"],
+    ans: 1,
+    exp: "A microglia, além da função imune (fagocitose), realiza poda sináptica — elimina sinapses desnecessárias — e contribui para a plasticidade neural."
+  }
+];
+
+let answered = new Array(30).fill(false);
+let correctCount = 0;
+
+function buildQuiz() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  answered = new Array(30).fill(false);
+  correctCount = 0;
+  updateProgress();
+
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q${i}`;
+
+    const letters = ['A','B','C','D'];
+    const optsHTML = q.opts.map((opt, j) => `
+      <button class="option-btn" onclick="selectAnswer(${i}, ${j})" id="opt-${i}-${j}">
+        <span class="opt-letter">${letters[j]}</span>
+        <span>${opt}</span>
+      </button>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="question-number">Questão ${i+1} de 30</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options">${optsHTML}</div>
+      <div class="feedback" id="fb-${i}"></div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.getElementById('quiz-result').classList.remove('show');
+}
+
+function selectAnswer(qi, optIdx) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#q${qi} .option-btn`);
+  opts.forEach(btn => btn.disabled = true);
+
+  opts[optIdx].classList.add(optIdx === q.ans ? 'correct' : 'wrong');
+  if (optIdx !== q.ans) opts[q.ans].classList.add('correct');
+
+  if (optIdx === q.ans) correctCount++;
+
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.textContent = (optIdx === q.ans ? '✓ Correto! ' : '✗ Incorreto. ') + q.exp;
+  fb.className = `feedback show ${optIdx === q.ans ? 'correct' : 'wrong'}`;
+
+  updateProgress();
+
+  if (answered.every(Boolean)) {
+    setTimeout(showResult, 600);
+  }
+}
+
+function updateProgress() {
+  const done = answered.filter(Boolean).length;
+  document.getElementById('progress-fill').style.width = `${(done/30)*100}%`;
+  document.getElementById('progress-text').textContent = `${done} / 30`;
+}
+
+function showResult() {
+  const resultEl = document.getElementById('quiz-result');
+  document.getElementById('final-score').textContent = `${correctCount}/30`;
+  const pct = Math.round((correctCount/30)*100);
+  let msg = pct >= 90 ? '🎯 Excelente! Domínio completo do conteúdo.' :
+            pct >= 70 ? '📚 Muito bom! Revise os pontos errados.' :
+            pct >= 50 ? '⚡ Regular. Estude os tópicos com menor acerto.' :
+                        '🔄 Refaça o resumo antes de tentar novamente.';
+  document.getElementById('result-message').textContent = msg;
+  resultEl.classList.add('show');
+  resultEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function restartQuiz() {
+  buildQuiz();
+  document.getElementById('quiz-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showQuiz() {
+  document.getElementById('summary-section').style.display = 'none';
+  const qs = document.getElementById('quiz-section');
+  qs.classList.add('visible');
+  qs.scrollIntoView({ behavior: 'smooth' });
+  buildQuiz();
+}
+
+function showSummary() {
+  document.getElementById('quiz-section').classList.remove('visible');
+  document.getElementById('summary-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollTo(id) {
+  showSummary();
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

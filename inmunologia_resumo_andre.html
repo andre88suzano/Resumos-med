@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inmunología — Resumen Clínico · André Suzano</title>
+<style>
+  @import url('data:text/css,');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2530;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --mark: #1e3a5f;
+    --mark2: #1a3a2a;
+    --mark3: #3a2a0a;
+    --sidebar-w: 360px;
+    --header-h: 56px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-badge {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-title {
+    font-family: 'Georgia', serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .brand-sub {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+
+  .topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .meta-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--text2);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .meta-pill span {
+    color: var(--accent2);
+    font-weight: bold;
+  }
+
+  .sidebar-toggle {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sidebar-toggle:hover { background: #2563eb; }
+
+  /* ── LAYOUT ── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* NAV PILLS */
+  .chapter-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-nav a {
+    text-decoration: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+  .chapter-nav a:hover, .chapter-nav a.active {
+    background: var(--mark);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-num {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--accent2);
+    margin: 20px 0 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--accent2);
+    letter-spacing: 0.01em;
+  }
+
+  p {
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.8;
+  }
+
+  /* BOX STYLES */
+  .box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .box-info    { background: var(--mark);  border-color: var(--accent);  color: #bfdbfe; }
+  .box-warn    { background: var(--mark3); border-color: var(--accent3); color: #fde68a; }
+  .box-danger  { background: #2a1010;      border-color: var(--danger);  color: #fca5a5; }
+  .box-success { background: var(--mark2); border-color: var(--success); color: #6ee7b7; }
+
+  .box strong { font-family: 'Courier New', monospace; letter-spacing: 0.02em; }
+  .box-title {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  /* TABLE */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 2px solid var(--accent);
+  }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--accent2);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  td {
+    padding: 9px 14px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--surface2); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+  }
+  .tag-blue   { background: var(--mark);  color: var(--accent); }
+  .tag-teal   { background: #0e2a2f;      color: var(--accent2);}
+  .tag-amber  { background: var(--mark3); color: var(--accent3);}
+  .tag-red    { background: #2a1010;      color: var(--danger); }
+  .tag-green  { background: var(--mark2); color: var(--success);}
+
+  /* FLUXOGRAMA */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .flow-node {
+    background: var(--mark);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    color: var(--text3);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .flow-node.green { background: var(--mark2); border-color: var(--success); color: var(--success); }
+  .flow-node.amber { background: var(--mark3); border-color: var(--accent3); color: var(--accent3);}
+  .flow-node.red   { background: #2a1010; border-color: var(--danger); color: var(--danger); }
+
+  /* GRID 2 col */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .card h4 {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li {
+    padding: 4px 0;
+    color: var(--text2);
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+  .card ul li:last-child { border-bottom: none; }
+  .card ul li::before { content: '›'; color: var(--accent2); flex-shrink: 0; }
+
+  /* EXAM TRAPS */
+  .trap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .trap-card {
+    background: #1a0d0d;
+    border: 1px solid #3a1a1a;
+    border-left: 4px solid var(--danger);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .trap-card .trap-label {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--danger);
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+  .trap-card p { font-size: 13px; color: #fca5a5; margin: 0; }
+
+  /* DIVIDER */
+  hr.section-div {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .sidebar.collapsed { width: 0; border-left-color: transparent; }
+
+  .sidebar-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-header-text {
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-header h3 {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  .sidebar-header p {
+    font-size: 11px;
+    color: var(--text3);
+    margin: 2px 0 0;
+  }
+
+  .score-badge {
+    background: var(--mark);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-align: center;
+    min-width: 52px;
+  }
+
+  .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar-body::-webkit-scrollbar { width: 4px; }
+  .sidebar-body::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .quiz-progress {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--text2);
+    font-family: 'Courier New', monospace;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .q-card.answered-correct { border-color: var(--success); }
+  .q-card.answered-wrong   { border-color: var(--danger); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .q-num {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .q-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    font-family: 'Georgia', serif;
+  }
+  .q-category {
+    font-size: 10px;
+    color: var(--text3);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .options { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .opt-btn {
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1.5;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--mark);
+  }
+  .opt-btn.correct {
+    background: var(--mark2);
+    border-color: var(--success);
+    color: #6ee7b7;
+  }
+  .opt-btn.wrong {
+    background: #2a1010;
+    border-color: var(--danger);
+    color: #fca5a5;
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  .explanation {
+    margin-top: 10px;
+    background: #0f1a14;
+    border: 1px solid #1a3a24;
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #86efac;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    display: none;
+  }
+  .explanation.show { display: block; animation: fadeUp 0.3s ease; }
+  .explanation strong { color: var(--success); }
+
+  .sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .btn-reset {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 7px;
+    padding: 9px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn-reset:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* WATERMARK */
+  .watermark {
+    text-align: center;
+    margin-top: 48px;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text3);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+  .watermark strong { color: var(--text2); }
+
+  /* HIGHLIGHT in text */
+  mark {
+    background: var(--mark3);
+    color: var(--accent3);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  mark.blue { background: var(--mark); color: var(--accent); }
+  mark.green { background: var(--mark2); color: var(--success); }
+  mark.red { background: #2a1010; color: var(--danger); }
+
+  /* SMALL BADGE */
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+  }
+  .badge-blue  { background: var(--mark);  color: var(--accent); }
+  .badge-teal  { background: #0e2a2f;      color: var(--accent2);}
+  .badge-amber { background: var(--mark3); color: var(--accent3);}
+  .badge-red   { background: #2a1010;      color: var(--danger); }
+
+  ul.content-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+  ul.content-list li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    color: var(--text);
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.6;
+  }
+  ul.content-list li:last-child { border-bottom: none; }
+  ul.content-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent2);
+    font-size: 12px;
+    top: 6px;
+  }
+  ul.content-list li strong { color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo-badge">A</div>
+    <div class="brand-text">
+      <div class="brand-title">Inmunología — Resumen Clínico Completo</div>
+      <div class="brand-sub">André Luiz Miranda Suzano · 3H · Medicina UCP — Pedro Juan Caballero</div>
+    </div>
+  </div>
+  <div class="topbar-meta">
+    <div class="meta-pill">Ref: <span>Abbas 10ª ed.</span></div>
+    <div class="meta-pill">Caps. 1–4 · 6 · 10</div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" id="toggle-btn">
+      ⚡ Quiz <span id="toggle-label">Ocultar</span>
+    </button>
+  </div>
+</div>
+
+<div class="app-body">
+
+<!-- MAIN -->
+<main class="main" id="main-content">
+
+  <!-- NAV -->
+  <nav class="chapter-nav">
+    <a href="#s1" class="active">Introducción</a>
+    <a href="#s2">Sistema Innato</a>
+    <a href="#s3">Células del S. Innato</a>
+    <a href="#s4">Sistema Adaptativo</a>
+    <a href="#s5">Células Linfoides</a>
+    <a href="#s6">Inmunoglobulinas</a>
+    <a href="#s7">Complemento</a>
+    <a href="#s8">Adhesión Leucocitaria</a>
+    <a href="#s9">Tablas Comparativas</a>
+    <a href="#s10">Trampas de Examen</a>
+  </nav>
+
+  <!-- ══ SEC 1 ══ -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>Introducción al Sistema Inmune</h2>
+    </div>
+
+    <p>El sistema inmune es el conjunto de células, tejidos y moléculas que defienden al organismo contra agentes infecciosos y otros patógenos. La <strong>inmunología</strong> es la ciencia que estudia estos mecanismos de defensa <em>(Abbas, Cap. 1)</em>.</p>
+
+    <div class="box box-info">
+      <div class="box-title">🔑 Concepto central — Abbas Cap. 1</div>
+      La respuesta inmune posee dos grandes divisiones: la <strong>inmunidad innata</strong> (primera línea, preexistente) y la <strong>inmunidad adaptativa</strong> (específica, adquirida). El sistema innato <em>activa</em> y <em>potencia</em> al adaptativo; el adaptativo amplifica la respuesta innata.
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>🛡 Inmunidad Innata</h4>
+        <ul>
+          <li>Presente desde el nacimiento ("ya nace")</li>
+          <li>Respuesta inmediata: <strong>0–12 horas</strong></li>
+          <li>Inespecífica — reconoce PAMPs y DAMPs</li>
+          <li>Baja diversidad celular</li>
+          <li>Sin memoria inmunológica clásica</li>
+          <li>Principal estrategia: <strong>inflamación</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🎯 Inmunidad Adaptativa</h4>
+        <ul>
+          <li>Adquirida individualmente a lo largo de la vida</li>
+          <li>Respuesta: días a semanas</li>
+          <li>Específica — reconoce antígenos propios de la sustancia</li>
+          <li>Alta diversidad celular</li>
+          <li>Posee <strong>memoria inmunológica</strong></li>
+          <li>Evita producir células autoinmunes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-title">⚠ Relación funcional clave</div>
+      El sistema innato activa el adaptativo. El sistema adaptativo potencia al innato (<em>apuntes 10/02/26</em>). Sin la señalización del innato, el adaptativo no puede iniciarse correctamente → concepto de <strong>señal de peligro</strong> (PAMPs/DAMPs).
+    </div>
+
+    <h3>PAMPs y DAMPs — Reconocimiento del Peligro</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Molécula</th><th>Significado</th><th>Origen</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-blue">PAMP</span></td><td>Pathogen-Associated Molecular Patterns</td><td>Microorganismos (externos)</td><td>LPS gram−, peptidoglucano gram+, flagelina, ARN viral</td></tr>
+          <tr><td><span class="tag tag-amber">DAMP</span></td><td>Damage-Associated Molecular Patterns</td><td>Células propias dañadas</td><td>HMGB1, HSPs, ATP extracelular, ácido úrico</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 2 ══ -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>Sistema Inmune Innato — Mecanismos</h2>
+    </div>
+
+    <h3>Receptores de Reconocimiento de Patrones (PRRs)</h3>
+    <p>El sistema innato reconoce los PAMPs/DAMPs a través de <strong>receptores Toll-like (TLR)</strong>. Existen 10 TLR en humanos, distribuidos en membrana o endosomales:</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>TLR</th><th>Localización</th><th>Ligando reconocido</th></tr></thead>
+        <tbody>
+          <tr><td><strong>TLR-1</strong></td><td>Membrana</td><td>Bacterias gram (+)</td></tr>
+          <tr><td><strong>TLR-2</strong></td><td>Membrana</td><td>Bacterias gram (+) — peptidoglucano</td></tr>
+          <tr><td><strong>TLR-3</strong></td><td>Endosómico</td><td>Virus — ARN bicatenario</td></tr>
+          <tr><td><strong>TLR-4</strong></td><td>Membrana</td><td>Bacterias gram (−) — LPS</td></tr>
+          <tr><td><strong>TLR-5</strong></td><td>Membrana</td><td>Flagelina bacteriana</td></tr>
+          <tr><td><strong>TLR-6</strong></td><td>Membrana</td><td>Bacterias gram (+)</td></tr>
+          <tr><td><strong>TLR-7</strong></td><td>Endosómico</td><td>Virus — ARN monocatenario</td></tr>
+          <tr><td><strong>TLR-8</strong></td><td>Endosómico</td><td>Virus — ARN monocatenario</td></tr>
+          <tr><td><strong>TLR-9</strong></td><td>Endosómico</td><td>Virus y bacterias — ADN CpG</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-info">
+      <div class="box-title">📌 Regla mnemotécnica — TLR</div>
+      <strong>Membrana (externos):</strong> TLR 1, 2, 4, 5, 6 → reconocen bacterias y sus componentes de pared.<br>
+      <strong>Endosómicos (internos):</strong> TLR 3, 7, 8, 9 → reconocen ácidos nucleicos virales y bacterianos.<br>
+      ▸ Los ácidos nucleicos propios no activan los TLR porque no están en el endosoma normalmente.
+    </div>
+
+    <h3>Inflamación — Estrategia Maestra del Innato</h3>
+    <p>La inflamación es el principal mecanismo de defensa del sistema innato. Su propósito es:</p>
+    <ul class="content-list">
+      <li><strong>Reclutar</strong> células de defensa al sitio de infección mediante citocinas y quimiocinas</li>
+      <li><strong>Cambiar el comportamiento</strong> de las células de defensa (quimiotaxis, diapédesis)</li>
+      <li><strong>Eliminar</strong> el agente infeccioso o el tejido dañado</li>
+    </ul>
+
+    <div class="flow">
+      <div class="flow-node">PAMP/DAMP</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">TLR activado</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">NF-κB</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">Citocinas/Quimiocinas</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Inflamación</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Eliminación patógeno</div>
+    </div>
+
+    <h3>Células Linfoides Innatas (ILC) — Abbas Cap. 4</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Tipo ILC</th><th>Equivalente Th</th><th>Responde a</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-blue">ILC-1</span></td><td>Th1</td><td>Bacterias intracelulares + Virus</td></tr>
+          <tr><td><span class="tag tag-teal">ILC-2</span></td><td>Th2</td><td>Helmintos + Alergias</td></tr>
+          <tr><td><span class="tag tag-amber">ILC-3</span></td><td>Th17</td><td>Hongos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 3 ══ -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>Células del Sistema Innato</h2>
+    </div>
+
+    <p>Las células del sistema innato constituyen la primera línea de defensa. Se dividen en <strong>células polimorfonucleares (PMN)</strong> y <strong>células mononucleares</strong>.</p>
+
+    <h3>Leucocitos — Valores de Referencia</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Célula</th><th>N° medio/mm³</th><th>% normal</th><th>Alteración clínica</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Total leucocitos</strong></td><td>7.400</td><td>—</td><td>Normal: 4.500–11.000/mm³</td></tr>
+          <tr><td>Neutrófilos</td><td>4.400</td><td><span class="tag tag-blue">40–60%</span></td><td>↑ en infección bacteriana (&gt;60%)</td></tr>
+          <tr><td>Eosinófilos</td><td>200</td><td>1–4%</td><td>↑ en parasitosis/alergia (8–20%)</td></tr>
+          <tr><td>Basófilos</td><td>40</td><td>&lt;1%</td><td>Raro &gt;1%</td></tr>
+          <tr><td>Linfocitos</td><td>2.500</td><td><span class="tag tag-teal">20–40%</span></td><td>↑ infección viral (50–60%); VIH: 12%–400/mm³</td></tr>
+          <tr><td>Monocitos (MØ)</td><td>300</td><td>2–8%</td><td>↑ inflamación crónica (&gt;10%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Neutrófilos — PMN (Polimorfonucleares)</h3>
+    <div class="box box-info">
+      <div class="box-title">🔬 Características principales</div>
+      Mayor cantidad de leucocitos circulantes. Vida media: <strong>48h</strong>. Capacidad fagocítica <strong>rápida</strong>. Origen en médula ósea. <strong>No producen NET en macrófagos</strong>.
+    </div>
+
+    <ul class="content-list">
+      <li><strong>Principal función:</strong> Ingerir y destruir microbios y tejidos dañados (fagocitosis)</li>
+      <li><strong>Reclutamiento:</strong> Por medio de citocinas proinflamatorias</li>
+      <li><strong>Reconocimiento:</strong> PAMPs y DAMPs → Ingesta → Destrucción (fagosome + lisosoma = fagolisosoma)</li>
+      <li><strong>Red Neutrofílica (NET):</strong> Trampas extracelulares para aislamiento de la infección</li>
+    </ul>
+
+    <div class="flow">
+      <div class="flow-node">Fagosoma</div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node">Lisosoma</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">Fagolisosoma</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Digestión/Destrucción</div>
+    </div>
+
+    <h3>Macrófagos (MØ) — Fagocitos Mononucleares</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Neutrófilos vs Macrófagos</h4>
+        <ul>
+          <li>Origen: <strong>médula</strong> vs. médula (saco vitelino → hígado fetal → médula)</li>
+          <li>Vida: <strong>48h</strong> vs. semanas/años</li>
+          <li>Capacidad fagocítica: corta-rápida vs. larga-prolongada</li>
+          <li>Recuerdo antigénico: No vs. Sí (MØ residente)</li>
+          <li>NET: Sí vs. Sin NET</li>
+          <li>Apoptosis: No (en neutrófilos) vs. Reminente c/ complemento</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Funciones del Macrófago</h4>
+        <ul>
+          <li>Defensa, destrucción de microbios</li>
+          <li>Ingesta de células muertas</li>
+          <li>Amplificación con reclutamiento</li>
+          <li>APCs para linfocito T</li>
+          <li>Presentación de antígenos</li>
+          <li>Explosión del macrófago → lesión tisular</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Polarización del Macrófago (M1/M2)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Vía</th><th>Nombre</th><th>Función</th><th>Resultado</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-red">M1</span></td>
+            <td>Vía Clásica</td>
+            <td>Fagocitosis + destrucción de invasores</td>
+            <td>Elimina infección; limpia el local infectado; evita que la infección aumente</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-green">M2</span></td>
+            <td>Vía Alternativa</td>
+            <td>Reparación y reestructuración de tejidos</td>
+            <td>Fibrosis y angiogénesis; pueden fusionarse → <strong>células gigantes (giganticidas)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-title">⚠ Células Gigantes (Giganticidas) — Abbas Cap. 2</div>
+      Cuando los macrófagos no pueden eliminar el agente (M2 prolongado), se fusionan formando <strong>células gigantes multinucleadas</strong>. Clásicamente vistas en granulomas: tuberculosis, sarcoidosis, cuerpos extraños.
+    </div>
+
+    <h3>Mastocitos (Mast Cells)</h3>
+    <ul class="content-list">
+      <li><strong>Células fijas</strong>, no circulantes — encontradas en tejidos</li>
+      <li>Repletas de histamina, eotaxina, mucina → vasodilatación, prurito, broncoespasmo</li>
+      <li>Mediadores en: infecciones parasitarias y <mark class="red">choque anafiláctico</mark></li>
+      <li>Examen: <strong>producen y liberan histamina</strong></li>
+      <li>Alergia al veneno de abejas (Apis) → respuesta de mastocitos</li>
+    </ul>
+
+    <h3>Basófilos y Eosinófilos</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Basófilos</h4>
+        <ul>
+          <li>Granulocitos circulantes</li>
+          <li>Receptores de IgE en superficie</li>
+          <li>Similares a mastocitos (pero circulantes)</li>
+          <li>Participan en respuestas alérgicas</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Eosinófilos</h4>
+        <ul>
+          <li>Contienen <strong>enzimas lesivas</strong> para membranas de helmintos</li>
+          <li>Degranulación → daño al parásito</li>
+          <li>Fagocíticos, pero limitados e ineficaces</li>
+          <li>↑ en parasitosis (1–4% → 8–20%)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Células NK (Natural Killer)</h3>
+    <div class="box box-info">
+      <div class="box-title">🔑 NK — Abbas Cap. 4</div>
+      Las NK <strong>no realizan fagocitosis</strong>. Matan células alteradas (tumorales, infectadas) por liberación de <strong>perforinas</strong> y granzimas. Son el "control de calidad" del organismo. Receptores transplantados son inmunosuprimidos → sin control NK → mayor riesgo tumoral.
+    </div>
+
+    <h3>Células Dendríticas (DC)</h3>
+    <ul class="content-list">
+      <li>No realizan fagocitosis eficaz, pero <strong>estimulan a los macrófagos</strong> para hacerlo</li>
+      <li>Son el <strong>enlace entre sistema innato y adaptativo</strong></li>
+      <li>Son las principales APCs (células presentadoras de antígenos)</li>
+      <li><strong>Clásica:</strong> presenta antígenos → activa LT (respuesta principal)</li>
+      <li><strong>Plasmacitoide:</strong> respuesta antiviral (IFN tipo I)</li>
+      <li><strong>Inflamatoria:</strong> amplifica la inflamación</li>
+      <li><strong>Langerhans:</strong> protección de la piel</li>
+    </ul>
+
+    <div class="box box-success">
+      <div class="box-title">✅ APCs — Células Presentadoras de Antígenos</div>
+      <strong>Innato → MØ y Células Dendríticas</strong> presentan el antígeno al LT.<br>
+      <strong>Adaptativo → LB:</strong> producen anticuerpos.<br>
+      <strong>LT guía la respuesta</strong> → maduración (de inmaduro/virgen → maduro).<br>
+      DC inmaduras capturan antígeno; DC maduras presentan a LT naive.
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 4 ══ -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>Sistema Inmune Adaptativo</h2>
+    </div>
+
+    <p>El sistema adaptativo se caracteriza por su <strong>especificidad</strong> y <strong>memoria</strong>. Responde en días, pero cuando se reactiva (respuesta secundaria), actúa casi tan rápido como el innato <em>(Abbas, Cap. 1)</em>.</p>
+
+    <h3>Principios Fundamentales del Adaptativo</h3>
+    <ul class="content-list">
+      <li><strong>Especificidad:</strong> Reconocimiento de antígenos propios de la sustancia extraña</li>
+      <li><strong>Diversidad:</strong> Alta diversidad celular para reconocer millones de antígenos</li>
+      <li><strong>Determinantes/Epítopos:</strong> La zona más antigénica del antígeno → antígeno más fuerte</li>
+      <li><strong>Selección clonal:</strong> Multiplicación de células de defensa frente a agentes (enfermedades conocidas o no)</li>
+      <li><strong>Memoria:</strong> Linfocitos de memoria persisten para respuesta rápida secundaria</li>
+      <li><strong>Evita autoinmunidad:</strong> Tolerancia central y periférica</li>
+    </ul>
+
+    <h3>Tipos de Inmunidad Adaptativa</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Mediada por</th><th>Lugar de acción</th><th>Función principal</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-blue">Humoral</span></td>
+            <td>Linfocito B → Plasmocitos</td>
+            <td>Extracelular (plasma/sangre)</td>
+            <td>Producción de anticuerpos (inmunoglobulinas)</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-teal">Celular</span></td>
+            <td>Linfocito T → TCD8, TCD4</td>
+            <td>Intracelular</td>
+            <td>Eliminación de células infectadas (TCD8) y coordinación (TCD4)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Linfocitos T — Subpoblaciones y Funciones</h3>
+    <p>Los linfocitos T se originan en <strong>médula ósea</strong> y maduran en el <strong>timo</strong> (el timo guía la respuesta inmune).</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Subtipo</th><th>Marcador</th><th>Equivalente ILC</th><th>Responde a</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td>Th1</td><td>CD4+</td><td>ILC-1</td><td>Bacterias + Virus</td><td>Activa macrófagos; IFN-γ; inmunidad celular</td></tr>
+          <tr><td>Th2</td><td>CD4+</td><td>ILC-2</td><td>Helmintos + Alergias</td><td>Activa eosinófilos, mastocitos; IL-4, IL-5, IL-13</td></tr>
+          <tr><td>Th17</td><td>CD4+</td><td>ILC-3</td><td>Hongos</td><td>IL-17; recluta neutrófilos; defensa mucocutánea</td></tr>
+          <tr><td>TCD8 (Tc)</td><td>CD8+</td><td>NK (análogo)</td><td>Células infectadas/tumorales</td><td>Citotoxicidad directa (perforinas/granzimas)</td></tr>
+          <tr><td>Treg</td><td>CD4+/Foxp3</td><td>—</td><td>Self</td><td>Suprime respuesta autoinmune; IL-10, TGF-β</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-title">⚠ Punto de examen — TCD4 vs TCD8</div>
+      <strong>TCD8:</strong> mata las células alteradas directamente (como la NK, pero con especificidad).<br>
+      <strong>TCD4:</strong> guía/coordina la respuesta → activa MØ, estimula LB, regula TCD8.<br>
+      En VIH: el virus destruye los <strong>TCD4</strong> → colapso inmunológico (cuando TCD4 &lt;200/mm³ = SIDA).
+    </div>
+
+    <h3>Tipos de Inmunidad según el Origen</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Natural</th><th>Artificial</th><th>Duración</th><th>Memoria</th></tr></thead>
+        <tbody>
+          <tr>
+            <td rowspan="2"><span class="tag tag-blue">Activa</span><br><small>(produce anticuerpos)</small></td>
+            <td>Enfermar (infección)</td>
+            <td>Vacunas</td>
+            <td>Permanente</td>
+            <td>✅ Sí</td>
+          </tr>
+          <tr>
+            <td colspan="4" style="font-size:12px;color:var(--text3)">— Específica; estimula producción propia de anticuerpos —</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><span class="tag tag-amber">Pasiva</span><br><small>(recibe anticuerpos)</small></td>
+            <td>Leche materna, transplacentaria</td>
+            <td>Sueros antitóxicos (antídotos)</td>
+            <td>Temporal</td>
+            <td>❌ No</td>
+          </tr>
+          <tr>
+            <td colspan="4" style="font-size:12px;color:var(--text3)">— Específica; anticuerpos externos; sin memoria —</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-info">
+      <div class="box-title">📌 Vacunas y Tétanos/Difteria — Abbas + Apuntes</div>
+      <strong>DTP:</strong> vacuna triple (Difteria + Tétanos + Pertussis) → inmunidad activa artificial.<br>
+      <strong>Difteria:</strong> <em>Corynebacterium diphtheriae</em> → produce <strong>toxina</strong> → toxoide en la vacuna.<br>
+      <strong>Tétanos:</strong> <em>Clostridium tetani</em> → produce la <strong>tetanospasmina</strong> → toxoide en la vacuna.<br>
+      La vacuna DTP genera respuesta contra los <strong>toxoides</strong> (toxinas inactivadas), no el microorganismo entero.
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 5 ══ -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>Linfocitos B — Circulación y Diferenciación</h2>
+    </div>
+
+    <h3>Maduración del Linfocito B</h3>
+    <div class="flow">
+      <div class="flow-node">LB en Médula Ósea</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Sangre (virgen)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">Linfonodo</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Plasmoblasto</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Plasmocito</div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Respuesta</th><th>Anticuerpo producido</th><th>Características</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-blue">Primaria</span></td>
+            <td><strong>IgM</strong></td>
+            <td>Primera vez que se encuentra el antígeno; lenta; LB virgen/naive</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-green">Secundaria</span></td>
+            <td><strong>IgG</strong></td>
+            <td>Respuesta de memoria; más rápida y eficiente; LB de memoria</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Tipos de Plasmocitos y su Vida</h3>
+    <ul class="content-list">
+      <li><strong>LB de memoria</strong> → activo por ~6 meses (½ vida); produce IgG en sangre</li>
+      <li><strong>Plasmocito de vida corta</strong> → mucosas → IgA</li>
+      <li><strong>Plasmocito de vida larga</strong> → 10 años (½ vida); circula como IgG</li>
+    </ul>
+
+    <h3>Adhesión Leucocitaria — Circulación y Migración</h3>
+    <p>La migración de leucocitos al sitio de infección ocurre mediante <strong>rodamiento → adhesión → diapédesis</strong>:</p>
+
+    <div class="flow">
+      <div class="flow-node">Médula ósea (línea mieloide)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">Alojamiento</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Migración</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Recirculación</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Local de infección</div>
+    </div>
+
+    <h3>Moléculas Claves en la Adhesión</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Molécula</th><th>CD</th><th>Expresada en</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-blue">L-selectina</span></td><td>CD62L</td><td>Leucocitos</td><td>Rodamiento inicial; búsqueda de sitio</td></tr>
+          <tr><td><span class="tag tag-amber">P-selectina</span></td><td>CD62P</td><td>Plaquetas</td><td>Reclutamiento leucocitario en inflamación</td></tr>
+          <tr><td><span class="tag tag-teal">E-selectina</span></td><td>CD62E</td><td>Células endoteliales</td><td>Adhesión al endotelio vascular</td></tr>
+          <tr><td><span class="tag tag-green">Integrinas</span></td><td>varios</td><td>Leucocitos</td><td>Adhesión firme; habilitación de la diapédesis</td></tr>
+          <tr><td><span class="tag tag-teal">Quimiocinas</span></td><td>—</td><td>Tejidos/endotelio</td><td>Quimioatrayentes para células del S. Inmune</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-info">
+      <div class="box-title">🔑 Inflamación — Reclutamiento (Abbas Cap. 3)</div>
+      En inflamación, los neutrófilos llegan <strong>primero y en mayor cantidad</strong>. El reclutamiento puede durar días. Las selectinas, integrinas y quimiocinas son las señales químicas que ayudan a reclutar las células de defensa → facilitan e habilitan la <strong>diapédesis</strong> (rodabilidad).
+    </div>
+
+    <h3>Recirculación de Linfocitos</h3>
+    <ul class="content-list">
+      <li><strong>Células del S. Innato</strong>: "ya nace y comienza a trabajar" (sin migración específica)</li>
+      <li><strong>Células del S. Adaptativo</strong>: nacen, migran y <em>recirculan</em> en busca de antígenos</li>
+      <li>Linfocitos vírgenes migran continuamente → se acomodan en linfonodos secundarios</li>
+      <li><strong>Recirculación:</strong> migración de linfocitos hacia zona antigénica (con más antígenos)</li>
+    </ul>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 6 ══ -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>Inmunoglobulinas (Anticuerpos)</h2>
+    </div>
+
+    <p>Las inmunoglobulinas son proteínas producidas por <strong>plasmocitos</strong> (LB diferenciados). Son lo mismo que los anticuerpos. Tienen estructura en "Y" con regiones variables (unión al antígeno) y constantes <em>(Abbas, Cap. 5)</em>.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Clase</th><th>Características</th><th>Función clínica</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>IgG</strong></td>
+            <td>Más abundante en suero; <mark class="blue">cruza la placenta</mark>; vida larga</td>
+            <td>Respuesta secundaria; opsonización; fijación de complemento; protección neonatal</td>
+          </tr>
+          <tr>
+            <td><strong>IgA</strong></td>
+            <td>Secretoria; predomina en mucosas; forma dímero en secreciones</td>
+            <td>Defensa mucosal (leche materna, saliva, lágrimas, intestino)</td>
+          </tr>
+          <tr>
+            <td><strong>IgM</strong></td>
+            <td>Pentámero; primera respuesta; <strong>no cruza placenta</strong></td>
+            <td>Respuesta primaria; gran activador del complemento</td>
+          </tr>
+          <tr>
+            <td><strong>IgD</strong></td>
+            <td>Receptor en LB naive; baja concentración sérica</td>
+            <td>Activación del LB virgen; función poco clara aún</td>
+          </tr>
+          <tr>
+            <td><strong>IgE</strong></td>
+            <td>Concentración mínima; receptores en mastocitos y basófilos</td>
+            <td>Alergia; anafilaxia; defensa antiparasitaria (helmintos)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-title">⚠ IgG e IgA — Reconocen NEONATOS</div>
+      <strong>IgG:</strong> única que cruza la placenta → protección neonatal transplacentaria (inmunidad pasiva natural).<br>
+      <strong>IgA secretoria:</strong> se transfiere en la leche materna → protección mucosal del recién nacido.<br>
+      <strong>IgM:</strong> infección activa actual (respuesta primaria) → si IgM elevada en RN = infección congénita.
+    </div>
+
+    <div class="box box-danger">
+      <div class="box-title">🚨 IgE — Anafilaxia</div>
+      La IgE se une a mastocitos. Cuando el antígeno se une a IgE-mastocito → <strong>degranulación masiva</strong> → histamina, leucotrienos, prostaglandinas → <mark class="red">choque anafiláctico</mark>. Tratamiento: epinefrina (adrenalina) inmediata.
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 7 ══ -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>Sistema del Complemento</h2>
+    </div>
+
+    <p>El sistema del complemento es un conjunto de <strong>proteínas plasmáticas</strong> producidas principalmente en el hígado. Actúan en cascada y constituyen un puente fundamental entre la inmunidad innata y adaptativa <em>(Abbas, Cap. 13)</em>.</p>
+
+    <h3>Las 3 Vías de Activación</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Vía</th><th>Activada por</th><th>Inicio</th><th>Presente en</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-blue">Clásica</span></td>
+            <td><strong>Anticuerpos</strong> (IgG o IgM) unidos al antígeno</td>
+            <td>C1q</td>
+            <td>Depende de respuesta adaptativa</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-amber">Alternativa</span></td>
+            <td>Independiente — proteínas plasmáticas se adsorben a bacteria</td>
+            <td>C3(H₂O)</td>
+            <td>Bacteria directamente</td>
+          </tr>
+          <tr>
+            <td><span class="tag tag-teal">Lectina (MBL)</span></td>
+            <td>Manosa presente en superficies bacterianas/fúngicas</td>
+            <td>MBL-MASP</td>
+            <td>Bacterias + Hongos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Proteínas Clave y sus Funciones</h3>
+    <div class="flow">
+      <div class="flow-node">Hígado libera C3</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Escisión → C3a + C3b</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>Fragmento C3a</h4>
+        <ul>
+          <li>Anafilatoxina → <strong>inflamación</strong></li>
+          <li>Atrae mastocitos y basófilos</li>
+          <li>Activa respuesta inflamatoria local</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Fragmento C3b</h4>
+        <ul>
+          <li><strong>Opsonización</strong> (marca la bacteria)</li>
+          <li>Facilita fagocitosis del macrófago</li>
+          <li>Chivato → "sello" de destrucción</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-node">Proteína C5</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">C5a → Inflamación + atrae MO</div>
+      <div class="flow-arrow">·</div>
+      <div class="flow-node red">C5b → MAC (complejo de ataque)</div>
+    </div>
+
+    <div class="box box-danger">
+      <div class="box-title">🚨 MAC — Complejo de Ataque a la Membrana (C5b-9)</div>
+      El MAC (C5b + C6 + C7 + C8 + C9) se inserta en la membrana bacteriana → forma un <strong>poro</strong> → desregulación osmótica → lisis celular bacteriana. Especialmente importante frente a bacterias gram negativas (<em>Neisseria</em>). Deficiencia de C5-C9 → infecciones recurrentes por <em>Neisseria</em>.
+    </div>
+
+    <div class="box box-info">
+      <div class="box-title">📌 Resumen del Complemento — 3 efectos finales</div>
+      1. <strong>Opsonización</strong> → C3b marca la bacteria → fagocitosis facilitada<br>
+      2. <strong>Inflamación</strong> → C3a, C5a (anafilatoxinas)<br>
+      3. <strong>Lisis directa</strong> → MAC (C5b-9) perfora la membrana
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 8 ══ -->
+  <section class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>Adhesión Leucocitaria y Diapédesis</h2>
+    </div>
+
+    <h3>Secuencia de la Migración Leucocitaria</h3>
+    <div class="flow">
+      <div class="flow-node">Señal inflamatoria</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Selectinas (rodamiento)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node amber">Quimiocinas (activación)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Integrinas (adhesión firme)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Diapédesis → Tejido</div>
+    </div>
+
+    <ul class="content-list">
+      <li>Las <strong>selectinas, integrinas y quimiocinas</strong> son moléculas químicas que ayudan a reclutar los leucocitos</li>
+      <li><strong>Facilitan e habilitan la diapédesis</strong> (rodabilidad = capacidad de migrar a través del endotelio)</li>
+      <li>Las <strong>moléculas de adhesión celular</strong> (poco) permiten que las células migren para dentro del tejido</li>
+      <li>Quimiocinas = <strong>quimioatrayentes</strong> para las células del S. Inmunitario</li>
+    </ul>
+
+    <h3>Diferencia entre Innato y Adaptativo en Migración</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>🛡 S. Innato</h4>
+        <ul>
+          <li>Células ya presentes en tejidos (residentes)</li>
+          <li>"Ya nace y comienza a trabajar"</li>
+          <li>Respuestas prácticamente idénticas cada vez</li>
+          <li>No necesita buscar antígenos específicos</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>🎯 S. Adaptativo</h4>
+        <ul>
+          <li>Células nacen, migran y recirculan</li>
+          <li>Buscan activamente antígenos</li>
+          <li>Se acumulan en linfonodos secundarios</li>
+          <li>Linfocitos vírgenes migran continuamente</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 9 ══ -->
+  <section class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>Tablas Comparativas Maestras</h2>
+    </div>
+
+    <h3>Innato × Adaptativo — Comparación Completa</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Innato</th><th>Adaptativo</th></tr></thead>
+        <tbody>
+          <tr><td>Especificidad</td><td>Inespecífico (PAMPs/DAMPs)</td><td>Específico (antígenos únicos)</td></tr>
+          <tr><td>Tiempo de respuesta</td><td>0–12 horas</td><td>Días a semanas</td></tr>
+          <tr><td>Diversidad</td><td>Baja</td><td>Alta (millones de clones)</td></tr>
+          <tr><td>Memoria</td><td>Limitada (MØ residentes)</td><td>✅ Sí (linfocitos de memoria)</td></tr>
+          <tr><td>Células principales</td><td>Neutrófilos, MØ, NK, DC, Mastocitos</td><td>Linfocitos T y B, Plasmocitos</td></tr>
+          <tr><td>Reconocimiento</td><td>TLR, NLR, RLR (PRRs)</td><td>TCR (LT) / BCR + IgS (LB)</td></tr>
+          <tr><td>Evita autoinmunidad</td><td>Sí (limitado)</td><td>✅ Sí (tolerancia central/periférica)</td></tr>
+          <tr><td>Estrategia central</td><td>Inflamación</td><td>Selección clonal + expansión</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Células Fagocíticas — Comparación Completa</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Característica</th><th>Neutrófilo</th><th>Macrófago</th></tr></thead>
+        <tbody>
+          <tr><td>Origen embrionario</td><td>Médula ósea</td><td>Saco vitelino → Hígado fetal → Médula</td></tr>
+          <tr><td>Tiempo de vida</td><td>48 horas</td><td>Semanas / Años</td></tr>
+          <tr><td>Capacidad fagocítica</td><td>Corta y rápida</td><td>Larga y prolongada</td></tr>
+          <tr><td>Memoria antigénica</td><td>No</td><td>Sí (MØ residente)</td></tr>
+          <tr><td>NET</td><td>✅ Sí</td><td>Sin NET</td></tr>
+          <tr><td>APC</td><td>No</td><td>✅ Sí</td></tr>
+          <tr><td>Apoptosis</td><td>Sí (muerte programada)</td><td>Reminente; activación del complemento</td></tr>
+          <tr><td>Llegan al tejido</td><td>Primeros (mayor cantidad)</td><td>Después (macrófagos circulantes)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Inmunoglobulinas — Resumen Clínico</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Ig</th><th>Estructura</th><th>% Suero</th><th>Cruza placenta</th><th>Funciones clave</th></tr></thead>
+        <tbody>
+          <tr><td><strong>IgG</strong></td><td>Monómero</td><td>~80%</td><td>✅ Sí</td><td>Resp. secundaria; opsonización; neutralización</td></tr>
+          <tr><td><strong>IgA</strong></td><td>Monómero/Dímero</td><td>~13%</td><td>❌ No</td><td>Mucosal (saliva, leche, lágrimas, intestino)</td></tr>
+          <tr><td><strong>IgM</strong></td><td>Pentámero</td><td>~6%</td><td>❌ No</td><td>Resp. primaria; activación complemento</td></tr>
+          <tr><td><strong>IgD</strong></td><td>Monómero</td><td>&lt;1%</td><td>❌ No</td><td>Receptor LB virgen; activación LB</td></tr>
+          <tr><td><strong>IgE</strong></td><td>Monómero</td><td>Trazas</td><td>❌ No</td><td>Alergia; anafilaxia; antiparasitaria</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="section-div">
+
+  <!-- ══ SEC 10 ══ -->
+  <section class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>Trampas de Examen y Puntos Críticos</h2>
+    </div>
+
+    <div class="trap-grid">
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #1</div>
+        <p>Los <strong>mastocitos</strong> son fijos (no circulan). Los <strong>basófilos</strong> son granulocitos circulantes. Ambos tienen receptores de IgE, pero son células distintas.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #2</div>
+        <p>Las células <strong>NK</strong> no fagocitan. Matan por perforinas/granzimas. No son linfocitos T ni B. Son del sistema innato.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #3</div>
+        <p><strong>IgM</strong> = infección aguda/primaria (primer encuentro). <strong>IgG</strong> = memoria/respuesta secundaria o protección pasiva neonatal.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #4</div>
+        <p>Solo la <strong>IgG cruza la placenta</strong>. La IgA se transfiere por leche materna. La IgM no cruza ninguno → IgM elevada en RN = infección congénita activa.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #5</div>
+        <p>El <strong>timo</strong> guía la respuesta inmune (LT). La <strong>médula ósea</strong> produce LB. Los órganos linfoides <em>secundarios</em> son donde ocurre la activación (linfonodos, bazo).</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #6</div>
+        <p>En VIH: el virus destruye <strong>TCD4</strong>. Sin TCD4, colapsa toda la respuesta inmune (humoral + celular). SIDA = TCD4 &lt;200/mm³.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #7</div>
+        <p>Las <strong>células dendríticas</strong> son las <em>mejores</em> APCs del sistema adaptativo. Los MØ también son APCs, pero secundarios. Las DC inmaduras capturan; las maduras presentan.</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #8</div>
+        <p>TLR endosómicos (3, 7, 8, 9) = virus (ácidos nucleicos). TLR de membrana (1, 2, 4, 5, 6) = bacterias. El TLR-4 reconoce el <strong>LPS</strong> de gram negativas (el más estudiado).</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #9</div>
+        <p>El complemento tiene <strong>3 vías</strong>: Clásica (anticuerpos), Alternativa (independiente), Lectina (manosa). Todas convergen en <strong>C3</strong> → C3a (inflamación) + C3b (opsonización).</p>
+      </div>
+      <div class="trap-card">
+        <div class="trap-label">⚠ Trampa #10</div>
+        <p>Inmunidad <strong>activa</strong> = produce sus propios anticuerpos (enfermar o vacunarse) → MEMORIA. Inmunidad <strong>pasiva</strong> = recibe anticuerpos prontos → sin memoria.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WATERMARK -->
+  <div class="watermark">
+    <strong>André Luiz Miranda Suzano</strong> · 3H · Medicina UCP — Pedro Juan Caballero<br>
+    Baseado em: Abbas, Lichtman & Pillai — Inmunología Celular y Molecular, 10ª ed.<br>
+    Complementado con apuntes de clase (10/02/26 · 03/03/26 · 10/03/26)
+  </div>
+
+</main>
+
+<!-- ══ SIDEBAR QUIZ ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-header-text">
+      <h3>⚡ Quiz de Fijación</h3>
+      <p>20 preguntas — Inmunología Caps. 1–4</p>
+    </div>
+    <div class="score-badge" id="score-display">0/20</div>
+  </div>
+
+  <div class="sidebar-body">
+    <div class="quiz-progress">
+      <span id="progress-text">0 de 20 respondidas</span>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="questions-container"></div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="btn-reset" onclick="resetQuiz()">↺ Reiniciar Quiz</button>
+  </div>
+</aside>
+
+</div><!-- /app-body -->
+
+<script>
+const QUESTIONS = [
+  {
+    cat: "Sistema Innato",
+    q: "¿Cuál es el tiempo de respuesta característico del sistema inmune innato?",
+    opts: ["0–12 horas", "2–3 días", "1–2 semanas", "1 mes"],
+    ans: 0,
+    exp: "El sistema innato responde de forma casi inmediata: 0–12 horas tras el estímulo. Es su principal ventaja frente al adaptativo, que tarda días. <strong>Abbas, Cap. 1.</strong>"
+  },
+  {
+    cat: "Células",
+    q: "¿Qué célula es la más abundante en la circulación y constituye la primera línea de defensa fagocítica?",
+    opts: ["Macrófago", "Neutrófilo", "Linfocito B", "Célula NK"],
+    ans: 1,
+    exp: "Los <strong>neutrófilos</strong> representan el 40–60% de los leucocitos circulantes. Son los primeros en llegar al sitio de infección y tienen capacidad fagocítica rápida. Vida media: 48h."
+  },
+  {
+    cat: "Inmunoglobulinas",
+    q: "¿Qué inmunoglobulina es la ÚNICA que puede atravesar la barrera placentaria?",
+    opts: ["IgM", "IgA", "IgE", "IgG"],
+    ans: 3,
+    exp: "<strong>IgG</strong> es la única que cruza la placenta gracias a receptores FcRn en el trofoblasto. Proporciona inmunidad pasiva al neonato durante los primeros meses de vida. <strong>Abbas, Cap. 5.</strong>"
+  },
+  {
+    cat: "Complemento",
+    q: "¿Cuál es la función principal del fragmento C3b del sistema del complemento?",
+    opts: ["Causa inflamación directa", "Opsoniza bacterias para fagocitosis", "Forma el MAC", "Activa linfocitos T"],
+    ans: 1,
+    exp: "<strong>C3b</strong> es la principal molécula de opsonización. Se deposita en la superficie bacteriana, facilitando su reconocimiento y fagocitosis por macrófagos y neutrófilos. C3a, en cambio, es anafilatoxina proinflamatoria."
+  },
+  {
+    cat: "Células Dendríticas",
+    q: "¿Cuál es la función principal de las células dendríticas en la respuesta inmune adaptativa?",
+    opts: ["Producir anticuerpos", "Fagocitar bacterias eficientemente", "Presentar antígenos a los linfocitos T", "Liberar histamina"],
+    ans: 2,
+    exp: "Las <strong>células dendríticas</strong> son las APCs (antigen presenting cells) más eficientes del sistema inmune. Capturan antígenos (inmaduras) y los presentan a linfocitos T vírgenes (maduras), iniciando la respuesta adaptativa. <strong>Abbas, Cap. 6.</strong>"
+  },
+  {
+    cat: "TLRs",
+    q: "¿Cuáles receptores Toll-like se ubican en compartimientos endosómicos y reconocen virus?",
+    opts: ["TLR-1, 2 y 4", "TLR-3, 7 y 8", "TLR-5 y 6", "TLR-2 y 6"],
+    ans: 1,
+    exp: "<strong>TLR-3, 7 y 8</strong> son endosómicos y reconocen ácidos nucleicos virales (ARN). El TLR-9 también es endosómico y reconoce ADN bacteriano/viral. Los de membrana reconocen bacterias (LPS, peptidoglucano, flagelina)."
+  },
+  {
+    cat: "Linfocitos",
+    q: "Un paciente con infección activa presenta IgM elevada y IgG normal. ¿Qué tipo de respuesta inmune indica esto?",
+    opts: ["Respuesta secundaria (memoria)", "Respuesta primaria (primera exposición)", "Inmunidad pasiva", "Autoinmunidad"],
+    ans: 1,
+    exp: "<strong>IgM elevada</strong> indica respuesta inmune primaria — el organismo se enfrenta al antígeno por primera vez. La IgG se eleva en la respuesta secundaria (memoria). Este patrón es clave para diagnosticar infecciones agudas."
+  },
+  {
+    cat: "Mastocitos",
+    q: "¿Qué desencadena el choque anafiláctico a nivel celular?",
+    opts: ["Activación del complemento vía clásica", "Lisis de neutrófilos", "Degranulación masiva de mastocitos mediada por IgE", "Apoptosis de linfocitos T"],
+    ans: 2,
+    exp: "La <strong>IgE</strong> se une a mastocitos. Cuando el antígeno (alérgeno) se une a la IgE en la superficie del mastocito → <strong>degranulación masiva</strong> → liberación de histamina, triptasa, leucotrienos → anafilaxia. Tratamiento: epinefrina."
+  },
+  {
+    cat: "Inmunidad Activa/Pasiva",
+    q: "Un niño recibe una vacuna contra la poliomielitis. ¿Qué tipo de inmunidad adquiere?",
+    opts: ["Pasiva natural", "Pasiva artificial", "Activa natural", "Activa artificial"],
+    ans: 3,
+    exp: "Las <strong>vacunas</strong> generan inmunidad <strong>activa artificial</strong>: el organismo produce sus propios anticuerpos y células de memoria en respuesta a un antígeno artificial (vacuna). Es permanente y genera memoria inmunológica."
+  },
+  {
+    cat: "Macrófagos",
+    q: "¿Cuál es la principal diferencia funcional entre el macrófago M1 y el M2?",
+    opts: [
+      "M1 produce anticuerpos; M2 fagocita",
+      "M1 repara tejidos; M2 destruye bacterias",
+      "M1 destruye patógenos (vía clásica); M2 repara tejidos (vía alternativa)",
+      "M1 y M2 tienen la misma función"
+    ],
+    ans: 2,
+    exp: "<strong>M1 (vía clásica)</strong>: activado por IFN-γ/LPS → destrucción de patógenos, pro-inflamatorio. <strong>M2 (vía alternativa)</strong>: activado por IL-4/IL-13 → reparación tisular, fibrosis, angiogénesis. Pueden fusionarse → células gigantes. <strong>Abbas, Cap. 2.</strong>"
+  },
+  {
+    cat: "Células NK",
+    q: "¿Cómo actúan las células NK para eliminar células tumorales?",
+    opts: ["Fagocitándolas directamente", "Produciendo anticuerpos", "Liberando perforinas y granzimas", "Activando el complemento"],
+    ans: 2,
+    exp: "Las células <strong>NK (Natural Killer)</strong> liberan <strong>perforinas</strong> (forman poros en la membrana) y <strong>granzimas</strong> (serina-proteasas que inducen apoptosis). No son fagocitos — realizan citotoxicidad mediada por contacto."
+  },
+  {
+    cat: "Sistema del Complemento",
+    q: "¿Cuál vía de activación del complemento depende de anticuerpos específicos para activarse?",
+    opts: ["Vía alternativa", "Vía lectina (MBL)", "Vía clásica", "Todas son independientes de anticuerpos"],
+    ans: 2,
+    exp: "La <strong>vía clásica</strong> requiere IgG o IgM unidas al antígeno → activan C1q. La vía alternativa es independiente (proteínas plasmáticas). La vía lectina depende de manosa en superficies microbianas, no de anticuerpos."
+  },
+  {
+    cat: "Linfocitos T",
+    q: "¿Cuál subpoblación de LT guía/coordina TODA la respuesta adaptativa (humoral y celular)?",
+    opts: ["TCD8", "LT regulador (Treg)", "TCD4 (Th)", "Célula NK"],
+    ans: 2,
+    exp: "<strong>TCD4 (células Th)</strong> son los directores de la respuesta inmune: activan macrófagos (Th1), estimulan LB para producir anticuerpos, regulan TCD8. Sin TCD4 → colapso inmune (base del SIDA). <strong>Abbas, Caps. 9–11.</strong>"
+  },
+  {
+    cat: "Adhesión",
+    q: "¿Qué molécula, expresada en células endoteliales activadas, media la adhesión de leucocitos al endotelio vascular durante la inflamación?",
+    opts: ["L-selectina (CD62L)", "P-selectina (CD62P)", "E-selectina (CD62E)", "IgG secretoria"],
+    ans: 2,
+    exp: "<strong>E-selectina (CD62E)</strong> es expresada por células endoteliales activadas (por TNF, IL-1). Interacciona con ligandos en leucocitos → rodamiento firme. La L-selectina es de leucocitos; la P-selectina es de plaquetas."
+  },
+  {
+    cat: "ILC",
+    q: "Un paciente con infección grave por Candida albicans (hongo). ¿Qué célula innata linfocitoide es fundamental en esta defensa?",
+    opts: ["ILC-1", "ILC-2", "ILC-3", "Célula NK clásica"],
+    ans: 2,
+    exp: "<strong>ILC-3</strong> es el equivalente innato de las células Th17. Producen IL-17 e IL-22, fundamentales en la defensa antifúngica mucocutánea. Análogamente, los LT Th17 también responden a hongos como <em>Candida</em>."
+  },
+  {
+    cat: "Eosinófilos",
+    q: "¿Cuál es el mecanismo principal por el que los eosinófilos eliminan helmintos?",
+    opts: ["Fagocitosis del parásito completo", "Producción de IgE", "Degranulación con liberación de enzimas lesivas para membranas", "Activación del complemento vía lectina"],
+    ans: 2,
+    exp: "Los <strong>eosinófilos</strong> contienen en sus gránulos proteínas como la <strong>MBP (major basic protein)</strong> y la ECP, que son tóxicas para las membranas de helmintos. La fagocitosis directa es ineficaz — los helmintos son demasiado grandes."
+  },
+  {
+    cat: "Vacunas",
+    q: "La vacuna DTP protege contra difteria y tétanos usando toxoides. ¿Qué es un toxoide?",
+    opts: [
+      "Un microorganismo vivo atenuado",
+      "Una toxina bacteriana inactivada que conserva antigenicidad",
+      "Un anticuerpo monoclonal específico",
+      "Una proteína de membrana bacterial"
+    ],
+    ans: 1,
+    exp: "Un <strong>toxoide</strong> es una toxina bacteriana que ha sido inactivada (calor o formaldehído) pero conserva su antigenicidad. Estimula respuesta inmune sin causar enfermedad. Difteria: toxoide diftérico; Tétanos: toxoide tetánico."
+  },
+  {
+    cat: "Complemento - MAC",
+    q: "¿Cuál es la consecuencia de la formación del MAC (Complejo de Ataque a la Membrana)?",
+    opts: [
+      "Opsonización de la bacteria",
+      "Activación de linfocitos T",
+      "Lisis bacteriana por formación de poros en la membrana",
+      "Liberación de histamina"
+    ],
+    ans: 2,
+    exp: "El <strong>MAC (C5b-C6-C7-C8-C9)</strong> se ensambla en la membrana bacteriana → forma un canal/poro → entrada masiva de agua e iones → <strong>lisis osmótica</strong>. Especialmente eficaz contra <em>Neisseria meningitidis</em> y <em>gonorrhoeae</em>."
+  },
+  {
+    cat: "Linfocito B",
+    q: "¿Cuál inmunoglobulina es producida por los plasmocitos de vida larga en linfonodos y protege durante años?",
+    opts: ["IgM", "IgA secretoria", "IgE", "IgG"],
+    ans: 3,
+    exp: "<strong>IgG</strong> es producida por plasmocitos de vida larga (hasta 10 años de vida media) localizados en la médula ósea y linfonodos. Constituye la memoria humoral a largo plazo. Los plasmocitos de vida corta producen IgA en mucosas."
+  },
+  {
+    cat: "Macrófagos vs Neutrófilos",
+    q: "¿Cuál afirmación diferencia correctamente al neutrófilo del macrófago?",
+    opts: [
+      "El neutrófilo tiene vida más larga y es APC",
+      "El macrófago muere en 48h y no puede presentar antígenos",
+      "El neutrófilo tiene vida de 48h y genera NET; el macrófago vive semanas y es APC",
+      "Ambas células tienen la misma vida media y función"
+    ],
+    ans: 2,
+    exp: "<strong>Neutrófilo</strong>: vida 48h, rápido, genera NETs (trampas extracelulares), NO es APC. <strong>Macrófago</strong>: vida semanas/años, digestión más lenta, SÍ es APC para LT, sin NET. Esta diferencia es clásica de examen."
+  }
+];
+
+let answered = new Array(QUESTIONS.length).fill(false);
+let correctCount = 0;
+
+function buildQuiz() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  answered = new Array(QUESTIONS.length).fill(false);
+  correctCount = 0;
+  updateProgress();
+
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = `qcard-${qi}`;
+
+    const optsHtml = q.opts.map((opt, oi) =>
+      `<li><button class="opt-btn" onclick="answer(${qi}, ${oi})" id="opt-${qi}-${oi}">${opt}</button></li>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="q-category">${q.cat}</div>
+      <div class="q-header">
+        <span class="q-num">${String(qi+1).padStart(2,'0')}</span>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <ul class="options">${optsHtml}</ul>
+      <div class="explanation" id="exp-${qi}">
+        <strong>✅ Explicación:</strong> ${q.exp}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+
+  const q = QUESTIONS[qi];
+  const card = document.getElementById(`qcard-${qi}`);
+  const exp = document.getElementById(`exp-${qi}`);
+
+  // Disable all options
+  q.opts.forEach((_, i) => {
+    const btn = document.getElementById(`opt-${qi}-${i}`);
+    btn.disabled = true;
+  });
+
+  const selectedBtn = document.getElementById(`opt-${qi}-${oi}`);
+  const correctBtn  = document.getElementById(`opt-${qi}-${q.ans}`);
+
+  if (oi === q.ans) {
+    selectedBtn.classList.add('correct');
+    card.classList.add('answered-correct');
+    correctCount++;
+  } else {
+    selectedBtn.classList.add('wrong');
+    correctBtn.classList.add('correct');
+    card.classList.add('answered-wrong');
+  }
+
+  exp.classList.add('show');
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = QUESTIONS.length;
+  const done = answered.filter(Boolean).length;
+  document.getElementById('progress-text').textContent = `${done} de ${total} respondidas`;
+  document.getElementById('progress-fill').style.width = `${(done/total)*100}%`;
+  document.getElementById('score-display').textContent = `${correctCount}/${total}`;
+}
+
+function resetQuiz() {
+  buildQuiz();
+}
+
+let sidebarOpen = true;
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const label = document.getElementById('toggle-label');
+  sidebarOpen = !sidebarOpen;
+  sb.classList.toggle('collapsed', !sidebarOpen);
+  label.textContent = sidebarOpen ? 'Ocultar' : 'Mostrar';
+}
+
+// Smooth scroll for nav
+document.querySelectorAll('.chapter-nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.chapter-nav a').forEach(a => a.classList.remove('active'));
+    link.classList.add('active');
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+buildQuiz();
+</script>
+</body>
+</html>
