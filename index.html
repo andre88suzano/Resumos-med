@@ -1179,10 +1179,10 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
           <div class="stat-value" id="stat-total-resumos">—</div>
           <div class="stat-label" data-i18n="stat-available">Resumos disponíveis</div>
         </div>
-        <div class="stat-card teal">
-          <div class="stat-icon">✅</div>
+        <div class="stat-card teal" style="cursor:pointer;" onclick="showPage('admin-users');filterUsers('pending');">
+          <div class="stat-icon">🕐</div>
           <div class="stat-value" id="stat-my-access">—</div>
-          <div class="stat-label" data-i18n="stat-my-access">Com acesso</div>
+          <div class="stat-label">Aguardando acesso</div>
         </div>
         <div class="stat-card gold">
           <div class="stat-icon">🎓</div>
@@ -2002,10 +2002,14 @@ function renderDashboard() {
   if (statGrid) statGrid.style.display = isAdmin ? '' : 'none';
 
   if (isAdmin) {
+    const pending = state.users.filter(u => !u.approved && !u.is_admin).length;
     document.getElementById('stat-total-resumos').textContent = state.resumos.length;
-    document.getElementById('stat-my-access').textContent = state.resumos.length;
+    document.getElementById('stat-my-access').textContent = pending;
     document.getElementById('stat-total-users').textContent = state.users.length;
     document.getElementById('stat-card-users').style.display = '';
+    // Destaque visual se houver pendentes
+    const card = document.querySelector('.stat-card.teal');
+    if (card) card.style.borderColor = pending > 0 ? 'var(--gold)' : '';
   }
 
   // Banner de pagamento — todos veem
