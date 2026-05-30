@@ -1897,6 +1897,9 @@ function showScreen(name) {
 }
 
 function showPage(name) {
+  // Reexpande a sidebar ao sair do viewer
+  if (state.currentPage === 'viewer' && name !== 'viewer') expandSidebar();
+
   state.currentPage = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -2065,6 +2068,16 @@ function onSearch(q) {
   if (state.currentPage === 'resumos') renderResumos();
 }
 
+function collapseSidebar() {
+  document.getElementById('sidebar').classList.add('collapsed');
+  document.getElementById('main-content').classList.add('expanded');
+}
+
+function expandSidebar() {
+  document.getElementById('sidebar').classList.remove('collapsed');
+  document.getElementById('main-content').classList.remove('expanded');
+}
+
 function openResumo(id) {
   const r = state.resumos.find(x => x.id === id);
   if (!r) return;
@@ -2090,6 +2103,8 @@ function openResumo(id) {
     <span>${r.materia}</span>
     <span>›</span>
     <span style="color:var(--text)">${r.title}</span>`;
+
+  collapseSidebar();
   showPage('viewer');
 }
 
