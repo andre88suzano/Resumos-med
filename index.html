@@ -1826,36 +1826,43 @@ async function doLogin() {
   setLoading('btn-login', true);
   try {
     const { data, ok } = await SB.signIn(email, pass);
-    if (!ok || !data.access_token) { toast(data?.error_description || (currentLang==='pt'?'Credenciais inválidas.':'Credenciales inválidas.'),'error'); return; }
+    if (!ok || !data.access_token) {
+      toast(data?.error_description || data?.msg || (currentLang==='pt'?'Credenciais inválidas.':'Credenciales inválidas.'),'error');
+      return;
+    }
     state.authToken = data.access_token;
     state.user = data.user;
 
-    // Verificar se há outro dispositivo ativo
-    const { data: profileData } = await SB.select('approved_users', `user_id=eq.${data.user.id}&select=active_token,approved,is_admin`);
-    const profile = Array.isArray(profileData) ? profileData[0] : null;
+    // Verificar bloqueio de dispositivo (não-bloqueante — se falhar, login continua)
+    try {
+      const { data: profileData, ok: pOk } = await SB.select('approved_users', `user_id=eq.${data.user.id}&select=active_token,is_admin`);
+      const profile = (pOk && Array.isArray(profileData)) ? profileData[0] : null;
 
-    if (profile?.active_token) {
-      const localToken = localStorage.getItem('med_device_token');
-      if (localToken !== profile.active_token) {
-        // Outro dispositivo está ativo — perguntar se quer forçar
-        setLoading('btn-login', false);
-        showForceLoginModal(data.access_token, data.user);
-        return;
+      if (profile && !profile.is_admin && profile.active_token) {
+        const localToken = localStorage.getItem('med_device_token');
+        if (localToken !== profile.active_token) {
+          setLoading('btn-login', false);
+          showForceLoginModal(data.access_token, data.user);
+          return;
+        }
       }
-    }
+      // Ativa dispositivo atual (ignora erros de RLS)
+      await activateDevice(data.user.id);
+    } catch(_) { /* bloqueio falhou — continua login normalmente */ }
 
-    await activateDevice(data.user.id);
     localStorage.setItem('med_session', JSON.stringify({ token: data.access_token, user: data.user }));
     await loadUserProfile();
-  } catch(e) { toast(e.message,'error'); }
+  } catch(e) { toast(currentLang==='pt'?'Erro ao entrar. Tente novamente.':'Error al entrar. Inténtalo de nuevo.','error'); console.error(e); }
   finally { setLoading('btn-login', false); }
 }
 
 async function activateDevice(userId) {
-  const token = genToken();
-  localStorage.setItem('med_device_token', token);
-  await SB.update('approved_users', { active_token: token }, `user_id=eq.${userId}`);
-  state.deviceToken = token;
+  try {
+    const token = genToken();
+    localStorage.setItem('med_device_token', token);
+    await SB.update('approved_users', { active_token: token }, `user_id=eq.${userId}`);
+    state.deviceToken = token;
+  } catch(_) { /* ignora falhas de RLS */ }
 }
 
 function showForceLoginModal(accessToken, user) {
@@ -2640,22 +2647,22 @@ async function init() {
       if (ok && Array.isArray(data) && data[0]) {
         state.profile = data[0];
         if (state.profile.approved || state.profile.is_admin) {
-          // Verificar se este dispositivo ainda é o ativo
-          const localToken = localStorage.getItem('med_device_token');
-          if (!state.profile.is_admin && state.profile.active_token && localToken !== state.profile.active_token) {
-            // Outro dispositivo tomou a sessão
-            state.authToken = null; state.user = null; state.profile = null;
-            localStorage.removeItem('med_session');
-            localStorage.removeItem('med_device_token');
-            document.getElementById('screen-loading').classList.add('hidden');
-            showScreen('auth');
-            toast(currentLang==='pt'
-              ? '⚠️ Sua sessão foi encerrada pois a conta foi acessada em outro dispositivo.'
-              : '⚠️ Tu sesión fue cerrada porque la cuenta fue accedida en otro dispositivo.', 'error');
-            return;
-          }
-          // Renovar token do dispositivo
-          if (!state.profile.is_admin) await activateDevice(user.id);
+          // Verificar dispositivo ativo (não-bloqueante)
+          try {
+            const localToken = localStorage.getItem('med_device_token');
+            if (!state.profile.is_admin && state.profile.active_token && localToken !== state.profile.active_token) {
+              state.authToken = null; state.user = null; state.profile = null;
+              localStorage.removeItem('med_session');
+              localStorage.removeItem('med_device_token');
+              document.getElementById('screen-loading').classList.add('hidden');
+              showScreen('auth');
+              toast(currentLang==='pt'
+                ? '⚠️ Sessão encerrada — conta acessada em outro dispositivo.'
+                : '⚠️ Sesión cerrada — cuenta accedida en otro dispositivo.', 'error');
+              return;
+            }
+            if (!state.profile.is_admin) await activateDevice(user.id);
+          } catch(_) { /* ignora erros de verificação */ }
           initApp();
           document.getElementById('screen-loading').classList.add('hidden');
           return;
