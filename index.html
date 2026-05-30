@@ -1349,9 +1349,10 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         </button>
       </div>
       <div class="viewer-body" id="viewer-body">
-        <div id="viewer-scale-wrapper">
-          <div id="viewer-scale-inner"></div>
-        </div>
+        <iframe id="viewer-iframe"
+          style="width:100%;border:none;display:block;min-height:80vh;"
+          allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
+        </iframe>
       </div>
     </div>
 
@@ -1999,8 +2000,11 @@ function showScreen(name) {
 }
 
 function showPage(name) {
-  // Reexpande a sidebar ao sair do viewer
-  if (state.currentPage === 'viewer' && name !== 'viewer') expandSidebar();
+  // Reexpande a sidebar e limpa viewer ao sair
+  if (state.currentPage === 'viewer' && name !== 'viewer') {
+    expandSidebar();
+    cleanupViewer();
+  }
 
   state.currentPage = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2193,17 +2197,27 @@ function openResumo(id) {
     <span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span>
     <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>`;
 
-  // Injeta conteúdo no inner wrapper (preserva layout original)
-  const inner = document.getElementById('viewer-scale-inner');
-  inner.innerHTML = r.content;
+  // Renderiza o HTML do resumo num iframe isolado
+  // Scripts, CSS e interatividade funcionam 100% sem conflito
+  const iframe = document.getElementById('viewer-iframe');
 
-  // Reexecuta scripts (quizzes, interatividade, acordeões)
-  inner.querySelectorAll('script').forEach(oldScript => {
-    const newScript = document.createElement('script');
-    [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
-    newScript.textContent = oldScript.textContent;
-    oldScript.parentNode.replaceChild(newScript, oldScript);
-  });
+  // Limpa URL anterior
+  if (iframe._blobUrl) { URL.revokeObjectURL(iframe._blobUrl); iframe._blobUrl = null; }
+
+  const blob = new Blob([r.content], { type: 'text/html; charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  iframe._blobUrl = url;
+  iframe.src = url;
+
+  // Ajusta altura do iframe ao conteúdo quando carrega
+  iframe.onload = () => {
+    try {
+      const h = iframe.contentDocument.documentElement.scrollHeight;
+      iframe.style.height = Math.max(h, 400) + 'px';
+    } catch(e) {
+      iframe.style.height = '100vh';
+    }
+  };
 
   document.getElementById('viewer-breadcrumb').innerHTML = `
     <a onclick="showPage('resumos')">${t('nav-resumos')}</a>
@@ -2214,33 +2228,6 @@ function openResumo(id) {
 
   collapseSidebar();
   showPage('viewer');
-
-  // Aplica zoom proporcional no mobile para o conteúdo caber sem quebrar
-  requestAnimationFrame(() => applyViewerZoom());
-}
-
-function applyViewerZoom() {
-  const inner   = document.getElementById('viewer-scale-inner');
-  const wrapper = document.getElementById('viewer-scale-wrapper');
-  if (!inner || !wrapper) return;
-
-  // Reset para medir largura natural
-  inner.style.transform = '';
-  inner.style.width = '';
-
-  const naturalW  = inner.scrollWidth;
-  const availableW = wrapper.clientWidth;
-
-  if (naturalW > availableW && availableW > 0) {
-    const scale = availableW / naturalW;
-    inner.style.transformOrigin = 'top left';
-    inner.style.transform = `scale(${scale})`;
-    inner.style.width = `${naturalW}px`;
-    wrapper.style.height = `${inner.scrollHeight * scale}px`;
-  } else {
-    inner.style.width = '100%';
-    wrapper.style.height = '';
-  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -2643,10 +2630,15 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Recalcular zoom ao girar tela
-window.addEventListener('resize', () => {
-  if (state.currentPage === 'viewer') applyViewerZoom();
-});
+// Libera blob URL ao sair do viewer
+function cleanupViewer() {
+  const iframe = document.getElementById('viewer-iframe');
+  if (iframe && iframe._blobUrl) {
+    URL.revokeObjectURL(iframe._blobUrl);
+    iframe._blobUrl = null;
+    iframe.src = 'about:blank';
+  }
+}
 
 init();
 </script>
