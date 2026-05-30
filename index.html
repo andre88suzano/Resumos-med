@@ -671,6 +671,38 @@
   }
   @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
 
+  /* ─── FOLDER CARDS ───────────────────────────────────── */
+  .folder-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .folder-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    opacity: 0;
+    transition: var(--transition);
+  }
+  .folder-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 24px #00000040; }
+  .folder-card:hover::before { opacity: 1; }
+  .folder-icon { font-size: 36px; line-height: 1; }
+  .folder-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .folder-meta { font-size: 12px; color: var(--text3); }
+  .folder-card.locked-folder { opacity: 0.55; cursor: default; }
+  .folder-card.locked-folder:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
 </style>
 </head>
 <body>
@@ -1054,16 +1086,36 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
 
     <!-- ── PAGE: RESUMOS ───────────────────────────── -->
     <div class="page hidden" id="page-resumos">
-      <h1 class="section-title anim-in" data-i18n="nav-resumos">Resumos</h1>
-      <p class="section-sub anim-in anim-delay-1" data-i18n="resumos-sub">Todos os resumos disponíveis na plataforma.</p>
 
-      <div class="filters anim-in anim-delay-2" id="materia-filters">
-        <button class="filter-chip active" onclick="filterMateria('all')" data-filter="all" data-i18n="all">Todos</button>
-        <!-- chips added dynamically -->
+      <!-- VISÃO: PASTAS (folders) -->
+      <div id="view-folders">
+        <h1 class="section-title anim-in" data-i18n="nav-resumos">Resumos</h1>
+        <p class="section-sub anim-in anim-delay-1">Selecione uma matéria para ver os resumos.</p>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <span style="font-size:12px;color:var(--text3);">📁</span>
+          <span style="font-size:13px;color:var(--text3);">Meus Resumos</span>
+        </div>
+
+        <div id="folder-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;">
+          <div class="empty-state"><div class="spinner"></div></div>
+        </div>
       </div>
 
-      <div class="resumo-grid" id="resumo-grid">
-        <div class="empty-state"><div class="spinner"></div></div>
+      <!-- VISÃO: RESUMOS DENTRO DA PASTA -->
+      <div id="view-folder-content" class="hidden">
+        <div class="breadcrumb" id="folder-breadcrumb"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="folder-icon-title" style="font-size:28px;"></span>
+            <div>
+              <h1 class="section-title" id="folder-title" style="margin-bottom:2px;"></h1>
+              <span style="font-size:13px;color:var(--text3);" id="folder-count"></span>
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="closeFolderContent()">← Voltar</button>
+        </div>
+        <div class="resumo-grid" id="folder-resumo-grid"></div>
       </div>
     </div>
 
@@ -1730,24 +1782,74 @@ const MATERIA_COLORS = {
   'Bioquímica':'badge-green','Genética Médica':'badge-blue','Biofísica':'badge-gray',
 };
 
+const MATERIA_ICONS = {
+  'Imunologia':'🛡️','Microbiologia':'🦠','Fisiologia':'❤️',
+  'Bioquímica':'⚗️','Genética Médica':'🧬','Biofísica':'⚡',
+};
+
+const FOLDER_COLORS = {
+  'Imunologia':'#0ecfc8','Microbiologia':'#2d6ef7','Fisiologia':'#f0b429',
+  'Bioquímica':'#10b981','Genética Médica':'#2d6ef7','Biofísica':'#8b5cf6',
+};
+
 function renderResumos() {
-  // Render filter chips
-  const filters = document.getElementById('materia-filters');
-  const materias = [...new Set(state.resumos.map(r => r.materia))];
-  const chips = [`<button class="filter-chip ${state.filterMateria==='all'?'active':''}" onclick="filterMateria('all')" data-filter="all">${t('all')}</button>`];
-  materias.forEach(m => chips.push(`<button class="filter-chip ${state.filterMateria===m?'active':''}" onclick="filterMateria('${m}')" data-filter="${m}">${m}</button>`));
-  filters.innerHTML = chips.join('');
+  closeFolderContent(true);
+  const materias = [...new Set(state.resumos.map(r => r.materia))].sort();
+  const grid = document.getElementById('folder-grid');
 
-  const q = state.searchQuery.toLowerCase();
-  const filtered = state.resumos.filter(r => {
-    const matchM = state.filterMateria === 'all' || r.materia === state.filterMateria;
-    const matchQ = !q || r.title.toLowerCase().includes(q) || r.materia.toLowerCase().includes(q) || (r.description||'').toLowerCase().includes(q);
-    return matchM && matchQ;
-  });
+  if (!materias.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><h3>${t('no-resumos-found')}</h3></div>`;
+    return;
+  }
 
-  const grid = document.getElementById('resumo-grid');
-  if (!filtered.length) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>${t('no-resumos-found')}</h3></div>`; return; }
-  grid.innerHTML = filtered.map(r => buildResumoCard(r)).join('');
+  grid.innerHTML = materias.map(m => {
+    const resumosDaMateria = state.resumos.filter(r => r.materia === m);
+    const liberados = resumosDaMateria.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
+    const icon = MATERIA_ICONS[m] || '📁';
+    const color = FOLDER_COLORS[m] || 'var(--accent)';
+    return `
+      <div class="folder-card" onclick="openFolder('${m}')" style="--folder-color:${color};">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+        <div class="folder-icon">${icon}</div>
+        <div class="folder-name">${m}</div>
+        <div class="folder-meta">${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+            <div style="width:${resumosDaMateria.length?Math.round(liberados/resumosDaMateria.length*100):0}%;height:100%;background:${color};border-radius:99px;transition:.5s ease;"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text3);">${resumosDaMateria.length?Math.round(liberados/resumosDaMateria.length*100):0}%</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openFolder(materia) {
+  document.getElementById('view-folders').classList.add('hidden');
+  const content = document.getElementById('view-folder-content');
+  content.classList.remove('hidden');
+
+  const icon = MATERIA_ICONS[materia] || '📁';
+  const resumosDaMateria = state.resumos.filter(r => r.materia === materia);
+
+  document.getElementById('folder-icon-title').textContent = icon;
+  document.getElementById('folder-title').textContent = materia;
+  document.getElementById('folder-count').textContent = `${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''}`;
+  document.getElementById('folder-breadcrumb').innerHTML = `
+    <a onclick="closeFolderContent()">📁 Meus Resumos</a>
+    <span>›</span>
+    <span style="color:var(--text)">${icon} ${materia}</span>`;
+
+  const grid = document.getElementById('folder-resumo-grid');
+  if (!resumosDaMateria.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${icon}</div><h3>Nenhum resumo ainda</h3></div>`;
+    return;
+  }
+  grid.innerHTML = resumosDaMateria.map(r => buildResumoCard(r)).join('');
+}
+
+function closeFolderContent(silent) {
+  document.getElementById('view-folders').classList.remove('hidden');
+  document.getElementById('view-folder-content').classList.add('hidden');
 }
 
 function buildResumoCard(r) {
@@ -1768,11 +1870,6 @@ function buildResumoCard(r) {
         <span class="lock-icon">${lockIcon}</span>
       </div>
     </div>`;
-}
-
-function filterMateria(m) {
-  state.filterMateria = m;
-  renderResumos();
 }
 
 function onSearch(q) {
