@@ -1217,26 +1217,28 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         <p class="section-sub anim-in anim-delay-1" id="dash-sub">Aqui está um resumo da sua atividade.</p>
       </div>
 
-      <div class="stat-grid anim-in anim-delay-2">
-        <div class="stat-card blue">
+      <div class="stat-grid anim-in anim-delay-2" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
+        <!-- Card visível para todos: resumos liberados -->
+        <div class="stat-card teal">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="stat-my-access">—</div>
+          <div class="stat-label">Resumos liberados</div>
+        </div>
+        <!-- Cards visíveis apenas para admin -->
+        <div class="stat-card blue admin-only" style="display:none;">
           <div class="stat-icon">📚</div>
           <div class="stat-value" id="stat-total-resumos">—</div>
-          <div class="stat-label" data-i18n="stat-available">Resumos disponíveis</div>
+          <div class="stat-label">Resumos disponíveis</div>
         </div>
-        <div class="stat-card teal" style="cursor:pointer;" onclick="showPage('admin-users');filterUsers('pending');">
+        <div class="stat-card gold admin-only" style="cursor:pointer;display:none;" onclick="showPage('admin-users');filterUsers('pending');">
           <div class="stat-icon">🕐</div>
-          <div class="stat-value" id="stat-my-access">—</div>
+          <div class="stat-value" id="stat-pending">—</div>
           <div class="stat-label">Aguardando acesso</div>
         </div>
-        <div class="stat-card gold">
-          <div class="stat-icon">🎓</div>
-          <div class="stat-value" id="stat-materias">6</div>
-          <div class="stat-label" data-i18n="stat-subjects">Matérias</div>
-        </div>
-        <div class="stat-card green" id="stat-card-users" style="display:none;">
+        <div class="stat-card green admin-only" style="display:none;">
           <div class="stat-icon">👥</div>
           <div class="stat-value" id="stat-total-users">—</div>
-          <div class="stat-label" data-i18n="stat-users">Usuários</div>
+          <div class="stat-label">Usuários</div>
         </div>
       </div>
 
@@ -2049,19 +2051,21 @@ function renderDashboard() {
   document.getElementById('dash-welcome').textContent = `${t('dash-welcome-prefix')} ${p.name || p.email}! 👋`;
   document.getElementById('dash-sub').textContent = t('dash-sub');
 
-  // Stat cards — apenas admin vê
-  const statGrid = document.querySelector('.stat-grid');
-  if (statGrid) statGrid.style.display = isAdmin ? '' : 'none';
+  // Card "Resumos liberados" — visível para todos
+  const myAccess = isAdmin ? state.resumos.length : state.myAccess.length;
+  document.getElementById('stat-my-access').textContent = myAccess;
+
+  // Cards admin — mostrar/ocultar
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
 
   if (isAdmin) {
     const pending = state.users.filter(u => !u.approved && !u.is_admin).length;
     document.getElementById('stat-total-resumos').textContent = state.resumos.length;
-    document.getElementById('stat-my-access').textContent = pending;
+    document.getElementById('stat-pending').textContent = pending;
     document.getElementById('stat-total-users').textContent = state.users.length;
-    document.getElementById('stat-card-users').style.display = '';
-    // Destaque visual se houver pendentes
-    const card = document.querySelector('.stat-card.teal');
-    if (card) card.style.borderColor = pending > 0 ? 'var(--gold)' : '';
+    // Destaque dourado se houver pendentes
+    const pendingCard = document.querySelector('.stat-card.gold.admin-only');
+    if (pendingCard) pendingCard.style.borderColor = pending > 0 ? 'var(--gold)' : '';
   }
 
   // Banner de pagamento — todos veem
