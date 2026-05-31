@@ -1267,7 +1267,7 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
                 <div style="width:32px;height:2px;background:var(--accent);border-radius:2px;margin-bottom:12px;"></div>
                 <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Chave Pix (CPF)</div>
                 <div style="font-size:15px;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:12px;">18553943755</div>
-                <button class="btn btn-sm" id="pix-copy-btn" onclick="copyPix()" style="background:var(--accent);color:#fff;border:none;">📋 Copiar</button>
+                <button class="btn btn-sm" onclick="openPixModal()" style="background:var(--accent);color:#fff;border:none;font-weight:700;">🔲 Pagar com Pix</button>
               </div>
               <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;">
                 <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Contato</div>
@@ -1476,6 +1476,59 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
 
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+
+<!-- MODAL PIX -->
+<div id="modal-pix" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:380px;text-align:center;">
+    <div class="modal-header" style="justify-content:center;position:relative;">
+      <h2 class="modal-title" style="font-size:18px;">Pagar com Pix</h2>
+      <button class="modal-close" onclick="closeModal('modal-pix')" style="position:absolute;right:0;top:0;">✕</button>
+    </div>
+
+    <!-- Logo Pix -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <path d="M7.5 16L16 7.5L24.5 16L16 24.5L7.5 16Z" fill="#32BCAD"/>
+        <path d="M16 2L2 16L16 30L30 16L16 2Z" stroke="#32BCAD" stroke-width="2" fill="none"/>
+      </svg>
+      <span style="font-size:20px;font-weight:700;color:#32BCAD;font-family:var(--font-head);">Pix</span>
+    </div>
+
+    <!-- QR Code -->
+    <div style="background:#fff;border-radius:16px;padding:16px;display:inline-block;margin-bottom:20px;box-shadow:0 4px 24px #00000040;">
+      <img id="pix-qr-img"
+        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=18553943755"
+        alt="QR Code Pix"
+        width="220" height="220"
+        style="display:block;border-radius:8px;" />
+    </div>
+
+    <!-- Instrução -->
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">
+      Escaneie o QR Code com o app do seu banco<br>ou copie a chave abaixo.
+    </p>
+
+    <!-- Chave Pix -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="text-align:left;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Chave Pix (CPF)</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:1px;">18553943755</div>
+      </div>
+      <button id="pix-modal-copy-btn" onclick="copyPixModal()" class="btn btn-sm" style="background:var(--teal);color:#000;font-weight:700;border:none;white-space:nowrap;flex-shrink:0;">
+        📋 Copiar
+      </button>
+    </div>
+
+    <!-- Valor -->
+    <div style="background:var(--green-dim);border:1px solid #10b98140;border-radius:var(--radius);padding:10px;font-size:14px;color:var(--green);font-weight:600;">
+      Valor por resumo: <strong>R$ 15,00</strong>
+    </div>
+
+    <p style="font-size:11px;color:var(--text3);margin-top:14px;line-height:1.6;">
+      Após o pagamento, envie o comprovante pelo WhatsApp para liberar o acesso.
+    </p>
+  </div>
+</div>
 
 <!-- ─── MODALS ──────────────────────────────────────────── -->
 <!-- Add/Edit Resumo Modal -->
@@ -1921,11 +1974,19 @@ async function doLogout() {
   showScreen('auth');
 }
 
-function copyPix() {
+function openPixModal() {
+  openModal('modal-pix');
+}
+
+function copyPixModal() {
   navigator.clipboard.writeText('18553943755').then(() => {
-    const btn = document.getElementById('pix-copy-btn');
-    btn.textContent = '✅ Copiado!';
-    setTimeout(() => { btn.innerHTML = '📋 Copiar'; }, 2000);
+    const btn = document.getElementById('pix-modal-copy-btn');
+    btn.innerHTML = '✅ Copiado!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      btn.innerHTML = '📋 Copiar';
+      btn.style.background = 'var(--teal)';
+    }, 2500);
     toast('Chave Pix copiada!', 'success');
   }).catch(() => toast('Erro ao copiar.', 'error'));
 }
