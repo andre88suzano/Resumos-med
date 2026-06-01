@@ -827,6 +827,33 @@
   }
   @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
 
+  /* ─── MODAL VALORES ─────────────────────────────────── */
+  .valores-tab {
+    padding: 8px 18px; border: none; background: transparent;
+    color: var(--text3); font-family: var(--font-body); font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: var(--transition);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .valores-tab:hover { color: var(--text); }
+  .valores-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .valor-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    transition: var(--transition);
+  }
+  .valor-item:hover { border-color: var(--border2); }
+  .valor-info { flex: 1; }
+  .valor-nome { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .valor-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 4px; }
+  .valor-preco {
+    font-size: 16px; font-weight: 700; color: var(--green);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .valor-placeholder { color: var(--text3) !important; font-size: 12px !important; font-style: italic; }
+
   /* ─── FOLDER CARDS ───────────────────────────────────── */
   .folder-card {
     background: var(--card);
@@ -1279,10 +1306,13 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
             </div>
           </div>
 
-          <!-- Coluna direita — Valor -->
-          <div style="flex:0 1 160px;background:var(--bg3);border:2px solid var(--accent);border-radius:var(--radius);padding:28px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);">Valor por resumo:</div>
-            <div style="font-size:36px;font-weight:700;color:var(--green);line-height:1.1;">R$<br>15,00</div>
+          <!-- Coluna direita — Consulte Valores -->
+          <div onclick="openValoresModal()" style="flex:0 1 160px;background:var(--bg3);border:2px solid var(--accent);border-radius:var(--radius);padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;cursor:pointer;transition:var(--transition);"
+            onmouseover="this.style.background='#2d6ef718';this.style.borderColor='var(--teal)'"
+            onmouseout="this.style.background='var(--bg3)';this.style.borderColor='var(--accent)'">
+            <div style="font-size:28px;">🏷️</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.3;">Consulte<br>Valores</div>
+            <div style="font-size:11px;color:var(--teal);font-weight:600;letter-spacing:.5px;">Ver planos →</div>
           </div>
         </div>
 
@@ -1582,6 +1612,130 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL VALORES ═══════════ -->
+<div id="modal-valores" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:580px;padding:0;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h2 style="font-family:var(--font-head);font-size:20px;color:var(--text);margin-bottom:2px;">🏷️ Tabela de Valores</h2>
+        <p style="font-size:12px;color:var(--text3);">Escolha o plano ideal para você</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-valores')">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;padding:16px 28px 0;border-bottom:1px solid var(--border);">
+      <button class="valores-tab active" onclick="switchValoresTab('individual')" id="vtab-individual">📄 Individual</button>
+      <button class="valores-tab" onclick="switchValoresTab('prova')" id="vtab-prova">📋 Por Prova</button>
+      <button class="valores-tab" onclick="switchValoresTab('semestre')" id="vtab-semestre">🎓 Semestre</button>
+    </div>
+
+    <!-- Conteúdo das tabs -->
+    <div style="padding:24px 28px 28px;max-height:60vh;overflow-y:auto;">
+
+      <!-- TAB: INDIVIDUAL -->
+      <div id="vcontent-individual">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Compre resumos avulsos, sem compromisso.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">📖 Um Resumo Individual</div>
+            </div>
+            <div class="valor-preco">R$ 15</div>
+          </div>
+
+          <div class="valor-item" style="border-color:var(--teal);">
+            <div class="valor-info">
+              <div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div>
+              <div class="valor-desc">
+                <span style="color:var(--teal);font-weight:600;">O que é o Mini Resumo?</span>
+                Material ultra-compacto com apenas os tópicos mais importantes — perfeito para aquela última checada rápida antes de entrar na sala de prova.
+              </div>
+            </div>
+            <div class="valor-preco" style="color:var(--teal);">R$ 20</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB: POR PROVA -->
+      <div id="vcontent-prova" class="hidden">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Pacotes com todos os resumos de uma prova específica.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:6px;">Parcial 1</div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 Pacote Resumos P1</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 + ⚡ Pacote Resumos P1 + Mini Resumos P1</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:6px;">Parcial 2</div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 Pacote Resumos P2</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 + ⚡ Pacote Resumos P2 + Mini Resumos P2</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:6px;">Exames Finais</div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 Pacote Resumos Final</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+          <div class="valor-item">
+            <div class="valor-nome">📚 + ⚡ Pacote Resumos Final + Mini Resumos Finais</div>
+            <div class="valor-preco valor-placeholder">A definir</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB: SEMESTRE -->
+      <div id="vcontent-semestre" class="hidden">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Acesso completo a todos os resumos do semestre.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <div class="valor-item" style="border-color:var(--gold);">
+            <div class="valor-info">
+              <div class="valor-nome">🏆 Pacote Semestre Completo</div>
+              <div class="valor-desc">Todos os resumos do semestre, de todas as matérias.</div>
+            </div>
+            <div class="valor-preco valor-placeholder" style="color:var(--gold);">A definir</div>
+          </div>
+
+          <div class="valor-item" style="border-color:var(--gold);background:var(--gold-dim);">
+            <div class="valor-info">
+              <div class="valor-nome">🏆 + ⚡ Semestre Completo + Mini Resumos</div>
+              <div class="valor-desc">Pacote completo com resumos + mini resumos de todas as matérias. <strong style="color:var(--gold);">Melhor custo-benefício!</strong></div>
+            </div>
+            <div class="valor-preco valor-placeholder" style="color:var(--gold);">A definir</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /conteúdo -->
+
+    <!-- Footer -->
+    <div style="padding:14px 28px;border-top:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <span style="font-size:12px;color:var(--text3);">Dúvidas? Fale pelo WhatsApp</span>
+      <a href="https://wa.me/5527992389129" target="_blank" class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);text-decoration:none;">
+        💬 WhatsApp
+      </a>
+    </div>
+
   </div>
 </div>
 
@@ -1976,6 +2130,18 @@ async function doLogout() {
 
 function openPixModal() {
   openModal('modal-pix');
+}
+
+function openValoresModal() {
+  openModal('modal-valores');
+  switchValoresTab('individual');
+}
+
+function switchValoresTab(tab) {
+  ['individual','prova','semestre'].forEach(t => {
+    document.getElementById('vcontent-' + t).classList.toggle('hidden', t !== tab);
+    document.getElementById('vtab-' + t).classList.toggle('active', t === tab);
+  });
 }
 
 function copyPixModal() {
