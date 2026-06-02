@@ -2245,10 +2245,15 @@ async function saveAtualizacao() {
   if (!resumo_nome || !descricao) { toast('Preencha todos os campos.','error'); return; }
 
   setLoading('btn-save-atualizacao', true);
-  const { ok } = await SB.insert('atualizacoes', { resumo_nome, descricao });
+  const result = await SB.insert('atualizacoes', { resumo_nome, descricao });
   setLoading('btn-save-atualizacao', false);
 
-  if (!ok) { toast('Erro ao publicar. Verifique as permissões.','error'); return; }
+  if (!result.ok) {
+    const errMsg = result.data?.message || result.data?.msg || result.data?.hint || JSON.stringify(result.data);
+    toast('Erro ' + result.status + ': ' + errMsg, 'error');
+    console.error('Atualizacao insert error:', result);
+    return;
+  }
   closeModal('modal-atualizacao');
   toast('Atualização publicada!','success');
   await loadAtualizacoes();
