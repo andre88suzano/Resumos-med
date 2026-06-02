@@ -2177,20 +2177,25 @@ function openPixModal() {
 
 /* ─────────────────────────────────────────────────────────
    ATUALIZAÇÕES DA SEMANA
+   Usa a tabela `resumos` com materia='_update_' como storage
 ───────────────────────────────────────────────────────── */
 async function loadAtualizacoes() {
-  // Se for domingo, apaga entradas da semana passada (admin)
+  // Se for domingo e admin, apaga atualizações com mais de 7 dias
   if (state.profile?.is_admin && new Date().getDay() === 0) {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 7);
-    await SB.delete('atualizacoes', `created_at=lt.${cutoff.toISOString()}`);
+    const { data: old } = await SB.select('resumos',
+      `materia=eq._update_&created_at=lt.${cutoff.toISOString()}&select=id`);
+    if (Array.isArray(old)) {
+      for (const r of old) await SB.delete('resumos', `id=eq.${r.id}`);
+    }
   }
 
   // Busca atualizações dos últimos 7 dias
   const cutoff7 = new Date();
   cutoff7.setDate(cutoff7.getDate() - 7);
-  const { data } = await SB.select('atualizacoes',
-    `created_at=gte.${cutoff7.toISOString()}&order=created_at.desc`);
+  const { data } = await SB.select('resumos',
+    `materia=eq._update_&created_at=gte.${cutoff7.toISOString()}&order=created_at.desc`);
 
   const list = Array.isArray(data) ? data : [];
   renderAtualizacoes(list);
@@ -2219,12 +2224,13 @@ function renderAtualizacoes(list) {
     const deleteBtn = state.profile?.is_admin
       ? `<button onclick="deleteAtualizacao('${a.id}')" title="Excluir" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;border-radius:6px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">🗑</button>`
       : '';
+    // title = resumo_nome, description = descricao
     return `
       <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
         <div style="flex-shrink:0;background:var(--accent);color:#fff;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;">${label}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">📄 ${a.resumo_nome}</div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.5;">${a.descricao}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">📄 ${a.title}</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.5;">${a.description || ''}</div>
         </div>
         ${deleteBtn}
       </div>`;
@@ -2246,8 +2252,8 @@ async function saveAtualizacao() {
 
   setLoading('btn-save-atualizacao', true);
   try {
-    // Insert direto com return=minimal para evitar problemas de SELECT após insert
-    const res = await fetch(`${state.sbUrl}/rest/v1/atualizacoes`, {
+    // Salva na tabela `resumos` com materia='_update_' (sem precisar de nova tabela)
+    const res = await fetch(`${state.sbUrl}/rest/v1/resumos`, {
       method: 'POST',
       headers: {
         'apikey': state.sbKey,
@@ -2255,13 +2261,18 @@ async function saveAtualizacao() {
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ resumo_nome, descricao })
+      body: JSON.stringify({
+        title: resumo_nome,
+        description: descricao,
+        materia: '_update_',
+        semestre: 0,
+        content: ''
+      })
     });
 
     if (!res.ok) {
       const errText = await res.text();
       toast('Erro ' + res.status + ': ' + errText, 'error');
-      console.error('Insert error:', res.status, errText);
       return;
     }
 
@@ -2269,10 +2280,16 @@ async function saveAtualizacao() {
     toast('Atualização publicada!', 'success');
     await loadAtualizacoes();
   } catch(e) {
-    toast('Erro de rede: ' + e.message, 'error');
+    toast('Erro: ' + e.message, 'error');
   } finally {
     setLoading('btn-save-atualizacao', false);
   }
+}
+
+async function deleteAtualizacao(id) {
+  await SB.delete('resumos', `id=eq.${id}`);
+  toast('Removido.', 'info');
+  await loadAtualizacoes();
 }
 
 async function deleteAtualizacao(id) {
@@ -2359,7 +2376,7 @@ async function loadAllData() {
 }
 
 async function loadResumos() {
-  const { data } = await SB.select('resumos', 'select=*&order=created_at.desc');
+  const { data } = await SB.select('resumos', 'materia=neq._update_&select=*&order=created_at.desc');
   state.resumos = Array.isArray(data) ? data : [];
 }
 
