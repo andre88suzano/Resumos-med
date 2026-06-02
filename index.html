@@ -1327,6 +1327,25 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         </div>
       </div>
 
+      <!-- ── ATUALIZAÇÕES DA SEMANA ── -->
+      <div class="card anim-in" style="margin-bottom:32px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🔔</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">Atualizações desta semana</div>
+              <div style="font-size:11px;color:var(--text3);">Resumos atualizados recentemente · limpa todo domingo</div>
+            </div>
+          </div>
+          <button id="btn-add-atualizacao" class="btn btn-sm btn-primary" onclick="openAddAtualizacao()" style="display:none;">
+            + Nova atualização
+          </button>
+        </div>
+        <div id="atualizacoes-container">
+          <div class="empty-state" style="padding:24px;"><div class="spinner" style="margin:auto;"></div></div>
+        </div>
+      </div>
+
       <h2 style="font-family:var(--font-head);font-size:20px;margin-bottom:16px;" class="anim-in anim-delay-4" data-i18n="recent-resumos">Últimos resumos adicionados</h2>
       <div class="resumo-grid anim-in" id="dash-recent-grid">
         <div class="empty-state"><div class="spinner"></div></div>
@@ -1739,6 +1758,30 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
   </div>
 </div>
 
+<!-- MODAL ATUALIZAÇÃO -->
+<div id="modal-atualizacao" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h2 class="modal-title">🔔 Nova Atualização</h2>
+      <button class="modal-close" onclick="closeModal('modal-atualizacao')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Resumo atualizado</label>
+        <input class="form-input" id="atu-resumo" placeholder="Ex: Microbiologia — Parcial 2" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">O que foi alterado</label>
+        <textarea class="form-input" id="atu-desc" rows="3" placeholder="Ex: Adicionei questões no questionário final e corrigi o diagrama de Gram-negativos." style="resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-atualizacao')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-atualizacao" onclick="saveAtualizacao()">Publicar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm Modal -->
 <div id="modal-confirm" class="modal-backdrop hidden">
   <div class="modal" style="max-width:400px;">
@@ -2132,6 +2175,91 @@ function openPixModal() {
   openModal('modal-pix');
 }
 
+/* ─────────────────────────────────────────────────────────
+   ATUALIZAÇÕES DA SEMANA
+───────────────────────────────────────────────────────── */
+async function loadAtualizacoes() {
+  // Se for domingo, apaga entradas da semana passada (admin)
+  if (state.profile?.is_admin && new Date().getDay() === 0) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    await SB.delete('atualizacoes', `created_at=lt.${cutoff.toISOString()}`);
+  }
+
+  // Busca atualizações dos últimos 7 dias
+  const cutoff7 = new Date();
+  cutoff7.setDate(cutoff7.getDate() - 7);
+  const { data } = await SB.select('atualizacoes',
+    `created_at=gte.${cutoff7.toISOString()}&order=created_at.desc`);
+
+  const list = Array.isArray(data) ? data : [];
+  renderAtualizacoes(list);
+
+  // Mostra botão de adicionar para admin
+  const btn = document.getElementById('btn-add-atualizacao');
+  if (btn) btn.style.display = state.profile?.is_admin ? '' : 'none';
+}
+
+function renderAtualizacoes(list) {
+  const container = document.getElementById('atualizacoes-container');
+  if (!container) return;
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">
+        📭 Nenhuma atualização esta semana.
+      </div>`;
+    return;
+  }
+
+  const rows = list.map(a => {
+    const date = new Date(a.created_at);
+    const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const label = `${dias[date.getDay()]} ${date.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`;
+    const deleteBtn = state.profile?.is_admin
+      ? `<button onclick="deleteAtualizacao('${a.id}')" title="Excluir" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;border-radius:6px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">🗑</button>`
+      : '';
+    return `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+        <div style="flex-shrink:0;background:var(--accent);color:#fff;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;">${label}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">📄 ${a.resumo_nome}</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.5;">${a.descricao}</div>
+        </div>
+        ${deleteBtn}
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `<div style="margin-top:-4px;">${rows}</div>`;
+}
+
+function openAddAtualizacao() {
+  document.getElementById('atu-resumo').value = '';
+  document.getElementById('atu-desc').value = '';
+  openModal('modal-atualizacao');
+}
+
+async function saveAtualizacao() {
+  const resumo_nome = document.getElementById('atu-resumo').value.trim();
+  const descricao   = document.getElementById('atu-desc').value.trim();
+  if (!resumo_nome || !descricao) { toast('Preencha todos os campos.','error'); return; }
+
+  setLoading('btn-save-atualizacao', true);
+  const { ok } = await SB.insert('atualizacoes', { resumo_nome, descricao });
+  setLoading('btn-save-atualizacao', false);
+
+  if (!ok) { toast('Erro ao publicar. Verifique as permissões.','error'); return; }
+  closeModal('modal-atualizacao');
+  toast('Atualização publicada!','success');
+  await loadAtualizacoes();
+}
+
+async function deleteAtualizacao(id) {
+  await SB.delete('atualizacoes', `id=eq.${id}`);
+  toast('Removido.','info');
+  await loadAtualizacoes();
+}
+
 function openValoresModal() {
   openModal('modal-valores');
   switchValoresTab('individual');
@@ -2206,6 +2334,7 @@ function initApp() {
 async function loadAllData() {
   await Promise.all([loadResumos(), loadMyAccess(), state.profile.is_admin ? loadUsers() : Promise.resolve()]);
   renderCurrentPage();
+  loadAtualizacoes(); // carrega atualizações em paralelo
 }
 
 async function loadResumos() {
