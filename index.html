@@ -1239,93 +1239,88 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
 
     <!-- ── PAGE: DASHBOARD ─────────────────────────── -->
     <div class="page active" id="page-dashboard">
-      <div style="padding-bottom:8px;">
+
+      <!-- Saudação -->
+      <div style="padding-bottom:16px;">
         <h1 class="section-title anim-in" id="dash-welcome">Olá! 👋</h1>
-        <p class="section-sub anim-in anim-delay-1" id="dash-sub">Aqui está um resumo da sua atividade.</p>
+        <p class="section-sub anim-in anim-delay-1" id="dash-sub" style="margin-bottom:0;">Aqui está um resumo da sua atividade.</p>
       </div>
 
-      <div class="stat-grid anim-in anim-delay-2" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
-        <!-- Card visível para todos: resumos liberados -->
-        <div class="stat-card teal">
-          <div class="stat-icon">✅</div>
-          <div class="stat-value" id="stat-my-access">—</div>
-          <div class="stat-label">Resumos liberados</div>
-        </div>
-        <!-- Cards visíveis apenas para admin -->
-        <div class="stat-card blue admin-only" style="display:none;">
-          <div class="stat-icon">📚</div>
-          <div class="stat-value" id="stat-total-resumos">—</div>
-          <div class="stat-label">Resumos disponíveis</div>
-        </div>
-        <div class="stat-card gold admin-only" style="cursor:pointer;display:none;" onclick="showPage('admin-users');filterUsers('pending');">
-          <div class="stat-icon">🕐</div>
-          <div class="stat-value" id="stat-pending">—</div>
-          <div class="stat-label">Aguardando acesso</div>
-        </div>
-        <div class="stat-card green admin-only" style="display:none;">
-          <div class="stat-icon">👥</div>
-          <div class="stat-value" id="stat-total-users">—</div>
-          <div class="stat-label">Usuários</div>
-        </div>
-      </div>
+      <!-- ── LAYOUT PRINCIPAL: Pagamento (esq) + Cards (dir) ── -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:32px;" class="anim-in anim-delay-2">
 
-      <!-- BANNER DE PAGAMENTO -->
-      <div class="payment-banner card anim-in anim-delay-3" style="margin-bottom:32px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
-          <span style="font-size:16px;">💳</span>
-          <span style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);">Informações de Pagamento</span>
-        </div>
+        <!-- BANNER DE PAGAMENTO -->
+        <div class="payment-banner card" style="flex:1 1 420px;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+            <span style="font-size:16px;">💳</span>
+            <span style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);">Informações de Pagamento</span>
+          </div>
 
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
-          <!-- Coluna esquerda -->
-          <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:12px;">
-            <!-- Responsável -->
-            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:14px;">
-              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👨‍⚕️</div>
-              <div>
-                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">Responsável</div>
-                <div style="font-size:15px;font-weight:600;color:var(--text);">André Luiz Miranda Suzano</div>
-              </div>
-            </div>
-            <!-- Pagamento + Contato -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;">
-                <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Pagamento</div>
-                <div style="width:32px;height:2px;background:var(--accent);border-radius:2px;margin-bottom:12px;"></div>
-                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Chave Pix (CPF)</div>
-                <div style="font-size:15px;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:12px;">18553943755</div>
-                <button class="btn btn-sm" onclick="openPixModal()" style="background:var(--accent);color:#fff;border:none;font-weight:700;">🔲 Pagar com Pix</button>
-              </div>
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;">
-                <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Contato</div>
-                <div style="width:32px;height:2px;background:var(--teal);border-radius:2px;margin-bottom:12px;"></div>
-                <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">WhatsApp</div>
-                <div style="font-size:15px;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:12px;">27 99238-9129</div>
-                <a href="https://wa.me/5527992389129?text=Ol%C3%A1%2C%20Andr%C3%A9.%20Gostaria%20de%20solicitar%20a%20libera%C3%A7%C3%A3o%20do%20meu%20resumo.%20Segue%20em%20anexo%20o%20comprovante%20de%20pagamento%20via%20Pix." target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);text-decoration:none;display:inline-flex;">💬 Abrir WhatsApp →</a>
-              </div>
+          <!-- Responsável -->
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👨‍⚕️</div>
+            <div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Responsável</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);">André Luiz Miranda Suzano</div>
             </div>
           </div>
 
-          <!-- Coluna direita — Consulte Valores -->
-          <div onclick="openValoresModal()" style="flex:0 1 160px;background:var(--bg3);border:2px solid var(--accent);border-radius:var(--radius);padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;cursor:pointer;transition:var(--transition);"
-            onmouseover="this.style.background='#2d6ef718';this.style.borderColor='var(--teal)'"
-            onmouseout="this.style.background='var(--bg3)';this.style.borderColor='var(--accent)'">
-            <div style="font-size:28px;">🏷️</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.3;">Consulte<br>Valores</div>
-            <div style="font-size:11px;color:var(--teal);font-weight:600;letter-spacing:.5px;">Ver planos →</div>
+          <!-- Pagamento + Contato -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;">Pagamento</div>
+              <div style="width:28px;height:2px;background:var(--accent);border-radius:2px;margin-bottom:10px;"></div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">Chave Pix (CPF)</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;">18553943755</div>
+              <button class="btn btn-sm" onclick="openPixModal()" style="background:var(--accent);color:#fff;border:none;font-weight:700;width:100%;">🔲 Pagar com Pix</button>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;">Contato</div>
+              <div style="width:28px;height:2px;background:var(--teal);border-radius:2px;margin-bottom:10px;"></div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">WhatsApp</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;">27 99238-9129</div>
+              <a href="https://wa.me/5527992389129?text=Ol%C3%A1%2C%20Andr%C3%A9.%20Gostaria%20de%20solicitar%20a%20libera%C3%A7%C3%A3o%20do%20meu%20resumo.%20Segue%20em%20anexo%20o%20comprovante%20de%20pagamento%20via%20Pix." target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);text-decoration:none;display:flex;justify-content:center;">💬 WhatsApp →</a>
+            </div>
+          </div>
+
+          <!-- Consulte Valores -->
+          <div onclick="openValoresModal()" style="background:var(--bg3);border:1px dashed var(--accent);border-radius:var(--radius);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:var(--transition);"
+            onmouseover="this.style.background='#2d6ef710'" onmouseout="this.style.background='var(--bg3)'">
+            <span style="font-size:13px;color:var(--text2);">🏷️ Ver tabela de valores e pacotes</span>
+            <span style="color:var(--accent);font-size:13px;font-weight:700;">Ver →</span>
           </div>
         </div>
 
-        <div class="divider"></div>
+        <!-- COLUNA DIREITA: Card Resumos Liberados + Cards Admin -->
+        <div style="flex:0 1 200px;display:flex;flex-direction:column;gap:14px;min-width:160px;">
 
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Importante</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          <div style="font-size:13px;color:var(--text2);line-height:1.55;">⚠️ Não há devolutiva do valor após a liberação do resumo.</div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.55;">‼️ Os resumos são feitos e atualizados de acordo com a aula e o livro da matéria em questão.</div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.55;">❌ Não realize a venda dos resumos presentes na plataforma, pois isso se considera plágio.</div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.55;">✍🏻 Para a liberação envie ao WhatsApp acima: foto do comprovante de pagamento · seu e-mail · o resumo que deseja adquirir.</div>
+          <!-- Card: Resumos liberados (todos) -->
+          <div class="stat-card teal" style="flex:1;">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="stat-my-access">—</div>
+            <div class="stat-label">Resumos liberados</div>
+          </div>
+
+          <!-- Cards admin -->
+          <div class="stat-card blue admin-only" style="display:none;flex:1;">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value" id="stat-total-resumos">—</div>
+            <div class="stat-label">Resumos disponíveis</div>
+          </div>
+          <div class="stat-card gold admin-only" style="display:none;flex:1;cursor:pointer;" onclick="showPage('admin-users');filterUsers('pending');">
+            <div class="stat-icon">🕐</div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-label">Aguardando acesso</div>
+          </div>
+          <div class="stat-card green admin-only" style="display:none;flex:1;">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="stat-total-users">—</div>
+            <div class="stat-label">Usuários</div>
+          </div>
+
         </div>
-      </div>
+      </div><!-- /layout principal -->
+
 
       <!-- ── ATUALIZAÇÕES DA SEMANA ── -->
       <div class="card anim-in" style="margin-bottom:32px;">
