@@ -2245,18 +2245,34 @@ async function saveAtualizacao() {
   if (!resumo_nome || !descricao) { toast('Preencha todos os campos.','error'); return; }
 
   setLoading('btn-save-atualizacao', true);
-  const result = await SB.insert('atualizacoes', { resumo_nome, descricao });
-  setLoading('btn-save-atualizacao', false);
+  try {
+    // Insert direto com return=minimal para evitar problemas de SELECT após insert
+    const res = await fetch(`${state.sbUrl}/rest/v1/atualizacoes`, {
+      method: 'POST',
+      headers: {
+        'apikey': state.sbKey,
+        'Authorization': `Bearer ${state.authToken || state.sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ resumo_nome, descricao })
+    });
 
-  if (!result.ok) {
-    const errMsg = result.data?.message || result.data?.msg || result.data?.hint || JSON.stringify(result.data);
-    toast('Erro ' + result.status + ': ' + errMsg, 'error');
-    console.error('Atualizacao insert error:', result);
-    return;
+    if (!res.ok) {
+      const errText = await res.text();
+      toast('Erro ' + res.status + ': ' + errText, 'error');
+      console.error('Insert error:', res.status, errText);
+      return;
+    }
+
+    closeModal('modal-atualizacao');
+    toast('Atualização publicada!', 'success');
+    await loadAtualizacoes();
+  } catch(e) {
+    toast('Erro de rede: ' + e.message, 'error');
+  } finally {
+    setLoading('btn-save-atualizacao', false);
   }
-  closeModal('modal-atualizacao');
-  toast('Atualização publicada!','success');
-  await loadAtualizacoes();
 }
 
 async function deleteAtualizacao(id) {
