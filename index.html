@@ -1813,15 +1813,7 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
     </div>
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div class="form-group">
-        <label class="form-label">Nome / Identificação</label>
-        <input class="form-input" id="fb-nome" placeholder="Ex: Maria S. — Medicina 3º sem" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Feedback</label>
-        <textarea class="form-input" id="fb-texto" rows="3" placeholder="Escreva o depoimento aqui..." style="resize:vertical;"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Imagem / Print (opcional)</label>
+        <label class="form-label">Imagem / Print <span style="color:var(--red);">*</span></label>
         <div id="fb-drop-area" style="border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:var(--transition);"
           onclick="document.getElementById('fb-img-input').click()"
           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
@@ -1836,6 +1828,14 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
           <img id="fb-img-preview-img" style="width:100%;border-radius:var(--radius);max-height:200px;object-fit:cover;" />
           <button onclick="clearFbImage()" style="position:absolute;top:6px;right:6px;background:#000000aa;border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">✕</button>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome / Identificação <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(opcional)</span></label>
+        <input class="form-input" id="fb-nome" placeholder="Ex: Maria S. — Medicina 3º sem" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Texto do Feedback <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(opcional)</span></label>
+        <textarea class="form-input" id="fb-texto" rows="2" placeholder="Escreva o depoimento aqui..." style="resize:vertical;"></textarea>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn btn-ghost" onclick="closeModal('modal-feedback')">Cancelar</button>
@@ -2486,7 +2486,7 @@ function clearFbImage() {
 async function saveFeedback() {
   const nome  = document.getElementById('fb-nome').value.trim();
   const texto = document.getElementById('fb-texto').value.trim();
-  if (!nome || !texto) { toast('Preencha nome e feedback.','error'); return; }
+  if (!fbImageBase64) { toast('Adicione uma imagem para continuar.','error'); return; }
 
   setLoading('btn-save-feedback', true);
   try {
