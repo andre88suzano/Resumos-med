@@ -854,6 +854,25 @@
   }
   .valor-placeholder { color: var(--text3) !important; font-size: 12px !important; font-style: italic; }
 
+  /* ─── FEEDBACK CARDS ────────────────────────────────── */
+  .feedback-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    transition: var(--transition); position: relative;
+  }
+  .feedback-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .feedback-card-img { width: 100%; max-height: 220px; object-fit: cover; display: block; cursor: zoom-in; }
+  .feedback-card-body { padding: 16px 18px; }
+  .feedback-stars { color: var(--gold); font-size: 16px; margin-bottom: 8px; letter-spacing: 2px; }
+  .feedback-texto { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; font-style: italic; }
+  .feedback-nome  { font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+  .feedback-del   { position: absolute; top: 8px; right: 8px; background: #000000aa; border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 13px; display: none; }
+  .feedback-card:hover .feedback-del { display: flex; align-items: center; justify-content: center; }
+
+  /* Modal de imagem ampliada */
+  #modal-img-zoom { position: fixed; inset: 0; background: #000000cc; z-index: 9998; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+  #modal-img-zoom img { max-width: 95vw; max-height: 95vh; border-radius: 8px; object-fit: contain; }
+
   /* ─── FOLDER CARDS ───────────────────────────────────── */
   .folder-card {
     background: var(--card);
@@ -1172,6 +1191,9 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         <a class="nav-item" onclick="showPage('resumos')" data-i18n-title="nav-resumos">
           <span class="nav-icon">📚</span> <span data-i18n="nav-resumos">Resumos</span>
         </a>
+        <a class="nav-item" onclick="showPage('feedbacks')">
+          <span class="nav-icon">⭐</span> <span>Feedbacks</span>
+        </a>
         <a class="nav-item" onclick="showPage('meu-perfil')">
           <span class="nav-icon">👤</span> <span data-i18n="nav-profile">Meu Perfil</span>
         </a>
@@ -1392,6 +1414,22 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
           <button class="btn btn-ghost" onclick="closeFolderContent()">← Voltar</button>
         </div>
         <div class="resumo-grid" id="folder-resumo-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: FEEDBACKS ───────────────────────── -->
+    <div class="page hidden" id="page-feedbacks">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+        <div>
+          <h1 class="section-title">⭐ Feedbacks</h1>
+          <p class="section-sub" style="margin-bottom:0;">O que os alunos estão dizendo</p>
+        </div>
+        <button id="btn-add-feedback" class="btn btn-primary" onclick="openAddFeedback()" style="display:none;">
+          + Adicionar Feedback
+        </button>
+      </div>
+      <div id="feedbacks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+        <div class="empty-state"><div class="spinner" style="margin:auto;"></div></div>
       </div>
     </div>
 
@@ -1763,6 +1801,47 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
       </a>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL FEEDBACK -->
+<div id="modal-feedback" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <h2 class="modal-title">⭐ Novo Feedback</h2>
+      <button class="modal-close" onclick="closeModal('modal-feedback')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Nome / Identificação</label>
+        <input class="form-input" id="fb-nome" placeholder="Ex: Maria S. — Medicina 3º sem" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Feedback</label>
+        <textarea class="form-input" id="fb-texto" rows="3" placeholder="Escreva o depoimento aqui..." style="resize:vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Imagem / Print (opcional)</label>
+        <div id="fb-drop-area" style="border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:var(--transition);"
+          onclick="document.getElementById('fb-img-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+          ondragleave="this.style.borderColor='var(--border)'"
+          ondrop="handleFbDrop(event)">
+          <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+          <div style="font-size:13px;color:var(--text3);">Clique ou arraste uma imagem aqui</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">PNG, JPG, WEBP — máx. 2MB</div>
+        </div>
+        <input type="file" id="fb-img-input" accept="image/*" style="display:none;" onchange="handleFbFile(this)" />
+        <div id="fb-img-preview" style="display:none;margin-top:10px;position:relative;">
+          <img id="fb-img-preview-img" style="width:100%;border-radius:var(--radius);max-height:200px;object-fit:cover;" />
+          <button onclick="clearFbImage()" style="position:absolute;top:6px;right:6px;background:#000000aa;border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-feedback')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-feedback" onclick="saveFeedback()">Publicar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2306,6 +2385,151 @@ async function deleteAtualizacao(id) {
   await loadAtualizacoes();
 }
 
+/* ─────────────────────────────────────────────────────────
+   FEEDBACKS
+   Armazenados na tabela resumos com materia='_feedback_'
+   title = nome/identificação
+   description = texto do feedback
+   content = base64 da imagem (se houver)
+───────────────────────────────────────────────────────── */
+let fbImageBase64 = null;
+
+async function loadFeedbacks() {
+  const { data } = await SB.select('resumos',
+    `materia=eq._feedback_&order=created_at.desc&select=*`);
+  const list = Array.isArray(data) ? data : [];
+  renderFeedbacks(list);
+  const btn = document.getElementById('btn-add-feedback');
+  if (btn) btn.style.display = state.profile?.is_admin ? '' : 'none';
+}
+
+function renderFeedbacks(list) {
+  const grid = document.getElementById('feedbacks-grid');
+  if (!grid) return;
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-icon">⭐</div>
+      <h3>Nenhum feedback ainda</h3>
+      <p>Os depoimentos dos alunos aparecerão aqui.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(fb => {
+    const delBtn = state.profile?.is_admin
+      ? `<button class="feedback-del" onclick="deleteFeedback('${fb.id}',event)" title="Excluir">🗑</button>`
+      : '';
+    const imgHtml = fb.content
+      ? `<img class="feedback-card-img" src="${fb.content}" alt="feedback" onclick="zoomImg('${fb.id}')" />`
+      : '';
+    return `
+      <div class="feedback-card" id="fbcard-${fb.id}">
+        ${delBtn}
+        ${imgHtml}
+        <div class="feedback-card-body">
+          <div class="feedback-stars">★★★★★</div>
+          <div class="feedback-texto">"${fb.description || ''}"</div>
+          <div class="feedback-nome">— ${fb.title || 'Aluno'}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function zoomImg(id) {
+  const card = document.getElementById('fbcard-' + id);
+  const src  = card?.querySelector('img')?.src;
+  if (!src) return;
+  const div = document.createElement('div');
+  div.id = 'modal-img-zoom';
+  div.onclick = () => div.remove();
+  div.innerHTML = `<img src="${src}" />`;
+  document.body.appendChild(div);
+}
+
+function openAddFeedback() {
+  fbImageBase64 = null;
+  document.getElementById('fb-nome').value = '';
+  document.getElementById('fb-texto').value = '';
+  document.getElementById('fb-img-preview').style.display = 'none';
+  document.getElementById('fb-drop-area').style.display = '';
+  openModal('modal-feedback');
+}
+
+function handleFbFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { toast('Imagem muito grande. Máx. 2MB.','error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    fbImageBase64 = e.target.result;
+    document.getElementById('fb-img-preview-img').src = fbImageBase64;
+    document.getElementById('fb-img-preview').style.display = 'block';
+    document.getElementById('fb-drop-area').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleFbDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('fb-img-input').files = dt.files; handleFbFile(document.getElementById('fb-img-input')); }
+}
+
+function clearFbImage() {
+  fbImageBase64 = null;
+  document.getElementById('fb-img-preview').style.display = 'none';
+  document.getElementById('fb-drop-area').style.display = '';
+  document.getElementById('fb-img-input').value = '';
+}
+
+async function saveFeedback() {
+  const nome  = document.getElementById('fb-nome').value.trim();
+  const texto = document.getElementById('fb-texto').value.trim();
+  if (!nome || !texto) { toast('Preencha nome e feedback.','error'); return; }
+
+  setLoading('btn-save-feedback', true);
+  try {
+    const res = await fetch(`${state.sbUrl}/rest/v1/resumos`, {
+      method: 'POST',
+      headers: {
+        'apikey': state.sbKey,
+        'Authorization': `Bearer ${state.authToken || state.sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        title: nome,
+        description: texto,
+        content: fbImageBase64 || '',
+        materia: '_feedback_',
+        semestre: 0
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      toast('Erro: ' + err, 'error');
+      return;
+    }
+
+    closeModal('modal-feedback');
+    toast('Feedback publicado!', 'success');
+    await loadFeedbacks();
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading('btn-save-feedback', false);
+  }
+}
+
+async function deleteFeedback(id, event) {
+  event?.stopPropagation();
+  await SB.delete('resumos', `id=eq.${id}`);
+  toast('Removido.','info');
+  await loadFeedbacks();
+}
+
 function openValoresModal() {
   openModal('modal-valores');
   switchValoresTab('individual');
@@ -2430,6 +2654,7 @@ function showPage(name) {
 
   const titles = {
     'dashboard': t('nav-dashboard'), 'resumos': t('nav-resumos'),
+    'feedbacks': '⭐ Feedbacks',
     'viewer': '—', 'meu-perfil': t('nav-profile'),
     'admin-users': t('nav-users'), 'admin-resumos': t('nav-manage-resumos'),
     'admin-access': t('nav-access'),
@@ -2444,6 +2669,7 @@ function renderCurrentPage() {
   switch(state.currentPage) {
     case 'dashboard':    renderDashboard(); break;
     case 'resumos':      renderResumos(); break;
+    case 'feedbacks':    loadFeedbacks(); break;
     case 'admin-users':  renderUsersTable(); break;
     case 'admin-resumos':renderAdminResumosTable(); break;
     case 'admin-access': renderAccessPage(); break;
