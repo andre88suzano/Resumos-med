@@ -1712,13 +1712,15 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
       <!-- TAB: INDIVIDUAL -->
       <div id="vcontent-individual">
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Compre resumos avulsos, sem compromisso.</p>
-        <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
 
           <div class="valor-item">
             <div class="valor-info">
-              <div class="valor-nome">📖 Um Resumo Individual</div>
+              <div class="valor-nome">📖 Resumo Individual</div>
             </div>
-            <div class="valor-preco">R$ 15</div>
+            <div class="valor-preco">R$ 15,00</div>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);">
@@ -1729,7 +1731,23 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
                 Material ultra-compacto com apenas os tópicos mais importantes — perfeito para aquela última checada rápida antes de entrar na sala de prova.
               </div>
             </div>
-            <div class="valor-preco" style="color:var(--teal);">R$ 20</div>
+            <div class="valor-preco" style="color:var(--teal);">R$ 20,00</div>
+          </div>
+
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
+
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">📖 Resumo Individual</div>
+            </div>
+            <div class="valor-preco">R$ 18,00</div>
+          </div>
+
+          <div class="valor-item" style="border-color:var(--teal);">
+            <div class="valor-info">
+              <div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div>
+            </div>
+            <div class="valor-preco" style="color:var(--teal);">R$ 25,00</div>
           </div>
 
         </div>
@@ -1740,34 +1758,24 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Pacote de todos os resumos de cada parcial.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:6px;">Parcial 1</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
           <div class="valor-item">
-            <div class="valor-nome">📚 Pacote Resumos P1</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
+            <div class="valor-nome">📚 Pacote Resumos (Parcial)</div>
+            <div class="valor-preco">R$ 54,90</div>
           </div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 + ⚡ Pacote Resumos P1 + Mini Resumos P1</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
-          </div>
-
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:6px;">Parcial 2</div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 Pacote Resumos P2</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
-          </div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 + ⚡ Pacote Resumos P2 + Mini Resumos P2</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
+          <div class="valor-item" style="border-color:var(--teal);">
+            <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Parcial)</div>
+            <div class="valor-preco" style="color:var(--teal);">R$ 64,90</div>
           </div>
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:6px;">Exames Finais</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
           <div class="valor-item">
-            <div class="valor-nome">📚 Pacote Resumos Final</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
+            <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
+            <div class="valor-preco">R$ 64,90</div>
           </div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 + ⚡ Pacote Resumos Final + Mini Resumos Finais</div>
-            <div class="valor-preco valor-placeholder">A definir</div>
+          <div class="valor-item" style="border-color:var(--teal);">
+            <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
+            <div class="valor-preco" style="color:var(--teal);">R$ 79,90</div>
           </div>
 
         </div>
