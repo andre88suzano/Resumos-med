@@ -2713,11 +2713,7 @@ function renderDashboard() {
   const paymentBanner = document.querySelector('.payment-banner');
   if (paymentBanner) paymentBanner.style.display = '';
 
-  // Resumos recentes — todos veem
-  const recent = state.resumos.slice(0, 6);
-  const grid = document.getElementById('dash-recent-grid');
-  if (!recent.length) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>${t('no-resumos-found')}</h3></div>`; return; }
-  grid.innerHTML = recent.map(r => buildResumoCard(r)).join('');
+  // Seção de resumos recentes removida do dashboard
 }
 
 /* ─────────────────────────────────────────────────────────
