@@ -1350,22 +1350,35 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
     <!-- ── PAGE: RESUMOS ───────────────────────────── -->
     <div class="page hidden" id="page-resumos">
 
-      <!-- VISÃO: PASTAS (folders) -->
-      <div id="view-folders">
+      <!-- VISÃO 1: SEMESTRES -->
+      <div id="view-semestres">
         <h1 class="section-title anim-in" data-i18n="nav-resumos">Resumos</h1>
-        <p class="section-sub anim-in anim-delay-1">Selecione uma matéria para ver os resumos.</p>
-
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-          <span style="font-size:12px;color:var(--text3);">📁</span>
-          <span style="font-size:13px;color:var(--text3);">Meus Resumos</span>
+        <p class="section-sub anim-in anim-delay-1">Selecione um semestre.</p>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;font-size:13px;color:var(--text3);">
+          <span>📁</span><span>Meus Resumos</span>
         </div>
-
-        <div id="folder-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;">
+        <div id="semestre-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
           <div class="empty-state"><div class="spinner"></div></div>
         </div>
       </div>
 
-      <!-- VISÃO: RESUMOS DENTRO DA PASTA -->
+      <!-- VISÃO 2: MATÉRIAS DO SEMESTRE -->
+      <div id="view-folders" class="hidden">
+        <div class="breadcrumb" id="semestre-breadcrumb"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="semestre-icon-title" style="font-size:28px;"></span>
+            <div>
+              <h1 class="section-title" id="semestre-title" style="margin-bottom:2px;"></h1>
+              <span style="font-size:13px;color:var(--text3);" id="semestre-count"></span>
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="closeSemestreContent()">← Voltar</button>
+        </div>
+        <div id="folder-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;"></div>
+      </div>
+
+      <!-- VISÃO 3: RESUMOS DA MATÉRIA -->
       <div id="view-folder-content" class="hidden">
         <div class="breadcrumb" id="folder-breadcrumb"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
@@ -2493,30 +2506,87 @@ const FOLDER_COLORS = {
   'Bioquímica':'#10b981','Genética Médica':'#2d6ef7','Biofísica':'#8b5cf6',
 };
 
-function renderResumos() {
-  closeFolderContent(true);
-  const materias = [...new Set(state.resumos.map(r => r.materia))].sort();
-  const grid = document.getElementById('folder-grid');
+const SEMESTRE_LABELS = {
+  3: '3º Semestre',
+  4: '4º Semestre',
+  5: '5º Semestre',
+  6: '6º Semestre',
+};
+const SEMESTRE_ICONS = { 3:'📘', 4:'📗', 5:'📙', 6:'📕' };
+const SEMESTRE_COLORS = { 3:'#2d6ef7', 4:'#10b981', 5:'#f0b429', 6:'#f05252' };
 
-  if (!materias.length) {
+// NÍVEL 1: mostra pastas de semestres
+function renderResumos() {
+  // Volta tudo para visão inicial
+  document.getElementById('view-semestres').classList.remove('hidden');
+  document.getElementById('view-folders').classList.add('hidden');
+  document.getElementById('view-folder-content').classList.add('hidden');
+
+  const semestres = [...new Set(state.resumos.map(r => r.semestre))].sort((a,b)=>a-b);
+  const grid = document.getElementById('semestre-grid');
+
+  if (!semestres.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><h3>${t('no-resumos-found')}</h3></div>`;
     return;
   }
 
-  grid.innerHTML = materias.map(m => {
-    const resumosDaMateria = state.resumos.filter(r => r.materia === m);
-    const liberados = resumosDaMateria.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
-    const icon = MATERIA_ICONS[m] || '📁';
-    const color = FOLDER_COLORS[m] || 'var(--accent)';
+  grid.innerHTML = semestres.map(sem => {
+    const resumosSem = state.resumos.filter(r => r.semestre === sem);
+    const liberados  = resumosSem.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
+    const icon  = SEMESTRE_ICONS[sem]  || '📁';
+    const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
+    const label = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
     return `
-      <div class="folder-card" onclick="openFolder('${m}')" style="--folder-color:${color};">
+      <div class="folder-card" onclick="openSemestre(${sem})" style="--folder-color:${color};">
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
         <div class="folder-icon">${icon}</div>
+        <div class="folder-name">${label}</div>
+        <div class="folder-meta">${resumosSem.length} resumo${resumosSem.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+            <div style="width:${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%;height:100%;background:${color};border-radius:99px;"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text3);">${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// NÍVEL 2: mostra matérias do semestre
+function openSemestre(sem) {
+  document.getElementById('view-semestres').classList.add('hidden');
+  document.getElementById('view-folders').classList.remove('hidden');
+  document.getElementById('view-folder-content').classList.add('hidden');
+
+  const label = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
+  const icon  = SEMESTRE_ICONS[sem] || '📁';
+  const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
+  const resumosSem = state.resumos.filter(r => r.semestre === sem);
+  const materias   = [...new Set(resumosSem.map(r => r.materia))].sort();
+
+  document.getElementById('semestre-icon-title').textContent = icon;
+  document.getElementById('semestre-title').textContent = label;
+  document.getElementById('semestre-count').textContent = `${materias.length} matéria${materias.length!==1?'s':''}`;
+  document.getElementById('semestre-breadcrumb').innerHTML = `
+    <a onclick="closeSemestreContent()" style="cursor:pointer;">📁 Meus Resumos</a>
+    <span>›</span>
+    <span style="color:var(--text)">${icon} ${label}</span>`;
+
+  const grid = document.getElementById('folder-grid');
+  grid.innerHTML = materias.map(m => {
+    const resumosDaMateria = resumosSem.filter(r => r.materia === m);
+    const liberados = resumosDaMateria.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
+    const mIcon  = MATERIA_ICONS[m]  || '📁';
+    const mColor = FOLDER_COLORS[m]  || color;
+    return `
+      <div class="folder-card" onclick="openFolder('${m}',${sem})" style="--folder-color:${mColor};">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${mColor};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+        <div class="folder-icon">${mIcon}</div>
         <div class="folder-name">${m}</div>
         <div class="folder-meta">${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
           <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
-            <div style="width:${resumosDaMateria.length?Math.round(liberados/resumosDaMateria.length*100):0}%;height:100%;background:${color};border-radius:99px;transition:.5s ease;"></div>
+            <div style="width:${resumosDaMateria.length?Math.round(liberados/resumosDaMateria.length*100):0}%;height:100%;background:${mColor};border-radius:99px;"></div>
           </div>
           <span style="font-size:11px;color:var(--text3);">${resumosDaMateria.length?Math.round(liberados/resumosDaMateria.length*100):0}%</span>
         </div>
@@ -2524,19 +2594,29 @@ function renderResumos() {
   }).join('');
 }
 
-function openFolder(materia) {
+function closeSemestreContent() {
+  document.getElementById('view-semestres').classList.remove('hidden');
   document.getElementById('view-folders').classList.add('hidden');
-  const content = document.getElementById('view-folder-content');
-  content.classList.remove('hidden');
+  document.getElementById('view-folder-content').classList.add('hidden');
+}
+
+// NÍVEL 3: resumos da matéria
+function openFolder(materia, sem) {
+  document.getElementById('view-folders').classList.add('hidden');
+  document.getElementById('view-folder-content').classList.remove('hidden');
 
   const icon = MATERIA_ICONS[materia] || '📁';
-  const resumosDaMateria = state.resumos.filter(r => r.materia === materia);
+  const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
+  const semIcon  = SEMESTRE_ICONS[sem] || '📁';
+  const resumosDaMateria = state.resumos.filter(r => r.materia === materia && (sem == null || r.semestre === sem));
 
   document.getElementById('folder-icon-title').textContent = icon;
   document.getElementById('folder-title').textContent = materia;
   document.getElementById('folder-count').textContent = `${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''}`;
   document.getElementById('folder-breadcrumb').innerHTML = `
-    <a onclick="closeFolderContent()">📁 Meus Resumos</a>
+    <a onclick="closeSemestreContent()" style="cursor:pointer;">📁 Meus Resumos</a>
+    <span>›</span>
+    <a onclick="openSemestre(${sem})" style="cursor:pointer;">${semIcon} ${semLabel}</a>
     <span>›</span>
     <span style="color:var(--text)">${icon} ${materia}</span>`;
 
@@ -2549,8 +2629,10 @@ function openFolder(materia) {
 }
 
 function closeFolderContent(silent) {
-  document.getElementById('view-folders').classList.remove('hidden');
+  // Volta para nível de semestre (não pula para raiz)
+  const semLink = document.getElementById('folder-breadcrumb')?.querySelector('a:nth-child(3)');
   document.getElementById('view-folder-content').classList.add('hidden');
+  document.getElementById('view-folders').classList.remove('hidden');
 }
 
 function buildResumoCard(r) {
