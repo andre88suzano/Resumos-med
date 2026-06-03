@@ -2614,7 +2614,7 @@ async function loadAllData() {
 }
 
 async function loadResumos() {
-  const { data } = await SB.select('resumos', 'materia=neq._update_&select=*&order=created_at.desc');
+  const { data } = await SB.select('resumos', 'materia=neq._update_&materia=neq._feedback_&select=*&order=created_at.desc');
   state.resumos = Array.isArray(data) ? data : [];
 }
 
