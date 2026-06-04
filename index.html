@@ -5898,7 +5898,9 @@ async function bibCarregarLivros() {
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
-    const { data, ok } = await SB.select('livros_chunks', 'select=id,livro,materia&order=livro.asc');
+    const res = await fetch('/api/biblioteca');
+    const data = await res.json();
+    const ok = res.ok;
     if (!ok || !Array.isArray(data)) {
       listEl.innerHTML = '<div style="color:var(--red);font-size:14px;">Erro ao carregar livros.</div>';
       return;
@@ -5947,8 +5949,8 @@ function escHtml(str) {
 async function bibRemoverLivro(livro) {
   if (!confirm(`Remover todos os chunks de "${livro}"?`)) return;
   try {
-    const { ok } = await SB.delete('livros_chunks', `livro=eq.${encodeURIComponent(livro)}`);
-    if (ok) { toast('Livro removido!', 'success'); bibCarregarLivros(); }
+    const res = await fetch('/api/biblioteca', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ livro }) });
+    if (res.ok) { toast('Livro removido!', 'success'); bibCarregarLivros(); }
     else toast('Erro ao remover livro.', 'error');
   } catch(e) {
     toast('Erro: ' + e.message, 'error');
