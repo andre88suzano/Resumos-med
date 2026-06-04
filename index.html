@@ -5898,7 +5898,7 @@ async function bibCarregarLivros() {
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
-    const { data, ok } = await SB.select('livros_chunks', 'select=livro,materia,semestre&order=livro.asc');
+    const { data, ok } = await SB.select('livros_chunks', 'select=livro,materia&order=livro.asc');
     if (!ok || !Array.isArray(data)) {
       listEl.innerHTML = '<div style="color:var(--red);font-size:14px;">Erro ao carregar livros.</div>';
       return;
@@ -5928,7 +5928,7 @@ async function bibCarregarLivros() {
           <div>
             <div style="font-weight:600;color:var(--text);">${escHtml(l.livro)}</div>
             <div style="font-size:12px;color:var(--text2);">
-              ${escHtml(l.materia)}${l.semestre ? ' · ' + l.semestre + 'º sem' : ''} · <span style="color:var(--teal);">${l.chunks} chunk${l.chunks !== 1 ? 's' : ''}</span>
+              ${escHtml(l.materia)} · <span style="color:var(--teal);">${l.chunks} chunk${l.chunks !== 1 ? 's' : ''}</span>
             </div>
           </div>
         </div>
