@@ -1,9 +1,9 @@
 /**
  * Cloudflare Pages Function — POST /api/dr-ia
- * Proxy para Google Gemini API
+ * Proxy seguro para a API da Anthropic (Claude)
  *
  * Variável de ambiente necessária (Cloudflare Pages → Settings → Variables):
- *   GEMINI_API_KEY = AIza...
+ *   ANTHROPIC_API_KEY = sk-ant-...
  */
 
 const ALLOWED_ORIGINS = [
@@ -29,9 +29,9 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
-  const apiKey = env.GEMINI_API_KEY;
+  const apiKey = env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'GEMINI_API_KEY não configurada' }), {
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY não configurada' }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
   }
@@ -44,48 +44,31 @@ export async function onRequest(context) {
     });
   }
 
-  // Converter formato Anthropic → Gemini
-  const { system, messages } = body;
-
-  const contents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-
-  const geminiBody = {
-    system_instruction: system ? { parts: [{ text: system }] } : undefined,
-    contents,
-    generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
-  };
-
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(geminiBody),
-      }
-    );
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify(body),
+    });
 
     const data = await res.json();
 
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'Erro na API Gemini', detail: data }), {
+      return new Response(JSON.stringify({ error: 'Erro na API Anthropic', detail: data }), {
         status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
       });
     }
 
-    // Converter resposta Gemini → formato Anthropic (para não mudar o frontend)
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    return new Response(JSON.stringify({
-      content: [{ type: 'text', text }]
-    }), {
+    return new Response(JSON.stringify(data), {
       status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Falha na comunicação com Gemini: ' + err.message }), {
+    return new Response(JSON.stringify({ error: 'Falha na comunicação com Anthropic: ' + err.message }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
   }
