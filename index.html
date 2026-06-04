@@ -1337,7 +1337,63 @@ CREATE POLICY "Users see own profile" ON public.approved_users FOR SELECT USING 
 CREATE POLICY "Admins see all users"  ON public.approved_users FOR ALL   USING (EXISTS (SELECT 1 FROM public.approved_users WHERE user_id = auth.uid() AND is_admin = TRUE));
 CREATE POLICY "Resumos visíveis"      ON public.resumos        FOR SELECT USING (TRUE);
 CREATE POLICY "Acesso próprio"        ON public.user_access    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING (EXISTS (SELECT 1 FROM public.approved_users WHERE user_id = auth.uid() AND is_admin = TRUE));</div>
+CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING (EXISTS (SELECT 1 FROM public.approved_users WHERE user_id = auth.uid() AND is_admin = TRUE));
+
+-- ─── SISTEMA DE VENDAS ─────────────────────────────────────
+
+-- Compras coletivas (sala de espera)
+CREATE TABLE IF NOT EXISTS public.compras_coletivas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  codigo TEXT NOT NULL,
+  tipo TEXT NOT NULL DEFAULT 'dupla',
+  status TEXT NOT NULL DEFAULT 'aguardando',
+  slots_total INTEGER NOT NULL DEFAULT 2,
+  slots_preenchidos INTEGER NOT NULL DEFAULT 0,
+  preco_individual DECIMAL(10,2) NOT NULL,
+  preco_dupla DECIMAL(10,2),
+  criador_user_id UUID REFERENCES auth.users(id),
+  expira_em TIMESTAMPTZ NOT NULL,
+  segunda_chance_expira_em TIMESTAMPTZ,
+  criado_em TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.compra_participantes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  compra_id UUID REFERENCES public.compras_coletivas(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id),
+  email TEXT,
+  status_pagamento TEXT NOT NULL DEFAULT 'pendente',
+  mp_payment_id TEXT,
+  mp_preference_id TEXT,
+  valor_pago DECIMAL(10,2),
+  resumos_selecionados JSONB DEFAULT '[]',
+  pago_em TIMESTAMPTZ,
+  criado_em TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(compra_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.assinaturas_ia (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  status TEXT NOT NULL DEFAULT 'ativa',
+  mp_subscription_id TEXT,
+  valor DECIMAL(10,2) DEFAULT 15.00,
+  inicio_em TIMESTAMPTZ DEFAULT NOW(),
+  proximo_pagamento TIMESTAMPTZ,
+  criado_em TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS para tabelas de vendas
+ALTER TABLE public.compras_coletivas   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.compra_participantes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.assinaturas_ia       ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Participante vê sua compra"    ON public.compra_participantes FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Participante insere"           ON public.compra_participantes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Compras visíveis"              ON public.compras_coletivas    FOR SELECT USING (TRUE);
+CREATE POLICY "Criador insere compra"         ON public.compras_coletivas    FOR INSERT WITH CHECK (auth.uid() = criador_user_id);
+CREATE POLICY "Criador atualiza compra"       ON public.compras_coletivas    FOR UPDATE USING (auth.uid() = criador_user_id);
+CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FOR SELECT USING (auth.uid() = user_id);</div>
         </div>
       </div>
 
@@ -2343,6 +2399,9 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
                 <div class="valor-desc" style="margin-top:2px;">Cada combo inclui Resumo + Mini Resumo (normalmente R$ 20 cada). No pacote de 4, pague só R$ 59,90 no total.</div>
               </div>
             </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;margin-top:4px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Promoção Solo', preco:59.90, tipo:'solo', quantidade:4 })">
+              🛒 Comprar Agora
+            </button>
           </div>
 
           <!-- Divisor -->
@@ -2364,6 +2423,9 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
             <div style="width:100%;background:#ede7ff;border-radius:8px;padding:8px 12px;font-size:12px;color:#7b2ff7;font-weight:600;text-align:center;">
               💜 Quanto mais amigos, mais economia para todo mundo!
             </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;background:#7b2ff7;border:none;margin-top:4px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Promoção Dupla', preco_dupla:49.90, preco_solo:59.90, tipo:'dupla', quantidade:4 })">
+              👯 Entrar na Sala de Espera — R$ 49,90
+            </button>
           </div>
 
         </div>
@@ -2376,38 +2438,44 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
 
-          <div class="valor-item">
-            <div class="valor-info">
-              <div class="valor-nome">📖 Resumo Individual</div>
+          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
+              <div class="valor-preco">R$ 15,00</div>
             </div>
-            <div class="valor-preco">R$ 15,00</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
-          <div class="valor-item" style="border-color:var(--teal);">
-            <div class="valor-info">
-              <div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div>
-              <div class="valor-desc">
-                <span style="color:var(--teal);font-weight:600;">O que é o Mini Resumo?</span>
-                Material ultra-compacto com apenas os tópicos mais importantes — perfeito para aquela última checada rápida antes de entrar na sala de prova.
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info">
+                <div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div>
+                <div class="valor-desc">
+                  <span style="color:var(--teal);font-weight:600;">O que é o Mini Resumo?</span>
+                  Material ultra-compacto com apenas os tópicos mais importantes — perfeito para aquela última checada rápida antes de entrar na sala de prova.
+                </div>
               </div>
+              <div class="valor-preco" style="color:var(--teal);">R$ 20,00</div>
             </div>
-            <div class="valor-preco" style="color:var(--teal);">R$ 20,00</div>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
 
-          <div class="valor-item">
-            <div class="valor-info">
-              <div class="valor-nome">📖 Resumo Individual</div>
+          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
+              <div class="valor-preco">R$ 18,00</div>
             </div>
-            <div class="valor-preco">R$ 18,00</div>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual (Final)', preco:18.00, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
-          <div class="valor-item" style="border-color:var(--teal);">
-            <div class="valor-info">
-              <div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div>
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div></div>
+              <div class="valor-preco" style="color:var(--teal);">R$ 25,00</div>
             </div>
-            <div class="valor-preco" style="color:var(--teal);">R$ 25,00</div>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo (Final)', preco:25.00, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
         </div>
@@ -2419,23 +2487,35 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
         <div style="display:flex;flex-direction:column;gap:10px;">
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 Pacote Resumos (Parcial)</div>
-            <div class="valor-preco">R$ 54,90</div>
+          <div class="valor-item" style="flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-nome">📚 Pacote Resumos (Parcial)</div>
+              <div class="valor-preco">R$ 54,90</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Parcial', preco:54.90, tipo:'solo' })">🛒 Comprar</button>
           </div>
-          <div class="valor-item" style="border-color:var(--teal);">
-            <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Parcial)</div>
-            <div class="valor-preco" style="color:var(--teal);">R$ 64,90</div>
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Parcial)</div>
+              <div class="valor-preco" style="color:var(--teal);">R$ 64,90</div>
+            </div>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Parcial', preco:64.90, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
-          <div class="valor-item">
-            <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
-            <div class="valor-preco">R$ 64,90</div>
+          <div class="valor-item" style="flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
+              <div class="valor-preco">R$ 64,90</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Finais', preco:64.90, tipo:'solo' })">🛒 Comprar</button>
           </div>
-          <div class="valor-item" style="border-color:var(--teal);">
-            <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
-            <div class="valor-preco" style="color:var(--teal);">R$ 79,90</div>
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
+              <div class="valor-preco" style="color:var(--teal);">R$ 79,90</div>
+            </div>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Finais', preco:79.90, tipo:'solo' })">🛒 Comprar</button>
           </div>
 
         </div>
@@ -2462,6 +2542,21 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
             <div class="valor-preco valor-placeholder" style="color:var(--gold);">A definir</div>
           </div>
 
+          <div class="valor-item" style="border-color:var(--teal);background:linear-gradient(135deg,#001a1a,#002222);flex-direction:column;gap:10px;margin-top:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info">
+                <div class="valor-nome">🤖 Assinatura Dr. IA</div>
+                <div class="valor-desc">Acesso ilimitado ao assistente IA de estudos por assinatura mensal. Cancele quando quiser.</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 15,00<span style="font-size:11px;font-weight:400;">/mês</span></div>
+              </div>
+            </div>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');assinarIA()">
+              🤖 Assinar Dr. IA — R$ 15/mês
+            </button>
+          </div>
+
         </div>
       </div>
 
@@ -2473,6 +2568,95 @@ CREATE POLICY "Admin gerencia acesso" ON public.user_access    FOR ALL    USING 
       <a href="https://wa.me/5527992389129" target="_blank" class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);text-decoration:none;">
         💬 WhatsApp
       </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ MODAL COMPRA ═══════════ -->
+<div id="modal-compra" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">🛒 Finalizar Compra</h2>
+        <p id="mc-plano-desc" style="font-size:13px;color:var(--text3);margin-top:2px;"></p>
+      </div>
+      <button class="modal-close" onclick="fecharModalCompra()">✕</button>
+    </div>
+
+    <!-- Banner segunda chance -->
+    <div id="mc-segunda-chance-banner" class="hidden" style="background:#1a0800;border:1px solid var(--gold);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:8px;">
+        ⚠️ Seu amigo não pagou. Você tem <span id="mc-sc-countdown" style="font-family:var(--font-mono);">--:--:--</span> para:
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" style="flex:1;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold);" onclick="ativarSegundaChance()">
+          👥 Convidar outro amigo
+        </button>
+        <button class="btn btn-sm" style="flex:1;background:var(--red-dim);color:var(--red);border:1px solid var(--red);" onclick="pagarTaxaIndividual()">
+          💳 Pagar +R$ 10 e liberar
+        </button>
+      </div>
+    </div>
+
+    <!-- Opção Solo -->
+    <div id="mc-option-solo" style="border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;cursor:pointer;transition:var(--transition);"
+         onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">📦 Compra Solo</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">Pagamento imediato — liberação automática</div>
+        </div>
+        <div id="mc-preco-solo" style="font-size:20px;font-weight:800;color:var(--accent);">R$ --</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
+        💳 Pagar Agora
+      </button>
+      <!-- Alternativa Pix -->
+      <div style="margin-top:10px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text3);text-align:center;">
+        💚 Prefere Pix? Chave: <strong style="color:var(--text);font-family:var(--font-mono);">18553943755</strong><br>
+        Após pagar, envie o comprovante no <a href="https://wa.me/5527992389129" target="_blank" style="color:var(--green);">WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- Opção Dupla -->
+    <div id="mc-option-dupla" class="hidden" style="border:1px solid #7b2ff7;border-radius:var(--radius);padding:18px;background:linear-gradient(135deg,#0f0020,#130028);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">👯 Trazer Amigo</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">Vocês dois pagam menos — sala aberta por 48h</div>
+        </div>
+        <div id="mc-preco-dupla" style="font-size:20px;font-weight:800;color:#7b2ff7;">R$ -- <span style="font-size:12px;font-weight:400;">cada</span></div>
+      </div>
+
+      <!-- Status sala -->
+      <div id="mc-sala-status" style="display:none;margin:10px 0;padding:10px;background:#1a0030;border-radius:8px;font-size:13px;color:var(--text2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span>⏱ Sala expira em:</span>
+          <span id="mc-sala-countdown" style="font-family:var(--font-mono);color:#7b2ff7;font-weight:700;">--:--:--</span>
+        </div>
+        <div id="mc-sala-slots" style="font-size:12px;color:var(--text3);">👤 Aguardando amigo...</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-sm" id="mc-btn-sala" style="flex:1;background:#7b2ff7;color:#fff;border:none;" onclick="entrarSalaEspera()">
+          👯 Entrar na Sala de Espera
+        </button>
+        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green-dim);color:var(--green);border:1px solid var(--green);display:none;" onclick="iniciarPagamentoDupla()">
+          💳 Pagar Minha Parte
+        </button>
+      </div>
+      <!-- Alternativa Pix -->
+      <div style="margin-top:10px;padding:10px;background:#ffffff08;border-radius:8px;font-size:12px;color:var(--text3);text-align:center;">
+        💚 Prefere Pix? Chave: <strong style="color:var(--text);font-family:var(--font-mono);">18553943755</strong><br>
+        Envie o comprovante no <a href="https://wa.me/5527992389129" target="_blank" style="color:var(--green);">WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- Spinner de processamento -->
+    <div id="mc-loading" class="hidden" style="text-align:center;padding:20px;">
+      <div class="spinner spinner-lg" style="margin:0 auto 12px;"></div>
+      <div style="font-size:13px;color:var(--text3);" id="mc-loading-msg">Processando...</div>
     </div>
 
   </div>
@@ -4825,6 +5009,452 @@ function drDownloadCard() {
 
 // ── INIT DR. IA ──────────────────────────────────────────
 drSetTimerMode('pomo');
+
+/* ═══════════════════════════════════════════════════════════
+   SISTEMA DE VENDAS — MERCADO PAGO + COMPRA COLETIVA
+   ═══════════════════════════════════════════════════════════
+
+   CONFIGURAÇÃO NECESSÁRIA:
+   ─────────────────────────────────────────────────────────
+   1. No Cloudflare Pages → Settings → Environment variables:
+      MP_ACCESS_TOKEN      = TEST-xxxx (ou APP_USR-xxxx em produção)
+      SUPABASE_URL         = https://xxx.supabase.co
+      SUPABASE_SERVICE_KEY = eyJ... (service role key)
+
+   2. Troque MP_PUBLIC_KEY abaixo pela Public Key do Mercado Pago:
+      - Em ambiente de testes: começa com TEST-
+      - Em produção: começa com APP_USR-
+      Encontre em: https://www.mercadopago.com.br/developers/panel/app
+
+   3. Troque SITE_URL pelo domínio real do seu site no Cloudflare Pages.
+   ─────────────────────────────────────────────────────────
+*/
+
+// ── CONFIGURAÇÕES FRONTEND (seguro expor — são públicas) ──
+// TODO: André — troque pela sua Public Key do Mercado Pago:
+const MP_PUBLIC_KEY = 'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+// TODO: André — troque pelo URL do seu site:
+const SITE_URL = 'https://resumos-med.pages.dev';
+
+// ── ESTADO DA COMPRA ATUAL ────────────────────────────────
+let mcState = {
+  plano: null,           // objeto plano { nome, preco, tipo, quantidade, preco_dupla, preco_solo }
+  compraId: null,        // UUID da compra_coletiva ativa
+  salaIntervalId: null,  // setInterval do countdown da sala
+  pollingIntervalId: null, // setInterval do polling de status
+  scIntervalId: null,    // setInterval da segunda chance
+};
+
+// ── ABRIR MODAL DE COMPRA ─────────────────────────────────
+function abrirModalCompra(plano) {
+  if (!state.user) {
+    toast('Faça login para comprar', 'error');
+    return;
+  }
+
+  mcState.plano = plano;
+  mcState.compraId = null;
+
+  // Atualizar descrição
+  document.getElementById('mc-plano-desc').textContent = plano.nome;
+
+  // Mostrar preço solo
+  const precoSolo = plano.preco || plano.preco_solo || 0;
+  document.getElementById('mc-preco-solo').textContent = `R$ ${precoSolo.toFixed(2).replace('.', ',')}`;
+
+  // Mostrar ou ocultar opção dupla
+  const optDupla = document.getElementById('mc-option-dupla');
+  if (plano.tipo === 'dupla' && plano.preco_dupla) {
+    optDupla.classList.remove('hidden');
+    document.getElementById('mc-preco-dupla').innerHTML =
+      `R$ ${plano.preco_dupla.toFixed(2).replace('.', ',')} <span style="font-size:12px;font-weight:400;">cada</span>`;
+  } else {
+    optDupla.classList.add('hidden');
+  }
+
+  // Ocultar banners de segunda chance por padrão
+  document.getElementById('mc-segunda-chance-banner').classList.add('hidden');
+  document.getElementById('mc-sala-status').style.display = 'none';
+  document.getElementById('mc-btn-pagar-dupla').style.display = 'none';
+  document.getElementById('mc-btn-sala').style.display = '';
+  document.getElementById('mc-loading').classList.add('hidden');
+
+  openModal('modal-compra');
+
+  // Verificar se existe sala ativa para este usuário
+  verificarSalaExistente();
+}
+
+function fecharModalCompra() {
+  closeModal('modal-compra');
+  // Parar intervalos
+  if (mcState.salaIntervalId) { clearInterval(mcState.salaIntervalId); mcState.salaIntervalId = null; }
+  if (mcState.pollingIntervalId) { clearInterval(mcState.pollingIntervalId); mcState.pollingIntervalId = null; }
+  if (mcState.scIntervalId) { clearInterval(mcState.scIntervalId); mcState.scIntervalId = null; }
+}
+
+// ── VERIFICAR SALA EXISTENTE ──────────────────────────────
+async function verificarSalaExistente() {
+  if (!state.user) return;
+  try {
+    // Buscar compras do usuário com status 'aguardando'
+    const r = await SB.select(
+      'compra_participantes',
+      `user_id=eq.${state.user.id}&status_pagamento=eq.pendente&select=*,compras_coletivas(*)`
+    );
+    if (!r.ok || !r.data?.length) return;
+
+    const part = r.data[0];
+    const compra = part.compras_coletivas;
+    if (!compra || compra.status !== 'aguardando') return;
+
+    // Existe sala ativa — restaurar estado
+    mcState.compraId = compra.id;
+    mostrarStatusSala(compra);
+
+    // Verificar segunda chance
+    if (compra.segunda_chance_expira_em) {
+      verificarSegundaChance(compra);
+    }
+  } catch (e) {
+    console.error('verificarSalaExistente:', e);
+  }
+}
+
+// ── ENTRAR NA SALA DE ESPERA ──────────────────────────────
+async function entrarSalaEspera() {
+  if (!state.user) { toast('Faça login para continuar', 'error'); return; }
+
+  mostrarLoading('Criando sala de espera...');
+
+  try {
+    // Gerar código único
+    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const expiraEm = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const plano = mcState.plano;
+
+    // Criar compra coletiva
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo,
+      tipo: 'dupla',
+      status: 'aguardando',
+      slots_total: 2,
+      slots_preenchidos: 0,
+      preco_individual: plano.preco_solo || plano.preco || 59.90,
+      preco_dupla: plano.preco_dupla || 49.90,
+      criador_user_id: state.user.id,
+      expira_em: expiraEm,
+    });
+
+    if (!rCompra.ok || !rCompra.data?.length) {
+      throw new Error('Erro ao criar compra coletiva');
+    }
+
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    mcState.compraId = compra.id;
+
+    // Registrar participante
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,
+      email: state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+
+    ocultarLoading();
+    mostrarStatusSala(compra);
+    toast('Sala criada! Agora é só aguardar seu amigo ou pagar sua parte.', 'success');
+
+    // Iniciar polling de status
+    iniciarPollingStatus(compra.id);
+
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro ao criar sala: ' + e.message, 'error');
+  }
+}
+
+// ── MOSTRAR STATUS DA SALA ────────────────────────────────
+function mostrarStatusSala(compra) {
+  document.getElementById('mc-sala-status').style.display = 'block';
+  document.getElementById('mc-btn-sala').style.display = 'none';
+  document.getElementById('mc-btn-pagar-dupla').style.display = '';
+
+  const slotsText = compra.slots_preenchidos === 0
+    ? '👤 Aguardando 1 amigo...'
+    : `✅ ${compra.slots_preenchidos}/${compra.slots_total} participantes`;
+  document.getElementById('mc-sala-slots').textContent = slotsText;
+
+  // Countdown da sala
+  if (mcState.salaIntervalId) clearInterval(mcState.salaIntervalId);
+  mcState.salaIntervalId = setInterval(() => {
+    renderCountdown(compra.expira_em, 'mc-sala-countdown');
+  }, 1000);
+  renderCountdown(compra.expira_em, 'mc-sala-countdown');
+}
+
+// ── INICIAR PAGAMENTO SOLO ────────────────────────────────
+async function iniciarPagamentoSolo() {
+  if (!state.user) { toast('Faça login para continuar', 'error'); return; }
+  const plano = mcState.plano;
+  if (!plano) return;
+
+  mostrarLoading('Preparando pagamento...');
+
+  try {
+    // Criar compra solo no banco
+    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo,
+      tipo: 'solo',
+      status: 'aguardando',
+      slots_total: 1,
+      slots_preenchidos: 0,
+      preco_individual: plano.preco || plano.preco_solo || 0,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,
+      email: state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+
+    await iniciarPagamento(compra.id, 'solo', plano.preco || plano.preco_solo || 0);
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ── INICIAR PAGAMENTO DUPLA ───────────────────────────────
+async function iniciarPagamentoDupla() {
+  if (!mcState.compraId) { toast('Entre na sala de espera primeiro', 'error'); return; }
+  mostrarLoading('Preparando pagamento...');
+  const preco = mcState.plano?.preco_dupla || 49.90;
+  await iniciarPagamento(mcState.compraId, 'dupla', preco);
+}
+
+// ── INICIAR PAGAMENTO (chama a Function do Cloudflare) ────
+async function iniciarPagamento(compraId, tipo, valor) {
+  try {
+    const external_reference = `${compraId}:${state.user.id}:${tipo}`;
+    const notification_url = `${SITE_URL}/api/mp-webhook`;
+
+    const res = await fetch('/api/mp-create-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{
+          title: mcState.plano?.nome || 'MedResúmenes',
+          quantity: 1,
+          unit_price: valor,
+          currency_id: 'BRL',
+        }],
+        payer_email: state.user.email,
+        external_reference,
+        notification_url,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.preference_id) {
+      throw new Error(data.error || 'Erro ao criar preferência de pagamento');
+    }
+
+    // Salvar preference_id no participante
+    await SB.update('compra_participantes',
+      { mp_preference_id: data.preference_id },
+      `compra_id=eq.${compraId}&user_id=eq.${state.user.id}`
+    );
+
+    ocultarLoading();
+
+    // Redirecionar para o checkout do Mercado Pago
+    // Em ambiente de testes use sandbox_init_point; em produção use init_point
+    const checkoutUrl = data.sandbox_init_point || data.init_point;
+    toast('Redirecionando para o Mercado Pago...', 'info');
+    setTimeout(() => { window.location.href = checkoutUrl; }, 800);
+
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro no pagamento: ' + e.message, 'error');
+  }
+}
+
+// ── POLLING DE STATUS ─────────────────────────────────────
+function iniciarPollingStatus(compraId) {
+  if (mcState.pollingIntervalId) clearInterval(mcState.pollingIntervalId);
+  mcState.pollingIntervalId = setInterval(async () => {
+    await verificarStatusCompra(compraId);
+  }, 8000);
+}
+
+async function verificarStatusCompra(compraId) {
+  try {
+    const r = await SB.select('compras_coletivas', `id=eq.${compraId}&select=*`);
+    if (!r.ok || !r.data?.length) return;
+
+    const compra = r.data[0];
+
+    // Atualizar slots
+    if (document.getElementById('mc-sala-slots')) {
+      const slotsText = compra.slots_preenchidos === 0
+        ? '👤 Aguardando 1 amigo...'
+        : `✅ ${compra.slots_preenchidos}/${compra.slots_total} participantes`;
+      document.getElementById('mc-sala-slots').textContent = slotsText;
+    }
+
+    if (compra.status === 'completo') {
+      // Para o polling
+      clearInterval(mcState.pollingIntervalId);
+      mcState.pollingIntervalId = null;
+      fecharModalCompra();
+      toast('🎉 Pagamento confirmado! Seu acesso foi liberado.', 'success');
+      setTimeout(() => location.reload(), 2000);
+    }
+
+    // Verificar segunda chance
+    if (compra.segunda_chance_expira_em && compra.status !== 'completo') {
+      verificarSegundaChance(compra);
+    }
+  } catch (e) {
+    console.error('verificarStatusCompra:', e);
+  }
+}
+
+// ── SEGUNDA CHANCE ────────────────────────────────────────
+function verificarSegundaChance(compra) {
+  const scExpira = new Date(compra.segunda_chance_expira_em).getTime();
+  const agora = Date.now();
+  if (scExpira <= agora) return; // já expirou
+
+  // Mostrar banner
+  const banner = document.getElementById('mc-segunda-chance-banner');
+  if (banner) {
+    banner.classList.remove('hidden');
+    if (mcState.scIntervalId) clearInterval(mcState.scIntervalId);
+    mcState.scIntervalId = setInterval(() => {
+      renderCountdown(compra.segunda_chance_expira_em, 'mc-sc-countdown');
+      if (new Date(compra.segunda_chance_expira_em).getTime() <= Date.now()) {
+        clearInterval(mcState.scIntervalId);
+      }
+    }, 1000);
+    renderCountdown(compra.segunda_chance_expira_em, 'mc-sc-countdown');
+  }
+}
+
+async function ativarSegundaChance() {
+  if (!mcState.compraId) return;
+  mostrarLoading('Ativando nova chance...');
+  try {
+    const novaExpiracao = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
+    await SB.update('compras_coletivas',
+      { segunda_chance_expira_em: novaExpiracao },
+      `id=eq.${mcState.compraId}`
+    );
+    ocultarLoading();
+    toast('Nova sala aberta por 3h! Convide outro amigo.', 'success');
+    document.getElementById('mc-segunda-chance-banner').classList.add('hidden');
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+async function pagarTaxaIndividual() {
+  if (!mcState.compraId) return;
+  mostrarLoading('Preparando cobrança adicional...');
+  // Cobra R$10 extra para converter de dupla para individual
+  await iniciarPagamento(mcState.compraId, 'taxa-individual', 10.00);
+}
+
+// ── ASSINATURA IA ─────────────────────────────────────────
+async function assinarIA() {
+  if (!state.user) { toast('Faça login para assinar', 'error'); return; }
+  toast('Redirecionando para assinatura...', 'info');
+
+  // Por enquanto cria uma preferência de pagamento único de R$15
+  // Para assinatura recorrente real, use a API de subscriptions do MP
+  try {
+    const res = await fetch('/api/mp-create-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{
+          title: 'Assinatura Dr. IA — MedResúmenes',
+          quantity: 1,
+          unit_price: 15.00,
+          currency_id: 'BRL',
+        }],
+        payer_email: state.user.email,
+        external_reference: `assinatura:${state.user.id}:ia`,
+        notification_url: `${SITE_URL}/api/mp-webhook`,
+      }),
+    });
+    const data = await res.json();
+    if (data.init_point || data.sandbox_init_point) {
+      window.location.href = data.sandbox_init_point || data.init_point;
+    } else {
+      throw new Error(data.error || 'Erro');
+    }
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ── COUNTDOWN ─────────────────────────────────────────────
+function renderCountdown(expiraEm, elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const diff = new Date(expiraEm).getTime() - Date.now();
+  if (diff <= 0) { el.textContent = '00:00:00'; return; }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ── HELPERS LOADING ───────────────────────────────────────
+function mostrarLoading(msg) {
+  document.getElementById('mc-loading').classList.remove('hidden');
+  document.getElementById('mc-loading-msg').textContent = msg || 'Processando...';
+  document.getElementById('mc-option-solo').style.opacity = '0.4';
+  document.getElementById('mc-option-solo').style.pointerEvents = 'none';
+}
+
+function ocultarLoading() {
+  document.getElementById('mc-loading').classList.add('hidden');
+  document.getElementById('mc-option-solo').style.opacity = '1';
+  document.getElementById('mc-option-solo').style.pointerEvents = '';
+}
+
+// ── VERIFICAR RETORNO DO PAGAMENTO (URL params) ───────────
+(function verificarRetornoPagamento() {
+  const params = new URLSearchParams(window.location.search);
+  const statusPag = params.get('pagamento');
+  if (statusPag === 'sucesso') {
+    toast('✅ Pagamento confirmado! Atualizando acesso...', 'success');
+    // Limpar params da URL
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => location.reload(), 2000);
+  } else if (statusPag === 'falha') {
+    toast('❌ Pagamento não aprovado. Tente novamente.', 'error');
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (statusPag === 'pendente') {
+    toast('⏳ Pagamento pendente. Aguardando confirmação...', 'info');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
 </script>
 </body>
 </html>
