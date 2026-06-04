@@ -4625,13 +4625,22 @@ async function drSendMsg(text) {
       })
     });
     const data = await res.json();
+    console.log('Dr. IA response:', JSON.stringify(data));
+    if (!res.ok) {
+      drHideTyping();
+      drAddMsg('ai', `⚠️ Erro ${res.status}: ${data.error || data.detail?.error?.message || JSON.stringify(data)}`);
+      drIsLoading = false;
+      document.getElementById('dr-send-btn').disabled = false;
+      drCheckLimitBanners();
+      return;
+    }
     const reply = data.content?.[0]?.text || 'Erro ao obter resposta.';
     drHideTyping();
     drAddMsg('ai', reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>'));
     drMsgHistory.push({ role:'assistant', content:reply });
   } catch(e) {
     drHideTyping();
-    drAddMsg('ai','⚠️ Erro de conexão. Verifique sua internet e tente novamente.');
+    drAddMsg('ai','⚠️ Erro: ' + e.message);
   }
   drIsLoading = false;
   document.getElementById('dr-send-btn').disabled = false;
