@@ -1,9 +1,9 @@
 /**
  * Cloudflare Pages Function — POST /api/dr-ia
- * Proxy para Google Gemini API usando Service Account
+ * Proxy para Groq API (gratuito)
  *
  * Variável de ambiente necessária:
- *   GOOGLE_SERVICE_ACCOUNT = conteúdo do JSON da conta de serviço (string)
+ *   GROQ_API_KEY = gsk_...
  */
 
 const ALLOWED_ORIGINS = [
@@ -21,56 +21,6 @@ function corsHeaders(origin) {
   };
 }
 
-// Gera JWT para autenticação com Google
-async function getAccessToken(serviceAccount) {
-  const now = Math.floor(Date.now() / 1000);
-  const header = { alg: 'RS256', typ: 'JWT' };
-  const payload = {
-    iss: serviceAccount.client_email,
-    scope: 'https://www.googleapis.com/auth/generative-language',
-    aud: 'https://oauth2.googleapis.com/token',
-    iat: now,
-    exp: now + 3600,
-  };
-
-  const encode = obj => btoa(JSON.stringify(obj)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  const headerB64 = encode(header);
-  const payloadB64 = encode(payload);
-  const sigInput = `${headerB64}.${payloadB64}`;
-
-  // Importar chave privada
-  const pemKey = serviceAccount.private_key;
-  const pemBody = pemKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, '');
-  const keyData = Uint8Array.from(atob(pemBody), c => c.charCodeAt(0));
-
-  const cryptoKey = await crypto.subtle.importKey(
-    'pkcs8', keyData.buffer,
-    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-    false, ['sign']
-  );
-
-  const signature = await crypto.subtle.sign(
-    'RSASSA-PKCS1-v1_5', cryptoKey,
-    new TextEncoder().encode(sigInput)
-  );
-
-  const sigB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
-  const jwt = `${sigInput}.${sigB64}`;
-
-  // Trocar JWT por access token
-  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
-  });
-
-  const tokenData = await tokenRes.json();
-  if (!tokenData.access_token) throw new Error('Falha ao obter access token: ' + JSON.stringify(tokenData));
-  return tokenData.access_token;
-}
-
 export async function onRequest(context) {
   const { request, env } = context;
   const origin = request.headers.get('Origin') || '';
@@ -79,17 +29,9 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
-  const saJson = env.GOOGLE_SERVICE_ACCOUNT;
-  if (!saJson) {
-    return new Response(JSON.stringify({ error: 'GOOGLE_SERVICE_ACCOUNT não configurada' }), {
-      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
-    });
-  }
-
-  let serviceAccount;
-  try { serviceAccount = JSON.parse(saJson); }
-  catch {
-    return new Response(JSON.stringify({ error: 'GOOGLE_SERVICE_ACCOUNT JSON inválido' }), {
+  const apiKey = env.GROQ_API_KEY;
+  if (!apiKey) {
+    return new Response(JSON.stringify({ error: 'GROQ_API_KEY não configurada' }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
   }
@@ -102,42 +44,38 @@ export async function onRequest(context) {
     });
   }
 
+  const { system, messages } = body;
+
+  // Groq usa formato OpenAI
+  const groqMessages = [];
+  if (system) groqMessages.push({ role: 'system', content: system });
+  messages.forEach(m => groqMessages.push({ role: m.role, content: m.content }));
+
   try {
-    const accessToken = await getAccessToken(serviceAccount);
-    const { system, messages } = body;
-
-    const contents = messages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }],
-    }));
-
-    const geminiBody = {
-      ...(system ? { system_instruction: { parts: [{ text: system }] } } : {}),
-      contents,
-      generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
-    };
-
-    const res = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(geminiBody),
-      }
-    );
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: groqMessages,
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
 
     const data = await res.json();
 
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'Erro na API Gemini', detail: data }), {
+      return new Response(JSON.stringify({ error: 'Erro na API Groq', detail: data }), {
         status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
       });
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Converter resposta Groq → formato Anthropic (frontend não muda)
+    const text = data.choices?.[0]?.message?.content || '';
     return new Response(JSON.stringify({
       content: [{ type: 'text', text }]
     }), {
@@ -145,7 +83,7 @@ export async function onRequest(context) {
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erro: ' + err.message }), {
+    return new Response(JSON.stringify({ error: 'Falha: ' + err.message }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
   }
