@@ -1237,6 +1237,8 @@
   }
 
 </style>
+<!-- PDF.js for client-side PDF text extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -1615,6 +1617,9 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <a class="nav-item" onclick="showPage('admin-access')">
           <span class="nav-icon">🔐</span> <span data-i18n="nav-access">Controle de Acesso</span>
         </a>
+        <a class="nav-item" onclick="showPage('biblioteca-ia')">
+          <span class="nav-icon">📚</span> <span>Biblioteca IA</span>
+        </a>
       </div>
     </div>
 
@@ -1990,6 +1995,86 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <div class="empty-icon">🔐</div>
           <h3 data-i18n="select-user-first">Selecione um usuário acima</h3>
           <p data-i18n="to-manage-access">para gerenciar o acesso aos resumos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: BIBLIOTECA IA
+    ══════════════════════════════════════════════ -->
+    <div class="page hidden" id="page-biblioteca-ia">
+      <h1 class="section-title">📚 Biblioteca IA</h1>
+      <p class="section-sub" id="bib-stats-label">Carregando estatísticas...</p>
+
+      <!-- SQL MIGRATION NOTICE -->
+      <div id="bib-sql-notice" class="card" style="margin-bottom:24px;border-color:var(--gold);background:var(--gold-dim);">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span style="font-size:22px;flex-shrink:0;">⚠️</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:6px;">SQL de Migração necessário no Supabase</div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Execute o SQL abaixo no Editor SQL do Supabase antes de usar a Biblioteca IA:</div>
+            <pre id="bib-sql-code" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;color:var(--teal);overflow-x:auto;white-space:pre-wrap;line-height:1.6;"></pre>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-sm btn-ghost" onclick="bibCopySql()">📋 Copiar SQL</button>
+              <button class="btn btn-sm btn-ghost" onclick="document.getElementById('bib-sql-notice').style.display='none'">✕ Fechar aviso</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPLOAD CARD -->
+      <div class="card" style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-head);font-size:18px;margin-bottom:20px;">📤 Upload de Livro</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label">Nome do Livro</label>
+            <input id="bib-livro" class="form-input" type="text" placeholder="Ex: Guyton — Cap. 14" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Matéria</label>
+            <input id="bib-materia" class="form-input" type="text" placeholder="Ex: Fisiologia" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semestre</label>
+            <input id="bib-semestre" class="form-input" type="number" placeholder="Ex: 3" min="1" max="12" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Arquivo PDF</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0;">
+                📎 Escolher PDF
+                <input id="bib-pdf-input" type="file" accept=".pdf,application/pdf" style="display:none;" onchange="bibOnFileSelect(this)" />
+              </label>
+              <span id="bib-file-name" style="font-size:13px;color:var(--text2);">nenhum arquivo</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="bib-process-btn" onclick="bibProcessar()">▶ Processar e Indexar</button>
+
+        <!-- Progress -->
+        <div id="bib-progress-wrap" style="display:none;margin-top:18px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px;">
+            <span id="bib-progress-label">Processando...</span>
+            <span id="bib-progress-pct">0%</span>
+          </div>
+          <div style="height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;">
+            <div id="bib-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:99px;transition:width 0.3s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVROS INDEXADOS -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <h2 style="font-family:var(--font-head);font-size:18px;">📖 Livros Indexados</h2>
+          <button class="btn btn-ghost btn-sm" onclick="bibCarregarLivros()">↻ Atualizar</button>
+        </div>
+        <div id="bib-livros-list">
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <h3>Nenhum livro indexado ainda</h3>
+            <p>Faça upload de um PDF para começar.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -3571,7 +3656,7 @@ function showPage(name) {
     'feedbacks': '⭐ Feedbacks',
     'viewer': '—', 'meu-perfil': t('nav-profile'),
     'admin-users': t('nav-users'), 'admin-resumos': t('nav-manage-resumos'),
-    'admin-access': t('nav-access'),
+    'admin-access': t('nav-access'), 'biblioteca-ia': '📚 Biblioteca IA',
   };
   document.getElementById('topbar-title').textContent = titles[name] || '';
 
@@ -3587,6 +3672,7 @@ function renderCurrentPage() {
     case 'admin-users':  renderUsersTable(); break;
     case 'admin-resumos':renderAdminResumosTable(); break;
     case 'admin-access': renderAccessPage(); break;
+    case 'biblioteca-ia': bibCarregarLivros(); break;
   }
 }
 
@@ -4616,13 +4702,36 @@ async function drSendMsg(text) {
   drIncrementUsage();
 
   const subjectCtx = Object.keys(DR_IA_SUBJECTS).join(', ');
+
+  // ── RAG: buscar chunks relevantes nos livros indexados ──
+  let ragContext = '';
+  try {
+    const ragRes = await fetch('/api/search-chunks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: txt, limit: 4 })
+    });
+    if (ragRes.ok) {
+      const ragData = await ragRes.json();
+      if (ragData.chunks && ragData.chunks.length > 0) {
+        const trechos = ragData.chunks.map(c =>
+          `[${c.livro}${c.materia ? ' · ' + c.materia : ''}]: ${c.conteudo}`
+        ).join('\n\n---\n\n');
+        ragContext = `\n\nContexto dos livros:\n---\n${trechos}\n---\nUse este contexto para responder quando relevante. Cite o livro quando utilizar a informação.`;
+      }
+    }
+  } catch(e) {
+    // RAG é opcional — continua sem contexto se falhar
+    console.warn('RAG search failed:', e.message);
+  }
+
   try {
     const res = await fetch('/api/dr-ia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022', max_tokens: 1000,
-        system: `Você é o Dr. IA, tutor de medicina integrado ao site de resumos do André Luiz Miranda Suzano (UCP 3H). Matérias disponíveis: ${subjectCtx}. Responda em português do Brasil, de forma clara e didática. Use **negrito** para termos chave. Máximo 3 parágrafos curtos. Seja direto como um colega sênior. IMPORTANTE: sempre inicie cada resposta com "Dr(a). IA:".`,
+        system: `Você é o Dr. IA, tutor de medicina integrado ao site de resumos do André Luiz Miranda Suzano (UCP 3H). Matérias disponíveis: ${subjectCtx}. Responda em português do Brasil, de forma clara e didática. Use **negrito** para termos chave. Máximo 3 parágrafos curtos. Seja direto como um colega sênior. IMPORTANTE: sempre inicie cada resposta com "Dr(a). IA:".${ragContext}`,
         messages: drMsgHistory
       })
     });
@@ -5637,6 +5746,220 @@ async function verificarSalaPendente() {
     toast(`🎉 Você entrou na sala! Pague R$ ${compra.preco_dupla?.toFixed(2) || compra.preco_individual?.toFixed(2)} para confirmar.`, 'success');
   } catch (e) {
     toast('Erro ao entrar na sala: ' + e.message, 'error');
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   BIBLIOTECA IA — RAG admin panel
+═══════════════════════════════════════════════════════════ */
+
+const BIB_SQL = `-- 1. Migrar coluna embedding para 768 dimensões (nomic-embed-text-v1.5)
+ALTER TABLE public.livros_chunks ALTER COLUMN embedding TYPE vector(768)
+  USING embedding::text::vector(768);
+
+-- 2. Criar função de busca vetorial
+CREATE OR REPLACE FUNCTION buscar_chunks_similares(
+  query_embedding vector(768),
+  match_threshold float DEFAULT 0.5,
+  match_count int DEFAULT 5,
+  filtro_materia text DEFAULT NULL,
+  filtro_semestre int DEFAULT NULL
+)
+RETURNS TABLE (
+  id uuid, livro text, materia text, semestre int, pagina int, conteudo text, similarity float
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    lc.id, lc.livro, lc.materia, lc.semestre, lc.pagina, lc.conteudo,
+    (1 - (lc.embedding <=> query_embedding))::float as similarity
+  FROM livros_chunks lc
+  WHERE
+    1 - (lc.embedding <=> query_embedding) > match_threshold
+    AND (filtro_materia IS NULL OR lc.materia = filtro_materia)
+    AND (filtro_semestre IS NULL OR lc.semestre = filtro_semestre)
+  ORDER BY lc.embedding <=> query_embedding
+  LIMIT match_count;
+END;
+$$;`;
+
+// Populate the SQL box on first render
+(function bibInitSql() {
+  const el = document.getElementById('bib-sql-code');
+  if (el) el.textContent = BIB_SQL;
+  else window.addEventListener('DOMContentLoaded', () => {
+    const e2 = document.getElementById('bib-sql-code');
+    if (e2) e2.textContent = BIB_SQL;
+  });
+})();
+
+function bibCopySql() {
+  navigator.clipboard.writeText(BIB_SQL).then(() => toast('SQL copiado!', 'success')).catch(() => toast('Falha ao copiar', 'error'));
+}
+
+let bibPdfFile = null;
+
+function bibOnFileSelect(input) {
+  bibPdfFile = input.files[0] || null;
+  document.getElementById('bib-file-name').textContent = bibPdfFile ? bibPdfFile.name : 'nenhum arquivo';
+}
+
+function bibSetProgress(pct, label) {
+  const wrap = document.getElementById('bib-progress-wrap');
+  const bar  = document.getElementById('bib-progress-bar');
+  const lbl  = document.getElementById('bib-progress-label');
+  const pctEl= document.getElementById('bib-progress-pct');
+  wrap.style.display = pct >= 0 ? '' : 'none';
+  bar.style.width = pct + '%';
+  lbl.textContent = label || 'Processando...';
+  pctEl.textContent = pct + '%';
+}
+
+async function bibExtractTextFromPdf(file) {
+  if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js não carregado');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const pages = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map(it => it.str).join(' ');
+    pages.push(text);
+  }
+  return pages;
+}
+
+async function bibProcessar() {
+  const livro   = document.getElementById('bib-livro').value.trim();
+  const materia = document.getElementById('bib-materia').value.trim();
+  const semestre= document.getElementById('bib-semestre').value.trim();
+
+  if (!livro || !materia) { toast('Preencha o nome do livro e a matéria!', 'error'); return; }
+  if (!bibPdfFile)         { toast('Selecione um arquivo PDF!', 'error'); return; }
+
+  const btn = document.getElementById('bib-process-btn');
+  btn.disabled = true;
+  bibSetProgress(0, 'Lendo PDF...');
+
+  let pages;
+  try {
+    pages = await bibExtractTextFromPdf(bibPdfFile);
+  } catch(e) {
+    toast('Erro ao ler PDF: ' + e.message, 'error');
+    btn.disabled = false;
+    bibSetProgress(-1);
+    return;
+  }
+
+  const BATCH = 10;
+  let totalChunks = 0;
+  const totalBatches = Math.ceil(pages.length / BATCH);
+
+  for (let b = 0; b < totalBatches; b++) {
+    const batchPages = pages.slice(b * BATCH, (b + 1) * BATCH);
+    const batchText  = batchPages.join('\n\n');
+    const paginaBase = b * BATCH + 1;
+    const pct = Math.round(((b + 1) / totalBatches) * 100);
+    bibSetProgress(pct, `Indexando batch ${b + 1} de ${totalBatches} (pág. ${paginaBase})...`);
+
+    try {
+      const res = await fetch('/api/process-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: batchText, livro, materia, semestre: semestre || null, pagina_base: paginaBase })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast(`Erro no batch ${b+1}: ${data.error || 'desconhecido'}`, 'error');
+        continue;
+      }
+      totalChunks += data.chunks_salvos || 0;
+    } catch(e) {
+      toast('Erro de rede no batch ' + (b + 1), 'error');
+    }
+  }
+
+  bibSetProgress(100, `Concluído! ${totalChunks} chunks indexados.`);
+  toast(`✅ ${livro} indexado! ${totalChunks} chunks criados.`, 'success');
+
+  // Reset form
+  document.getElementById('bib-livro').value = '';
+  document.getElementById('bib-materia').value = '';
+  document.getElementById('bib-semestre').value = '';
+  document.getElementById('bib-pdf-input').value = '';
+  document.getElementById('bib-file-name').textContent = 'nenhum arquivo';
+  bibPdfFile = null;
+  btn.disabled = false;
+
+  setTimeout(() => bibSetProgress(-1), 3000);
+  bibCarregarLivros();
+}
+
+async function bibCarregarLivros() {
+  const listEl = document.getElementById('bib-livros-list');
+  const statsEl = document.getElementById('bib-stats-label');
+  if (!listEl) return;
+
+  listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
+
+  try {
+    const { data, ok } = await SB.select('livros_chunks', 'select=livro,materia,semestre&order=livro.asc');
+    if (!ok || !Array.isArray(data)) {
+      listEl.innerHTML = '<div style="color:var(--red);font-size:14px;">Erro ao carregar livros.</div>';
+      return;
+    }
+
+    // Agrupar por livro
+    const livrosMap = {};
+    data.forEach(row => {
+      const key = row.livro;
+      if (!livrosMap[key]) livrosMap[key] = { livro: row.livro, materia: row.materia, semestre: row.semestre, chunks: 0 };
+      livrosMap[key].chunks++;
+    });
+    const livros = Object.values(livrosMap);
+
+    const totalChunks = data.length;
+    statsEl.textContent = `${livros.length} livro${livros.length !== 1 ? 's' : ''} · ${totalChunks} chunks indexados`;
+
+    if (livros.length === 0) {
+      listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>Nenhum livro indexado ainda</h3><p>Faça upload de um PDF para começar.</p></div>`;
+      return;
+    }
+
+    listEl.innerHTML = livros.map(l => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:22px;">📖</span>
+          <div>
+            <div style="font-weight:600;color:var(--text);">${escHtml(l.livro)}</div>
+            <div style="font-size:12px;color:var(--text2);">
+              ${escHtml(l.materia)}${l.semestre ? ' · ' + l.semestre + 'º sem' : ''} · <span style="color:var(--teal);">${l.chunks} chunk${l.chunks !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="bibRemoverLivro(${JSON.stringify(escHtml(l.livro))})">🗑 Remover</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    listEl.innerHTML = `<div style="color:var(--red);font-size:14px;">Erro: ${e.message}</div>`;
+  }
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function bibRemoverLivro(livro) {
+  if (!confirm(`Remover todos os chunks de "${livro}"?`)) return;
+  try {
+    const { ok } = await SB.delete('livros_chunks', `livro=eq.${encodeURIComponent(livro)}`);
+    if (ok) { toast('Livro removido!', 'success'); bibCarregarLivros(); }
+    else toast('Erro ao remover livro.', 'error');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
   }
 }
 
