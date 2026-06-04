@@ -206,10 +206,14 @@ async function liberarAcessoCompra(sbUrl, sbKey, compra_id) {
 
       if (resumos.length === 0) continue;
 
-      // INSERT em user_access (ignorar duplicatas)
+      // INSERT em user_access com expiração de 50 dias
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 50 * 86400000).toISOString();
       const rows = resumos.map(resumo_id => ({
         user_id: part.user_id,
         resumo_id,
+        granted_at: now.toISOString(),
+        expires_at: expiresAt,
       }));
 
       await fetch(`${sbUrl}/rest/v1/user_access`, {

@@ -1324,8 +1324,13 @@ CREATE TABLE IF NOT EXISTS public.user_access (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   resumo_id UUID REFERENCES public.resumos(id) ON DELETE CASCADE,
   granted_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '50 days'),
   UNIQUE(user_id, resumo_id)
 );
+
+-- Adicionar coluna em tabela existente (rode se a tabela já existe):
+-- ALTER TABLE public.user_access ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '50 days');
+-- UPDATE public.user_access SET expires_at = granted_at + INTERVAL '50 days' WHERE expires_at IS NULL;
 
 -- Habilitar RLS
 ALTER TABLE public.approved_users ENABLE ROW LEVEL SECURITY;
@@ -3500,8 +3505,30 @@ async function loadResumos() {
 }
 
 async function loadMyAccess() {
-  const { data } = await SB.select('user_access', `user_id=eq.${state.user.id}&select=resumo_id`);
-  state.myAccess = Array.isArray(data) ? data.map(a => a.resumo_id) : [];
+  const { data } = await SB.select('user_access', `user_id=eq.${state.user.id}&select=resumo_id,granted_at,expires_at`);
+  const rows = Array.isArray(data) ? data : [];
+  const now = new Date();
+
+  // Mapa completo: resumo_id → { granted_at, expires_at, expired }
+  state.myAccessMap = {};
+  rows.forEach(a => {
+    const expiresAt = a.expires_at ? new Date(a.expires_at) : null;
+    const expired   = expiresAt ? now > expiresAt : false;
+    state.myAccessMap[a.resumo_id] = {
+      granted_at: a.granted_at,
+      expires_at: a.expires_at,
+      expired,
+      daysLeft: expiresAt ? Math.max(0, Math.ceil((expiresAt - now) / 86400000)) : null,
+    };
+  });
+
+  // Lista simples de IDs com acesso ATIVO (não expirado)
+  state.myAccess = rows
+    .filter(a => {
+      const exp = a.expires_at ? new Date(a.expires_at) : null;
+      return !exp || now <= exp;
+    })
+    .map(a => a.resumo_id);
 }
 
 async function loadUsers() {
@@ -3745,15 +3772,43 @@ function closeFolderContent(silent) {
 }
 
 function buildResumoCard(r) {
-  const hasAccess = state.profile.is_admin || state.myAccess.includes(r.id);
+  const isAdmin   = state.profile.is_admin;
+  const accessInfo = state.myAccessMap?.[r.id];
+  const hasActive  = isAdmin || state.myAccess.includes(r.id);
+  const isExpired  = !isAdmin && accessInfo?.expired === true;
   const color = MATERIA_COLORS[r.materia] || 'badge-gray';
-  const lockIcon = hasAccess ? '📖' : '🔒';
-  const onclick = hasAccess ? `openResumo('${r.id}')` : `toast('${t('locked')} — ${currentLang==='pt'?'Solicite acesso ao administrador.':'Solicita acceso al administrador.'}', 'info')`;
+
+  // Badge de prazo
+  let prazoBadge = '';
+  if (!isAdmin && accessInfo && !isExpired) {
+    const d = accessInfo.daysLeft;
+    if (d <= 7)       prazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;">⏰ ${d}d restantes</span>`;
+    else if (d <= 15) prazoBadge = `<span class="badge" style="background:#78350f;color:#fcd34d;">⏳ ${d}d</span>`;
+    else              prazoBadge = `<span class="badge badge-gray">📅 ${d}d</span>`;
+  }
+  if (isExpired) prazoBadge = `<span class="badge" style="background:#450a0a;color:#f87171;">🔴 Expirado</span>`;
+
+  let lockIcon, onclick, cardClass;
+  if (isAdmin || hasActive) {
+    lockIcon  = '📖';
+    cardClass = 'resumo-card';
+    onclick   = `openResumo('${r.id}')`;
+  } else if (isExpired) {
+    lockIcon  = '⏰';
+    cardClass = 'resumo-card locked';
+    onclick   = `showAccessExpiredModal('${r.id}')`;
+  } else {
+    lockIcon  = '🔒';
+    cardClass = 'resumo-card locked';
+    onclick   = `toast('${t('locked')} — ${currentLang==='pt'?'Solicite acesso ao administrador.':'Solicita acceso al administrador.'}', 'info')`;
+  }
+
   return `
-    <div class="resumo-card ${hasAccess?'':'locked'}" onclick="${onclick}">
+    <div class="${cardClass}" onclick="${onclick}">
       <div class="resumo-materia">
         <span class="badge ${color}">${r.materia}</span>
         <span class="badge badge-gray">${r.semestre}º sem</span>
+        ${prazoBadge}
       </div>
       <div class="resumo-title">${r.title}</div>
       <div class="resumo-desc">${r.description || ''}</div>
@@ -3779,9 +3834,30 @@ function expandSidebar() {
   document.getElementById('main-content').classList.remove('expanded');
 }
 
+function showAccessExpiredModal(resumoId) {
+  const r = state.resumos.find(x => x.id === resumoId);
+  const nome = r ? r.title : 'este resumo';
+  // Reutiliza o modal de compra se disponível, senão usa toast
+  toast(`⏰ Seu acesso a "${nome}" expirou após 50 dias. Adquira novamente na Tabela de Valores.`, 'info');
+  setTimeout(() => openValoresModal(), 1200);
+}
+
 function openResumo(id) {
   const r = state.resumos.find(x => x.id === id);
   if (!r) return;
+
+  // Middleware de proteção — 50 dias
+  if (!state.profile.is_admin) {
+    const accessInfo = state.myAccessMap?.[id];
+    if (!accessInfo) {
+      toast(t('locked') + ' — Solicite acesso.', 'info');
+      return;
+    }
+    if (accessInfo.expired) {
+      showAccessExpiredModal(id);
+      return;
+    }
+  }
 
   document.getElementById('viewer-title').textContent = r.title;
   document.getElementById('viewer-badges').innerHTML = `
@@ -4071,7 +4147,7 @@ async function loadAccessMatrix() {
 }
 
 async function grantAccess(uid, rid) {
-  await SB.upsert('user_access', { user_id: uid, resumo_id: rid });
+  await SB.upsert('user_access', { user_id: uid, resumo_id: rid, granted_at: new Date().toISOString(), expires_at: new Date(Date.now() + 50*86400000).toISOString() });
   toast(t('access-granted'),'success');
   await loadAccessMatrix();
 }
@@ -4084,7 +4160,7 @@ async function revokeAccess(uid, rid) {
 
 async function grantAll(uid) {
   for (const r of state.resumos) {
-    await SB.upsert('user_access', { user_id: uid, resumo_id: r.id });
+    await SB.upsert('user_access', { user_id: uid, resumo_id: r.id, granted_at: new Date().toISOString(), expires_at: new Date(Date.now() + 50*86400000).toISOString() });
   }
   toast(t('access-granted'),'success');
   await loadAccessMatrix();
