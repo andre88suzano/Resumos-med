@@ -5898,7 +5898,7 @@ async function bibCarregarLivros() {
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
-    const { data, ok } = await SB.select('livros_chunks', 'select=livro,materia&order=livro.asc');
+    const { data, ok } = await SB.select('livros_chunks', 'select=id,livro,materia&order=livro.asc');
     if (!ok || !Array.isArray(data)) {
       listEl.innerHTML = '<div style="color:var(--red);font-size:14px;">Erro ao carregar livros.</div>';
       return;
