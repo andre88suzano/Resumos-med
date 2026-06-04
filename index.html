@@ -4476,12 +4476,14 @@ function drSaveUsageData(d) {
 
 function drCanSendMessage() {
   if (window.DR_IA_PREMIUM) return true;
+  if (state.profile?.is_admin) return true;
   const d = drGetUsageData();
   return d.count < 10;
 }
 
 function drIncrementUsage() {
   if (window.DR_IA_PREMIUM) return;
+  if (state.profile?.is_admin) return;
   const d = drGetUsageData();
   d.count++;
   drSaveUsageData(d);
