@@ -3780,13 +3780,23 @@ function buildResumoCard(r) {
 
   // Badge de prazo
   let prazoBadge = '';
-  if (!isAdmin && accessInfo && !isExpired) {
+  if (isExpired) {
+    prazoBadge = `<span class="badge" style="background:#450a0a;color:#f87171;">🔴 Expirado</span>`;
+  } else if (!isAdmin && accessInfo) {
     const d = accessInfo.daysLeft;
-    if (d <= 7)       prazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;">⏰ ${d}d restantes</span>`;
-    else if (d <= 15) prazoBadge = `<span class="badge" style="background:#78350f;color:#fcd34d;">⏳ ${d}d</span>`;
-    else              prazoBadge = `<span class="badge badge-gray">📅 ${d}d</span>`;
+    if (d === null) {
+      // expires_at = NULL → acesso permanente (legado)
+      prazoBadge = `<span class="badge" style="background:var(--bg3);color:var(--text3);">♾️ Permanente</span>`;
+    } else if (d <= 3) {
+      prazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;animation:pulse 1.5s infinite;">🚨 ${d}d restantes</span>`;
+    } else if (d <= 7) {
+      prazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;">⏰ ${d}d restantes</span>`;
+    } else if (d <= 15) {
+      prazoBadge = `<span class="badge" style="background:#78350f;color:#fcd34d;">⏳ ${d}d restantes</span>`;
+    } else {
+      prazoBadge = `<span class="badge" style="background:var(--bg3);color:var(--text2);">📅 ${d}d restantes</span>`;
+    }
   }
-  if (isExpired) prazoBadge = `<span class="badge" style="background:#450a0a;color:#f87171;">🔴 Expirado</span>`;
 
   let lockIcon, onclick, cardClass;
   if (isAdmin || hasActive) {
@@ -3860,9 +3870,23 @@ function openResumo(id) {
   }
 
   document.getElementById('viewer-title').textContent = r.title;
+
+  // Badge de prazo no viewer
+  let viewerPrazoBadge = '';
+  if (!state.profile.is_admin) {
+    const ai = state.myAccessMap?.[id];
+    if (ai && ai.daysLeft !== null) {
+      if (ai.daysLeft <= 3)       viewerPrazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;">🚨 ${ai.daysLeft}d restantes</span>`;
+      else if (ai.daysLeft <= 7)  viewerPrazoBadge = `<span class="badge" style="background:#7f1d1d;color:#fca5a5;">⏰ ${ai.daysLeft}d restantes</span>`;
+      else if (ai.daysLeft <= 15) viewerPrazoBadge = `<span class="badge" style="background:#78350f;color:#fcd34d;">⏳ ${ai.daysLeft}d restantes</span>`;
+      else                         viewerPrazoBadge = `<span class="badge" style="background:var(--bg3);color:var(--text2);">📅 ${ai.daysLeft}d restantes</span>`;
+    }
+  }
+
   document.getElementById('viewer-badges').innerHTML = `
     <span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span>
-    <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>`;
+    <span class="badge badge-gray">${r.semestre}º ${currentLang==='pt'?'Semestre':'Semestre'}</span>
+    ${viewerPrazoBadge}`;
 
   // Renderiza o HTML do resumo num iframe isolado
   const iframe = document.getElementById('viewer-iframe');
