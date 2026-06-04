@@ -4619,7 +4619,7 @@ async function drSendMsg(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+        model: 'claude-sonnet-4-5', max_tokens: 1000,
         system: `Você é o Dr. IA, tutor de medicina integrado ao site de resumos do André Luiz Miranda Suzano (UCP 3H). Matérias disponíveis: ${subjectCtx}. Responda em português do Brasil, de forma clara e didática. Use **negrito** para termos chave. Máximo 3 parágrafos curtos. Seja direto como um colega sênior.`,
         messages: drMsgHistory
       })
@@ -4661,7 +4661,7 @@ async function drGenPlan() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 1200,
+        model: 'claude-sonnet-4-5', max_tokens: 1200,
         messages: [{ role:'user', content:`Você é o Dr. IA, tutor de medicina (UCP 3H). Crie um plano de estudos em português:\n- Matérias: ${sub}\n- Dias até a prova: ${days} (${date})\n- Horas por dia: ${hrs}h\n- Nível: ${lvl}\nDia a dia com horários, emojis, dica motivacional. Seja prático.` }]
       })
     });
