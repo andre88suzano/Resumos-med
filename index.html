@@ -1238,7 +1238,7 @@
 
 </style>
 <!-- PDF.js for client-side PDF text extraction -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
 </head>
 <body>
 
@@ -5811,7 +5811,7 @@ function bibSetProgress(pct, label) {
 
 async function bibExtractTextFromPdf(file) {
   if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js não carregado');
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.worker.min.js';
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const pages = [];
