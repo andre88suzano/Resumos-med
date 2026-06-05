@@ -5895,13 +5895,18 @@ async function bibCarregarLivros() {
   const statsEl = document.getElementById('bib-stats-label');
   if (!listEl) return;
 
+  if (!state.sbUrl || !state.authToken) {
+    setTimeout(bibCarregarLivros, 1000);
+    return;
+  }
+
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
     const res = await fetch(`${state.sbUrl}/rest/v1/livros_chunks?select=id,livro,materia&order=livro.asc`, {
       headers: {
         'apikey': state.sbKey,
-        'Authorization': `Bearer ${state.authToken || state.sbKey}`,
+        'Authorization': `Bearer ${state.authToken}`,
         'Content-Type': 'application/json',
       }
     });
