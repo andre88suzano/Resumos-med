@@ -3255,12 +3255,11 @@ async function loadAtualizacoes() {
   const list = Array.isArray(data) ? data : [];
   renderAtualizacoes(list);
 
-  // Mostra botão de adicionar para admin
+  // Atualizações desativadas do dashboard
   const btn = document.getElementById('btn-add-atualizacao');
-  if (btn) btn.style.display = state.profile?.is_admin ? '' : 'none';
-  // Oculta container de atualizações para alunos
+  if (btn) btn.style.display = 'none';
   const container = document.getElementById('atualizacoes-container');
-  if (container) container.style.display = state.profile?.is_admin ? '' : 'none';
+  if (container) container.style.display = 'none';
 }
 
 function renderAtualizacoes(list) {
