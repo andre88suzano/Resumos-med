@@ -3668,6 +3668,9 @@ function showScreen(name) {
   ['loading','setup','auth','app'].forEach(s => {
     document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name);
   });
+  // Esconder Dr. IA FAB fora do app
+  const fab = document.getElementById('dr-fab');
+  if (fab) fab.style.display = name === 'app' ? '' : 'none';
 }
 
 function showPage(name) {
