@@ -1695,11 +1695,11 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <!-- Pagamento + Contato -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
             <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
-              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;">Pagamento</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;">Catálogo</div>
               <div style="width:28px;height:2px;background:var(--accent);border-radius:2px;margin-bottom:10px;"></div>
-              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">Chave Pix (CPF)</div>
-              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;">fab6cfa3-c156-42ec-8644-77a506476979</div>
-              <button class="btn btn-sm" onclick="openPixModal()" style="background:var(--accent);color:#fff;border:none;font-weight:700;width:100%;">🔲 Pagar com Pix</button>
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px;">Chave Pix (Aleatória)</div>
+              <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:10px;word-break:break-all;">fab6cfa3-c156-42ec-8644-77a506476979</div>
+              <button class="btn btn-sm" onclick="openValoresModal()" style="background:var(--accent);color:#fff;border:none;font-weight:700;width:100%;">📋 Ver Catálogo</button>
             </div>
             <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
               <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;">Contato</div>
@@ -1717,14 +1717,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <span style="color:var(--accent);font-size:13px;font-weight:700;">Ver →</span>
           </div>
 
-          <!-- Avisos importantes -->
+          <!-- Meus Resumos -->
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">📖 Meus Resumos</div>
+            <div id="dashboard-meus-resumos">
+              <div style="font-size:13px;color:var(--text3);">Carregando...</div>
+            </div>
+            <button onclick="showPage('resumos')" style="margin-top:10px;width:100%;padding:8px;background:transparent;border:1px dashed var(--accent);border-radius:var(--radius);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;">Ver todos os resumos →</button>
+          </div>
+
+          <!-- Informações importantes -->
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">Informações importantes</div>
             <div style="font-size:12px;color:var(--text2);line-height:1.55;">⚠️ Todos os resumos são feitos e atualizados com base nos livros, slides e anotações das aulas dos Drs.</div>
             <div style="font-size:12px;color:var(--text2);line-height:1.55;">❌‼️ É extremamente proibida a venda dos resumos — isso se considera plágio.</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.55;">⏳ O tempo de acesso aos resumos é o das parciais e recuperatórias das mesmas.</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.55;">⏳ O tempo de acesso aos resumos é de <strong style="color:var(--text);">50 dias após o pagamento</strong>.</div>
             <div style="font-size:12px;color:var(--text2);line-height:1.55;">📲 Meus resumos são feitos com base nas minhas aulas, porém se você for de outra turma me mande o seu conteúdo que eu crio um resumo personalizado para a sua turma.</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.55;">✍🏻 <strong style="color:var(--text);">Regras para liberação:</strong> enviar comprovante do pagamento + qual(is) resumo(s) deseja liberar + o seu e-mail.</div>
           </div>
         </div>
 
@@ -3712,7 +3720,35 @@ function renderDashboard() {
   const paymentBanner = document.querySelector('.payment-banner');
   if (paymentBanner) paymentBanner.style.display = '';
 
-  // Seção de resumos recentes removida do dashboard
+  // Meus Resumos no dashboard
+  renderDashboardMeusResumos();
+}
+
+function renderDashboardMeusResumos() {
+  const el = document.getElementById('dashboard-meus-resumos');
+  if (!el) return;
+
+  const isAdmin = state.profile?.is_admin;
+  const meusIds = isAdmin ? state.resumos.map(r => r.id) : state.myAccess;
+  const meusResumos = state.resumos.filter(r => meusIds.includes(r.id)).slice(0, 5);
+
+  if (!meusResumos.length) {
+    el.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:10px 0;">Nenhum resumo disponível ainda.<br><span style="font-size:11px;">Adquira na tabela de valores.</span></div>`;
+    return;
+  }
+
+  el.innerHTML = meusResumos.map(r => {
+    const info = state.myAccessMap?.[r.id];
+    const dias = info?.daysLeft;
+    const prazo = isAdmin ? '' : dias !== null && dias !== undefined
+      ? `<span style="font-size:10px;color:${dias <= 7 ? 'var(--red)' : 'var(--text3)'};">⏰ ${dias}d</span>`
+      : '';
+    return `
+      <div onclick="openResumo('${r.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;gap:8px;" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+        <span style="font-size:13px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📄 ${r.title}</span>
+        ${prazo}
+      </div>`;
+  }).join('');
 }
 
 /* ─────────────────────────────────────────────────────────
