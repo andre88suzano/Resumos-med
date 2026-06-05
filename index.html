@@ -2049,6 +2049,11 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             </div>
           </div>
         </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:11px;">🔑 Groq API Key (para gerar embeddings — opcional)</label>
+          <input class="form-input" id="bib-groq-key" type="password" placeholder="gsk_..." style="font-family:var(--font-mono);font-size:12px;" />
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">Se não preencher, salva sem embedding (busca vetorial desativada).</div>
+        </div>
         <button class="btn btn-primary" id="bib-process-btn" onclick="bibProcessar()">▶ Processar e Indexar</button>
 
         <!-- Progress -->
@@ -5846,31 +5851,63 @@ async function bibProcessar() {
     return;
   }
 
-  const BATCH = 10;
-  let totalChunks = 0;
-  const totalBatches = Math.ceil(pages.length / BATCH);
+  // Quebrar texto em chunks de ~500 palavras
+  const fullText = pages.join('\n\n');
+  const words = fullText.split(/\s+/);
+  const CHUNK_SIZE = 500, OVERLAP = 50;
+  const chunks = [];
+  for (let i = 0; i < words.length; i += CHUNK_SIZE - OVERLAP) {
+    const chunk = words.slice(i, i + CHUNK_SIZE).join(' ');
+    if (chunk.trim().length > 50) chunks.push({ text: chunk, pagina: Math.floor(i / CHUNK_SIZE) + 1 });
+  }
 
-  for (let b = 0; b < totalBatches; b++) {
-    const batchPages = pages.slice(b * BATCH, (b + 1) * BATCH);
-    const batchText  = batchPages.join('\n\n');
-    const paginaBase = b * BATCH + 1;
-    const pct = Math.round(((b + 1) / totalBatches) * 100);
-    bibSetProgress(pct, `Indexando batch ${b + 1} de ${totalBatches} (pág. ${paginaBase})...`);
+  let totalChunks = 0;
+  const GROQ_KEY = document.getElementById('bib-groq-key')?.value?.trim() || '';
+
+  for (let i = 0; i < chunks.length; i++) {
+    const pct = Math.round(((i + 1) / chunks.length) * 100);
+    bibSetProgress(pct, `Indexando chunk ${i + 1} de ${chunks.length}...`);
 
     try {
-      const res = await fetch('/api/process-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: batchText, livro, materia, semestre: semestre || null, pagina_base: paginaBase })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast(`Erro no batch ${b+1}: ${data.error || 'desconhecido'}`, 'error');
-        continue;
+      // Gerar embedding via Groq
+      let embedding = null;
+      if (GROQ_KEY) {
+        const embRes = await fetch('https://api.groq.com/openai/v1/embeddings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+          body: JSON.stringify({ model: 'nomic-embed-text-v1_5', input: chunks[i].text })
+        });
+        const embData = await embRes.json();
+        embedding = embData.data?.[0]?.embedding || null;
       }
-      totalChunks += data.chunks_salvos || 0;
+
+      // Salvar chunk no Supabase
+      const row = {
+        livro, materia,
+        semestre: semestre ? parseInt(semestre) : null,
+        pagina: chunks[i].pagina,
+        conteudo: chunks[i].text,
+        ...(embedding ? { embedding: JSON.stringify(embedding) } : {})
+      };
+
+      const saveRes = await fetch(`${state.sbUrl}/rest/v1/livros_chunks`, {
+        method: 'POST',
+        headers: {
+          'apikey': state.sbKey,
+          'Authorization': `Bearer ${state.authToken}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(row)
+      });
+
+      if (saveRes.ok) totalChunks++;
+      else {
+        const err = await saveRes.text();
+        console.error('Erro ao salvar chunk:', err);
+      }
     } catch(e) {
-      toast('Erro de rede no batch ' + (b + 1), 'error');
+      console.error('Erro no chunk ' + i, e);
     }
   }
 
