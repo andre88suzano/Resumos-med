@@ -2486,25 +2486,52 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
       <!-- TAB: PROMOÇÃO -->
       <div id="vcontent-promo">
-        <div style="text-align:center;margin-bottom:20px;">
+        <!-- Header + Timer -->
+        <div style="text-align:center;margin-bottom:16px;">
           <div style="font-size:28px;margin-bottom:6px;">🔥</div>
-          <h3 style="font-family:var(--font-head);font-size:18px;color:#e85d04;margin-bottom:4px;">Promoção da Semana!</h3>
-          <p style="font-size:12px;color:var(--text3);">Não perca!</p>
+          <h3 style="font-family:var(--font-head);font-size:18px;color:#e85d04;margin-bottom:8px;">Promoção da Semana!</h3>
+          <!-- Countdown até domingo -->
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#1a0f00;border:1px solid #e85d04;border-radius:8px;padding:8px 16px;">
+            <span style="font-size:12px;color:#e85d04;font-weight:600;">⏱ Termina em:</span>
+            <span id="promo-countdown" style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:#e85d04;">--:--:--</span>
+          </div>
         </div>
+
         <div style="display:flex;flex-direction:column;gap:14px;">
 
-          <!-- Card Solo -->
-          <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:10px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:20px;">📦</span>
-              <div>
-                <div class="valor-nome" style="font-size:15px;">4 combos 📖+⚡ por R$&nbsp;<span style="color:#e85d04;font-size:18px;font-weight:800;">59,90</span></div>
-                <div class="valor-desc" style="margin-top:2px;">Cada combo inclui Resumo + Mini Resumo (normalmente R$ 20 cada). No pacote de 4, pague só R$ 59,90 no total.</div>
+          <!-- Linha com 3 e 4 combos lado a lado -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+            <!-- Card 3 combos -->
+            <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:18px;">📦</span>
+                <div>
+                  <div class="valor-nome" style="font-size:13px;">3 combos 📖+⚡</div>
+                  <div style="color:#e85d04;font-size:17px;font-weight:800;">R$ 49,90</div>
+                </div>
               </div>
+              <div class="valor-desc" style="font-size:11px;">Normalmente R$ 20 cada. Pacote de 3 por só R$ 49,90.</div>
+              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Promoção', preco:49.90, tipo:'solo', quantidade:3 })">
+                🛒 Comprar
+              </button>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;margin-top:4px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Promoção Solo', preco:59.90, tipo:'solo', quantidade:4 })">
-              🛒 Comprar Agora
-            </button>
+
+            <!-- Card 4 combos -->
+            <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:18px;">📦</span>
+                <div>
+                  <div class="valor-nome" style="font-size:13px;">4 combos 📖+⚡</div>
+                  <div style="color:#e85d04;font-size:17px;font-weight:800;">R$ 59,90</div>
+                </div>
+              </div>
+              <div class="valor-desc" style="font-size:11px;">Normalmente R$ 20 cada. Pacote de 4 por só R$ 59,90.</div>
+              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Promoção Solo', preco:59.90, tipo:'solo', quantidade:4 })">
+                🛒 Comprar
+              </button>
+            </div>
+
           </div>
 
           <!-- Divisor -->
@@ -2523,7 +2550,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div class="valor-desc" style="margin-top:2px;">Vocês dois adquirem 4 combos 📖+⚡ cada um (normalmente R$ 20 cada) e cada um paga apenas R$ 49,90. Economia garantida na dupla!</div>
               </div>
             </div>
-            <div style="width:100%;background:#ede7ff;border-radius:8px;padding:8px 12px;font-size:12px;color:#7b2ff7;font-weight:600;text-align:center;">
+            <div style="width:100%;background:#1e0a3c;border-radius:8px;padding:8px 12px;font-size:12px;color:#a78bfa;font-weight:600;text-align:center;">
               💜 Quanto mais amigos, mais economia para todo mundo!
             </div>
             <button class="btn btn-primary btn-sm" style="width:100%;background:#7b2ff7;border:none;margin-top:4px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Promoção Dupla', preco_dupla:49.90, preco_solo:59.90, tipo:'dupla', quantidade:4 })">
@@ -3503,6 +3530,32 @@ async function deleteFeedback(id, event) {
 function openValoresModal() {
   openModal('modal-valores');
   switchValoresTab('promo');
+  iniciarCountdownPromo();
+}
+
+function iniciarCountdownPromo() {
+  const el = document.getElementById('promo-countdown');
+  if (!el) return;
+  if (window._promoCountdownInterval) clearInterval(window._promoCountdownInterval);
+
+  function atualizar() {
+    const agora = new Date();
+    // Próximo domingo às 23:59:59
+    const domingo = new Date(agora);
+    domingo.setDate(agora.getDate() + (7 - agora.getDay()) % 7 || 7);
+    domingo.setHours(23, 59, 59, 0);
+
+    const diff = domingo - agora;
+    if (diff <= 0) { el.textContent = 'Expirado'; return; }
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  atualizar();
+  window._promoCountdownInterval = setInterval(atualizar, 1000);
 }
 
 function switchValoresTab(tab) {
