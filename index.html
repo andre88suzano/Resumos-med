@@ -2061,7 +2061,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <h2 style="font-family:var(--font-head);font-size:18px;">📖 Livros Indexados</h2>
           <button class="btn btn-ghost btn-sm" onclick="bibCarregarLivros()">↻ Atualizar</button>
         </div>
-        <div id="bib-livros-list">
+        <div id="bib-livros-list" style="max-height:none;overflow:visible;">
           <div class="empty-state">
             <div class="empty-icon">📚</div>
             <h3>Nenhum livro indexado ainda</h3>
@@ -6045,11 +6045,12 @@ async function bibCarregarLivros() {
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
-    const res = await fetch(`${state.sbUrl}/rest/v1/livros_chunks?select=id,livro,materia&order=livro.asc`, {
+    const res = await fetch(`${state.sbUrl}/rest/v1/livros_chunks?select=id,livro,materia&order=livro.asc&limit=10000`, {
       headers: {
         'apikey': state.sbKey,
         'Authorization': `Bearer ${state.authToken}`,
         'Content-Type': 'application/json',
+        'Range': '0-9999',
       }
     });
     const data = await res.json();
