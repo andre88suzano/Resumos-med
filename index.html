@@ -5470,21 +5470,37 @@ function mcRenderizarSelecaoResumos(plano) {
   const miniResumos = todoResumos.filter(r => r.title.toLowerCase().includes('mini'));
   const resumosNormais = todoResumos.filter(r => !r.title.toLowerCase().includes('mini'));
 
-  // Parear: para cada resumo normal, tentar encontrar mini do mesmo assunto/turma
-  function extrairChave(titulo) {
+  // Extrai turma do título (ex: "3H", "3F", "2A", etc.)
+  function extrairTurma(titulo) {
+    const m = titulo.match(/\b([1-6][A-Ka-k])\b/);
+    return m ? m[1].toUpperCase() : null;
+  }
+
+  // Remove turma e palavras "resumo"/"mini" para comparar o assunto
+  function extrairAssunto(titulo) {
     return titulo.toLowerCase()
-      .replace(/mini\s*resumo/gi,'').replace(/resumo/gi,'')
-      .replace(/[^a-z0-9]/g,' ').trim().split(/\s+/).slice(0,4).join(' ');
+      .replace(/mini\s*resumen?/gi,'').replace(/resumen?/gi,'')
+      .replace(/\b[1-6][A-Ka-k]\b/gi,'')
+      .replace(/[^a-z0-9]/g,' ').trim()
+      .split(/\s+/).filter(w => w.length > 1).slice(0,5).join(' ');
   }
 
   const pares = resumosNormais.map(r => {
-    const chave = extrairChave(r.title);
+    const turmaR   = extrairTurma(r.title);
+    const assuntoR = extrairAssunto(r.title);
+
     const mini = miniResumos.find(m => {
-      const chaveM = extrairChave(m.title);
-      // Verifica similaridade: ao menos 2 palavras em comum
-      const pa = chave.split(' '), pb = chaveM.split(' ');
+      const turmaM   = extrairTurma(m.title);
+      const assuntoM = extrairAssunto(m.title);
+
+      // Turmas precisam ser iguais (ambas null = sem turma = pode parear)
+      if (turmaR !== turmaM) return false;
+
+      // Assuntos precisam ter ao menos 1 palavra significativa em comum
+      const pa = assuntoR.split(' '), pb = assuntoM.split(' ');
       return pa.filter(w => w.length > 2 && pb.includes(w)).length >= 1;
     });
+
     return { resumo: r, mini: mini || null };
   });
 
