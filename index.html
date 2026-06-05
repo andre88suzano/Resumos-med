@@ -2855,6 +2855,26 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 </div>
 
 <!-- Confirm Modal -->
+<!-- Modal outro dispositivo -->
+<div id="modal-outro-dispositivo" class="modal-backdrop hidden" style="z-index:10000;">
+  <div class="modal" style="max-width:400px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+    <h2 style="font-family:var(--font-head);font-size:18px;margin-bottom:8px;">Conta em outro dispositivo</h2>
+    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px;">
+      Sua conta está aberta em outro dispositivo.<br>
+      Deseja desconectá-lo e entrar aqui?
+    </p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('modal-outro-dispositivo').classList.add('hidden')">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" style="flex:1;" onclick="confirmarEntrarAqui()">
+        ✅ Sim, entrar aqui
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-confirm" class="modal-backdrop hidden">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
@@ -3155,7 +3175,24 @@ async function doLogin() {
     state.authToken = data.access_token;
     state.user = data.user;
 
-    // Verificação de dispositivo desativada — login direto
+    // Verificar bloqueio de dispositivo
+    try {
+      const { data: profileData, ok: pOk } = await SB.select('approved_users', `user_id=eq.${data.user.id}&select=active_token,is_admin`);
+      const profile = (pOk && Array.isArray(profileData)) ? profileData[0] : null;
+
+      if (profile && !profile.is_admin && profile.active_token) {
+        const localToken = localStorage.getItem('med_device_token');
+        if (localToken !== profile.active_token) {
+          // Guardar dados para uso no modal
+          window._pendingLoginData = { accessToken: data.access_token, user: data.user };
+          setLoading('btn-login', false);
+          // Mostrar modal dedicado (não usa openConfirm)
+          document.getElementById('modal-outro-dispositivo').classList.remove('hidden');
+          return;
+        }
+      }
+      await activateDevice(data.user.id);
+    } catch(_) { /* ignora falhas */ }
 
     localStorage.setItem('med_session', JSON.stringify({ token: data.access_token, user: data.user }));
     await loadUserProfile();
@@ -3170,6 +3207,18 @@ async function activateDevice(userId) {
     await SB.update('approved_users', { active_token: token }, `user_id=eq.${userId}`);
     state.deviceToken = token;
   } catch(_) { /* ignora falhas de RLS */ }
+}
+
+async function confirmarEntrarAqui() {
+  document.getElementById('modal-outro-dispositivo').classList.add('hidden');
+  const { accessToken, user } = window._pendingLoginData || {};
+  if (!accessToken || !user) return;
+  window._pendingLoginData = null;
+  state.authToken = accessToken;
+  state.user = user;
+  await activateDevice(user.id);
+  localStorage.setItem('med_session', JSON.stringify({ token: accessToken, user }));
+  await loadUserProfile();
 }
 
 function showForceLoginModal(accessToken, user) {
