@@ -5898,7 +5898,13 @@ async function bibCarregarLivros() {
   listEl.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:16px 0;">Carregando...</div>';
 
   try {
-    const res = await fetch('/api/biblioteca');
+    const res = await fetch(`${state.sbUrl}/rest/v1/livros_chunks?select=id,livro,materia&order=livro.asc`, {
+      headers: {
+        'apikey': state.sbKey,
+        'Authorization': `Bearer ${state.authToken || state.sbKey}`,
+        'Content-Type': 'application/json',
+      }
+    });
     const data = await res.json();
     const ok = res.ok;
     if (!ok || !Array.isArray(data)) {
@@ -5949,7 +5955,14 @@ function escHtml(str) {
 async function bibRemoverLivro(livro) {
   if (!confirm(`Remover todos os chunks de "${livro}"?`)) return;
   try {
-    const res = await fetch('/api/biblioteca', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ livro }) });
+    const res = await fetch(`${state.sbUrl}/rest/v1/livros_chunks?livro=eq.${encodeURIComponent(livro)}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': state.sbKey,
+        'Authorization': `Bearer ${state.authToken || state.sbKey}`,
+        'Content-Type': 'application/json',
+      }
+    });
     if (res.ok) { toast('Livro removido!', 'success'); bibCarregarLivros(); }
     else toast('Erro ao remover livro.', 'error');
   } catch(e) {
