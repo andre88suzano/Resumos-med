@@ -202,18 +202,22 @@
     backdrop-filter: blur(6px);
     z-index: 1000;
     display: flex; align-items: center; justify-content: center;
-    padding: 24px;
+    padding: 12px;
     animation: fadeIn .2s ease;
   }
   .modal {
     background: var(--bg2);
     border: 1px solid var(--border2);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 24px;
     width: 100%; max-width: 520px;
     box-shadow: var(--shadow-lg);
     animation: slideUp .3s cubic-bezier(.4,0,.2,1);
-    max-height: 90vh; overflow-y: auto;
+    max-height: 92vh; overflow-y: auto;
+  }
+  @media (max-width: 480px) {
+    .modal-backdrop { padding: 8px; align-items: flex-end; }
+    .modal { border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 88vh; padding: 18px 16px; }
   }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .modal-title  { font-family: var(--font-head); font-size: 22px; color: var(--text); }
@@ -2441,10 +2445,10 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
 <!-- ═══════════ MODAL VALORES ═══════════ -->
 <div id="modal-valores" class="modal-backdrop hidden">
-  <div class="modal" style="max-width:580px;padding:0;overflow:hidden;">
+  <div class="modal" style="max-width:580px;padding:0;overflow:hidden;width:100%;">
 
     <!-- Header -->
-    <div style="padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between;">
+    <div style="padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;">
       <div>
         <h2 style="font-family:var(--font-head);font-size:20px;color:var(--text);margin-bottom:2px;">🏷️ Tabela de Valores</h2>
         <p style="font-size:12px;color:var(--text3);">Escolha o plano ideal para você</p>
@@ -2453,7 +2457,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     </div>
 
     <!-- Tabs -->
-    <div style="display:flex;gap:0;padding:16px 28px 0;border-bottom:1px solid var(--border);">
+    <div style="display:flex;gap:0;padding:10px 16px 0;border-bottom:1px solid var(--border);overflow-x:auto;">
       <button class="valores-tab active" onclick="switchValoresTab('promo')" id="vtab-promo" style="color:#e85d04;border-bottom-color:#e85d04;font-weight:700;">🔥 Promoção</button>
       <button class="valores-tab" onclick="switchValoresTab('individual')" id="vtab-individual">📄 Individual</button>
       <button class="valores-tab" onclick="switchValoresTab('prova')" id="vtab-prova">📋 Por Prova</button>
@@ -2461,7 +2465,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     </div>
 
     <!-- Conteúdo das tabs -->
-    <div style="padding:24px 28px 28px;max-height:60vh;overflow-y:auto;">
+    <div style="padding:16px;max-height:65vh;overflow-y:auto;">
 
       <!-- TAB: PROMOÇÃO -->
       <div id="vcontent-promo">
