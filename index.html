@@ -2506,15 +2506,26 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
               <div style="display:flex;align-items:center;gap:6px;">
                 <span style="font-size:18px;">📦</span>
-                <div>
-                  <div class="valor-nome" style="font-size:13px;">3 combos 📖+⚡</div>
-                  <div style="color:#e85d04;font-size:17px;font-weight:800;">R$ 49,90</div>
+                <div class="valor-nome" style="font-size:13px;">3 Combos 📖+⚡</div>
+              </div>
+              <div style="width:100%;display:flex;flex-direction:column;gap:5px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:11px;color:var(--text2);">👤 Solo</span>
+                  <span style="color:#e85d04;font-size:14px;font-weight:800;">R$ 44,90</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:11px;color:#a78bfa;">👯 Com amigo</span>
+                  <span style="color:#a78bfa;font-size:14px;font-weight:800;">R$ 37,90 cada</span>
                 </div>
               </div>
-              <div class="valor-desc" style="font-size:11px;">Normalmente R$ 20 cada. Pacote de 3 por só R$ 49,90.</div>
-              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Promoção', preco:49.90, tipo:'solo', quantidade:3 })">
-                🛒 Comprar
-              </button>
+              <div style="display:flex;flex-direction:column;gap:5px;width:100%;">
+                <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Solo', preco:44.90, tipo:'solo', quantidade:3 })">
+                  👤 Solo — R$ 44,90
+                </button>
+                <button class="btn btn-sm" style="width:100%;background:#1e0a3c;border:1px solid #7b2ff7;color:#a78bfa;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Dupla', preco_dupla:37.90, preco_solo:44.90, tipo:'dupla', quantidade:3 })">
+                  👯 Com amigo — R$ 37,90
+                </button>
+              </div>
             </div>
 
             <!-- Card 4 combos -->
