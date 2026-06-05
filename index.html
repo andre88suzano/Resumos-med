@@ -5517,12 +5517,32 @@ function mcRenderizarSelecaoResumos(plano) {
     return { resumo: r, mini: mini || null };
   });
 
-  // Resumos sem par (mini sem resumo correspondente)
-  const miniSemPar = miniResumos.filter(m =>
-    !pares.some(p => p.mini && p.mini.id === m.id)
-  ).map(m => ({ resumo: m, mini: null, somentemini: true }));
+  // Detectar tipo do plano
+  const nomeP = (plano.nome || '').toLowerCase();
+  const ehComboPlano = nomeP.includes('combo') || nomeP.includes('mini');
+  const ehMiniIndividual = nomeP.includes('mini') && !nomeP.includes('combo');
 
-  const todosPares = [...pares, ...miniSemPar];
+  // Filtrar o que mostrar conforme o plano:
+  // - Combo: só pares completos (resumo + mini)
+  // - Resumo individual: só resumos sem mini (ou todos sem mini)
+  // - Mini individual: só mini resumos sem par
+  let todosPares;
+  if (ehComboPlano) {
+    // Só combos com par completo
+    todosPares = pares.filter(p => p.mini !== null);
+  } else if (ehMiniIndividual) {
+    // Só mini resumos
+    const miniSemPar = miniResumos.filter(m =>
+      !pares.some(p => p.mini && p.mini.id === m.id)
+    ).map(m => ({ resumo: m, mini: null }));
+    todosPares = [...miniSemPar, ...miniResumos
+      .filter(m => pares.some(p => p.mini && p.mini.id === m.id))
+      .map(m => ({ resumo: m, mini: null }))
+    ];
+  } else {
+    // Resumo individual: só resumos normais (sem mini junto)
+    todosPares = pares.map(p => ({ resumo: p.resumo, mini: null }));
+  }
 
   function atualizar() {
     const sel = mcState.resumosSelecionados.length;
