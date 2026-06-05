@@ -5875,7 +5875,7 @@ async function bibProcessar() {
         const embRes = await fetch('https://api.groq.com/openai/v1/embeddings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
-          body: JSON.stringify({ model: 'nomic-embed-text-v1_5', input: chunks[i].text })
+          body: JSON.stringify({ model: 'nomic-embed-text-v1.5', input: chunks[i].text })
         });
         const embData = await embRes.json();
         embedding = embData.data?.[0]?.embedding || null;
@@ -5883,8 +5883,8 @@ async function bibProcessar() {
 
       // Salvar chunk no Supabase
       const row = {
-        livro, materia,
-        semestre: semestre ? parseInt(semestre) : null,
+        livro,
+        materia,
         pagina: chunks[i].pagina,
         conteudo: chunks[i].text,
         ...(embedding ? { embedding: JSON.stringify(embedding) } : {})
