@@ -1767,14 +1767,14 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       </div><!-- /layout principal -->
 
 
-      <!-- ── ATUALIZAÇÕES DA SEMANA ── -->
+      <!-- ── MEUS RESUMOS ── -->
       <div class="card anim-in" style="margin-bottom:32px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🔔</span>
+            <span style="font-size:18px;">📚</span>
             <div>
-              <div style="font-size:15px;font-weight:700;color:var(--text);">Atualizações desta semana</div>
-              <div style="font-size:11px;color:var(--text3);">Resumos atualizados recentemente · limpa todo domingo</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">Meus Resumos</div>
+              <div style="font-size:11px;color:var(--text3);">Resumos disponíveis para você</div>
             </div>
           </div>
           <button id="btn-add-atualizacao" class="btn btn-sm btn-primary" onclick="openAddAtualizacao()" style="display:none;">
@@ -1784,6 +1784,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <div id="atualizacoes-container">
           <div class="empty-state" style="padding:24px;"><div class="spinner" style="margin:auto;"></div></div>
         </div>
+        <div id="meus-resumos-dashboard-list"></div>
+        <button onclick="showPage('resumos')" style="margin-top:12px;width:100%;padding:9px;background:transparent;border:1px dashed var(--accent);border-radius:var(--radius);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;">Ver todos →</button>
       </div>
 
     </div>
@@ -3298,6 +3300,9 @@ async function loadAtualizacoes() {
   // Mostra botão de adicionar para admin
   const btn = document.getElementById('btn-add-atualizacao');
   if (btn) btn.style.display = state.profile?.is_admin ? '' : 'none';
+  // Oculta container de atualizações para alunos
+  const container = document.getElementById('atualizacoes-container');
+  if (container) container.style.display = state.profile?.is_admin ? '' : 'none';
 }
 
 function renderAtualizacoes(list) {
@@ -3760,7 +3765,12 @@ function renderDashboard() {
   const p = state.profile;
   const isAdmin = p.is_admin;
 
-  document.getElementById('dash-welcome').textContent = `${t('dash-welcome-prefix')} ${p.name || p.email}! 👋`;
+  // Detectar gênero pelo primeiro nome (terminação em 'a' = feminino)
+  const primeiroNome = (p.name || p.email).split(' ')[0];
+  const vogaisF = ['a','á','â','ã','à'];
+  const eFeminino = vogaisF.includes(primeiroNome.slice(-1).toLowerCase());
+  const titulo = eFeminino ? 'Dra.' : 'Dr.';
+  document.getElementById('dash-welcome').textContent = `Olá, ${titulo} ${p.name || p.email}! 👋`;
   document.getElementById('dash-sub').textContent = t('dash-sub');
 
   // Card "Resumos liberados" — visível para todos
@@ -3784,8 +3794,48 @@ function renderDashboard() {
   const paymentBanner = document.querySelector('.payment-banner');
   if (paymentBanner) paymentBanner.style.display = '';
 
-  // Meus Resumos no dashboard
+  // Meus Resumos no dashboard (seção grande)
   renderDashboardMeusResumos();
+  renderMeusResumosDashboard();
+}
+
+function renderMeusResumosDashboard() {
+  const el = document.getElementById('meus-resumos-dashboard-list');
+  if (!el) return;
+
+  const isAdmin = state.profile?.is_admin;
+  const meusIds = isAdmin ? state.resumos.map(r => r.id) : state.myAccess;
+  const meusResumos = state.resumos.filter(r => meusIds.includes(r.id));
+
+  if (!meusResumos.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:20px;">
+      <div class="empty-icon">📭</div>
+      <h3>Nenhum resumo disponível</h3>
+      <p>Adquira resumos na <span style="color:var(--accent);cursor:pointer;" onclick="openValoresModal()">tabela de valores</span>.</p>
+    </div>`;
+    return;
+  }
+
+  const MATERIA_COLORS_MAP = window.MATERIA_COLORS || {};
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">` +
+    meusResumos.map(r => {
+      const info = state.myAccessMap?.[r.id];
+      const dias = info?.daysLeft;
+      let prazoBadge = '';
+      if (!isAdmin && dias !== null && dias !== undefined) {
+        const cor = dias <= 7 ? '#f87171' : dias <= 15 ? '#fcd34d' : 'var(--text3)';
+        prazoBadge = `<span style="font-size:10px;color:${cor};">⏰ ${dias}d</span>`;
+      }
+      const color = MATERIA_COLORS_MAP[r.materia] || 'badge-gray';
+      return `<div onclick="openResumo('${r.id}')" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span class="badge ${color}" style="font-size:10px;">${r.materia}</span>
+          ${prazoBadge}
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${r.title}</div>
+        ${r.description ? `<div style="font-size:11px;color:var(--text3);margin-top:4px;">${r.description}</div>` : ''}
+      </div>`;
+    }).join('') + `</div>`;
 }
 
 function renderDashboardMeusResumos() {
