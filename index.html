@@ -3709,7 +3709,7 @@ function renderCurrentPage() {
     case 'admin-users':  renderUsersTable(); break;
     case 'admin-resumos':renderAdminResumosTable(); break;
     case 'admin-access': renderAccessPage(); break;
-    case 'biblioteca-ia': bibCarregarLivros(); break;
+    case 'biblioteca-ia': setTimeout(bibCarregarLivros, 300); break;
   }
 }
 
@@ -6056,7 +6056,7 @@ async function bibCarregarLivros() {
     const data = await res.json();
     const ok = res.ok;
     if (!ok || !Array.isArray(data)) {
-      listEl.innerHTML = '<div style="color:var(--red);font-size:14px;">Erro ao carregar livros.</div>';
+      listEl.innerHTML = `<div style="color:var(--red);font-size:14px;">Erro ao carregar livros (${res.status}): ${JSON.stringify(data).slice(0,200)}</div>`;
       return;
     }
 
