@@ -5454,73 +5454,136 @@ function mcRenderizarSelecaoResumos(plano) {
   const lista = document.getElementById('mc-resumos-lista');
   const contador = document.getElementById('mc-selecao-contador');
   const btnContinuar = document.getElementById('mc-btn-continuar');
-  const qtd = plano.quantidade || 1; // quantos podem selecionar
+  const qtdCombos = plano.quantidade || null; // nº de combos permitidos
+  const ehCombo = plano.nome && plano.nome.toLowerCase().includes('combo');
 
-  // Todos os resumos disponíveis (admin vê todos, aluno vê todos para poder comprar)
   const todoResumos = state.resumos || [];
-
   if (!todoResumos.length) {
-    lista.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px;">Nenhum resumo disponível no momento.</div>';
+    lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;">Nenhum resumo disponível.</div>';
     return;
   }
 
   mcState.resumosSelecionados = [];
+  mcState.combosSelecionados = 0; // conta pares selecionados
+
+  // Separar mini resumos dos resumos normais
+  const miniResumos = todoResumos.filter(r => r.title.toLowerCase().includes('mini'));
+  const resumosNormais = todoResumos.filter(r => !r.title.toLowerCase().includes('mini'));
+
+  // Parear: para cada resumo normal, tentar encontrar mini do mesmo assunto/turma
+  function extrairChave(titulo) {
+    return titulo.toLowerCase()
+      .replace(/mini\s*resumo/gi,'').replace(/resumo/gi,'')
+      .replace(/[^a-z0-9]/g,' ').trim().split(/\s+/).slice(0,4).join(' ');
+  }
+
+  const pares = resumosNormais.map(r => {
+    const chave = extrairChave(r.title);
+    const mini = miniResumos.find(m => {
+      const chaveM = extrairChave(m.title);
+      // Verifica similaridade: ao menos 2 palavras em comum
+      const pa = chave.split(' '), pb = chaveM.split(' ');
+      return pa.filter(w => w.length > 2 && pb.includes(w)).length >= 1;
+    });
+    return { resumo: r, mini: mini || null };
+  });
+
+  // Resumos sem par (mini sem resumo correspondente)
+  const miniSemPar = miniResumos.filter(m =>
+    !pares.some(p => p.mini && p.mini.id === m.id)
+  ).map(m => ({ resumo: m, mini: null, somentemini: true }));
+
+  const todosPares = [...pares, ...miniSemPar];
 
   function atualizar() {
     const sel = mcState.resumosSelecionados.length;
-    const ilimitado = !plano.quantidade;
-    contador.textContent = ilimitado ? `${sel} selecionados` : `${sel} / ${qtd} selecionados`;
-    btnContinuar.disabled = sel === 0 || (!ilimitado && sel > qtd);
-    btnContinuar.textContent = sel === 0 ? 'Selecione ao menos 1 resumo' :
-      (!ilimitado && sel < qtd) ? `Selecione mais ${qtd - sel} resumo(s)` :
-      (!ilimitado && sel > qtd) ? `Máximo ${qtd} resumos` :
-      'Continuar para pagamento →';
+    // Conta combos (pares) ou resumos individuais
+    const combosAtivos = todosPares.filter(p =>
+      mcState.resumosSelecionados.some(s => s.id === p.resumo.id)
+    ).length;
+
+    if (qtdCombos) {
+      contador.textContent = `${combosAtivos} / ${qtdCombos} combos selecionados`;
+      btnContinuar.disabled = combosAtivos === 0 || combosAtivos > qtdCombos;
+      btnContinuar.textContent = combosAtivos === 0 ? 'Selecione os combos' :
+        combosAtivos < qtdCombos ? `Selecione mais ${qtdCombos - combosAtivos} combo(s)` :
+        combosAtivos > qtdCombos ? `Máximo ${qtdCombos} combos` :
+        'Continuar para pagamento →';
+    } else {
+      contador.textContent = `${sel} selecionados`;
+      btnContinuar.disabled = sel === 0;
+      btnContinuar.textContent = sel === 0 ? 'Selecione ao menos 1' : 'Continuar para pagamento →';
+    }
   }
 
-  // Agrupar por matéria
+  // Agrupar pares por matéria
   const grupos = {};
-  todoResumos.forEach(r => {
-    if (!grupos[r.materia]) grupos[r.materia] = [];
-    grupos[r.materia].push(r);
+  todosPares.forEach(p => {
+    const mat = p.resumo.materia || 'Geral';
+    if (!grupos[mat]) grupos[mat] = [];
+    grupos[mat].push(p);
   });
 
-  lista.innerHTML = Object.entries(grupos).map(([mat, resumos]) => `
-    <div style="margin-bottom:8px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">${mat}</div>
-      ${resumos.map(r => `
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:var(--transition);margin-bottom:4px;" id="mc-row-${r.id}"
-          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor=mcState.resumosSelecionados.includes('${r.id}')?'var(--accent)':'var(--border)'">
-          <input type="checkbox" id="mc-chk-${r.id}" value="${r.id}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);"
-            onchange="mcToggleResumo('${r.id}', ${JSON.stringify(r.title)}, ${qtd || 999}, this)">
-          <div style="flex:1;">
-            <div style="font-size:13px;color:var(--text);">${r.title}</div>
-            ${r.description ? `<div style="font-size:11px;color:var(--text3);">${r.description}</div>` : ''}
+  lista.innerHTML = Object.entries(grupos).map(([mat, pares]) => `
+    <div style="margin-bottom:10px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">${mat}</div>
+      ${pares.map(p => {
+        const cid = `mc-combo-${p.resumo.id}`;
+        return `<div id="${cid}" style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:var(--transition);"
+          onclick="mcToggleCombo('${p.resumo.id}','${p.mini ? p.mini.id : ''}','${cid}',${qtdCombos||999})">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="chk-${cid}" style="width:16px;height:16px;accent-color:var(--accent);pointer-events:none;" readonly>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);">📖 ${p.resumo.title}</div>
+              ${p.mini ? `<div style="font-size:12px;color:var(--teal);margin-top:2px;">⚡ ${p.mini.title}</div>` : ''}
+            </div>
+            ${p.mini ? '<span style="font-size:10px;background:var(--teal-dim);color:var(--teal);padding:2px 6px;border-radius:4px;border:1px solid var(--teal);white-space:nowrap;">COMBO</span>' : ''}
           </div>
-        </label>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`).join('');
 
   atualizar();
   window._mcAtualizarContador = atualizar;
 }
 
-function mcToggleResumo(id, titulo, maxQtd, checkbox) {
-  const idx = mcState.resumosSelecionados.findIndex(r => r.id === id);
-  if (checkbox.checked) {
-    if (maxQtd !== 999 && mcState.resumosSelecionados.length >= maxQtd) {
-      checkbox.checked = false;
-      toast(`Máximo de ${maxQtd} resumo(s) para este plano.`, 'info');
+function mcToggleCombo(resumoId, miniId, cardId, maxCombos) {
+  const card = document.getElementById(cardId);
+  const chk = document.getElementById(`chk-${cardId}`);
+  const jasel = mcState.resumosSelecionados.some(s => s.id === resumoId);
+
+  if (jasel) {
+    // Desmarcar
+    mcState.resumosSelecionados = mcState.resumosSelecionados.filter(s => s.id !== resumoId && s.id !== miniId);
+    card.style.borderColor = 'var(--border)';
+    card.style.background = '';
+    chk.checked = false;
+  } else {
+    // Verificar limite
+    const combosAtivos = window._mcContarCombos ? window._mcContarCombos() : 0;
+    if (maxCombos !== 999 && combosAtivos >= maxCombos) {
+      toast(`Máximo de ${maxCombos} combo(s) para este plano.`, 'info');
       return;
     }
-    mcState.resumosSelecionados.push({ id, titulo });
-    document.getElementById(`mc-row-${id}`).style.borderColor = 'var(--accent)';
-    document.getElementById(`mc-row-${id}`).style.background = 'var(--bg3)';
-  } else {
-    if (idx > -1) mcState.resumosSelecionados.splice(idx, 1);
-    document.getElementById(`mc-row-${id}`).style.borderColor = 'var(--border)';
-    document.getElementById(`mc-row-${id}`).style.background = '';
+    // Marcar resumo + mini se existir
+    const r = state.resumos.find(x => x.id === resumoId);
+    if (r) mcState.resumosSelecionados.push({ id: resumoId, titulo: r.title });
+    if (miniId) {
+      const m = state.resumos.find(x => x.id === miniId);
+      if (m) mcState.resumosSelecionados.push({ id: miniId, titulo: m.title });
+    }
+    card.style.borderColor = 'var(--accent)';
+    card.style.background = 'var(--bg3)';
+    chk.checked = true;
   }
   if (window._mcAtualizarContador) window._mcAtualizarContador();
 }
+
+// Helper para contar combos ativos
+window._mcContarCombos = function() {
+  return document.querySelectorAll('#mc-resumos-lista [id^="mc-combo-"]')
+    .length - document.querySelectorAll('#mc-resumos-lista input[type=checkbox]:not(:checked)').length;
+};
 
 function mcContinuarParaPagamento() {
   if (!mcState.resumosSelecionados.length) return;
