@@ -1624,6 +1624,9 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <a class="nav-item" onclick="showPage('biblioteca-ia')">
           <span class="nav-icon">📚</span> <span>Biblioteca IA</span>
         </a>
+        <a class="nav-item" onclick="showPage('admin-vendas')" id="nav-vendas">
+          <span class="nav-icon">💰</span> <span>Financeiro</span>
+        </a>
       </div>
     </div>
 
@@ -2072,6 +2075,62 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <p>Faça upload de um PDF para começar.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         FINANCEIRO / VENDAS
+    ══════════════════════════════════════════════ -->
+    <div class="page hidden" id="page-admin-vendas">
+      <h1 class="section-title">💰 Financeiro</h1>
+      <p class="section-sub" style="margin-bottom:28px;">Acompanhe as vendas e o desempenho financeiro.</p>
+
+      <!-- Cards de resumo -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;">
+
+        <div class="card" style="text-align:center;padding:24px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Esta semana</div>
+          <div id="vend-semana-qtd" style="font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;">—</div>
+          <div id="vend-semana-val" style="font-size:.95rem;color:#4caf50;margin-top:6px;">R$ —</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Reseta todo domingo</div>
+        </div>
+
+        <div class="card" style="text-align:center;padding:24px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Este mês</div>
+          <div id="vend-mes-qtd" style="font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;">—</div>
+          <div id="vend-mes-val" style="font-size:.95rem;color:#4caf50;margin-top:6px;">R$ —</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Reseta no 1º do mês</div>
+        </div>
+
+        <div class="card" style="text-align:center;padding:24px 16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Este ano</div>
+          <div id="vend-ano-qtd" style="font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;">—</div>
+          <div id="vend-ano-val" style="font-size:.95rem;color:#4caf50;margin-top:6px;">R$ —</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Reseta em 1º de janeiro</div>
+        </div>
+
+        <div class="card" style="text-align:center;padding:24px 16px;border-color:#e91e6330;background:rgba(233,30,99,.04);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Abandono de checkout</div>
+          <div id="vend-abandono-qtd" style="font-size:2.4rem;font-weight:700;color:#e91e63;line-height:1;">—</div>
+          <div style="font-size:.85rem;color:var(--text3);margin-top:6px;">não finalizaram</div>
+        </div>
+
+      </div>
+
+      <!-- Vendas recentes -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h2 style="font-size:1.05rem;font-weight:700;margin:0;">Vendas no Mercado Pago</h2>
+        <button onclick="carregarVendas()" style="font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;">↻ Atualizar</button>
+      </div>
+
+      <div id="vend-lista" style="margin-bottom:40px;">
+        <div class="card" style="text-align:center;color:var(--text3);padding:32px;">Carregando…</div>
+      </div>
+
+      <!-- Abandonos -->
+      <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:14px;">Entraram no checkout mas não finalizaram</h2>
+      <div id="vend-abandonos-lista">
+        <div class="card" style="text-align:center;color:var(--text3);padding:32px;">Carregando…</div>
       </div>
     </div>
 
@@ -3754,6 +3813,7 @@ function showPage(name) {
     'viewer': '—', 'meu-perfil': t('nav-profile'),
     'admin-users': t('nav-users'), 'admin-resumos': t('nav-manage-resumos'),
     'admin-access': t('nav-access'), 'biblioteca-ia': '📚 Biblioteca IA',
+    'admin-vendas': '💰 Financeiro',
   };
   document.getElementById('topbar-title').textContent = titles[name] || '';
 
@@ -3770,6 +3830,126 @@ function renderCurrentPage() {
     case 'admin-resumos':renderAdminResumosTable(); break;
     case 'admin-access': renderAccessPage(); break;
     case 'biblioteca-ia': setTimeout(bibCarregarLivros, 300); break;
+    case 'admin-vendas': setTimeout(carregarVendas, 100); break;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   FINANCEIRO / VENDAS
+───────────────────────────────────────────────────────── */
+async function carregarVendas() {
+  const sbUrl = state.sbUrl;
+  const sbKey = state.sbKey;
+
+  const now = new Date();
+
+  // Início da semana (domingo)
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0,0,0,0);
+
+  // Início do mês
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Início do ano
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+
+  const fmt = d => d.toISOString();
+
+  try {
+    // Buscar participantes aprovados (= vendas concluídas)
+    const res = await fetch(
+      `${sbUrl}/rest/v1/compra_participantes?status_pagamento=eq.aprovado&select=user_id,valor_pago,pago_em,mp_payment_id,compra_id&order=pago_em.desc&limit=100`,
+      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+    );
+    const vendas = res.ok ? await res.json() : [];
+
+    // Buscar participantes não aprovados (abandonos)
+    const resAband = await fetch(
+      `${sbUrl}/rest/v1/compra_participantes?status_pagamento=neq.aprovado&select=user_id,compra_id,status_pagamento,updated_at&order=updated_at.desc&limit=50`,
+      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+    );
+    const abandonos = resAband.ok ? await resAband.json() : [];
+
+    // Buscar emails dos usuários para exibir
+    const allIds = [...new Set([...vendas.map(v=>v.user_id), ...abandonos.map(a=>a.user_id)].filter(Boolean))];
+    let usersMap = {};
+    if (allIds.length > 0) {
+      const ids = allIds.map(id => `"${id}"`).join(',');
+      const uRes = await fetch(
+        `${sbUrl}/rest/v1/approved_users?user_id=in.(${allIds.join(',')})&select=user_id,name,email`,
+        { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+      );
+      const users = uRes.ok ? await uRes.json() : [];
+      users.forEach(u => { usersMap[u.user_id] = u; });
+    }
+
+    // Calcular stats
+    const filterByDate = (arr, from) => arr.filter(v => v.pago_em && new Date(v.pago_em) >= from);
+    const sum = arr => arr.reduce((s, v) => s + (parseFloat(v.valor_pago) || 0), 0);
+
+    const semana  = filterByDate(vendas, weekStart);
+    const mes     = filterByDate(vendas, monthStart);
+    const ano     = filterByDate(vendas, yearStart);
+
+    const fmtVal = v => `R$ ${v.toFixed(2).replace('.', ',')}`;
+
+    document.getElementById('vend-semana-qtd').textContent = semana.length;
+    document.getElementById('vend-semana-val').textContent = fmtVal(sum(semana));
+    document.getElementById('vend-mes-qtd').textContent    = mes.length;
+    document.getElementById('vend-mes-val').textContent    = fmtVal(sum(mes));
+    document.getElementById('vend-ano-qtd').textContent    = ano.length;
+    document.getElementById('vend-ano-val').textContent    = fmtVal(sum(ano));
+    document.getElementById('vend-abandono-qtd').textContent = abandonos.length;
+
+    // Tabela de vendas
+    const listaEl = document.getElementById('vend-lista');
+    if (vendas.length === 0) {
+      listaEl.innerHTML = '<div class="card" style="text-align:center;color:var(--text3);padding:32px;">Nenhuma venda registrada ainda.</div>';
+    } else {
+      listaEl.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .5fr;gap:8px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">
+          <span>Cliente</span><span>Compra ID</span><span>Valor</span><span>ID MP</span><span>Data</span>
+        </div>
+        ${vendas.map(v => {
+          const u = usersMap[v.user_id] || {};
+          const data = v.pago_em ? new Date(v.pago_em).toLocaleDateString('pt-BR') : '—';
+          return `<div class="card" style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .5fr;gap:8px;padding:14px 16px;margin-bottom:8px;align-items:center;">
+            <div>
+              <div style="font-weight:600;">${u.name || '—'}</div>
+              <div style="font-size:12px;color:var(--text3);">${u.email || v.user_id?.slice(0,8) || '—'}</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);word-break:break-all;">${v.compra_id?.slice(0,12) || '—'}…</div>
+            <div style="font-weight:700;color:#4caf50;">${fmtVal(parseFloat(v.valor_pago)||0)}</div>
+            <div style="font-size:12px;color:var(--accent);font-family:monospace;">${v.mp_payment_id || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);">${data}</div>
+          </div>`;
+        }).join('')}
+      `;
+    }
+
+    // Tabela de abandonos
+    const abandEl = document.getElementById('vend-abandonos-lista');
+    if (abandonos.length === 0) {
+      abandEl.innerHTML = '<div class="card" style="text-align:center;color:var(--text3);padding:32px;">Nenhum abandono registrado.</div>';
+    } else {
+      abandEl.innerHTML = abandonos.map(a => {
+        const u = usersMap[a.user_id] || {};
+        const data = a.updated_at ? new Date(a.updated_at).toLocaleDateString('pt-BR') : '—';
+        return `<div class="card" style="display:grid;grid-template-columns:1fr 1fr .5fr;gap:8px;padding:14px 16px;margin-bottom:8px;align-items:center;border-color:rgba(233,30,99,.2);background:rgba(233,30,99,.03);">
+          <div>
+            <div style="font-weight:600;">${u.name || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);">${u.email || v?.user_id?.slice(0,8) || '—'}</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);">${a.compra_id?.slice(0,16) || '—'}…</div>
+          <div style="font-size:12px;color:var(--text3);">${data}</div>
+        </div>`;
+      }).join('');
+    }
+
+  } catch(err) {
+    console.error('Erro ao carregar vendas:', err);
+    document.getElementById('vend-lista').innerHTML = '<div class="card" style="color:#e57373;padding:24px;">Erro ao carregar dados.</div>';
   }
 }
 
