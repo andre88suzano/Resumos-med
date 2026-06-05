@@ -5476,27 +5476,40 @@ function mcRenderizarSelecaoResumos(plano) {
     return m ? m[1].toUpperCase() : null;
   }
 
-  // Remove turma e palavras "resumo"/"mini" para comparar o assunto
+  // Extrai números relevantes do título (ex: "1", "2", "p1", "p2")
+  function extrairNumeros(titulo) {
+    const nums = titulo.match(/\d+/g) || [];
+    return nums.map(n => n);
+  }
+
+  // Remove turma, "resumo"/"mini" para comparar o assunto base
   function extrairAssunto(titulo) {
     return titulo.toLowerCase()
       .replace(/mini\s*resumen?/gi,'').replace(/resumen?/gi,'')
-      .replace(/\b[1-6][A-Ka-k]\b/gi,'')
+      .replace(/\b\d{1,2}[A-Ka-k]\b/gi,'')
       .replace(/[^a-z0-9]/g,' ').trim()
-      .split(/\s+/).filter(w => w.length > 1).slice(0,5).join(' ');
+      .split(/\s+/).filter(w => w.length > 1).join(' ');
   }
 
   const pares = resumosNormais.map(r => {
     const turmaR   = extrairTurma(r.title);
     const assuntoR = extrairAssunto(r.title);
+    const numerosR = extrairNumeros(r.title);
 
     const mini = miniResumos.find(m => {
       const turmaM   = extrairTurma(m.title);
       const assuntoM = extrairAssunto(m.title);
+      const numerosM = extrairNumeros(m.title);
 
-      // Turmas precisam ser iguais (ambas null = sem turma = pode parear)
+      // 1. Turmas precisam ser iguais (null === null também funciona)
       if (turmaR !== turmaM) return false;
 
-      // Assuntos precisam ter ao menos 1 palavra significativa em comum
+      // 2. Números precisam ser iguais (parcial 1 ≠ parcial 2)
+      const numR = numerosR.join(',');
+      const numM = numerosM.join(',');
+      if (numR !== numM) return false;
+
+      // 3. Assuntos precisam ter ao menos 1 palavra em comum
       const pa = assuntoR.split(' '), pb = assuntoM.split(' ');
       return pa.filter(w => w.length > 2 && pb.includes(w)).length >= 1;
     });
