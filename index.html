@@ -3155,22 +3155,7 @@ async function doLogin() {
     state.authToken = data.access_token;
     state.user = data.user;
 
-    // Verificar bloqueio de dispositivo (não-bloqueante — se falhar, login continua)
-    try {
-      const { data: profileData, ok: pOk } = await SB.select('approved_users', `user_id=eq.${data.user.id}&select=active_token,is_admin`);
-      const profile = (pOk && Array.isArray(profileData)) ? profileData[0] : null;
-
-      if (profile && !profile.is_admin && profile.active_token) {
-        const localToken = localStorage.getItem('med_device_token');
-        if (localToken !== profile.active_token) {
-          setLoading('btn-login', false);
-          showForceLoginModal(data.access_token, data.user);
-          return;
-        }
-      }
-      // Ativa dispositivo atual (ignora erros de RLS)
-      await activateDevice(data.user.id);
-    } catch(_) { /* bloqueio falhou — continua login normalmente */ }
+    // Verificação de dispositivo desativada — login direto
 
     localStorage.setItem('med_session', JSON.stringify({ token: data.access_token, user: data.user }));
     await loadUserProfile();
