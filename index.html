@@ -3685,6 +3685,9 @@ async function loadUserProfile() {
 
   state.profile = profile;
 
+  // Atualiza last_seen para contagem de usuários online
+  SB.update('approved_users', { last_seen: new Date().toISOString() }, `user_id=eq.${state.user.id}`);
+
   if (!profile.approved && !profile.is_admin) {
     showScreen('auth');
     toast(t('pending-approval'), 'info');
@@ -3968,9 +3971,28 @@ function renderDashboard() {
   document.getElementById('dash-welcome').textContent = `Olá, ${titulo} ${p.name || p.email}! 👋`;
   document.getElementById('dash-sub').textContent = t('dash-sub');
 
-  // Card "Resumos liberados" — visível para todos
-  const myAccess = isAdmin ? state.resumos.length : state.myAccess.length;
-  document.getElementById('stat-my-access').textContent = myAccess;
+  // Card teal — "Resumos liberados" para usuários, "Online agora" para admin
+  if (isAdmin) {
+    document.querySelector('#stat-my-access').closest('.stat-card').querySelector('.stat-icon').textContent = '🟢';
+    document.getElementById('stat-my-access').textContent = '…';
+    document.querySelector('#stat-my-access + .stat-label').textContent = 'Online agora';
+    // Contar sessões ativas nos últimos 5 min via Supabase
+    (async () => {
+      try {
+        const cinco = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const res = await fetch(
+          `${state.sbUrl}/rest/v1/approved_users?last_seen=gte.${cinco}&select=user_id`,
+          { headers: { apikey: state.sbKey, Authorization: `Bearer ${state.sbKey}` } }
+        );
+        const rows = res.ok ? await res.json() : [];
+        const el = document.getElementById('stat-my-access');
+        if (el) el.textContent = Array.isArray(rows) ? rows.length : '?';
+      } catch { document.getElementById('stat-my-access').textContent = '?'; }
+    })();
+  } else {
+    const myAccess = state.myAccess.length;
+    document.getElementById('stat-my-access').textContent = myAccess;
+  }
 
   // Cards admin — mostrar/ocultar
   document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? '' : 'none');
