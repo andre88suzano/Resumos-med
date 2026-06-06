@@ -6139,11 +6139,19 @@ window._mcContarCombos = function() {
     .length - document.querySelectorAll('#mc-resumos-lista input[type=checkbox]:not(:checked)').length;
 };
 
-function mcContinuarParaPagamento() {
+async function mcContinuarParaPagamento() {
   if (!mcState.resumosSelecionados.length) return;
-  // Guardar ids selecionados para liberar após pagamento
-  mcState.plano.resumosIds = mcState.resumosSelecionados.map(r => r.id);
-  // Ocultar step 1, mostrar step 2
+  const ids = mcState.resumosSelecionados.map(r => r.id);
+  mcState.plano.resumosIds = ids;
+
+  // Salvar resumos selecionados no banco para o webhook usar na liberação
+  if (mcState.compraId && state.user) {
+    await SB.update('compra_participantes',
+      { resumos_selecionados: ids },
+      `compra_id=eq.${mcState.compraId}&user_id=eq.${state.user.id}`
+    );
+  }
+
   document.getElementById('mc-step-selecao').style.display = 'none';
   document.getElementById('mc-step-pagamento').style.display = '';
 }
@@ -6469,12 +6477,13 @@ async function iniciarPagamentoSolo() {
     const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
     if (!compra?.id) throw new Error('Falha ao criar compra');
 
+    const resumosIds = mcState.plano?.resumosIds || [];
     await SB.insert('compra_participantes', {
       compra_id: compra.id,
       user_id: state.user.id,
       email: state.user.email,
       status_pagamento: 'pendente',
-      resumos_selecionados: [],
+      resumos_selecionados: resumosIds,
     });
 
     await iniciarPagamento(compra.id, 'solo', plano.preco || plano.preco_solo || 0);
