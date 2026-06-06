@@ -6143,6 +6143,8 @@ function fecharModalCompra() {
 // ── VERIFICAR SALA EXISTENTE ──────────────────────────────
 async function verificarSalaExistente() {
   if (!state.user) return;
+  // Se já temos uma compra definida (ex: entrou via código), não sobrescrever
+  if (mcState.compraId) return;
   try {
     // Buscar compras do usuário com status 'aguardando'
     const r = await SB.select(
@@ -6220,26 +6222,18 @@ async function entrarComCodigo() {
   if (!codigo) { toast('Digite o código da sala.', 'error'); return; }
   if (!state.user) { toast('Faça login para continuar.', 'error'); return; }
 
+  const btn = document.querySelector('#modal-entrar-codigo .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
+
   try {
     const { data } = await SB.select('compras_coletivas', `codigo=eq.${codigo}&select=*`);
     const compra = Array.isArray(data) ? data[0] : null;
+
     if (!compra) { toast('Código inválido ou sala não encontrada.', 'error'); return; }
     if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
     if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
 
-    closeModal('modal-entrar-codigo');
-
-    const plano = {
-      nome: `3 combos · Dupla (código ${codigo})`,
-      preco: compra.preco_individual,
-      preco_dupla: compra.preco_dupla,
-      preco_solo: compra.preco_individual,
-      tipo: 'dupla',
-      quantidade: 3,
-    };
-
-    abrirModalCompra(plano);
-    mcState.compraId = compra.id;
+    // Registrar participante ANTES de abrir o modal de compra
     await SB.upsert('compra_participantes', {
       compra_id: compra.id,
       user_id: state.user.id,
@@ -6247,11 +6241,35 @@ async function entrarComCodigo() {
       status_pagamento: 'pendente',
       resumos_selecionados: [],
     });
+
+    closeModal('modal-entrar-codigo');
+
+    // Montar plano com os preços da sala existente
+    const plano = {
+      nome: `Combo Dupla — código ${codigo}`,
+      preco: compra.preco_individual,
+      preco_dupla: compra.preco_dupla,
+      preco_solo: compra.preco_individual,
+      tipo: 'dupla',
+      quantidade: 3,
+      _compraExistente: compra, // passa a compra para usar após a seleção
+    };
+
+    // Abre o modal de compra normalmente (step 1: seleção de resumos)
+    abrirModalCompra(plano);
+
+    // Sobrescreve o compraId APÓS abrirModalCompra (que o resetava para null)
+    mcState.compraId = compra.id;
+
+    // Mostra o status da sala no step 2 (ainda oculto) para quando o usuário avançar
     mostrarStatusSala(compra);
     iniciarPollingStatus(compra.id);
-    toast(`🎉 Você entrou na sala! Selecione os resumos e pague R$ ${compra.preco_dupla?.toFixed(2)}.`, 'success');
+
+    toast(`✅ Sala encontrada! Selecione seus resumos e pague R$ ${compra.preco_dupla?.toFixed(2).replace('.',',')} para confirmar.`, 'success');
   } catch(e) {
-    toast('Erro ao entrar na sala: ' + e.message, 'error');
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '👯 Entrar na Sala'; }
   }
 }
 
