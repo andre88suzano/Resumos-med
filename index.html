@@ -6819,8 +6819,11 @@ function ocultarLoading() {
     toast('❌ Pagamento não aprovado. Tente novamente.', 'error');
     window.history.replaceState({}, '', window.location.pathname);
   } else if (statusPag === 'pendente') {
-    toast('⏳ Pagamento pendente. Aguardando confirmação...', 'info');
+    // Pix: pagamento iniciado, aguardando confirmação do banco
+    toast('🟢 Pix gerado! Pague no seu banco e o acesso será liberado automaticamente.', 'info');
     window.history.replaceState({}, '', window.location.pathname);
+    // Recarrega após 10s para verificar se o pagamento foi confirmado
+    setTimeout(() => location.reload(), 10000);
   }
 
   // Amigo abriu link de convite da sala

@@ -95,8 +95,16 @@ export async function onRequest(context) {
       failure: 'https://resumos-med.pages.dev/?pagamento=falha',
       pending: 'https://resumos-med.pages.dev/?pagamento=pendente',
     },
-    auto_return: 'approved',
+    // auto_return só para cartão — Pix é assíncrono e não redireciona automaticamente
+    auto_return: 'all',
+    // Aceitar pagamento pendente (necessário para Pix)
+    binary_mode: false,
     statement_descriptor: 'MedResumenes',
+    // Garantir que todos os métodos estejam habilitados incluindo Pix
+    payment_methods: {
+      excluded_payment_types: [],
+      installments: 12,
+    },
   };
 
   try {
