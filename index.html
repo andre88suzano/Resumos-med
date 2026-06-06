@@ -4144,14 +4144,12 @@ function renderResumos() {
       if (resumosSem.length === 0) {
         const materiasFixas = SEMESTRE_MATERIAS[sem];
         if (materiasFixas) {
-          // Semestre com matérias fixas: clicável mas mostra "em breve" dentro
           return `
             <div class="folder-card" onclick="openSemestre(${sem})" style="--folder-color:${color};">
               <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
               <div class="folder-icon">${icon}</div>
               <div class="folder-name">${label}</div>
-              <div class="folder-meta">${materiasFixas.length} matéria${materiasFixas.length!==1?'s':''} · Em breve</div>
-              <div style="margin-top:6px;font-size:11px;color:${color};font-weight:600;">⏳ Em breve</div>
+              <div class="folder-meta">${materiasFixas.length} matéria${materiasFixas.length!==1?'s':''}</div>
             </div>`;
         }
         // Semestre sem matérias fixas: bloqueado
