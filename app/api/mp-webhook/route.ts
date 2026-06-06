@@ -4,6 +4,18 @@ export async function GET() {
   return new Response('OK', { status: 200 })
 }
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Allow': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Signature, X-Request-Id',
+    },
+  })
+}
+
 export async function POST(req: Request) {
   const mpToken = process.env.MP_ACCESS_TOKEN
   const sbUrl = process.env.SUPABASE_URL
