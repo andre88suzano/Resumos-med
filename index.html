@@ -1730,7 +1730,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <div style="flex:0 1 200px;display:flex;flex-direction:column;gap:14px;min-width:160px;">
 
           <!-- Card: Resumos liberados / Online agora (admin) -->
-          <div class="stat-card teal" id="card-my-access" style="flex:1;" onclick="if(document.getElementById('card-my-access').dataset.admin==='1') abrirModalOnline()">
+          <div class="stat-card teal" id="card-my-access" style="flex:1;" onclick="abrirModalOnlineSeAdmin()">
             <div class="stat-icon" id="stat-my-access-icon">✅</div>
             <div class="stat-value" id="stat-my-access">—</div>
             <div class="stat-label" id="stat-my-access-label">Resumos liberados</div>
@@ -6080,6 +6080,11 @@ async function verificarSalaExistente() {
 }
 
 // ── ENTRAR NA SALA DE ESPERA ──────────────────────────────
+function abrirModalOnlineSeAdmin() {
+  if (!state.profile?.is_admin) return;
+  abrirModalOnline();
+}
+
 async function abrirModalOnline() {
   openModal('modal-online');
   const lista = document.getElementById('modal-online-lista');
