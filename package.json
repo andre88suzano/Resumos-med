@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cf": "opennextjs-cloudflare build",
+    "build:cf": "node scripts/build-cf.mjs",
     "preview": "opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint"

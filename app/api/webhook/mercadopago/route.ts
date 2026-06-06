@@ -4,6 +4,10 @@ import { MercadoPagoConfig, Payment } from 'mercadopago'
 
 const mp = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! })
 
+export async function GET() {
+  return new Response('OK', { status: 200 })
+}
+
 export async function POST(req: Request) {
   const body = await req.json()
 
