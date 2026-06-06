@@ -2873,13 +2873,28 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </div>
         <div id="mc-preco-solo" style="font-size:20px;font-weight:800;color:var(--accent);">R$ --</div>
       </div>
-      <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
-        💳 Pagar Agora
-      </button>
-      <!-- Alternativa Pix -->
-      <div style="margin-top:10px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text3);text-align:center;">
-        💚 Prefere Pix? Chave: <strong style="color:var(--text);font-family:var(--font-mono);">fab6cfa3-c156-42ec-8644-77a506476979</strong><br>
-        Após pagar, envie o comprovante no <a href="https://wa.me/5527992389129" target="_blank" style="color:var(--green);">WhatsApp</a>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
+          💳 Cartão
+        </button>
+        <button class="btn btn-sm" style="width:100%;background:#32BCAD;border:none;color:#fff;font-weight:700;" onclick="iniciarPagamentoPixSolo()">
+          🟢 Pix
+        </button>
+      </div>
+
+      <!-- Área do QR Code Pix (oculta até gerar) -->
+      <div id="mc-pix-area" style="display:none;margin-top:12px;background:var(--bg3);border:1px solid #32BCAD40;border-radius:10px;padding:16px;text-align:center;">
+        <div id="mc-pix-loading" style="color:var(--text3);font-size:13px;">⏳ Gerando QR Code...</div>
+        <div id="mc-pix-content" style="display:none;">
+          <img id="mc-pix-qr" src="" alt="QR Code Pix" style="width:200px;height:200px;border-radius:8px;background:#fff;padding:8px;margin-bottom:12px;" />
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Ou copie o código Pix abaixo:</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="mc-pix-copiacola" readonly style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:10px;color:var(--text2);font-family:var(--font-mono);" />
+            <button onclick="copiarPixCola()" style="flex-shrink:0;background:#32BCAD;border:none;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px;" id="mc-pix-copy-btn">📋</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">⏱ QR Code expira em 30 minutos</div>
+          <div style="font-size:11px;color:#32BCAD;margin-top:4px;">✅ A liberação é automática após o pagamento</div>
+        </div>
       </div>
     </div>
 
@@ -2922,14 +2937,27 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <button class="btn btn-sm" id="mc-btn-sala" style="flex:1;background:#7b2ff7;color:#fff;border:none;" onclick="entrarSalaEspera()">
           👯 Entrar na Sala de Espera
         </button>
-        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green-dim);color:var(--green);border:1px solid var(--green);display:none;" onclick="iniciarPagamentoDupla()">
-          💳 Pagar Minha Parte
+        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green);color:#000;border:none;font-weight:700;display:none;" onclick="iniciarPagamentoDupla()">
+          💳 Cartão
+        </button>
+        <button class="btn btn-sm" id="mc-btn-pix-dupla" style="flex:1;background:#32BCAD;color:#fff;border:none;font-weight:700;display:none;" onclick="iniciarPagamentoPixDupla()">
+          🟢 Pix
         </button>
       </div>
-      <!-- Alternativa Pix -->
-      <div style="margin-top:10px;padding:10px;background:#ffffff08;border-radius:8px;font-size:12px;color:var(--text3);text-align:center;">
-        💚 Prefere Pix? Chave: <strong style="color:var(--text);font-family:var(--font-mono);">fab6cfa3-c156-42ec-8644-77a506476979</strong><br>
-        Envie o comprovante no <a href="https://wa.me/5527992389129" target="_blank" style="color:var(--green);">WhatsApp</a>
+
+      <!-- Área do QR Code Pix dupla (oculta até gerar) -->
+      <div id="mc-pix-area-dupla" style="display:none;margin-top:12px;background:#ffffff06;border:1px solid #32BCAD40;border-radius:10px;padding:16px;text-align:center;">
+        <div id="mc-pix-loading-dupla" style="color:var(--text3);font-size:13px;">⏳ Gerando QR Code...</div>
+        <div id="mc-pix-content-dupla" style="display:none;">
+          <img id="mc-pix-qr-dupla" src="" alt="QR Code Pix" style="width:200px;height:200px;border-radius:8px;background:#fff;padding:8px;margin-bottom:12px;" />
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Ou copie o código Pix abaixo:</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="mc-pix-copiacola-dupla" readonly style="flex:1;background:#0d0018;border:1px solid rgba(50,188,173,0.3);border-radius:6px;padding:8px;font-size:10px;color:#a7f3d0;font-family:var(--font-mono);" />
+            <button onclick="copiarPixColaDupla()" style="flex-shrink:0;background:#32BCAD;border:none;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px;" id="mc-pix-copy-btn-dupla">📋</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">⏱ QR Code expira em 30 minutos</div>
+          <div style="font-size:11px;color:#32BCAD;margin-top:4px;">✅ A liberação é automática após o pagamento</div>
+        </div>
       </div>
     </div>
 
@@ -6431,6 +6459,7 @@ function mostrarStatusSala(compra) {
   document.getElementById('mc-sala-status').style.display = 'block';
   document.getElementById('mc-btn-sala').style.display = 'none';
   document.getElementById('mc-btn-pagar-dupla').style.display = '';
+  document.getElementById('mc-btn-pix-dupla').style.display = '';
 
   // Mostrar código curto
   document.getElementById('mc-sala-codigo').textContent = compra.codigo || '——';
@@ -6546,6 +6575,126 @@ async function iniciarPagamento(compraId, tipo, valor) {
     ocultarLoading();
     toast('Erro no pagamento: ' + e.message, 'error');
   }
+}
+
+// ── PIX SOLO ─────────────────────────────────────────────
+async function iniciarPagamentoPixSolo() {
+  if (!state.user) { toast('Faça login para continuar', 'error'); return; }
+  const plano = mcState.plano;
+  if (!plano) return;
+
+  // Mostra área de carregamento
+  const area = document.getElementById('mc-pix-area');
+  area.style.display = 'block';
+  document.getElementById('mc-pix-loading').style.display = 'block';
+  document.getElementById('mc-pix-content').style.display = 'none';
+
+  try {
+    // Criar compra no banco (igual ao solo)
+    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo, tipo: 'solo', status: 'aguardando', slots_total: 1, slots_preenchidos: 0,
+      preco_individual: plano.preco || plano.preco_solo || 0,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    const resumosIds = mcState.plano?.resumosIds || [];
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id, user_id: state.user.id, email: state.user.email,
+      status_pagamento: 'pendente', resumos_selecionados: resumosIds,
+    });
+
+    await gerarPix(compra.id, 'solo', plano.preco || plano.preco_solo || 0, 'solo');
+    iniciarPollingStatus(compra.id);
+  } catch (e) {
+    area.style.display = 'none';
+    toast('Erro ao gerar Pix: ' + e.message, 'error');
+  }
+}
+
+// ── PIX DUPLA ─────────────────────────────────────────────
+async function iniciarPagamentoPixDupla() {
+  if (!mcState.compraId) { toast('Entre na sala de espera primeiro', 'error'); return; }
+  const preco = mcState.plano?.preco_dupla || 0;
+
+  const area = document.getElementById('mc-pix-area-dupla');
+  area.style.display = 'block';
+  document.getElementById('mc-pix-loading-dupla').style.display = 'block';
+  document.getElementById('mc-pix-content-dupla').style.display = 'none';
+
+  await gerarPix(mcState.compraId, 'dupla', preco, 'dupla');
+}
+
+// ── GERAR PIX (chama a Function do Cloudflare) ────────────
+async function gerarPix(compraId, tipo, valor, modo) {
+  try {
+    const external_reference = `${compraId}:${state.user.id}:${tipo}`;
+    const res = await fetch('/api/mp-create-pix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: valor,
+        description: mcState.plano?.nome || 'MedResúmenes',
+        payer_email: state.user.email,
+        external_reference,
+        notification_url: `${SITE_URL}/api/mp-webhook`,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.qr_code) throw new Error(data.error || 'Erro ao gerar Pix');
+
+    // Salvar payment_id no participante
+    if (data.payment_id) {
+      await SB.update('compra_participantes',
+        { mp_preference_id: String(data.payment_id) },
+        `compra_id=eq.${compraId}&user_id=eq.${state.user.id}`
+      );
+    }
+
+    const suffix = modo === 'dupla' ? '-dupla' : '';
+    document.getElementById(`mc-pix-loading${suffix}`).style.display = 'none';
+    document.getElementById(`mc-pix-content${suffix}`).style.display = 'block';
+
+    // QR Code (imagem base64)
+    if (data.qr_code_base64) {
+      document.getElementById(`mc-pix-qr${suffix}`).src = `data:image/png;base64,${data.qr_code_base64}`;
+    }
+
+    // Copia e cola
+    document.getElementById(`mc-pix-copiacola${suffix}`).value = data.qr_code;
+
+    toast('🟢 QR Code Pix gerado! Escaneie ou copie o código.', 'success');
+
+  } catch (e) {
+    const suffix = modo === 'dupla' ? '-dupla' : '';
+    const area = document.getElementById(`mc-pix-area${suffix}`);
+    if (area) area.style.display = 'none';
+    toast('Erro ao gerar Pix: ' + e.message, 'error');
+  }
+}
+
+function copiarPixCola() {
+  const val = document.getElementById('mc-pix-copiacola').value;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('mc-pix-copy-btn');
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 2000);
+    toast('Código Pix copiado!', 'success');
+  });
+}
+
+function copiarPixColaDupla() {
+  const val = document.getElementById('mc-pix-copiacola-dupla').value;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('mc-pix-copy-btn-dupla');
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 2000);
+    toast('Código Pix copiado!', 'success');
+  });
 }
 
 // ── POLLING DE STATUS ─────────────────────────────────────
