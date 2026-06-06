@@ -18,6 +18,18 @@
 export async function onRequest(context) {
   const { request, env } = context;
 
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Allow': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Signature, X-Request-Id',
+      },
+    });
+  }
+
   // Mercado Pago envia GET para verificar o endpoint — responder 200
   if (request.method === 'GET') {
     return new Response('OK', { status: 200 });
