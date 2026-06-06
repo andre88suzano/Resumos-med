@@ -6528,9 +6528,8 @@ async function iniciarPagamento(compraId, tipo, valor) {
 
     ocultarLoading();
 
-    // Redirecionar para o checkout do Mercado Pago
-    // Em ambiente de testes use sandbox_init_point; em produção use init_point
-    const checkoutUrl = data.sandbox_init_point || data.init_point;
+    // Usar sempre init_point de produção
+    const checkoutUrl = data.init_point;
     toast('Redirecionando para o Mercado Pago...', 'info');
     setTimeout(() => { window.location.href = checkoutUrl; }, 800);
 
@@ -6651,8 +6650,8 @@ async function assinarIA() {
       }),
     });
     const data = await res.json();
-    if (data.init_point || data.sandbox_init_point) {
-      window.location.href = data.sandbox_init_point || data.init_point;
+    if (data.init_point) {
+      window.location.href = data.init_point;
     } else {
       throw new Error(data.error || 'Erro');
     }
