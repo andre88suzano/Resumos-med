@@ -3253,14 +3253,17 @@ const state = {
 ───────────────────────────────────────────────────────── */
 const SB = {
   async _req(path, method='GET', body=null, headers={}) {
+    const isAuth = path.startsWith('/auth/');
     const h = {
       'apikey': state.sbKey,
       'Authorization': `Bearer ${state.sbKey}`,
       'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
+      // Prefer só para rotas de banco — auth rejeita esse header com 400
+      ...(!isAuth ? { 'Prefer': 'return=representation' } : {}),
       ...headers,
     };
-    if (state.authToken) h['Authorization'] = `Bearer ${state.authToken}`;
+    if (state.authToken && !isAuth) h['Authorization'] = `Bearer ${state.authToken}`;
+    if (state.authToken && isAuth) h['Authorization'] = `Bearer ${state.authToken}`;
     const opts = { method, headers: h };
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(`${state.sbUrl}${path}`, opts);
@@ -3349,9 +3352,12 @@ async function doLogin() {
   if (!email || !pass) { toast(currentLang==='pt'?'Preencha todos os campos.':'Completa todos los campos.','error'); return; }
   setLoading('btn-login', true);
   try {
-    const { data, ok } = await SB.signIn(email, pass);
+    const { data, ok, status } = await SB.signIn(email, pass);
     if (!ok || !data.access_token) {
-      toast(data?.error_description || data?.msg || (currentLang==='pt'?'Credenciais inválidas.':'Credenciales inválidas.'),'error');
+      const msg = status === 400
+        ? (currentLang==='pt' ? 'Email ou senha incorretos.' : 'Email o contraseña incorrectos.')
+        : (data?.error_description || data?.msg || (currentLang==='pt' ? 'Erro ao entrar. Tente novamente.' : 'Error al ingresar.'));
+      toast(msg, 'error');
       return;
     }
     state.authToken = data.access_token;
