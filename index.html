@@ -1951,13 +1951,14 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <tr>
               <th data-i18n="name">Nome</th>
               <th data-i18n="email">E-mail</th>
+              <th>🟢 Online</th>
               <th data-i18n="status">Status</th>
               <th data-i18n="role">Cargo</th>
               <th data-i18n="actions">Ações</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <tr><td colspan="5" class="text-center" style="padding:40px;color:var(--text3);"><div class="spinner" style="margin:auto;"></div></td></tr>
+            <tr><td colspan="6" class="text-center" style="padding:40px;color:var(--text3);"><div class="spinner" style="margin:auto;"></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -4605,16 +4606,36 @@ function filterUsers(f) {
 }
 
 function renderUsersTable() {
+  const agora = Date.now();
+  const cincoMin = 5 * 60 * 1000;
+
   const filtered = state.users.filter(u => {
     if (state.filterUser === 'pending')  return !u.approved && !u.is_admin;
     if (state.filterUser === 'approved') return u.approved || u.is_admin;
     return true;
   });
 
+  // Ordenar: online primeiro, depois por nome
+  filtered.sort((a, b) => {
+    const aOnline = a.last_seen && (agora - new Date(a.last_seen)) < cincoMin;
+    const bOnline = b.last_seen && (agora - new Date(b.last_seen)) < cincoMin;
+    if (aOnline && !bOnline) return -1;
+    if (!aOnline && bOnline) return 1;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+
   const tbody = document.getElementById('users-tbody');
-  if (!filtered.length) { tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding:40px;color:var(--text3);">${t('no-users-found')}</td></tr>`; return; }
+  if (!filtered.length) { tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:40px;color:var(--text3);">${t('no-users-found')}</td></tr>`; return; }
 
   tbody.innerHTML = filtered.map(u => {
+    const isOnline = u.last_seen && (agora - new Date(u.last_seen)) < cincoMin;
+    const minAtras = u.last_seen ? Math.floor((agora - new Date(u.last_seen)) / 60000) : null;
+    const onlineBadge = isOnline
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#22c55e;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 5px #22c55e;"></span>online</span>`
+      : u.last_seen
+        ? `<span style="font-size:11px;color:var(--text3);">${minAtras < 60 ? `${minAtras}min atrás` : minAtras < 1440 ? `${Math.floor(minAtras/60)}h atrás` : `${Math.floor(minAtras/1440)}d atrás`}</span>`
+        : `<span style="font-size:11px;color:var(--text3);">—</span>`;
+
     const statusBadge = u.is_admin ? `<span class="badge badge-gold">★ ${t('admin')}</span>`
       : u.approved ? `<span class="badge badge-green">✓ ${t('approved')}</span>`
       : `<span class="badge badge-gold"><span class="pending-dot"></span> ${t('pending')}</span>`;
@@ -4635,6 +4656,7 @@ function renderUsersTable() {
     return `<tr>
       <td><strong>${u.name||'—'}</strong></td>
       <td style="color:var(--text2);">${u.email}</td>
+      <td>${onlineBadge}</td>
       <td>${statusBadge}</td>
       <td>${roleBadge}</td>
       <td style="display:flex;gap:6px;flex-wrap:wrap;">${approveBtn}${roleBtn}${deleteBtn}</td>
