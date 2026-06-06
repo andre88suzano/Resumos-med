@@ -151,22 +151,12 @@ export async function onRequest(context) {
     }
 
     const novosSlots = (compra.slots_preenchidos || 0) + 1;
-    const estaCompleto = novosSlots >= compra.slots_total;
 
-    // 5. Atualizar slots_preenchidos (e status se completo)
+    // 5. Atualizar slots_preenchidos — NUNCA fechar a sala (status permanece 'aguardando')
+    // para que novos participantes possam entrar a qualquer momento.
     const compraUpdate = {
       slots_preenchidos: novosSlots,
     };
-
-    // Se o 1º pagante chegar, ativar segunda_chance (3h)
-    if (novosSlots === 1 && compra.tipo !== 'solo') {
-      const tresHoras = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
-      compraUpdate.segunda_chance_expira_em = tresHoras;
-    }
-
-    if (estaCompleto) {
-      compraUpdate.status = 'completo';
-    }
 
     const updateCompra = await fetch(
       `${sbUrl}/rest/v1/compras_coletivas?id=eq.${compra_id}`,
@@ -187,10 +177,9 @@ export async function onRequest(context) {
       console.error('Erro ao atualizar compra:', err);
     }
 
-    // 6. Se completo, liberar acesso para todos os participantes
-    if (estaCompleto) {
-      await liberarAcessoCompra(sbUrl, sbKey, compra_id);
-    }
+    // 6. Liberar acesso IMEDIATAMENTE para o participante que acabou de pagar
+    // (não espera os outros — cada um libera seu próprio acesso ao pagar)
+    await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
 
     return new Response('OK', { status: 200 });
 
@@ -202,14 +191,15 @@ export async function onRequest(context) {
 }
 
 /**
- * Libera acesso aos resumos para todos os participantes pagantes de uma compra.
- * Faz INSERT em user_access para cada (user_id, resumo_id) da compra.
+ * Libera acesso aos resumos APENAS para o participante que acabou de pagar.
+ * Cada participante libera seus próprios resumos ao pagar — sem depender dos outros.
+ * Os resumos liberados são EXATAMENTE os que ele selecionou (resumos_selecionados).
  */
-async function liberarAcessoCompra(sbUrl, sbKey, compra_id) {
+async function liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id) {
   try {
-    // Buscar todos os participantes aprovados
+    // Buscar os resumos selecionados por ESTE participante específico
     const partRes = await fetch(
-      `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&status_pagamento=eq.aprovado&select=user_id,resumos_selecionados`,
+      `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${user_id}&status_pagamento=eq.aprovado&select=user_id,resumos_selecionados`,
       {
         headers: {
           'apikey': sbKey,
@@ -219,37 +209,50 @@ async function liberarAcessoCompra(sbUrl, sbKey, compra_id) {
     );
 
     const participantes = await partRes.json();
-    if (!Array.isArray(participantes)) return;
+    if (!Array.isArray(participantes) || participantes.length === 0) {
+      console.log(`Participante ${user_id} não encontrado ou não aprovado.`);
+      return;
+    }
 
-    for (const part of participantes) {
-      const resumos = Array.isArray(part.resumos_selecionados)
-        ? part.resumos_selecionados
-        : (part.resumos_selecionados || []);
+    const part = participantes[0];
+    const resumos = Array.isArray(part.resumos_selecionados)
+      ? part.resumos_selecionados
+      : [];
 
-      if (resumos.length === 0) continue;
+    if (resumos.length === 0) {
+      console.log(`Participante ${user_id} não tem resumos selecionados.`);
+      return;
+    }
 
-      // INSERT em user_access com expiração de 50 dias
-      const now = new Date();
-      const expiresAt = new Date(now.getTime() + 50 * 86400000).toISOString();
-      const rows = resumos.map(resumo_id => ({
-        user_id: part.user_id,
-        resumo_id,
-        granted_at: now.toISOString(),
-        expires_at: expiresAt,
-      }));
+    // INSERT em user_access com expiração de 50 dias
+    // Libera APENAS os resumos que este participante escolheu — sem misturar com outros
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 50 * 86400000).toISOString();
+    const rows = resumos.map(resumo_id => ({
+      user_id: part.user_id,
+      resumo_id,
+      granted_at: now.toISOString(),
+      expires_at: expiresAt,
+    }));
 
-      await fetch(`${sbUrl}/rest/v1/user_access`, {
-        method: 'POST',
-        headers: {
-          'apikey': sbKey,
-          'Authorization': `Bearer ${sbKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=ignore-duplicates,return=minimal',
-        },
-        body: JSON.stringify(rows),
-      });
+    const insertRes = await fetch(`${sbUrl}/rest/v1/user_access`, {
+      method: 'POST',
+      headers: {
+        'apikey': sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=ignore-duplicates,return=minimal',
+      },
+      body: JSON.stringify(rows),
+    });
+
+    if (!insertRes.ok) {
+      const err = await insertRes.text();
+      console.error('Erro ao inserir user_access:', err);
+    } else {
+      console.log(`Acesso liberado para ${user_id}: ${resumos.length} resumo(s).`);
     }
   } catch (err) {
-    console.error('Erro ao liberar acesso:', err);
+    console.error('Erro ao liberar acesso do participante:', err);
   }
 }

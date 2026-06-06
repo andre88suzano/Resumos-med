@@ -6091,48 +6091,38 @@ function mcRenderizarSelecaoResumos(plano) {
   const miniResumos = todoResumos.filter(r => r.title.toLowerCase().includes('mini'));
   const resumosNormais = todoResumos.filter(r => !r.title.toLowerCase().includes('mini'));
 
-  // Extrai turma do título (ex: "3H", "3F", "2A", ... até K, qualquer ano)
+  // PAREAMENTO ROBUSTO: usa materia + semestre + parcial do banco de dados
+  // Critérios (em ordem de prioridade):
+  // 1. mesma materia (campo do banco)
+  // 2. mesmo semestre (campo do banco)
+  // 3. mesmo parcial (campo do banco)
+  // 4. turma extraída do título deve coincidir (ou ambas sem turma)
+  // Nunca mistura biofísica com histologia, ou parcial 1 com parcial 2.
+
   function extrairTurma(titulo) {
     const m = titulo.match(/\b(\d{1,2}[A-Ka-k])\b/);
     return m ? m[1].toUpperCase() : null;
   }
 
-  // Extrai números relevantes do título (ex: "1", "2", "p1", "p2")
-  function extrairNumeros(titulo) {
-    const nums = titulo.match(/\d+/g) || [];
-    return nums.map(n => n);
-  }
-
-  // Remove turma, "resumo"/"mini" para comparar o assunto base
-  function extrairAssunto(titulo) {
-    return titulo.toLowerCase()
-      .replace(/mini\s*resumen?/gi,'').replace(/resumen?/gi,'')
-      .replace(/\b\d{1,2}[A-Ka-k]\b/gi,'')
-      .replace(/[^a-z0-9]/g,' ').trim()
-      .split(/\s+/).filter(w => w.length > 1).join(' ');
-  }
-
   const pares = resumosNormais.map(r => {
-    const turmaR   = extrairTurma(r.title);
-    const assuntoR = extrairAssunto(r.title);
-    const numerosR = extrairNumeros(r.title);
+    const turmaR = extrairTurma(r.title);
 
     const mini = miniResumos.find(m => {
-      const turmaM   = extrairTurma(m.title);
-      const assuntoM = extrairAssunto(m.title);
-      const numerosM = extrairNumeros(m.title);
+      const turmaM = extrairTurma(m.title);
 
-      // 1. Turmas precisam ser iguais (null === null também funciona)
-      if (turmaR !== turmaM) return false;
+      // 1. Mesma materia (campo do banco — OBRIGATÓRIO)
+      if ((r.materia || '').toLowerCase() !== (m.materia || '').toLowerCase()) return false;
 
-      // 2. Números precisam ser iguais (parcial 1 ≠ parcial 2)
-      const numR = numerosR.join(',');
-      const numM = numerosM.join(',');
-      if (numR !== numM) return false;
+      // 2. Mesmo semestre (campo do banco — OBRIGATÓRIO)
+      if (r.semestre !== m.semestre) return false;
 
-      // 3. Assuntos precisam ter ao menos 1 palavra em comum
-      const pa = assuntoR.split(' '), pb = assuntoM.split(' ');
-      return pa.filter(w => w.length > 2 && pb.includes(w)).length >= 1;
+      // 3. Mesmo parcial (campo do banco — OBRIGATÓRIO, evita misturar P1 com P2)
+      if ((r.parcial || '') !== (m.parcial || '')) return false;
+
+      // 4. Turma: se alguma tiver turma identificada, precisam ser iguais
+      if (turmaR && turmaM && turmaR !== turmaM) return false;
+
+      return true;
     });
 
     return { resumo: r, mini: mini || null };
@@ -6283,7 +6273,7 @@ async function verificarSalaExistente() {
 
     const part = r.data[0];
     const compra = part.compras_coletivas;
-    if (!compra || compra.status !== 'aguardando') return;
+    if (!compra || compra.status === 'expirado') return; // aceita aguardando e completo
 
     // Existe sala ativa — restaurar estado
     mcState.compraId = compra.id;
@@ -6358,16 +6348,21 @@ async function usarCodigoInline(tipo) {
     const { data } = await SB.select('compras_coletivas', `codigo=eq.${codigo}&select=*`);
     const compra = Array.isArray(data) ? data[0] : null;
     if (!compra) { toast('Código inválido ou sala não encontrada.', 'error'); return; }
-    if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
+    if (compra.status === 'expirado') { toast('Esta sala expirou.', 'info'); return; }
     if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
 
-    await SB.upsert('compra_participantes', {
-      compra_id: compra.id,
-      user_id: state.user.id,
-      email: state.user.email,
-      status_pagamento: 'pendente',
-      resumos_selecionados: [],
-    });
+    // Só insere se ainda não é participante
+    const { data: jaPartic } = await SB.select('compra_participantes', `compra_id=eq.${compra.id}&user_id=eq.${state.user.id}&select=id,status_pagamento`);
+    const jaEsta = Array.isArray(jaPartic) && jaPartic.length > 0;
+    if (!jaEsta) {
+      await SB.upsert('compra_participantes', {
+        compra_id: compra.id,
+        user_id: state.user.id,
+        email: state.user.email,
+        status_pagamento: 'pendente',
+        resumos_selecionados: [],
+      });
+    }
 
     const plano = {
       nome: `Combo Dupla — código ${codigo}`,
@@ -6413,17 +6408,21 @@ async function entrarComCodigo() {
     const compra = Array.isArray(data) ? data[0] : null;
 
     if (!compra) { toast('Código inválido ou sala não encontrada.', 'error'); return; }
-    if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
+    if (compra.status === 'expirado') { toast('Esta sala expirou.', 'info'); return; }
     if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
 
-    // Registrar participante ANTES de abrir o modal de compra
-    await SB.upsert('compra_participantes', {
-      compra_id: compra.id,
-      user_id: state.user.id,
-      email: state.user.email,
-      status_pagamento: 'pendente',
-      resumos_selecionados: [],
-    });
+    // Registrar participante ANTES de abrir o modal de compra (só se ainda não está na sala)
+    const { data: jaPartic2 } = await SB.select('compra_participantes', `compra_id=eq.${compra.id}&user_id=eq.${state.user.id}&select=id`);
+    const jaEsta2 = Array.isArray(jaPartic2) && jaPartic2.length > 0;
+    if (!jaEsta2) {
+      await SB.upsert('compra_participantes', {
+        compra_id: compra.id,
+        user_id: state.user.id,
+        email: state.user.email,
+        status_pagamento: 'pendente',
+        resumos_selecionados: [],
+      });
+    }
 
     closeModal('modal-entrar-codigo');
 
@@ -6472,7 +6471,7 @@ async function entrarSalaEspera() {
       codigo,
       tipo: 'dupla',
       status: 'aguardando',
-      slots_total: 2,
+      slots_total: 9999,
       slots_preenchidos: 0,
       preco_individual: plano.preco_solo || plano.preco || 59.90,
       preco_dupla: plano.preco_dupla || 49.90,
@@ -6838,7 +6837,7 @@ async function verificarSalaPendente() {
     const { data } = await SB.select('compras_coletivas', `id=eq.${salaId}&select=*`);
     const compra = Array.isArray(data) ? data[0] : null;
     if (!compra) { toast('Sala não encontrada ou expirada.', 'error'); return; }
-    if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
+    if (compra.status === 'expirado') { toast('Esta sala expirou.', 'info'); return; }
     if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
 
     // Montar plano a partir da compra
