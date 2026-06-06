@@ -2619,7 +2619,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Dupla', preco_dupla:29.90, preco_solo:34.90, tipo:'dupla', quantidade:3 })">
                   👯 Criar Sala
                 </button>
-                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
+                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="abrirModalEntrarComCodigo()">
                   🔑 Tenho um código
                 </button>
               </div>
@@ -2668,7 +2668,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Dupla', preco_dupla:39.90, preco_solo:49.90, tipo:'dupla', quantidade:3 })">
                   👯 Criar Sala
                 </button>
-                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
+                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="abrirModalEntrarComCodigo()">
                   🔑 Tenho um código
                 </button>
               </div>
@@ -2943,7 +2943,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 </div>
 
 <!-- MODAL ENTRAR COM CÓDIGO -->
-<div id="modal-entrar-codigo" class="modal-backdrop hidden">
+<div id="modal-entrar-codigo" class="modal-backdrop hidden" style="z-index:2000;">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
       <div>
@@ -6213,8 +6213,12 @@ async function abrirModalOnline() {
 }
 
 function abrirModalEntrarComCodigo() {
-  document.getElementById('input-codigo-sala').value = '';
-  openModal('modal-entrar-codigo');
+  // Garante que modal-valores está fechado antes de abrir o próximo
+  closeModal('modal-valores');
+  setTimeout(() => {
+    document.getElementById('input-codigo-sala').value = '';
+    openModal('modal-entrar-codigo');
+  }, 100);
 }
 
 async function entrarComCodigo() {
