@@ -1807,7 +1807,23 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <div id="folder-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;"></div>
       </div>
 
-      <!-- VISÃO 3: RESUMOS DA MATÉRIA -->
+      <!-- VISÃO 3: PARCIAIS DA MATÉRIA -->
+      <div id="view-parciais" class="hidden">
+        <div class="breadcrumb" id="parciais-breadcrumb"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="parciais-icon-title" style="font-size:28px;"></span>
+            <div>
+              <h1 class="section-title" id="parciais-title" style="margin-bottom:2px;"></h1>
+              <span style="font-size:13px;color:var(--text3);" id="parciais-count"></span>
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="closeParciais()">← Voltar</button>
+        </div>
+        <div id="parciais-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;"></div>
+      </div>
+
+      <!-- VISÃO 4: RESUMOS DA MATÉRIA/PARCIAL -->
       <div id="view-folder-content" class="hidden">
         <div class="breadcrumb" id="folder-breadcrumb"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
@@ -2462,7 +2478,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <label class="form-label" data-i18n="title">Título</label>
         <input class="form-input" id="resumo-form-title" placeholder="Ex: Imunidade Inata" />
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
         <div class="form-group">
           <label class="form-label" data-i18n="subject">Matéria</label>
           <select class="form-input form-select" id="resumo-form-materia">
@@ -2472,6 +2488,16 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <option>Bioquímica</option>
             <option>Genética Médica</option>
             <option>Biofísica</option>
+            <option>Histología I</option>
+            <option>Biología</option>
+            <option>Embriología</option>
+            <option>Anatomía I</option>
+            <option>Anatomía II</option>
+            <option>Histología II</option>
+            <option>Medicina Comunitaria</option>
+            <option>Psicología en Salud</option>
+            <option>Optativa I</option>
+            <option>Seminario Integrador</option>
           </select>
         </div>
         <div class="form-group">
@@ -2483,6 +2509,14 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <option value="4">4º</option>
             <option value="5">5º</option>
             <option value="6">6º</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parcial</label>
+          <select class="form-input form-select" id="resumo-form-parcial">
+            <option value="Parcial 1">Parcial 1</option>
+            <option value="Parcial 2">Parcial 2</option>
+            <option value="Final">Final</option>
           </select>
         </div>
       </div>
@@ -4248,42 +4282,101 @@ function openSemestre(sem) {
 function closeSemestreContent() {
   document.getElementById('view-semestres').classList.remove('hidden');
   document.getElementById('view-folders').classList.add('hidden');
+  document.getElementById('view-parciais').classList.add('hidden');
   document.getElementById('view-folder-content').classList.add('hidden');
 }
 
-// NÍVEL 3: resumos da matéria
+const PARCIAIS = ['Parcial 1', 'Parcial 2', 'Final'];
+const PARCIAL_ICONS = { 'Parcial 1': '📝', 'Parcial 2': '📋', 'Final': '🏆' };
+const PARCIAL_COLORS = { 'Parcial 1': '#2d6ef7', 'Parcial 2': '#f0b429', 'Final': '#10b981' };
+
+// NÍVEL 3: parciais da matéria
 function openFolder(materia, sem) {
   document.getElementById('view-folders').classList.add('hidden');
-  document.getElementById('view-folder-content').classList.remove('hidden');
+  document.getElementById('view-parciais').classList.remove('hidden');
+  document.getElementById('view-folder-content').classList.add('hidden');
 
   const icon = MATERIA_ICONS[materia] || '📁';
   const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
   const semIcon  = SEMESTRE_ICONS[sem] || '📁';
   const resumosDaMateria = state.resumos.filter(r => r.materia === materia && (sem == null || r.semestre === sem));
 
-  document.getElementById('folder-icon-title').textContent = icon;
-  document.getElementById('folder-title').textContent = materia;
-  document.getElementById('folder-count').textContent = `${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''}`;
-  document.getElementById('folder-breadcrumb').innerHTML = `
+  document.getElementById('parciais-icon-title').textContent = icon;
+  document.getElementById('parciais-title').textContent = materia;
+  document.getElementById('parciais-count').textContent = `${resumosDaMateria.length} resumo${resumosDaMateria.length!==1?'s':''}`;
+  document.getElementById('parciais-breadcrumb').innerHTML = `
     <a onclick="closeSemestreContent()" style="cursor:pointer;">📁 Meus Resumos</a>
     <span>›</span>
     <a onclick="openSemestre(${sem})" style="cursor:pointer;">${semIcon} ${semLabel}</a>
     <span>›</span>
     <span style="color:var(--text)">${icon} ${materia}</span>`;
 
+  // Guarda contexto atual
+  state._currentMateria = materia;
+  state._currentSem = sem;
+
+  const grid = document.getElementById('parciais-grid');
+  grid.innerHTML = PARCIAIS.map(p => {
+    const resumosDoParcial = resumosDaMateria.filter(r => r.parcial === p);
+    const liberados = resumosDoParcial.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
+    const pIcon  = PARCIAL_ICONS[p];
+    const pColor = PARCIAL_COLORS[p];
+    return `
+      <div class="folder-card" onclick="openParcial('${materia}',${sem},'${p}')" style="--folder-color:${pColor};">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${pColor};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+        <div class="folder-icon">${pIcon}</div>
+        <div class="folder-name">${p}</div>
+        <div class="folder-meta">${resumosDoParcial.length} resumo${resumosDoParcial.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+            <div style="width:${resumosDoParcial.length?Math.round(liberados/resumosDoParcial.length*100):0}%;height:100%;background:${pColor};border-radius:99px;"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text3);">${resumosDoParcial.length?Math.round(liberados/resumosDoParcial.length*100):0}%</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function closeParciais() {
+  document.getElementById('view-parciais').classList.add('hidden');
+  document.getElementById('view-folders').classList.remove('hidden');
+}
+
+// NÍVEL 4: resumos de um parcial
+function openParcial(materia, sem, parcial) {
+  document.getElementById('view-parciais').classList.add('hidden');
+  document.getElementById('view-folder-content').classList.remove('hidden');
+
+  const icon = PARCIAL_ICONS[parcial] || '📁';
+  const mIcon = MATERIA_ICONS[materia] || '📁';
+  const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
+  const semIcon  = SEMESTRE_ICONS[sem] || '📁';
+  const pColor = PARCIAL_COLORS[parcial] || 'var(--accent)';
+  const resumosDoParcial = state.resumos.filter(r => r.materia === materia && r.semestre === sem && r.parcial === parcial);
+
+  document.getElementById('folder-icon-title').textContent = icon;
+  document.getElementById('folder-title').textContent = `${materia} — ${parcial}`;
+  document.getElementById('folder-count').textContent = `${resumosDoParcial.length} resumo${resumosDoParcial.length!==1?'s':''}`;
+  document.getElementById('folder-breadcrumb').innerHTML = `
+    <a onclick="closeSemestreContent()" style="cursor:pointer;">📁 Meus Resumos</a>
+    <span>›</span>
+    <a onclick="openSemestre(${sem})" style="cursor:pointer;">${semIcon} ${semLabel}</a>
+    <span>›</span>
+    <a onclick="openFolder('${materia}',${sem})" style="cursor:pointer;">${mIcon} ${materia}</a>
+    <span>›</span>
+    <span style="color:${pColor}">${icon} ${parcial}</span>`;
+
   const grid = document.getElementById('folder-resumo-grid');
-  if (!resumosDaMateria.length) {
+  if (!resumosDoParcial.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${icon}</div><h3>Nenhum resumo ainda</h3></div>`;
     return;
   }
-  grid.innerHTML = resumosDaMateria.map(r => buildResumoCard(r)).join('');
+  grid.innerHTML = resumosDoParcial.map(r => buildResumoCard(r)).join('');
 }
 
 function closeFolderContent(silent) {
-  // Volta para nível de semestre (não pula para raiz)
-  const semLink = document.getElementById('folder-breadcrumb')?.querySelector('a:nth-child(3)');
   document.getElementById('view-folder-content').classList.add('hidden');
-  document.getElementById('view-folders').classList.remove('hidden');
+  document.getElementById('view-parciais').classList.remove('hidden');
 }
 
 function buildResumoCard(r) {
@@ -4587,6 +4680,7 @@ function openEditResumo(id) {
   document.getElementById('resumo-form-content').value = r.content;
   document.getElementById('resumo-form-materia').value = r.materia;
   document.getElementById('resumo-form-semestre').value= String(r.semestre);
+  document.getElementById('resumo-form-parcial').value = r.parcial || 'Parcial 1';
   openModal('modal-resumo');
 }
 
@@ -4596,14 +4690,15 @@ async function saveResumo() {
   const content  = document.getElementById('resumo-form-content').value.trim();
   const materia  = document.getElementById('resumo-form-materia').value;
   const semestre = parseInt(document.getElementById('resumo-form-semestre').value);
+  const parcial  = document.getElementById('resumo-form-parcial').value;
   if (!title || !content) { toast(currentLang==='pt'?'Preencha título e conteúdo.':'Completa título y contenido.','error'); return; }
 
   setLoading('btn-save-resumo', true);
   try {
     if (state.editingResumoId) {
-      await SB.update('resumos', {title,description:desc,content,materia,semestre}, `id=eq.${state.editingResumoId}`);
+      await SB.update('resumos', {title,description:desc,content,materia,semestre,parcial}, `id=eq.${state.editingResumoId}`);
     } else {
-      await SB.insert('resumos', {title,description:desc,content,materia,semestre});
+      await SB.insert('resumos', {title,description:desc,content,materia,semestre,parcial});
     }
     await loadResumos();
     renderAdminResumosTable();
