@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, cpSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = process.cwd()
@@ -28,3 +28,20 @@ if (!manifest.middleware?.['/']) {
 
 // 3. Run opennextjs build skipping Next.js build
 execSync('npx opennextjs-cloudflare build --skipNextBuild', { stdio: 'inherit' })
+
+// 4. Copy .open-next output to repo root so Cloudflare Pages (build output: /) can find it
+// Cloudflare Pages looks for _worker.js at the build output root
+const openNextDir = join(root, '.open-next')
+
+// Copy worker.js → _worker.js at root
+cpSync(join(openNextDir, 'worker.js'), join(root, '_worker.js'))
+console.log('✓ Copied worker.js → _worker.js')
+
+// Copy assets (static files) to root
+const assetsDir = join(openNextDir, 'assets')
+if (existsSync(assetsDir)) {
+  cpSync(assetsDir, root, { recursive: true })
+  console.log('✓ Copied static assets to root')
+}
+
+console.log('✅ Build complete — ready for Cloudflare Pages deployment')

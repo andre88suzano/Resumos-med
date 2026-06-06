@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .netlify/
+
+# Cloudflare Pages build output
+_worker.js
+.open-next/
