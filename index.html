@@ -2577,48 +2577,31 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
         <div style="display:flex;flex-direction:column;gap:14px;">
 
-          <!-- Linha SOLO: 3 combos solo | 4 combos solo -->
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">👤 Solo (preço cheio)</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
-              <div>
-                <div class="valor-nome" style="font-size:12px;">3 combos 📖+⚡</div>
-                <div style="color:#e85d04;font-size:18px;font-weight:800;">R$ 44,90</div>
-              </div>
-              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Solo', preco:44.90, tipo:'solo', quantidade:3 })">
-                🛒 Comprar
-              </button>
+          <!-- Solo: apenas 3 combos -->
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">👤 Solo (preço cheio)</div>
+          <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div>
+              <div class="valor-nome" style="font-size:12px;">3 combos 📖+⚡</div>
+              <div style="color:#e85d04;font-size:18px;font-weight:800;">R$ 44,90</div>
             </div>
-            <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
-              <div>
-                <div class="valor-nome" style="font-size:12px;">4 combos 📖+⚡</div>
-                <div style="color:#e85d04;font-size:18px;font-weight:800;">R$ 59,90</div>
-              </div>
-              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Solo', preco:59.90, tipo:'solo', quantidade:4 })">
-                🛒 Comprar
-              </button>
-            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Solo', preco:44.90, tipo:'solo', quantidade:3 })">
+              🛒 Comprar
+            </button>
           </div>
 
-          <!-- Linha AMIGO: 3 combos amigo | 4 combos amigo -->
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:2px;">👯 Com um(a) amigo(a) (desconto)</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div class="valor-item" style="border-color:#7b2ff7;background:linear-gradient(135deg,#0f0020,#130028);flex-direction:column;align-items:flex-start;gap:8px;">
-              <div>
-                <div class="valor-nome" style="font-size:12px;">3 combos 📖+⚡</div>
-                <div style="color:#a78bfa;font-size:18px;font-weight:800;">R$ 37,90 cada</div>
-              </div>
-              <button class="btn btn-sm" style="width:100%;background:#1e0a3c;border:1px solid #7b2ff7;color:#a78bfa;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Dupla', preco_dupla:37.90, preco_solo:44.90, tipo:'dupla', quantidade:3 })">
-                👯 Entrar na Sala
-              </button>
+          <!-- Com amigo: apenas 3 combos -->
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:6px;margin-top:4px;">👯 Com um(a) amigo(a) (desconto)</div>
+          <div class="valor-item" style="border-color:#7b2ff7;background:linear-gradient(135deg,#0f0020,#130028);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div>
+              <div class="valor-nome" style="font-size:12px;">3 combos 📖+⚡</div>
+              <div style="color:#a78bfa;font-size:18px;font-weight:800;">R$ 37,90 cada</div>
             </div>
-            <div class="valor-item" style="border-color:#7b2ff7;background:linear-gradient(135deg,#0f0020,#130028);flex-direction:column;align-items:flex-start;gap:8px;">
-              <div>
-                <div class="valor-nome" style="font-size:12px;">4 combos 📖+⚡</div>
-                <div style="color:#a78bfa;font-size:18px;font-weight:800;">R$ 49,90 cada</div>
-              </div>
-              <button class="btn btn-sm" style="width:100%;background:#1e0a3c;border:1px solid #7b2ff7;color:#a78bfa;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'4 combos · Dupla', preco_dupla:49.90, preco_solo:59.90, tipo:'dupla', quantidade:4 })">
-                👯 Entrar na Sala
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;">
+              <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #7b2ff7;color:#a78bfa;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Dupla', preco_dupla:37.90, preco_solo:44.90, tipo:'dupla', quantidade:3 })">
+                👯 Criar Sala
+              </button>
+              <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
+                🔑 Tenho um código
               </button>
             </div>
           </div>
@@ -2877,6 +2860,28 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       <div style="font-size:13px;color:var(--text3);" id="mc-loading-msg">Processando...</div>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL ENTRAR COM CÓDIGO -->
+<div id="modal-entrar-codigo" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">🔑 Entrar na Sala do Amigo</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:2px;">Digite o código que seu amigo te enviou</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-entrar-codigo')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label class="form-label">Código da Sala</label>
+        <input class="form-input" id="input-codigo-sala" placeholder="Ex: AB12CD" maxlength="8"
+          style="text-transform:uppercase;font-family:var(--font-mono);font-size:1.2rem;letter-spacing:4px;text-align:center;"
+          oninput="this.value=this.value.toUpperCase()" />
+      </div>
+      <button class="btn btn-primary" onclick="entrarComCodigo()">👯 Entrar na Sala</button>
+    </div>
   </div>
 </div>
 
@@ -4142,7 +4147,7 @@ const SEMESTRE_COLORS = { 1:'#a78bfa', 2:'#fb923c', 3:'#2d6ef7', 4:'#10b981', 5:
 // Matérias fixas por semestre (exibidas mesmo sem resumos)
 const SEMESTRE_MATERIAS = {
   1: ['Histología I', 'Biología', 'Embriología', 'Anatomía I'],
-  2: ['Anatomía II', 'Histología II', 'Medicina Comunitaria', 'Psicología en Salud', 'Optativa I', 'Seminario Integrador'],
+  2: ['Anatomía II', 'Histología II', 'Medicina Comunitaria', 'Psicología en Salud'],
 };
 
 // NÍVEL 1: mostra pastas de semestres
@@ -4254,7 +4259,8 @@ function openSemestre(sem) {
     const mIcon  = MATERIA_ICONS[m]  || '📁';
     const mColor = FOLDER_COLORS[m]  || color;
     const temResumos = resumosDaMateria.length > 0;
-    if (!temResumos) {
+    const eFixa = materiasFixas.includes(m);
+    if (!temResumos && !eFixa) {
       return `
         <div class="folder-card locked-folder" style="--folder-color:${mColor};cursor:default;opacity:.7;">
           <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${mColor};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
@@ -6060,6 +6066,51 @@ async function verificarSalaExistente() {
 }
 
 // ── ENTRAR NA SALA DE ESPERA ──────────────────────────────
+function abrirModalEntrarComCodigo() {
+  document.getElementById('input-codigo-sala').value = '';
+  openModal('modal-entrar-codigo');
+}
+
+async function entrarComCodigo() {
+  const codigo = document.getElementById('input-codigo-sala').value.trim().toUpperCase();
+  if (!codigo) { toast('Digite o código da sala.', 'error'); return; }
+  if (!state.user) { toast('Faça login para continuar.', 'error'); return; }
+
+  try {
+    const { data } = await SB.select('compras_coletivas', `codigo=eq.${codigo}&select=*`);
+    const compra = Array.isArray(data) ? data[0] : null;
+    if (!compra) { toast('Código inválido ou sala não encontrada.', 'error'); return; }
+    if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
+    if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
+
+    closeModal('modal-entrar-codigo');
+
+    const plano = {
+      nome: `3 combos · Dupla (código ${codigo})`,
+      preco: compra.preco_individual,
+      preco_dupla: compra.preco_dupla,
+      preco_solo: compra.preco_individual,
+      tipo: 'dupla',
+      quantidade: 3,
+    };
+
+    abrirModalCompra(plano);
+    mcState.compraId = compra.id;
+    await SB.upsert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,
+      email: state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+    mostrarStatusSala(compra);
+    iniciarPollingStatus(compra.id);
+    toast(`🎉 Você entrou na sala! Selecione os resumos e pague R$ ${compra.preco_dupla?.toFixed(2)}.`, 'success');
+  } catch(e) {
+    toast('Erro ao entrar na sala: ' + e.message, 'error');
+  }
+}
+
 async function entrarSalaEspera() {
   if (!state.user) { toast('Faça login para continuar', 'error'); return; }
 
