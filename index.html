@@ -2873,29 +2873,9 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </div>
         <div id="mc-preco-solo" style="font-size:20px;font-weight:800;color:var(--accent);">R$ --</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
-          💳 Cartão
-        </button>
-        <button class="btn btn-sm" style="width:100%;background:#32BCAD;border:none;color:#fff;font-weight:700;" onclick="iniciarPagamentoPixSolo()">
-          🟢 Pix
-        </button>
-      </div>
-
-      <!-- Área do QR Code Pix (oculta até gerar) -->
-      <div id="mc-pix-area" style="display:none;margin-top:12px;background:var(--bg3);border:1px solid #32BCAD40;border-radius:10px;padding:16px;text-align:center;">
-        <div id="mc-pix-loading" style="color:var(--text3);font-size:13px;">⏳ Gerando QR Code...</div>
-        <div id="mc-pix-content" style="display:none;">
-          <img id="mc-pix-qr" src="" alt="QR Code Pix" style="width:200px;height:200px;border-radius:8px;background:#fff;padding:8px;margin-bottom:12px;" />
-          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Ou copie o código Pix abaixo:</div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <input id="mc-pix-copiacola" readonly style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:10px;color:var(--text2);font-family:var(--font-mono);" />
-            <button onclick="copiarPixCola()" style="flex-shrink:0;background:#32BCAD;border:none;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px;" id="mc-pix-copy-btn">📋</button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:8px;">⏱ QR Code expira em 30 minutos</div>
-          <div style="font-size:11px;color:#32BCAD;margin-top:4px;">✅ A liberação é automática após o pagamento</div>
-        </div>
-      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
+        💳 Pagar Agora
+      </button>
     </div>
 
     <!-- Opção Dupla -->
@@ -2937,27 +2917,9 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <button class="btn btn-sm" id="mc-btn-sala" style="flex:1;background:#7b2ff7;color:#fff;border:none;" onclick="entrarSalaEspera()">
           👯 Entrar na Sala de Espera
         </button>
-        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green);color:#000;border:none;font-weight:700;display:none;" onclick="iniciarPagamentoDupla()">
-          💳 Cartão
+        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green-dim);color:var(--green);border:1px solid var(--green);display:none;" onclick="iniciarPagamentoDupla()">
+          💳 Pagar Minha Parte
         </button>
-        <button class="btn btn-sm" id="mc-btn-pix-dupla" style="flex:1;background:#32BCAD;color:#fff;border:none;font-weight:700;display:none;" onclick="iniciarPagamentoPixDupla()">
-          🟢 Pix
-        </button>
-      </div>
-
-      <!-- Área do QR Code Pix dupla (oculta até gerar) -->
-      <div id="mc-pix-area-dupla" style="display:none;margin-top:12px;background:#ffffff06;border:1px solid #32BCAD40;border-radius:10px;padding:16px;text-align:center;">
-        <div id="mc-pix-loading-dupla" style="color:var(--text3);font-size:13px;">⏳ Gerando QR Code...</div>
-        <div id="mc-pix-content-dupla" style="display:none;">
-          <img id="mc-pix-qr-dupla" src="" alt="QR Code Pix" style="width:200px;height:200px;border-radius:8px;background:#fff;padding:8px;margin-bottom:12px;" />
-          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Ou copie o código Pix abaixo:</div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <input id="mc-pix-copiacola-dupla" readonly style="flex:1;background:#0d0018;border:1px solid rgba(50,188,173,0.3);border-radius:6px;padding:8px;font-size:10px;color:#a7f3d0;font-family:var(--font-mono);" />
-            <button onclick="copiarPixColaDupla()" style="flex-shrink:0;background:#32BCAD;border:none;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px;" id="mc-pix-copy-btn-dupla">📋</button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:8px;">⏱ QR Code expira em 30 minutos</div>
-          <div style="font-size:11px;color:#32BCAD;margin-top:4px;">✅ A liberação é automática após o pagamento</div>
-        </div>
       </div>
     </div>
 
@@ -6459,7 +6421,6 @@ function mostrarStatusSala(compra) {
   document.getElementById('mc-sala-status').style.display = 'block';
   document.getElementById('mc-btn-sala').style.display = 'none';
   document.getElementById('mc-btn-pagar-dupla').style.display = '';
-  document.getElementById('mc-btn-pix-dupla').style.display = '';
 
   // Mostrar código curto
   document.getElementById('mc-sala-codigo').textContent = compra.codigo || '——';
