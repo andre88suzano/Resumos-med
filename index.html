@@ -6612,8 +6612,17 @@ async function iniciarPagamentoSolo() {
 async function iniciarPagamentoDupla() {
   if (!mcState.compraId) { toast('Entre na sala de espera primeiro', 'error'); return; }
   mostrarLoading('Preparando pagamento...');
-  const preco = mcState.plano?.preco_dupla || 49.90;
-  await iniciarPagamento(mcState.compraId, 'dupla', preco);
+
+  // Buscar o preço diretamente do banco para garantir valor correto
+  try {
+    const { data } = await SB.select('compras_coletivas', `id=eq.${mcState.compraId}&select=preco_dupla,preco_individual`);
+    const compra = Array.isArray(data) ? data[0] : null;
+    const preco = compra?.preco_dupla || mcState.plano?.preco_dupla || 49.90;
+    await iniciarPagamento(mcState.compraId, 'dupla', preco);
+  } catch(e) {
+    ocultarLoading();
+    toast('Erro ao buscar preço: ' + e.message, 'error');
+  }
 }
 
 // ── INICIAR PAGAMENTO (chama a Function do Cloudflare) ────
