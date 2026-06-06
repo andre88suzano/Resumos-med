@@ -169,6 +169,7 @@
   .badge-gold   { background: var(--gold-dim); color: var(--gold); border: 1px solid #f0b42940; }
   .badge-red    { background: var(--red-dim); color: var(--red); border: 1px solid #f0525240; }
   .badge-green  { background: var(--green-dim); color: var(--green); border: 1px solid #10b98140; }
+  .badge-orange { background: #fb923c20; color: #fb923c; border: 1px solid #fb923c40; }
   .badge-gray   { background: #ffffff0d; color: var(--text3); border: 1px solid var(--border); }
 
   /* ─── TOAST ─────────────────────────────────────────── */
@@ -3581,12 +3582,6 @@ async function deleteAtualizacao(id) {
   await loadAtualizacoes();
 }
 
-async function deleteAtualizacao(id) {
-  await SB.delete('atualizacoes', `id=eq.${id}`);
-  toast('Removido.','info');
-  await loadAtualizacoes();
-}
-
 /* ─────────────────────────────────────────────────────────
    FEEDBACKS
    Armazenados na tabela resumos com materia='_feedback_'
@@ -4711,7 +4706,7 @@ function renderUsersTable() {
 
     const statusBadge = u.is_admin ? `<span class="badge badge-gold">★ ${t('admin')}</span>`
       : u.approved ? `<span class="badge badge-green">✓ ${t('approved')}</span>`
-      : `<span class="badge badge-gold"><span class="pending-dot"></span> ${t('pending')}</span>`;
+      : `<span class="badge badge-orange"><span class="pending-dot"></span> ${t('pending')}</span>`;
 
     const roleBadge = u.is_admin ? `<span class="badge badge-gold">${t('admin')}</span>` : `<span class="badge badge-blue">${t('student')}</span>`;
 
@@ -6538,125 +6533,6 @@ async function iniciarPagamento(compraId, tipo, valor) {
   }
 }
 
-// ── PIX SOLO ─────────────────────────────────────────────
-async function iniciarPagamentoPixSolo() {
-  if (!state.user) { toast('Faça login para continuar', 'error'); return; }
-  const plano = mcState.plano;
-  if (!plano) return;
-
-  // Mostra área de carregamento
-  const area = document.getElementById('mc-pix-area');
-  area.style.display = 'block';
-  document.getElementById('mc-pix-loading').style.display = 'block';
-  document.getElementById('mc-pix-content').style.display = 'none';
-
-  try {
-    // Criar compra no banco (igual ao solo)
-    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const rCompra = await SB.insert('compras_coletivas', {
-      codigo, tipo: 'solo', status: 'aguardando', slots_total: 1, slots_preenchidos: 0,
-      preco_individual: plano.preco || plano.preco_solo || 0,
-      criador_user_id: state.user.id,
-      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    });
-    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
-    if (!compra?.id) throw new Error('Falha ao criar compra');
-
-    const resumosIds = mcState.plano?.resumosIds || [];
-    await SB.insert('compra_participantes', {
-      compra_id: compra.id, user_id: state.user.id, email: state.user.email,
-      status_pagamento: 'pendente', resumos_selecionados: resumosIds,
-    });
-
-    await gerarPix(compra.id, 'solo', plano.preco || plano.preco_solo || 0, 'solo');
-    iniciarPollingStatus(compra.id);
-  } catch (e) {
-    area.style.display = 'none';
-    toast('Erro ao gerar Pix: ' + e.message, 'error');
-  }
-}
-
-// ── PIX DUPLA ─────────────────────────────────────────────
-async function iniciarPagamentoPixDupla() {
-  if (!mcState.compraId) { toast('Entre na sala de espera primeiro', 'error'); return; }
-  const preco = mcState.plano?.preco_dupla || 0;
-
-  const area = document.getElementById('mc-pix-area-dupla');
-  area.style.display = 'block';
-  document.getElementById('mc-pix-loading-dupla').style.display = 'block';
-  document.getElementById('mc-pix-content-dupla').style.display = 'none';
-
-  await gerarPix(mcState.compraId, 'dupla', preco, 'dupla');
-}
-
-// ── GERAR PIX (chama a Function do Cloudflare) ────────────
-async function gerarPix(compraId, tipo, valor, modo) {
-  try {
-    const external_reference = `${compraId}:${state.user.id}:${tipo}`;
-    const res = await fetch('/api/mp-create-pix', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: valor,
-        description: mcState.plano?.nome || 'MedResúmenes',
-        payer_email: state.user.email,
-        external_reference,
-        notification_url: `${SITE_URL}/api/mp-webhook`,
-      }),
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data.qr_code) throw new Error(data.error || 'Erro ao gerar Pix');
-
-    // Salvar payment_id no participante
-    if (data.payment_id) {
-      await SB.update('compra_participantes',
-        { mp_preference_id: String(data.payment_id) },
-        `compra_id=eq.${compraId}&user_id=eq.${state.user.id}`
-      );
-    }
-
-    const suffix = modo === 'dupla' ? '-dupla' : '';
-    document.getElementById(`mc-pix-loading${suffix}`).style.display = 'none';
-    document.getElementById(`mc-pix-content${suffix}`).style.display = 'block';
-
-    // QR Code (imagem base64)
-    if (data.qr_code_base64) {
-      document.getElementById(`mc-pix-qr${suffix}`).src = `data:image/png;base64,${data.qr_code_base64}`;
-    }
-
-    // Copia e cola
-    document.getElementById(`mc-pix-copiacola${suffix}`).value = data.qr_code;
-
-    toast('🟢 QR Code Pix gerado! Escaneie ou copie o código.', 'success');
-
-  } catch (e) {
-    const suffix = modo === 'dupla' ? '-dupla' : '';
-    const area = document.getElementById(`mc-pix-area${suffix}`);
-    if (area) area.style.display = 'none';
-    toast('Erro ao gerar Pix: ' + e.message, 'error');
-  }
-}
-
-function copiarPixCola() {
-  const val = document.getElementById('mc-pix-copiacola').value;
-  navigator.clipboard.writeText(val).then(() => {
-    const btn = document.getElementById('mc-pix-copy-btn');
-    btn.textContent = '✅';
-    setTimeout(() => btn.textContent = '📋', 2000);
-    toast('Código Pix copiado!', 'success');
-  });
-}
-
-function copiarPixColaDupla() {
-  const val = document.getElementById('mc-pix-copiacola-dupla').value;
-  navigator.clipboard.writeText(val).then(() => {
-    const btn = document.getElementById('mc-pix-copy-btn-dupla');
-    btn.textContent = '✅';
-    setTimeout(() => btn.textContent = '📋', 2000);
-    toast('Código Pix copiado!', 'success');
-  });
-}
 
 // ── POLLING DE STATUS ─────────────────────────────────────
 function iniciarPollingStatus(compraId) {
@@ -6820,9 +6696,8 @@ function ocultarLoading() {
     window.history.replaceState({}, '', window.location.pathname);
   } else if (statusPag === 'pendente') {
     // Pix: pagamento iniciado, aguardando confirmação do banco
-    toast('🟢 Pix gerado! Pague no seu banco e o acesso será liberado automaticamente.', 'info');
+    toast('⏳ Pagamento pendente. O acesso será liberado automaticamente após a confirmação.', 'info');
     window.history.replaceState({}, '', window.location.pathname);
-    // Recarrega após 10s para verificar se o pagamento foi confirmado
     setTimeout(() => location.reload(), 10000);
   }
 
@@ -6863,7 +6738,8 @@ async function verificarSalaPendente() {
       compra_id: compra.id,
       user_id: state.user.id,
       email: state.user.email,
-      status_pagamento: 'pendente'
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
     });
     mostrarStatusSala(compra);
     iniciarPollingStatus(compra.id);

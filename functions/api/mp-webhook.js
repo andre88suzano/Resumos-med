@@ -66,8 +66,18 @@ export async function onRequest(context) {
     const payment = await payRes.json();
 
     if (payment.status !== 'approved') {
-      // Pagamento não aprovado — registrar mas não processar
       console.log(`Pagamento ${paymentId} com status: ${payment.status}`);
+      return new Response('OK', { status: 200 });
+    }
+
+    // Idempotência — verificar se este payment_id já foi processado
+    const checkRes = await fetch(
+      `${sbUrl}/rest/v1/compra_participantes?mp_payment_id=eq.${String(paymentId)}&status_pagamento=eq.aprovado&select=user_id`,
+      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+    );
+    const already = await checkRes.json();
+    if (Array.isArray(already) && already.length > 0) {
+      console.log(`Pagamento ${paymentId} já processado — ignorando reenvio.`);
       return new Response('OK', { status: 200 });
     }
 
