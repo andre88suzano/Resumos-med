@@ -2823,14 +2823,21 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
       <!-- Status sala -->
       <div id="mc-sala-status" style="display:none;margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid rgba(123,47,247,0.35);">
-        <!-- Link de convite -->
+        <!-- Código + Link de convite -->
         <div style="background:#1a0030;padding:12px 14px;">
-          <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:6px;">🔗 ENVIE ESTE LINK PARA SEU AMIGO</div>
+          <!-- Código curto (principal) -->
+          <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:6px;">🔑 CÓDIGO DA SALA — envie para seu amigo</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
+            <div id="mc-sala-codigo" style="flex:1;background:#0d0018;border:2px solid #7b2ff7;border-radius:6px;padding:10px;font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#c4b5fd;text-align:center;letter-spacing:6px;"></div>
+            <button onclick="copiarCodigoSala()" id="mc-copy-codigo-btn" style="flex-shrink:0;padding:10px 14px;background:#7b2ff7;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copiar</button>
+          </div>
+          <!-- Link alternativo -->
+          <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:4px;">🔗 OU ENVIE O LINK</div>
           <div style="display:flex;gap:6px;align-items:center;">
             <div id="mc-sala-link" style="flex:1;background:#0d0018;border:1px solid rgba(123,47,247,0.3);border-radius:6px;padding:7px 10px;font-family:var(--font-mono);font-size:11px;color:#c4b5fd;word-break:break-all;"></div>
-            <button onclick="copiarLinkSala()" style="flex-shrink:0;padding:7px 12px;background:#7b2ff7;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;" id="mc-copy-btn">📋 Copiar</button>
+            <button onclick="copiarLinkSala()" style="flex-shrink:0;padding:7px 12px;background:#3d1a6e;border:none;border-radius:6px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;" id="mc-copy-btn">📋</button>
           </div>
-          <div style="font-size:11px;color:#7c6b8a;margin-top:5px;">O amigo abre o link, clica em "Entrar na Sala" e paga R$ 49,90.</div>
+          <div style="font-size:11px;color:#7c6b8a;margin-top:6px;">Seu amigo usa o código ou o link para entrar e pagar a parte dele.</div>
         </div>
         <!-- Status da sala -->
         <div style="background:#130020;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
@@ -6165,6 +6172,15 @@ async function entrarSalaEspera() {
 }
 
 // ── COPIAR LINK DA SALA ───────────────────────────────────
+function copiarCodigoSala() {
+  const codigo = document.getElementById('mc-sala-codigo').textContent;
+  navigator.clipboard.writeText(codigo).then(() => {
+    const btn = document.getElementById('mc-copy-codigo-btn');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
 function copiarLinkSala() {
   const link = document.getElementById('mc-sala-link').textContent;
   navigator.clipboard.writeText(link).then(() => {
@@ -6181,6 +6197,9 @@ function mostrarStatusSala(compra) {
   document.getElementById('mc-sala-status').style.display = 'block';
   document.getElementById('mc-btn-sala').style.display = 'none';
   document.getElementById('mc-btn-pagar-dupla').style.display = '';
+
+  // Mostrar código curto
+  document.getElementById('mc-sala-codigo').textContent = compra.codigo || '——';
 
   // Gerar link de convite
   const link = `${SITE_URL}/?sala=${compra.id}`;
