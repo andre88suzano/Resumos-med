@@ -1528,6 +1528,18 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <button class="btn-auth-submit" id="btn-login" onclick="doLogin()">
           <span data-i18n="enter">Entrar</span>
         </button>
+
+        <!-- Painel de outro dispositivo (aparece no lugar do botão quando detectado) -->
+        <div id="outro-dispositivo-panel" style="display:none;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.4);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:8px;">⚠️</div>
+          <div style="font-size:14px;font-weight:700;color:#fb923c;margin-bottom:6px;">Conta aberta em outro dispositivo</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;">Deseja desconectar o outro dispositivo e entrar aqui?</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="cancelarEntrarAqui()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:13px;">Cancelar</button>
+            <button onclick="confirmarEntrarAqui()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#fb923c;color:#fff;cursor:pointer;font-size:13px;font-weight:700;">✅ Entrar aqui</button>
+          </div>
+        </div>
+
         <div class="auth-footer">
           <span data-i18n="no-account">Não tem conta?</span>
           <span class="auth-link" onclick="switchAuthTab('register')" data-i18n="register-here"> Cadastre-se</span>
@@ -3371,11 +3383,11 @@ async function doLogin() {
       if (profile && !profile.is_admin && profile.active_token) {
         const localToken = localStorage.getItem('med_device_token');
         if (localToken !== profile.active_token) {
-          // Guardar dados para uso no modal
           window._pendingLoginData = { accessToken: data.access_token, user: data.user };
           setLoading('btn-login', false);
-          // Mostrar modal dedicado (não usa openConfirm)
-          document.getElementById('modal-outro-dispositivo').classList.remove('hidden');
+          // Mostra painel direto na tela de login (sem modal separado)
+          document.getElementById('btn-login').style.display = 'none';
+          document.getElementById('outro-dispositivo-panel').style.display = 'block';
           return;
         }
       }
@@ -3405,8 +3417,15 @@ async function activateDevice(userId) {
   } catch(_) { /* ignora erros de rede */ }
 }
 
-async function confirmarEntrarAqui() {
+function resetOutroDispositivoPanel() {
+  document.getElementById('outro-dispositivo-panel').style.display = 'none';
+  document.getElementById('btn-login').style.display = '';
+  // Mantém o modal antigo compatível
   document.getElementById('modal-outro-dispositivo').classList.add('hidden');
+}
+
+async function confirmarEntrarAqui() {
+  resetOutroDispositivoPanel();
   const { accessToken, user } = window._pendingLoginData || {};
   if (!accessToken || !user) return;
   window._pendingLoginData = null;
@@ -3418,8 +3437,7 @@ async function confirmarEntrarAqui() {
 }
 
 function cancelarEntrarAqui() {
-  // Limpa estado parcial para não deixar usuário preso
-  document.getElementById('modal-outro-dispositivo').classList.add('hidden');
+  resetOutroDispositivoPanel();
   state.authToken = null;
   state.user = null;
   window._pendingLoginData = null;
