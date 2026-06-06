@@ -1729,11 +1729,11 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <!-- COLUNA DIREITA: Card Resumos Liberados + Cards Admin -->
         <div style="flex:0 1 200px;display:flex;flex-direction:column;gap:14px;min-width:160px;">
 
-          <!-- Card: Resumos liberados (todos) -->
-          <div class="stat-card teal" style="flex:1;">
-            <div class="stat-icon">✅</div>
+          <!-- Card: Resumos liberados / Online agora (admin) -->
+          <div class="stat-card teal" id="card-my-access" style="flex:1;" onclick="if(document.getElementById('card-my-access').dataset.admin==='1') abrirModalOnline()">
+            <div class="stat-icon" id="stat-my-access-icon">✅</div>
             <div class="stat-value" id="stat-my-access">—</div>
-            <div class="stat-label">Resumos liberados</div>
+            <div class="stat-label" id="stat-my-access-label">Resumos liberados</div>
           </div>
 
           <!-- Cards admin -->
@@ -4017,12 +4017,12 @@ function renderDashboard() {
 
   // Card teal — "Resumos liberados" para usuários, "Online agora" para admin
   if (isAdmin) {
-    const cardOnline = document.querySelector('#stat-my-access').closest('.stat-card');
-    cardOnline.querySelector('.stat-icon').textContent = '🟢';
+    const cardOnline = document.getElementById('card-my-access');
+    cardOnline.dataset.admin = '1';
     cardOnline.style.cursor = 'pointer';
-    cardOnline.onclick = () => abrirModalOnline();
+    document.getElementById('stat-my-access-icon').textContent = '🟢';
     document.getElementById('stat-my-access').textContent = '…';
-    document.querySelector('#stat-my-access + .stat-label').textContent = 'Online agora';
+    document.getElementById('stat-my-access-label').textContent = 'Online agora';
     // Contar sessões ativas nos últimos 5 min (excluindo admins)
     (async () => {
       try {
