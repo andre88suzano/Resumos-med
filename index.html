@@ -2858,6 +2858,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
   </div>
 </div>
 
+<!-- MODAL ONLINE AGORA -->
+<div id="modal-online" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">🟢 Online agora</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:2px;">Usuários ativos nos últimos 5 minutos</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-online')">✕</button>
+    </div>
+    <div id="modal-online-lista" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;">
+      <div style="text-align:center;color:var(--text3);padding:24px;">Carregando...</div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL ENTRAR COM CÓDIGO -->
 <div id="modal-entrar-codigo" class="modal-backdrop hidden">
   <div class="modal" style="max-width:400px;">
@@ -4001,15 +4017,18 @@ function renderDashboard() {
 
   // Card teal — "Resumos liberados" para usuários, "Online agora" para admin
   if (isAdmin) {
-    document.querySelector('#stat-my-access').closest('.stat-card').querySelector('.stat-icon').textContent = '🟢';
+    const cardOnline = document.querySelector('#stat-my-access').closest('.stat-card');
+    cardOnline.querySelector('.stat-icon').textContent = '🟢';
+    cardOnline.style.cursor = 'pointer';
+    cardOnline.onclick = () => abrirModalOnline();
     document.getElementById('stat-my-access').textContent = '…';
     document.querySelector('#stat-my-access + .stat-label').textContent = 'Online agora';
-    // Contar sessões ativas nos últimos 5 min via Supabase
+    // Contar sessões ativas nos últimos 5 min (excluindo admins)
     (async () => {
       try {
         const cinco = new Date(Date.now() - 5 * 60 * 1000).toISOString();
         const res = await fetch(
-          `${state.sbUrl}/rest/v1/approved_users?last_seen=gte.${cinco}&select=user_id`,
+          `${state.sbUrl}/rest/v1/approved_users?last_seen=gte.${cinco}&is_admin=eq.false&select=user_id`,
           { headers: { apikey: state.sbKey, Authorization: `Bearer ${state.sbKey}` } }
         );
         const rows = res.ok ? await res.json() : [];
@@ -6061,6 +6080,42 @@ async function verificarSalaExistente() {
 }
 
 // ── ENTRAR NA SALA DE ESPERA ──────────────────────────────
+async function abrirModalOnline() {
+  openModal('modal-online');
+  const lista = document.getElementById('modal-online-lista');
+  lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;">Carregando...</div>';
+
+  try {
+    const cinco = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const res = await fetch(
+      `${state.sbUrl}/rest/v1/approved_users?last_seen=gte.${cinco}&is_admin=eq.false&select=name,email,last_seen&order=last_seen.desc`,
+      { headers: { apikey: state.sbKey, Authorization: `Bearer ${state.sbKey}` } }
+    );
+    const rows = res.ok ? await res.json() : [];
+
+    if (!rows.length) {
+      lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;">Nenhum usuário online no momento.</div>';
+      return;
+    }
+
+    lista.innerHTML = rows.map(u => {
+      const minAtras = Math.floor((Date.now() - new Date(u.last_seen)) / 60000);
+      const tempo = minAtras === 0 ? 'agora mesmo' : `há ${minAtras} min`;
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);">
+          <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 6px #22c55e88;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:var(--text);font-size:14px;">${u.name || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);">${u.email}</div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);white-space:nowrap;">${tempo}</div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    lista.innerHTML = '<div style="text-align:center;color:var(--red);padding:24px;">Erro ao carregar.</div>';
+  }
+}
+
 function abrirModalEntrarComCodigo() {
   document.getElementById('input-codigo-sala').value = '';
   openModal('modal-entrar-codigo');
