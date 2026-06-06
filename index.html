@@ -2576,38 +2576,105 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
 
-          <!-- Solo: apenas 3 combos -->
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">👤 Solo (preço cheio)</div>
-          <div class="valor-item" style="border-color:#e85d04;background:linear-gradient(135deg,#1a0f00,#1f1200);flex-direction:column;align-items:flex-start;gap:8px;">
-            <div>
-              <div class="valor-nome" style="font-size:13px;font-weight:800;color:#e85d04;">Upgrade Individual — Ritmo Acelerado</div>
-              <div style="color:#e85d04;font-size:18px;font-weight:800;margin:4px 0;">R$ 54,90</div>
-              <div style="font-size:11px;color:var(--text3);line-height:1.5;">Tenha acesso imediato a <strong style="color:#fff;">3 combos completos</strong> de resumos e garanta todo o conteúdo que você precisa para decolar nos estudos. Sem depender de ninguém, compre e comece a estudar agora mesmo!</div>
+          <!-- ── COMBO NORMAL ── -->
+          <div style="border:1px solid #e85d04;border-radius:12px;overflow:hidden;">
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#1a0f00,#2a1500);padding:14px 16px;border-bottom:1px solid #e85d0440;">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                <div>
+                  <div style="font-size:13px;font-weight:800;color:#e85d04;">📦 Combo Normal</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">3 Resumos Completos · Valor real: <s style="color:var(--text3);">R$ 45,00</s></div>
+                </div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:12px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Solo', preco:54.90, tipo:'solo', quantidade:3 })">
-              🛒 Garanta Seu Acesso por R$ 54,90
-            </button>
+            <!-- Opções -->
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(135deg,#120a00,#1a0f00);">
+              <!-- Solo -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#fff;">👤 Solo</div>
+                  <div style="font-size:11px;color:var(--text3);">Economia de <strong style="color:#22c55e;">R$ 10,10</strong></div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:20px;font-weight:800;color:#e85d04;">R$ 34,90</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:12px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Solo', preco:34.90, tipo:'solo', quantidade:3 })">
+                🛒 Comprar Solo — R$ 34,90
+              </button>
+              <div style="height:1px;background:#e85d0430;"></div>
+              <!-- Dupla -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#a78bfa;">👯 Com Amigo</div>
+                  <div style="font-size:11px;color:var(--text3);">O preço que faz fechar na hora!</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 29,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Dupla', preco_dupla:29.90, preco_solo:34.90, tipo:'dupla', quantidade:3 })">
+                  👯 Criar Sala
+                </button>
+                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
+                  🔑 Tenho um código
+                </button>
+              </div>
+            </div>
           </div>
 
-          <!-- Com amigo: apenas 3 combos -->
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:6px;margin-top:4px;">👯 Com um(a) amigo(a) (desconto)</div>
-          <div class="valor-item" style="border-color:#7b2ff7;background:linear-gradient(135deg,#0f0020,#130028);flex-direction:column;align-items:flex-start;gap:8px;">
-            <div>
-              <div class="valor-nome" style="font-size:13px;font-weight:800;color:#a78bfa;">Combo Duplo — Estudar Junto Custa Menos!</div>
-              <div style="color:#a78bfa;font-size:18px;font-weight:800;margin:4px 0;">R$ 47,90 cada</div>
-              <div style="font-size:11px;color:var(--text3);line-height:1.5;">Chame um colega de turma e economize! Ao criar uma sala ou usar um código de convite, cada um de vocês garante os <strong style="color:#fff;">3 combos completos</strong> com um super desconto.</div>
+          <!-- ── COMBO PREMIUM ── -->
+          <div style="border:1px solid #10b981;border-radius:12px;overflow:hidden;">
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#001a10,#002a18);padding:14px 16px;border-bottom:1px solid #10b98140;">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+                <div>
+                  <div style="font-size:13px;font-weight:800;color:#10b981;">🚀 Combo Premium</div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:2px;">3 Resumos + 3 Mini Resumos de Corredor · Valor real: <s style="color:var(--text3);">R$ 60,00</s></div>
+                </div>
+                <span style="background:#10b98120;color:#10b981;border:1px solid #10b98140;border-radius:20px;font-size:10px;font-weight:700;padding:2px 10px;letter-spacing:.05em;">MAIS POPULAR</span>
+              </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;">
-              <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'3 combos · Dupla', preco_dupla:47.90, preco_solo:54.90, tipo:'dupla', quantidade:3 })">
-                👯 Economize Já — Criar Sala
+            <!-- Opções -->
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(135deg,#001208,#001a10);">
+              <!-- Solo -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#fff;">👤 Solo</div>
+                  <div style="font-size:11px;color:var(--text3);">Abaixo dos <strong style="color:#10b981;">R$ 50,00</strong> — barreira psicológica!</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:20px;font-weight:800;color:#10b981;">R$ 49,90</div>
+                </div>
+              </div>
+              <button class="btn btn-sm" style="width:100%;background:#10b981;border:none;color:#fff;font-size:12px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Solo', preco:49.90, tipo:'solo', quantidade:3 })">
+                🚀 Comprar Premium — R$ 49,90
               </button>
-              <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
-                🔑 Tenho um código
-              </button>
+              <div style="height:1px;background:#10b98130;"></div>
+              <!-- Dupla -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#a78bfa;">👯 Com Amigo</div>
+                  <div style="font-size:11px;color:var(--text3);">Só R$ 10 a mais que o Normal para levar o mini resumo!</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 39,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Dupla', preco_dupla:39.90, preco_solo:49.90, tipo:'dupla', quantidade:3 })">
+                  👯 Criar Sala
+                </button>
+                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="closeModal('modal-valores');abrirModalEntrarComCodigo()">
+                  🔑 Tenho um código
+                </button>
+              </div>
             </div>
           </div>
+
           <div style="background:#1e0a3c;border-radius:8px;padding:8px 12px;font-size:12px;color:#a78bfa;font-weight:600;text-align:center;">
             💜 Quanto mais amigos, mais economia para todo mundo!
           </div>
