@@ -4105,6 +4105,12 @@ const SEMESTRE_LABELS = {
 const SEMESTRE_ICONS = { 1:'📓', 2:'📒', 3:'📘', 4:'📗', 5:'📙', 6:'📕' };
 const SEMESTRE_COLORS = { 1:'#a78bfa', 2:'#fb923c', 3:'#2d6ef7', 4:'#10b981', 5:'#f0b429', 6:'#f05252' };
 
+// Matérias fixas por semestre (exibidas mesmo sem resumos)
+const SEMESTRE_MATERIAS = {
+  1: ['Histología I', 'Biología', 'Embriología', 'Anatomía I'],
+  2: ['Anatomía II', 'Histología II', 'Medicina Comunitaria', 'Psicología en Salud', 'Optativa I', 'Seminario Integrador'],
+};
+
 // NÍVEL 1: mostra pastas de semestres
 function renderResumos() {
   // Volta tudo para visão inicial
@@ -4136,14 +4142,25 @@ function renderResumos() {
       const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
       const label = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
       if (resumosSem.length === 0) {
-        // Semestre sem resumos: mostra bloqueado com "Em breve"
+        const materiasFixas = SEMESTRE_MATERIAS[sem];
+        if (materiasFixas) {
+          // Semestre com matérias fixas: clicável mas mostra "em breve" dentro
+          return `
+            <div class="folder-card" onclick="openSemestre(${sem})" style="--folder-color:${color};">
+              <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+              <div class="folder-icon">${icon}</div>
+              <div class="folder-name">${label}</div>
+              <div class="folder-meta">${materiasFixas.length} matéria${materiasFixas.length!==1?'s':''} · Em breve</div>
+              <div style="margin-top:6px;font-size:11px;color:${color};font-weight:600;">⏳ Em breve</div>
+            </div>`;
+        }
+        // Semestre sem matérias fixas: bloqueado
         return `
           <div class="folder-card locked-folder" style="--folder-color:${color};cursor:default;opacity:.7;">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
             <div class="folder-icon" style="filter:grayscale(.5);">${icon}</div>
             <div class="folder-name">${label}</div>
             <div class="folder-meta" style="color:var(--text3);">Em breve</div>
-            <div style="margin-top:6px;font-size:11px;color:${color};font-weight:600;">⏳ Em breve</div>
           </div>`;
       }
       return `
@@ -4185,7 +4202,10 @@ function openSemestre(sem) {
   const icon  = SEMESTRE_ICONS[sem] || '📁';
   const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
   const resumosSem = state.resumos.filter(r => r.semestre === sem);
-  const materias   = [...new Set(resumosSem.map(r => r.materia))].sort();
+  const materiasComResumos = [...new Set(resumosSem.map(r => r.materia))];
+  const materiasFixas = SEMESTRE_MATERIAS[sem] || [];
+  // Une matérias fixas com as que têm resumos (sem duplicatas)
+  const materias = [...new Set([...materiasFixas, ...materiasComResumos])];
 
   document.getElementById('semestre-icon-title').textContent = icon;
   document.getElementById('semestre-title').textContent = label;
@@ -4201,6 +4221,16 @@ function openSemestre(sem) {
     const liberados = resumosDaMateria.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
     const mIcon  = MATERIA_ICONS[m]  || '📁';
     const mColor = FOLDER_COLORS[m]  || color;
+    const temResumos = resumosDaMateria.length > 0;
+    if (!temResumos) {
+      return `
+        <div class="folder-card locked-folder" style="--folder-color:${mColor};cursor:default;opacity:.7;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${mColor};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+          <div class="folder-icon" style="filter:grayscale(.4);">${mIcon}</div>
+          <div class="folder-name">${m}</div>
+          <div class="folder-meta" style="color:var(--text3);">Em breve</div>
+        </div>`;
+    }
     return `
       <div class="folder-card" onclick="openFolder('${m}',${sem})" style="--folder-color:${mColor};">
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${mColor};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
