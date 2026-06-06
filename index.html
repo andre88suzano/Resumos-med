@@ -3047,7 +3047,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       Deseja desconectá-lo e entrar aqui?
     </p>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('modal-outro-dispositivo').classList.add('hidden')">
+      <button class="btn btn-ghost" style="flex:1;" onclick="cancelarEntrarAqui()">
         Cancelar
       </button>
       <button class="btn btn-primary" style="flex:1;" onclick="confirmarEntrarAqui()">
@@ -3386,9 +3386,17 @@ async function activateDevice(userId) {
   try {
     const token = genToken();
     localStorage.setItem('med_device_token', token);
-    await SB.update('approved_users', { active_token: token }, `user_id=eq.${userId}`);
     state.deviceToken = token;
-  } catch(_) { /* ignora falhas de RLS */ }
+    // Usa a Cloudflare Function com service role para bypassar RLS
+    await fetch('/api/device-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.authToken}`,
+      },
+      body: JSON.stringify({ user_id: userId, token }),
+    });
+  } catch(_) { /* ignora erros de rede */ }
 }
 
 async function confirmarEntrarAqui() {
@@ -3401,6 +3409,14 @@ async function confirmarEntrarAqui() {
   await activateDevice(user.id);
   localStorage.setItem('med_session', JSON.stringify({ token: accessToken, user }));
   await loadUserProfile();
+}
+
+function cancelarEntrarAqui() {
+  // Limpa estado parcial para não deixar usuário preso
+  document.getElementById('modal-outro-dispositivo').classList.add('hidden');
+  state.authToken = null;
+  state.user = null;
+  window._pendingLoginData = null;
 }
 
 function showForceLoginModal(accessToken, user) {
