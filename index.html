@@ -2116,7 +2116,35 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     ══════════════════════════════════════════════ -->
     <div class="page hidden" id="page-admin-vendas">
       <h1 class="section-title">💰 Financeiro</h1>
-      <p class="section-sub" style="margin-bottom:28px;">Acompanhe as vendas e o desempenho financeiro.</p>
+      <p class="section-sub" style="margin-bottom:16px;">Acompanhe as vendas e o desempenho financeiro.</p>
+
+      <!-- 🧪 PAINEL DE TESTE (só admin) -->
+      <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:18px 20px;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:18px;">🧪</span>
+          <div>
+            <div style="font-weight:700;color:#a855f7;font-size:14px;">Modo Teste — Mercado Pago Sandbox</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Simule um pagamento real sem cobrar ninguém. Use os cartões de teste do MP.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Valor (R$)</label>
+            <input id="test-valor" type="number" value="1.00" min="0.01" step="0.01" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Descrição</label>
+            <input id="test-desc" type="text" value="Teste de Pagamento" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+        </div>
+        <button onclick="iniciarPagamentoTeste()" style="width:100%;padding:10px;background:#7b2ff7;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
+          🧪 Iniciar Pagamento de Teste (Sandbox)
+        </button>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;">
+          <strong style="color:#a855f7;">Cartão de teste aprovado:</strong> 5031 7557 3453 0604 · CVV: 123 · Venc: 11/25 · Nome: APRO<br>
+          <strong style="color:#e57373;">Cartão recusado:</strong> Use nome: OTHE
+        </div>
+      </div>
 
       <!-- Cards de resumo -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;">
@@ -3995,6 +4023,37 @@ function renderCurrentPage() {
 /* ─────────────────────────────────────────────────────────
    FINANCEIRO / VENDAS
 ───────────────────────────────────────────────────────── */
+async function iniciarPagamentoTeste() {
+  if (!state.profile?.is_admin) { toast('Apenas admins podem usar o modo teste.', 'error'); return; }
+  const valor = parseFloat(document.getElementById('test-valor').value) || 1.00;
+  const desc  = document.getElementById('test-desc').value.trim() || 'Teste de Pagamento';
+
+  toast('🧪 Criando preferência de teste...', 'info');
+
+  try {
+    const res = await fetch('/api/mp-create-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{ title: desc, quantity: 1, unit_price: valor, currency_id: 'BRL' }],
+        payer_email: state.user.email,
+        external_reference: `teste:${state.user.id}:admin`,
+        notification_url: `${SITE_URL}/api/mp-webhook`,
+        test_mode: true,   // ← usa token sandbox
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao criar preferência');
+
+    // Abre o checkout sandbox numa nova aba para não perder o painel admin
+    window.open(data.sandbox_init_point || data.init_point, '_blank');
+    toast('✅ Checkout de teste aberto! Use o cartão: 5031 7557 3453 0604', 'success');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
 async function carregarVendas() {
   const sbUrl = state.sbUrl;
   const sbKey = state.sbKey;

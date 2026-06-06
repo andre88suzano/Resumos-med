@@ -51,9 +51,8 @@ export async function onRequest(context) {
     });
   }
 
-  // Verificar token do Mercado Pago
-  const mpToken = env.MP_ACCESS_TOKEN;
-  if (!mpToken) {
+  // Verificar token base
+  if (!env.MP_ACCESS_TOKEN) {
     return new Response(JSON.stringify({ error: 'MP_ACCESS_TOKEN não configurado' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
@@ -70,7 +69,12 @@ export async function onRequest(context) {
     });
   }
 
-  const { items, payer_email, external_reference, notification_url } = body;
+  const { items, payer_email, external_reference, notification_url, test_mode } = body;
+
+  // Modo teste: usa token sandbox (só aceito se vier com flag explícita)
+  const mpToken = test_mode && env.MP_ACCESS_TOKEN_TEST
+    ? env.MP_ACCESS_TOKEN_TEST
+    : env.MP_ACCESS_TOKEN;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return new Response(JSON.stringify({ error: 'items é obrigatório' }), {
