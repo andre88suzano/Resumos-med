@@ -2367,6 +2367,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     <div class="dr-timer-controls">
       <button class="dr-t-btn primary" id="dr-t-start"  onclick="drTimerToggle()">▶ Iniciar</button>
       <button class="dr-t-btn"         id="dr-t-skip"   onclick="drTimerSkip()">⏭ Pular</button>
+      <button class="dr-t-btn"         id="dr-t-save"   onclick="drTimerSalvar()" style="display:none;background:rgba(16,185,129,.15);color:#10b981;border-color:rgba(16,185,129,.3);">⏹ Salvar</button>
       <button class="dr-t-btn danger"  id="dr-t-reset"  onclick="drTimerReset()">↺ Reset</button>
     </div>
     <div class="dr-session-log">
@@ -5595,6 +5596,8 @@ function drTimerToggle() {
     drTimerState = 'running';
     document.getElementById('dr-t-start').textContent = '⏸ Pausar';
     if (drTimerMode === 'pure') {
+      document.getElementById('dr-t-save').style.display = '';
+      document.getElementById('dr-t-skip').style.display = 'none';
       drInterval = setInterval(() => { drPureElapsed++; drUpdateClockDisplay(drPureElapsed, true); drSetRing(Math.min(drPureElapsed/3600, 1), false); }, 1000);
     } else {
       drInterval = setInterval(drPomoClock, 1000);
@@ -5604,6 +5607,20 @@ function drTimerToggle() {
     clearInterval(drInterval);
     document.getElementById('dr-t-start').textContent = '▶ Continuar';
   }
+}
+
+function drTimerSalvar() {
+  if (drPureElapsed < 5) { toast('Tempo muito curto para salvar.', 'info'); return; }
+  clearInterval(drInterval);
+  drTimerState = 'idle';
+  drLogSession();
+  drPureElapsed = 0;
+  document.getElementById('dr-t-start').textContent = '▶ Iniciar';
+  document.getElementById('dr-t-save').style.display = 'none';
+  document.getElementById('dr-t-skip').style.display = '';
+  drUpdateClockDisplay(0, true);
+  drSetRing(0, false);
+  toast('✅ Sessão salva com sucesso!', 'success');
 }
 
 function drPomoClock() {
@@ -5635,6 +5652,8 @@ function drTimerReset() {
   clearInterval(drInterval); drTimerState = 'idle';
   drPomoPhase = 'study'; drPomoCount = 0; drPureElapsed = 0;
   document.getElementById('dr-t-start').textContent = '▶ Iniciar';
+  document.getElementById('dr-t-save').style.display = 'none';
+  document.getElementById('dr-t-skip').style.display = '';
   drResetToPhase('study');
 }
 
