@@ -4095,13 +4095,15 @@ const FOLDER_COLORS = {
 };
 
 const SEMESTRE_LABELS = {
+  1: '1º Semestre',
+  2: '2º Semestre',
   3: '3º Semestre',
   4: '4º Semestre',
   5: '5º Semestre',
   6: '6º Semestre',
 };
-const SEMESTRE_ICONS = { 3:'📘', 4:'📗', 5:'📙', 6:'📕' };
-const SEMESTRE_COLORS = { 3:'#2d6ef7', 4:'#10b981', 5:'#f0b429', 6:'#f05252' };
+const SEMESTRE_ICONS = { 1:'📓', 2:'📒', 3:'📘', 4:'📗', 5:'📙', 6:'📕' };
+const SEMESTRE_COLORS = { 1:'#a78bfa', 2:'#fb923c', 3:'#2d6ef7', 4:'#10b981', 5:'#f0b429', 6:'#f05252' };
 
 // NÍVEL 1: mostra pastas de semestres
 function renderResumos() {
@@ -4110,34 +4112,67 @@ function renderResumos() {
   document.getElementById('view-folders').classList.add('hidden');
   document.getElementById('view-folder-content').classList.add('hidden');
 
-  const semestres = [...new Set(state.resumos.map(r => r.semestre))].sort((a,b)=>a-b);
+  const semestresComResumos = [...new Set(state.resumos.map(r => r.semestre))].sort((a,b)=>a-b);
+  // Sempre mostra 1º, 2º e os semestres que têm resumos; 4º aparece como "Em breve"
+  const semestresVisiveis = [...new Set([1, 2, ...semestresComResumos])].sort((a,b)=>a-b);
   const grid = document.getElementById('semestre-grid');
 
-  if (!semestres.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><h3>${t('no-resumos-found')}</h3></div>`;
-    return;
+  // Calcular countdown até 01/ago/2026
+  function getCountdownAgosto() {
+    const target = new Date('2026-08-01T00:00:00');
+    const diff = target - new Date();
+    if (diff <= 0) return null;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return `${d}d ${h}h ${m}m`;
   }
 
-  grid.innerHTML = semestres.map(sem => {
-    const resumosSem = state.resumos.filter(r => r.semestre === sem);
-    const liberados  = resumosSem.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
-    const icon  = SEMESTRE_ICONS[sem]  || '📁';
-    const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
-    const label = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
-    return `
-      <div class="folder-card" onclick="openSemestre(${sem})" style="--folder-color:${color};">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
-        <div class="folder-icon">${icon}</div>
-        <div class="folder-name">${label}</div>
-        <div class="folder-meta">${resumosSem.length} resumo${resumosSem.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
-            <div style="width:${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%;height:100%;background:${color};border-radius:99px;"></div>
+  grid.innerHTML = [
+    ...semestresVisiveis.map(sem => {
+      const resumosSem = state.resumos.filter(r => r.semestre === sem);
+      const liberados  = resumosSem.filter(r => state.profile.is_admin || state.myAccess.includes(r.id)).length;
+      const icon  = SEMESTRE_ICONS[sem]  || '📁';
+      const color = SEMESTRE_COLORS[sem] || 'var(--accent)';
+      const label = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
+      if (resumosSem.length === 0) {
+        // Semestre sem resumos: mostra bloqueado com "Em breve"
+        return `
+          <div class="folder-card locked-folder" style="--folder-color:${color};cursor:default;opacity:.7;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+            <div class="folder-icon" style="filter:grayscale(.5);">${icon}</div>
+            <div class="folder-name">${label}</div>
+            <div class="folder-meta" style="color:var(--text3);">Em breve</div>
+            <div style="margin-top:6px;font-size:11px;color:${color};font-weight:600;">⏳ Em breve</div>
+          </div>`;
+      }
+      return `
+        <div class="folder-card" onclick="openSemestre(${sem})" style="--folder-color:${color};">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+          <div class="folder-icon">${icon}</div>
+          <div class="folder-name">${label}</div>
+          <div class="folder-meta">${resumosSem.length} resumo${resumosSem.length!==1?'s':''} · ${liberados} liberado${liberados!==1?'s':''}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+            <div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+              <div style="width:${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%;height:100%;background:${color};border-radius:99px;"></div>
+            </div>
+            <span style="font-size:11px;color:var(--text3);">${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%</span>
           </div>
-          <span style="font-size:11px;color:var(--text3);">${resumosSem.length?Math.round(liberados/resumosSem.length*100):0}%</span>
-        </div>
-      </div>`;
-  }).join('');
+        </div>`;
+    }),
+    // Card fixo do 4º semestre com timer até agosto (só aparece se 4º não tem resumos ainda)
+    !semestresComResumos.includes(4) ? (() => {
+      const countdown = getCountdownAgosto();
+      return `
+        <div class="folder-card locked-folder" style="--folder-color:#10b981;cursor:default;opacity:.85;border-color:rgba(16,185,129,.3);">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+          <div class="folder-icon">📗</div>
+          <div class="folder-name">4º Semestre</div>
+          <div class="folder-meta" style="color:#10b981;">Em breve · Agosto 2026</div>
+          ${countdown ? `<div style="margin-top:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#10b981;font-weight:700;font-family:var(--font-mono);">⏳ ${countdown}</div>` : ''}
+        </div>`;
+    })() : '',
+  ].join('');
 }
 
 // NÍVEL 2: mostra matérias do semestre
