@@ -2615,14 +2615,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 29,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
                 </div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Dupla', preco_dupla:29.90, preco_solo:34.90, tipo:'dupla', quantidade:3 })">
-                  👯 Criar Sala
-                </button>
-                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="abrirModalEntrarComCodigo()">
-                  🔑 Tenho um código
-                </button>
+              <button class="btn btn-sm" style="width:100%;background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Dupla', preco_dupla:29.90, preco_solo:34.90, tipo:'dupla', quantidade:3 })">
+                👯 Criar Sala
+              </button>
+              <!-- Campo de código inline -->
+              <div id="codigo-inline-normal" style="display:none;margin-top:4px;">
+                <div style="display:flex;gap:6px;">
+                  <input id="input-codigo-normal" class="form-input" placeholder="Digite o código" maxlength="8"
+                    style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:13px;letter-spacing:3px;text-transform:uppercase;"
+                    oninput="this.value=this.value.toUpperCase()"
+                    onkeydown="if(event.key==='Enter') usarCodigoInline('normal')" />
+                  <button class="btn btn-sm" style="background:#a78bfa;border:none;color:#fff;font-weight:700;white-space:nowrap;" onclick="usarCodigoInline('normal')">Entrar</button>
+                </div>
               </div>
+              <button class="btn btn-sm" style="background:transparent;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="toggleCodigoInline('normal')">
+                🔑 Tenho um código
+              </button>
             </div>
           </div>
 
@@ -2664,14 +2672,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 39,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
                 </div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                <button class="btn btn-sm" style="background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Dupla', preco_dupla:39.90, preco_solo:49.90, tipo:'dupla', quantidade:3 })">
-                  👯 Criar Sala
-                </button>
-                <button class="btn btn-sm" style="background:#1e0a3c;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="abrirModalEntrarComCodigo()">
-                  🔑 Tenho um código
-                </button>
+              <button class="btn btn-sm" style="width:100%;background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Dupla', preco_dupla:39.90, preco_solo:49.90, tipo:'dupla', quantidade:3 })">
+                👯 Criar Sala
+              </button>
+              <!-- Campo de código inline -->
+              <div id="codigo-inline-premium" style="display:none;margin-top:4px;">
+                <div style="display:flex;gap:6px;">
+                  <input id="input-codigo-premium" class="form-input" placeholder="Digite o código" maxlength="8"
+                    style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:13px;letter-spacing:3px;text-transform:uppercase;"
+                    oninput="this.value=this.value.toUpperCase()"
+                    onkeydown="if(event.key==='Enter') usarCodigoInline('premium')" />
+                  <button class="btn btn-sm" style="background:#10b981;border:none;color:#fff;font-weight:700;white-space:nowrap;" onclick="usarCodigoInline('premium')">Entrar</button>
+                </div>
               </div>
+              <button class="btn btn-sm" style="background:transparent;border:1px solid #a78bfa;color:#c4b5fd;font-size:11px;" onclick="toggleCodigoInline('premium')">
+                🔑 Tenho um código
+              </button>
             </div>
           </div>
 
@@ -6209,6 +6225,57 @@ async function abrirModalOnline() {
     }).join('');
   } catch(e) {
     lista.innerHTML = '<div style="text-align:center;color:var(--red);padding:24px;">Erro ao carregar.</div>';
+  }
+}
+
+function toggleCodigoInline(tipo) {
+  const el = document.getElementById(`codigo-inline-${tipo}`);
+  const input = document.getElementById(`input-codigo-${tipo}`);
+  const visible = el.style.display !== 'none';
+  el.style.display = visible ? 'none' : 'block';
+  if (!visible && input) setTimeout(() => input.focus(), 50);
+}
+
+async function usarCodigoInline(tipo) {
+  const input = document.getElementById(`input-codigo-${tipo}`);
+  const codigo = input.value.trim().toUpperCase();
+  if (!codigo) { toast('Digite o código da sala.', 'error'); return; }
+  if (!state.user) { toast('Faça login para continuar.', 'error'); return; }
+
+  try {
+    const { data } = await SB.select('compras_coletivas', `codigo=eq.${codigo}&select=*`);
+    const compra = Array.isArray(data) ? data[0] : null;
+    if (!compra) { toast('Código inválido ou sala não encontrada.', 'error'); return; }
+    if (compra.status !== 'aguardando') { toast('Esta sala já foi fechada ou expirou.', 'info'); return; }
+    if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
+
+    await SB.upsert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,
+      email: state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+
+    const plano = {
+      nome: `Combo Dupla — código ${codigo}`,
+      preco: compra.preco_individual,
+      preco_dupla: compra.preco_dupla,
+      preco_solo: compra.preco_individual,
+      tipo: 'dupla',
+      quantidade: 3,
+    };
+
+    closeModal('modal-valores');
+    setTimeout(() => {
+      abrirModalCompra(plano);
+      mcState.compraId = compra.id;
+      mostrarStatusSala(compra);
+      iniciarPollingStatus(compra.id);
+      toast(`✅ Selecione os resumos e pague R$ ${compra.preco_dupla?.toFixed(2).replace('.',',')}!`, 'success');
+    }, 150);
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
   }
 }
 
