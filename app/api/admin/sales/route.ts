@@ -57,26 +57,22 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(50),
     admin.from('compra_participantes')
-      .select('id, email, valor_pago, mp_payment_id, pago_em, compra_id, compras_coletivas(codigo, preco_individual, preco_dupla, tipo)')
+      .select('id, email, valor_pago, mp_payment_id, pago_em, compra_id')
       .eq('status_pagamento', 'aprovado')
       .order('pago_em', { ascending: false })
       .limit(50),
   ])
 
-  // Normalizar compra_participantes para o mesmo formato de Sale
-  type CompraColetiva = { codigo: string; preco_individual: number; preco_dupla: number | null; tipo: string }
-  type CompraRow = {
-    id: string
-    email: string
-    valor_pago: number | null
-    mp_payment_id: string | null
-    pago_em: string
-    compra_id: string
-    compras_coletivas: CompraColetiva | CompraColetiva[] | null
-  }
+  // Buscar compras_coletivas separadamente para evitar join sem FK
+  const compraIds = [...new Set((compraParticipantes ?? []).map(cp => cp.compra_id).filter(Boolean))]
+  const { data: comprasColetivas } = compraIds.length > 0
+    ? await admin.from('compras_coletivas').select('id, codigo, preco_individual, preco_dupla, tipo').in('id', compraIds)
+    : { data: [] }
 
-  const salesFromCompras = ((compraParticipantes ?? []) as unknown as CompraRow[]).map(cp => {
-    const compra = Array.isArray(cp.compras_coletivas) ? cp.compras_coletivas[0] : cp.compras_coletivas
+  const comprasMap = new Map((comprasColetivas ?? []).map(c => [c.id, c]))
+
+  const salesFromCompras = (compraParticipantes ?? []).map(cp => {
+    const compra = comprasMap.get(cp.compra_id)
     const amount = cp.valor_pago ?? compra?.preco_individual ?? 0
     return {
       id: cp.id,
