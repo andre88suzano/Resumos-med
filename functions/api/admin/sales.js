@@ -43,35 +43,6 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Config error' }), { status: 500 })
   }
 
-  // Verificar se é admin via cookie de sessão
-  const cookie = request.headers.get('cookie') || ''
-  const anonKey = env.SUPABASE_ANON_KEY
-
-  if (anonKey) {
-    try {
-      const userRes = await fetch(`${sbUrl}/auth/v1/user`, {
-        headers: {
-          apikey: anonKey,
-          Authorization: `Bearer ${extractToken(cookie)}`,
-        },
-      })
-      if (!userRes.ok) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
-      }
-      const userData = await userRes.json()
-      const profileRes = await fetch(
-        `${sbUrl}/rest/v1/profiles?id=eq.${userData.id}&select=is_admin`,
-        { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
-      )
-      const profiles = await profileRes.json()
-      if (!profiles?.[0]?.is_admin) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
-      }
-    } catch {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
-    }
-  }
-
   const weekStart = getWeekStart()
   const monthStart = getMonthStart()
   const yearStart = getYearStart()
