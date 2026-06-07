@@ -6872,18 +6872,21 @@ async function verificarSalaPendente() {
     if (compra.status === 'expirado') { toast('Esta sala expirou.', 'info'); return; }
     if (compra.criador_user_id === state.user.id) { toast('Você já é o criador desta sala!', 'info'); return; }
 
-    // Montar plano a partir da compra
+    // Usar preços fixos do site para o joiner
+    const preco_dupla = compra.preco_dupla && compra.preco_dupla > 0 ? compra.preco_dupla : 39.90;
     const plano = {
-      nome: compra.codigo,
-      preco: compra.preco_individual,
-      preco_dupla: compra.preco_dupla,
-      preco_solo: compra.preco_individual,
-      tipo: 'dupla'
+      nome: `Sala — código ${compra.codigo}`,
+      preco: preco_dupla,
+      preco_dupla: preco_dupla,
+      preco_solo: compra.preco_individual || 49.90,
+      tipo: 'dupla',
+      quantidade: 3,
     };
 
     abrirModalCompra(plano);
-    // Pré-entrar na sala como segundo participante
+    // Pré-entrar na sala como participante
     mcState.compraId = compra.id;
+    mcState.isJoiner = true; // vai direto para pagamento após selecionar resumos
     await SB.upsert('compra_participantes', {
       compra_id: compra.id,
       user_id: state.user.id,
@@ -6891,9 +6894,7 @@ async function verificarSalaPendente() {
       status_pagamento: 'pendente',
       resumos_selecionados: [],
     });
-    mostrarStatusSala(compra);
-    iniciarPollingStatus(compra.id);
-    toast(`🎉 Você entrou na sala! Pague R$ ${compra.preco_dupla?.toFixed(2) || compra.preco_individual?.toFixed(2)} para confirmar.`, 'success');
+    toast(`🎉 Selecione seus resumos e pague R$ ${preco_dupla.toFixed(2).replace('.',',')} para confirmar.`, 'success');
   } catch (e) {
     toast('Erro ao entrar na sala: ' + e.message, 'error');
   }
