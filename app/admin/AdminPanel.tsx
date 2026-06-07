@@ -53,8 +53,15 @@ export default function AdminPanel({ users: initialUsers, resumos: initialResumo
     setSalesLoading(true)
     fetch('/api/admin/sales')
       .then(r => r.json())
-      .then(d => { setSalesData(d); setSalesLoading(false) })
-      .catch(() => setSalesLoading(false))
+      .then(d => {
+        console.log('[admin/sales] response:', JSON.stringify(d).slice(0, 300))
+        setSalesData(d)
+        setSalesLoading(false)
+      })
+      .catch(err => {
+        console.error('[admin/sales] error:', err)
+        setSalesLoading(false)
+      })
   }
 
   useEffect(() => {
