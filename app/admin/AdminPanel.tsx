@@ -463,25 +463,31 @@ export default function AdminPanel({ users: initialUsers, resumos: initialResumo
                 ) : (
                   <div style={{ marginBottom: '40px' }}>
                     {/* Cabeçalho */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr .8fr .8fr .6fr', gap: '8px', padding: '8px 16px', color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.7rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                      <span>Cliente</span><span>Descrição</span><span>Valor</span><span>ID MP</span><span>Data</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr .7fr .7fr .7fr .55fr', gap: '8px', padding: '8px 16px', color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.7rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                      <span>Cliente</span><span>Descrição</span><span>Bruto</span><span>Líquido (−1%)</span><span>ID MP</span><span>Data</span>
                     </div>
-                    {salesData.sales.map(s => (
-                      <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr .8fr .8fr .6fr', gap: '8px', padding: '14px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '10px', marginBottom: '8px', alignItems: 'center' }}>
+                    {salesData.sales.map(s => {
+                      const gross = Number(s.amount)
+                      const net = gross * 0.99
+                      return (
+                      <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr .7fr .7fr .7fr .55fr', gap: '8px', padding: '14px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '10px', marginBottom: '8px', alignItems: 'center' }}>
                         <div>
                           <div style={{ color: '#fff', fontFamily: 'Georgia, serif', fontSize: '.95rem' }}>{s.name ?? '—'}</div>
                           <div style={{ color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.78rem', marginTop: '2px' }}>{s.email}</div>
                         </div>
                         <div style={{ color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.82rem' }}>{s.description ?? '—'}</div>
+                        <div style={{ color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.88rem' }}>
+                          R$ {gross.toFixed(2).replace('.', ',')}
+                        </div>
                         <div style={{ color: 'var(--accent3)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.9rem', fontWeight: 600 }}>
-                          R$ {Number(s.amount).toFixed(2).replace('.', ',')}
+                          R$ {net.toFixed(2).replace('.', ',')}
                         </div>
                         <div style={{ color: 'var(--accent1)', fontFamily: 'monospace', fontSize: '.78rem' }}>{s.mp_payment_id ?? '—'}</div>
                         <div style={{ color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.78rem' }}>
                           {new Date(s.created_at).toLocaleDateString('pt-BR')}
                         </div>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 )}
 
