@@ -69,7 +69,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { items, payer_email, external_reference, notification_url, test_mode } = body;
+  const { items, payer_email, external_reference, notification_url, test_mode, metodo } = body;
 
   // Modo teste: usa token sandbox (só aceito se vier com flag explícita)
   const mpToken = test_mode && env.MP_ACCESS_TOKEN_TEST
@@ -83,12 +83,32 @@ export async function onRequest(context) {
     });
   }
 
+  // metodo: 'pix' → unit_price = valor original, exclui cartão/débito
+  //         'cartao' → unit_price = valor/0.95, exclui PIX (bank_transfer)
+  //         undefined/outro → comportamento anterior (cartão com desconto PIX)
+  const isPix = metodo === 'pix';
+  const isCartao = metodo === 'cartao';
+
+  const toCardPrice = (v) => Math.round((parseFloat(v) / 0.95) * 100) / 100;
+
+  const getUnitPrice = (v) => {
+    if (isPix) return parseFloat(v);          // PIX: preço original
+    return toCardPrice(v);                    // cartão ou fallback: preço com taxa
+  };
+
+  // Tipos excluídos conforme método escolhido
+  const excludedTypes = isPix
+    ? [{ id: 'credit_card' }, { id: 'debit_card' }, { id: 'ticket' }]  // só PIX
+    : isCartao
+      ? [{ id: 'bank_transfer' }]                                        // só cartão/débito
+      : [];                                                              // fallback: todos
+
   // Montar payload para o Mercado Pago
   const mpPayload = {
     items: items.map(item => ({
       title: item.title || 'MedResúmenes',
       quantity: item.quantity || 1,
-      unit_price: parseFloat(item.unit_price),
+      unit_price: getUnitPrice(item.unit_price),
       currency_id: item.currency_id || 'BRL',
     })),
     payer: payer_email ? { email: payer_email } : undefined,
@@ -104,10 +124,9 @@ export async function onRequest(context) {
     // binary_mode false: permite status pendente (Pix aguardando confirmação)
     binary_mode: false,
     statement_descriptor: 'MedResumenes',
-    // Garantir que todos os métodos estejam habilitados incluindo Pix
     payment_methods: {
-      excluded_payment_types: [],
-      installments: 12,
+      excluded_payment_types: excludedTypes,
+      installments: isCartao ? 12 : 1,
     },
   };
 

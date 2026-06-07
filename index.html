@@ -2641,11 +2641,12 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:11px;color:var(--text3);">3 Resumos Completos</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;">
-                  <div style="font-size:20px;font-weight:800;color:#e85d04;">R$ 34,90</div>
+                  <div style="font-size:20px;font-weight:800;color:#e85d04;">R$ 34,90 <span style="font-size:11px;font-weight:400;color:var(--text3);">no PIX</span></div>
+                  <div style="font-size:11px;color:var(--text3);">ou R$ 36,74 no cartão</div>
                 </div>
               </div>
               <button class="btn btn-primary btn-sm" style="width:100%;background:#e85d04;border:none;font-size:12px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Solo', preco:34.90, tipo:'solo', quantidade:3 })">
-                🛒 Comprar Solo — R$ 34,90
+                🛒 Comprar Solo — R$ 34,90 no PIX
               </button>
               <div style="height:1px;background:#e85d0430;"></div>
               <!-- Dupla -->
@@ -2655,7 +2656,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:11px;color:var(--text3);">3 Resumos Completos em dupla</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;">
-                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 29,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
+                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 29,90 <span style="font-size:11px;font-weight:400;">cada no PIX</span></div>
+                  <div style="font-size:11px;color:var(--text3);">ou R$ 31,47 no cartão</div>
                 </div>
               </div>
               <button class="btn btn-sm" style="width:100%;background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Normal · Dupla', preco_dupla:29.90, preco_solo:34.90, tipo:'dupla', quantidade:3 })">
@@ -2698,11 +2700,12 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:11px;color:var(--text3);">3 Resumos + 3 Mini Resumos</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;">
-                  <div style="font-size:20px;font-weight:800;color:#10b981;">R$ 49,90</div>
+                  <div style="font-size:20px;font-weight:800;color:#10b981;">R$ 49,90 <span style="font-size:11px;font-weight:400;color:var(--text3);">no PIX</span></div>
+                  <div style="font-size:11px;color:var(--text3);">ou R$ 52,53 no cartão</div>
                 </div>
               </div>
               <button class="btn btn-sm" style="width:100%;background:#10b981;border:none;color:#fff;font-size:12px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Solo', preco:49.90, tipo:'solo', quantidade:3 })">
-                🚀 Comprar Premium — R$ 49,90
+                🚀 Comprar Premium — R$ 49,90 no PIX
               </button>
               <div style="height:1px;background:#10b98130;"></div>
               <!-- Dupla -->
@@ -2712,7 +2715,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   <div style="font-size:11px;color:var(--text3);">3 Resumos + 3 Mini Resumos em dupla</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;">
-                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 39,90 <span style="font-size:11px;font-weight:400;">cada</span></div>
+                  <div style="font-size:20px;font-weight:800;color:#a78bfa;">R$ 39,90 <span style="font-size:11px;font-weight:400;">cada no PIX</span></div>
+                  <div style="font-size:11px;color:var(--text3);">ou R$ 42,00 no cartão</div>
                 </div>
               </div>
               <button class="btn btn-sm" style="width:100%;background:#7b2ff7;border:none;color:#fff;font-size:11px;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Premium · Dupla', preco_dupla:39.90, preco_solo:49.90, tipo:'dupla', quantidade:3 })">
@@ -2751,9 +2755,12 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
-              <div class="valor-preco">R$ 15,00</div>
+              <div style="text-align:right;">
+                <div class="valor-preco">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 15,79 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, tipo:'solo' })">🛒 Comprar — R$ 15,00 no PIX</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
@@ -2765,9 +2772,12 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                   Material ultra-compacto com apenas os tópicos mais importantes — perfeito para aquela última checada rápida antes de entrar na sala de prova.
                 </div>
               </div>
-              <div class="valor-preco" style="color:var(--teal);">R$ 20,00</div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 20,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 21,05 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, tipo:'solo' })">🛒 Comprar — R$ 20,00 no PIX</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
@@ -2775,17 +2785,23 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
-              <div class="valor-preco">R$ 18,00</div>
+              <div style="text-align:right;">
+                <div class="valor-preco">R$ 18,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 18,95 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual (Final)', preco:18.00, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual (Final)', preco:18.00, tipo:'solo' })">🛒 Comprar — R$ 18,00 no PIX</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div></div>
-              <div class="valor-preco" style="color:var(--teal);">R$ 25,00</div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 25,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 26,32 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo (Final)', preco:25.00, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo (Final)', preco:25.00, tipo:'solo' })">🛒 Comprar — R$ 25,00 no PIX</button>
           </div>
 
         </div>
@@ -2800,32 +2816,44 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <div class="valor-item" style="flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 Pacote Resumos (Parcial)</div>
-              <div class="valor-preco">R$ 54,90</div>
+              <div style="text-align:right;">
+                <div class="valor-preco">R$ 54,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 57,79 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Parcial', preco:54.90, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Parcial', preco:54.90, tipo:'solo' })">🛒 Comprar — R$ 54,90 no PIX</button>
           </div>
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Parcial)</div>
-              <div class="valor-preco" style="color:var(--teal);">R$ 64,90</div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 64,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 68,32 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Parcial', preco:64.90, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Parcial', preco:64.90, tipo:'solo' })">🛒 Comprar — R$ 64,90 no PIX</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
           <div class="valor-item" style="flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
-              <div class="valor-preco">R$ 64,90</div>
+              <div style="text-align:right;">
+                <div class="valor-preco">R$ 64,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 68,32 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Finais', preco:64.90, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Finais', preco:64.90, tipo:'solo' })">🛒 Comprar — R$ 64,90 no PIX</button>
           </div>
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
-              <div class="valor-preco" style="color:var(--teal);">R$ 79,90</div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 79,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 84,11 cartão</div>
+              </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Finais', preco:79.90, tipo:'solo' })">🛒 Comprar</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Finais', preco:79.90, tipo:'solo' })">🛒 Comprar — R$ 79,90 no PIX</button>
           </div>
 
         </div>
@@ -2916,9 +2944,14 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </div>
         <div id="mc-preco-solo" style="font-size:20px;font-weight:800;color:var(--accent);">R$ --</div>
       </div>
-      <button class="btn btn-primary" style="width:100%;" onclick="iniciarPagamentoSolo()">
-        💳 Pagar Agora
-      </button>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="iniciarPagamentoSolo('pix')">
+          ⚡ PIX — R$ <span class="mc-preco-pix-solo">--</span>
+        </button>
+        <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="iniciarPagamentoSolo('cartao')">
+          💳 Cartão — R$ <span class="mc-preco-card-solo">--</span>
+        </button>
+      </div>
     </div>
 
     <!-- Opção Grupo -->
@@ -2960,9 +2993,14 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <button class="btn btn-sm" id="mc-btn-sala" style="flex:1;background:#7b2ff7;color:#fff;border:none;" onclick="entrarSalaEspera()">
           👥 Criar Sala de Grupo
         </button>
-        <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green-dim);color:var(--green);border:1px solid var(--green);display:none;" onclick="iniciarPagamentoDupla()">
-          💳 Pagar Minha Parte
-        </button>
+        <div id="mc-btn-pagar-dupla" class="hidden" style="display:none;gap:6px;flex:1;" >
+          <button class="btn btn-sm" style="flex:1;background:#0d3320;color:#4ade80;border:1px solid #22c55e;" onclick="iniciarPagamentoDupla('pix')">
+            ⚡ PIX — R$ <span class="mc-preco-pix-dupla">--</span>
+          </button>
+          <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="iniciarPagamentoDupla('cartao')">
+            💳 Cartão — R$ <span class="mc-preco-card-dupla">--</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -6004,14 +6042,25 @@ function abrirModalCompra(plano) {
 
   // Mostrar preço solo
   const precoSolo = plano.preco || plano.preco_solo || 0;
-  document.getElementById('mc-preco-solo').textContent = `R$ ${precoSolo.toFixed(2).replace('.', ',')}`;
+  const precoSoloCartao = Math.round((precoSolo / 0.95) * 100) / 100;
+  const fmtBR = v => v.toFixed(2).replace('.', ',');
+  document.getElementById('mc-preco-solo').innerHTML =
+    `R$ ${fmtBR(precoSolo)} <span style="font-size:11px;font-weight:400;color:var(--text3);">PIX · R$ ${fmtBR(precoSoloCartao)} cartão</span>`;
+  // Atualizar spans dos botões de pagamento solo
+  document.querySelectorAll('.mc-preco-pix-solo').forEach(el => el.textContent = fmtBR(precoSolo));
+  document.querySelectorAll('.mc-preco-card-solo').forEach(el => el.textContent = fmtBR(precoSoloCartao));
 
   // Mostrar ou ocultar opção dupla
   const optDupla = document.getElementById('mc-option-dupla');
   if (plano.tipo === 'dupla' && plano.preco_dupla) {
     optDupla.classList.remove('hidden');
+    const precoDupla = plano.preco_dupla;
+    const precoDuplaCartao = Math.round((precoDupla / 0.95) * 100) / 100;
     document.getElementById('mc-preco-dupla').innerHTML =
-      `R$ ${plano.preco_dupla.toFixed(2).replace('.', ',')} <span style="font-size:12px;font-weight:400;">cada</span>`;
+      `R$ ${fmtBR(precoDupla)} <span style="font-size:11px;font-weight:400;">cada PIX · R$ ${fmtBR(precoDuplaCartao)} cartão</span>`;
+    // Atualizar spans dos botões dupla
+    document.querySelectorAll('.mc-preco-pix-dupla').forEach(el => el.textContent = fmtBR(precoDupla));
+    document.querySelectorAll('.mc-preco-card-dupla').forEach(el => el.textContent = fmtBR(precoDuplaCartao));
   } else {
     optDupla.classList.add('hidden');
   }
@@ -6509,7 +6558,7 @@ function copiarLinkSala() {
 function mostrarStatusSala(compra, eCriador = true) {
   document.getElementById('mc-sala-status').style.display = 'block';
   document.getElementById('mc-btn-sala').style.display = 'none';
-  document.getElementById('mc-btn-pagar-dupla').style.display = '';
+  document.getElementById('mc-btn-pagar-dupla').style.display = 'flex';
 
   // Seção de código/link: visível só para o criador
   const secaoCodigo = document.getElementById('mc-sala-secao-codigo');
@@ -6536,7 +6585,7 @@ function mostrarStatusSala(compra, eCriador = true) {
 }
 
 // ── INICIAR PAGAMENTO SOLO ────────────────────────────────
-async function iniciarPagamentoSolo() {
+async function iniciarPagamentoSolo(metodo = 'pix') {
   if (!state.user) { toast('Faça login para continuar', 'error'); return; }
   const plano = mcState.plano;
   if (!plano) return;
@@ -6569,7 +6618,7 @@ async function iniciarPagamentoSolo() {
       resumos_selecionados: resumosIds,
     });
 
-    await iniciarPagamento(compra.id, 'solo', plano.preco || plano.preco_solo || 0);
+    await iniciarPagamento(compra.id, 'solo', plano.preco || plano.preco_solo || 0, metodo);
   } catch (e) {
     ocultarLoading();
     toast('Erro: ' + e.message, 'error');
@@ -6577,7 +6626,7 @@ async function iniciarPagamentoSolo() {
 }
 
 // ── INICIAR PAGAMENTO DUPLA ───────────────────────────────
-async function iniciarPagamentoDupla() {
+async function iniciarPagamentoDupla(metodo = 'pix') {
   if (!mcState.compraId) { toast('Entre na sala de espera primeiro', 'error'); return; }
   mostrarLoading('Preparando pagamento...');
 
@@ -6586,7 +6635,7 @@ async function iniciarPagamentoDupla() {
     const { data } = await SB.select('compras_coletivas', `id=eq.${mcState.compraId}&select=preco_dupla,preco_individual`);
     const compra = Array.isArray(data) ? data[0] : null;
     const preco = compra?.preco_dupla || mcState.plano?.preco_dupla || 49.90;
-    await iniciarPagamento(mcState.compraId, 'dupla', preco);
+    await iniciarPagamento(mcState.compraId, 'dupla', preco, metodo);
   } catch(e) {
     ocultarLoading();
     toast('Erro ao buscar preço: ' + e.message, 'error');
@@ -6594,11 +6643,14 @@ async function iniciarPagamentoDupla() {
 }
 
 // ── INICIAR PAGAMENTO (chama a Function do Cloudflare) ────
-async function iniciarPagamento(compraId, tipo, valor) {
+// metodo: 'pix' (padrão) ou 'cartao'
+async function iniciarPagamento(compraId, tipo, valor, metodo = 'pix') {
   try {
     const external_reference = `${compraId}:${state.user.id}:${tipo}`;
     const notification_url = `${SITE_URL}/api/mp-webhook`;
 
+    // PIX usa o valor original; cartão usa valor/0.95 (calculado no backend)
+    // Indicamos o método para o backend excluir os outros métodos
     const res = await fetch('/api/mp-create-preference', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -6612,6 +6664,7 @@ async function iniciarPagamento(compraId, tipo, valor) {
         payer_email: state.user.email,
         external_reference,
         notification_url,
+        metodo, // 'pix' ou 'cartao' — controla exclusão de métodos e preço no backend
       }),
     });
 
