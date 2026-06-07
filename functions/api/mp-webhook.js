@@ -150,7 +150,6 @@ export async function onRequest(context) {
       return new Response('OK', { status: 200 });
     }
 
-    const ePrimeiroPagamento = (compra.slots_preenchidos || 0) === 0;
     const novosSlots = (compra.slots_preenchidos || 0) + 1;
 
     // 5. Atualizar slots_preenchidos — sala nunca fecha, fica aberta para novos participantes
@@ -165,33 +164,9 @@ export async function onRequest(context) {
       body: JSON.stringify({ slots_preenchidos: novosSlots }),
     });
 
-    // 6. Liberar acesso para quem pagou
+    // 6. Liberar acesso imediatamente para quem pagou
+    // Cada participante (criador ou joiner) paga e libera seu próprio acesso
     await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
-
-    // 7. Se for o 1º pagamento, liberar também para o criador da sala
-    // (criador não paga — acesso liberado quando a primeira pessoa usa o código)
-    if (ePrimeiroPagamento && compra.criador_user_id && compra.criador_user_id !== user_id) {
-      console.log(`1º pagamento — liberando acesso também para o criador: ${compra.criador_user_id}`);
-      // Marcar criador como aprovado
-      await fetch(
-        `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'apikey': sbKey,
-            'Authorization': `Bearer ${sbKey}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation',
-          },
-          body: JSON.stringify({
-            status_pagamento: 'aprovado',
-            pago_em: new Date().toISOString(),
-            mp_payment_id: `gratis_via_${String(paymentId)}`,
-          }),
-        }
-      );
-      await liberarAcessoParticipante(sbUrl, sbKey, compra_id, compra.criador_user_id);
-    }
 
     return new Response('OK', { status: 200 });
 
