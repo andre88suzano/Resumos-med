@@ -4055,90 +4055,49 @@ async function iniciarPagamentoTeste() {
 }
 
 async function carregarVendas() {
-  const sbUrl = state.sbUrl;
-  const sbKey = state.sbKey;
-
-  const now = new Date();
-
-  // Início da semana (domingo)
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0,0,0,0);
-
-  // Início do mês
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  // Início do ano
-  const yearStart = new Date(now.getFullYear(), 0, 1);
-
-  const fmt = d => d.toISOString();
+  const fmtVal = v => `R$ ${Number(v).toFixed(2).replace('.', ',')}`;
+  const listaEl = document.getElementById('vend-lista');
+  const abandEl = document.getElementById('vend-abandonos-lista');
 
   try {
-    // Buscar participantes aprovados (= vendas concluídas)
-    const res = await fetch(
-      `${sbUrl}/rest/v1/compra_participantes?status_pagamento=eq.aprovado&select=user_id,valor_pago,pago_em,mp_payment_id,compra_id&order=pago_em.desc&limit=100`,
-      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
-    );
-    const vendas = res.ok ? await res.json() : [];
+    const res = await fetch('/api/admin/sales');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
 
-    // Buscar participantes não aprovados (abandonos)
-    const resAband = await fetch(
-      `${sbUrl}/rest/v1/compra_participantes?status_pagamento=neq.aprovado&select=user_id,compra_id,status_pagamento,updated_at&order=updated_at.desc&limit=50`,
-      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
-    );
-    const abandonos = resAband.ok ? await resAband.json() : [];
+    const sales = d.sales || [];
+    const abandoned = d.abandoned || [];
+    const counts = d.counts || {};
+    const revenue = d.revenue || {};
 
-    // Buscar emails dos usuários para exibir
-    const allIds = [...new Set([...vendas.map(v=>v.user_id), ...abandonos.map(a=>a.user_id)].filter(Boolean))];
-    let usersMap = {};
-    if (allIds.length > 0) {
-      const ids = allIds.map(id => `"${id}"`).join(',');
-      const uRes = await fetch(
-        `${sbUrl}/rest/v1/approved_users?user_id=in.(${allIds.join(',')})&select=user_id,name,email`,
-        { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
-      );
-      const users = uRes.ok ? await uRes.json() : [];
-      users.forEach(u => { usersMap[u.user_id] = u; });
-    }
-
-    // Calcular stats
-    const filterByDate = (arr, from) => arr.filter(v => v.pago_em && new Date(v.pago_em) >= from);
-    const sum = arr => arr.reduce((s, v) => s + (parseFloat(v.valor_pago) || 0), 0);
-
-    const semana  = filterByDate(vendas, weekStart);
-    const mes     = filterByDate(vendas, monthStart);
-    const ano     = filterByDate(vendas, yearStart);
-
-    const fmtVal = v => `R$ ${v.toFixed(2).replace('.', ',')}`;
-
-    document.getElementById('vend-semana-qtd').textContent = semana.length;
-    document.getElementById('vend-semana-val').textContent = fmtVal(sum(semana));
-    document.getElementById('vend-mes-qtd').textContent    = mes.length;
-    document.getElementById('vend-mes-val').textContent    = fmtVal(sum(mes));
-    document.getElementById('vend-ano-qtd').textContent    = ano.length;
-    document.getElementById('vend-ano-val').textContent    = fmtVal(sum(ano));
-    document.getElementById('vend-abandono-qtd').textContent = abandonos.length;
+    document.getElementById('vend-semana-qtd').textContent = counts.weekly || 0;
+    document.getElementById('vend-semana-val').textContent = fmtVal(revenue.weekly || 0);
+    document.getElementById('vend-mes-qtd').textContent    = counts.monthly || 0;
+    document.getElementById('vend-mes-val').textContent    = fmtVal(revenue.monthly || 0);
+    document.getElementById('vend-ano-qtd').textContent    = counts.yearly || 0;
+    document.getElementById('vend-ano-val').textContent    = fmtVal(revenue.yearly || 0);
+    document.getElementById('vend-abandono-qtd').textContent = abandoned.length;
 
     // Tabela de vendas
-    const listaEl = document.getElementById('vend-lista');
-    if (vendas.length === 0) {
+    if (sales.length === 0) {
       listaEl.innerHTML = '<div class="card" style="text-align:center;color:var(--text3);padding:32px;">Nenhuma venda registrada ainda.</div>';
     } else {
       listaEl.innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .5fr;gap:8px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">
-          <span>Cliente</span><span>Compra ID</span><span>Valor</span><span>ID MP</span><span>Data</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .7fr .5fr;gap:8px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">
+          <span>Cliente</span><span>Descrição</span><span>Bruto</span><span>Líquido (−1%)</span><span>ID MP</span><span>Data</span>
         </div>
-        ${vendas.map(v => {
-          const u = usersMap[v.user_id] || {};
-          const data = v.pago_em ? new Date(v.pago_em).toLocaleDateString('pt-BR') : '—';
-          return `<div class="card" style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .5fr;gap:8px;padding:14px 16px;margin-bottom:8px;align-items:center;">
+        ${sales.map(s => {
+          const gross = parseFloat(s.amount) || 0;
+          const net = gross * 0.99;
+          const data = s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : '—';
+          return `<div class="card" style="display:grid;grid-template-columns:1fr 1fr .7fr .7fr .7fr .5fr;gap:8px;padding:14px 16px;margin-bottom:8px;align-items:center;">
             <div>
-              <div style="font-weight:600;">${u.name || '—'}</div>
-              <div style="font-size:12px;color:var(--text3);">${u.email || v.user_id?.slice(0,8) || '—'}</div>
+              <div style="font-weight:600;">${s.name || '—'}</div>
+              <div style="font-size:12px;color:var(--text3);">${s.email || '—'}</div>
             </div>
-            <div style="font-size:12px;color:var(--text3);word-break:break-all;">${v.compra_id?.slice(0,12) || '—'}…</div>
-            <div style="font-weight:700;color:#4caf50;">${fmtVal(parseFloat(v.valor_pago)||0)}</div>
-            <div style="font-size:12px;color:var(--accent);font-family:monospace;">${v.mp_payment_id || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);">${s.description || '—'}</div>
+            <div style="font-size:13px;color:var(--text2);">${fmtVal(gross)}</div>
+            <div style="font-weight:700;color:#4caf50;">${fmtVal(net)}</div>
+            <div style="font-size:12px;color:var(--accent);font-family:monospace;">${s.mp_payment_id || '—'}</div>
             <div style="font-size:12px;color:var(--text3);">${data}</div>
           </div>`;
         }).join('')}
@@ -4146,19 +4105,17 @@ async function carregarVendas() {
     }
 
     // Tabela de abandonos
-    const abandEl = document.getElementById('vend-abandonos-lista');
-    if (abandonos.length === 0) {
+    if (abandoned.length === 0) {
       abandEl.innerHTML = '<div class="card" style="text-align:center;color:var(--text3);padding:32px;">Nenhum abandono registrado.</div>';
     } else {
-      abandEl.innerHTML = abandonos.map(a => {
-        const u = usersMap[a.user_id] || {};
-        const data = a.updated_at ? new Date(a.updated_at).toLocaleDateString('pt-BR') : '—';
+      abandEl.innerHTML = abandoned.map(a => {
+        const data = a.created_at ? new Date(a.created_at).toLocaleDateString('pt-BR') : '—';
         return `<div class="card" style="display:grid;grid-template-columns:1fr 1fr .5fr;gap:8px;padding:14px 16px;margin-bottom:8px;align-items:center;border-color:rgba(233,30,99,.2);background:rgba(233,30,99,.03);">
           <div>
-            <div style="font-weight:600;">${u.name || '—'}</div>
-            <div style="font-size:12px;color:var(--text3);">${u.email || v?.user_id?.slice(0,8) || '—'}</div>
+            <div style="font-weight:600;">${a.name || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);">${a.email || '—'}</div>
           </div>
-          <div style="font-size:12px;color:var(--text3);">${a.compra_id?.slice(0,16) || '—'}…</div>
+          <div style="font-size:12px;color:var(--text3);">${a.preference_id?.slice(0,20) || '—'}</div>
           <div style="font-size:12px;color:var(--text3);">${data}</div>
         </div>`;
       }).join('');
