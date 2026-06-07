@@ -151,8 +151,9 @@ export async function onRequest(context) {
     }
 
     const novosSlots = (compra.slots_preenchidos || 0) + 1;
+    const isCriador = compra.criador_user_id === user_id;
 
-    // 5. Atualizar slots_preenchidos — sala nunca fecha, fica aberta para novos participantes
+    // 5. Atualizar slots_preenchidos
     await fetch(`${sbUrl}/rest/v1/compras_coletivas?id=eq.${compra_id}`, {
       method: 'PATCH',
       headers: {
@@ -164,9 +165,26 @@ export async function onRequest(context) {
       body: JSON.stringify({ slots_preenchidos: novosSlots }),
     });
 
-    // 6. Liberar acesso imediatamente para quem pagou
-    // Cada participante (criador ou joiner) paga e libera seu próprio acesso
-    await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
+    if (isCriador) {
+      // Criador pagou — aguarda que um parceiro pague para liberar acesso
+      console.log(`Criador ${user_id} pagou. Acesso pendente até o primeiro parceiro pagar.`);
+    } else {
+      // Joiner pagou — libera acesso para ele imediatamente
+      await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
+
+      // Se o criador já pagou, libera acesso para ele também agora
+      if (compra.criador_user_id) {
+        const criadorRes = await fetch(
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}&status_pagamento=eq.aprovado&select=user_id`,
+          { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+        );
+        const criadorData = await criadorRes.json();
+        if (Array.isArray(criadorData) && criadorData.length > 0) {
+          console.log(`Liberando acesso para o criador ${compra.criador_user_id}`);
+          await liberarAcessoParticipante(sbUrl, sbKey, compra_id, compra.criador_user_id);
+        }
+      }
+    }
 
     return new Response('OK', { status: 200 });
 
