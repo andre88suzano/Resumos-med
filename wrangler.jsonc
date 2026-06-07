@@ -1,6 +1,6 @@
 {
   "name": "resumos-med",
-  "pages_build_output_dir": ".",
+  "pages_build_output_dir": ".open-next",
   "vars": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://gsbofwchnjvtyemapjfm.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzYm9md2Nobmp2dHllbWFwamZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDk2NjcsImV4cCI6MjA5NTQ4NTY2N30.RULolCDG_Ijh6xdi6yvLht74MznwJwo9Wq2OaMpclvI",

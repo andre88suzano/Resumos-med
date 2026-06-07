@@ -1,16 +1,14 @@
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync, cpSync, copyFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = process.cwd()
 
-// 1. Run Next.js build (optional — if it fails, index.html is still deployed as static)
+// 1. Run Next.js build
 try {
   execSync('npm run build', { stdio: 'inherit' })
 } catch (e) {
   console.warn('⚠️  Next.js build failed — deploying index.html as static file only')
-  // Copy index.html to ensure it's fresh in the output
-  console.log('✅ Static index.html will be deployed')
   process.exit(0)
 }
 
@@ -30,24 +28,30 @@ if (!manifest.middleware?.['/']) {
     regions: 'auto',
   }
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
-  console.log('✓ Patched middleware-manifest.json for opennextjs compatibility')
+  console.log('✓ Patched middleware-manifest.json')
 }
 
-// 3. Run opennextjs build skipping Next.js build
+// 3. Run opennextjs build
 execSync('npx opennextjs-cloudflare build --skipNextBuild', { stdio: 'inherit' })
 
-// 4. Copy .open-next output to repo root (build output dir = .)
+// 4. Rename worker.js → _worker.js INSIDE .open-next
+//    (relative imports in worker.js point to other files inside .open-next)
 const openNextDir = join(root, '.open-next')
+const workerSrc = join(openNextDir, 'worker.js')
+const workerDst = join(openNextDir, '_worker.js')
 
-// Copy worker.js → _worker.js at root
-cpSync(join(openNextDir, 'worker.js'), join(root, '_worker.js'))
-console.log('✓ Copied worker.js → _worker.js')
+if (existsSync(workerSrc)) {
+  renameSync(workerSrc, workerDst)
+  console.log('✓ Renamed .open-next/worker.js → .open-next/_worker.js')
+}
 
-// Copy assets (static files) to root
-const assetsDir = join(openNextDir, 'assets')
-if (existsSync(assetsDir)) {
-  cpSync(assetsDir, root, { recursive: true })
-  console.log('✓ Copied static assets to root')
+// 5. Also copy index.html into .open-next so it gets deployed as static file
+const { copyFileSync } = await import('node:fs')
+const indexSrc = join(root, 'index.html')
+const indexDst = join(openNextDir, 'index.html')
+if (existsSync(indexSrc)) {
+  copyFileSync(indexSrc, indexDst)
+  console.log('✓ Copied index.html → .open-next/index.html')
 }
 
 console.log('✅ Build complete — ready for Cloudflare Pages deployment')
