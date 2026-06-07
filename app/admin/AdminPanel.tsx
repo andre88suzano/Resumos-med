@@ -49,13 +49,17 @@ export default function AdminPanel({ users: initialUsers, resumos: initialResumo
   const [salesData, setSalesData] = useState<SalesData | null>(null)
   const [salesLoading, setSalesLoading] = useState(false)
 
-  useEffect(() => {
-    if (tab !== 'sales' || salesData) return
+  function fetchSales() {
     setSalesLoading(true)
     fetch('/api/admin/sales')
       .then(r => r.json())
       .then(d => { setSalesData(d); setSalesLoading(false) })
       .catch(() => setSalesLoading(false))
+  }
+
+  useEffect(() => {
+    if (tab !== 'sales' || salesData) return
+    fetchSales()
   }, [tab, salesData])
   const [users, setUsers] = useState(initialUsers)
   const [resumos, setResumos] = useState(initialResumos)
@@ -440,9 +444,18 @@ export default function AdminPanel({ users: initialUsers, resumos: initialResumo
                 </div>
 
                 {/* Vendas recentes */}
-                <h3 style={{ fontFamily: 'Georgia, serif', color: '#fff', fontSize: '1.1rem', marginBottom: '16px' }}>
-                  Vendas no Mercado Pago ({salesData.sales.length})
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <h3 style={{ fontFamily: 'Georgia, serif', color: '#fff', fontSize: '1.1rem', margin: 0 }}>
+                    Vendas no Mercado Pago ({salesData.sales.length})
+                  </h3>
+                  <button
+                    onClick={() => { setSalesData(null); fetchSales() }}
+                    disabled={salesLoading}
+                    style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text2)', padding: '7px 16px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.78rem', letterSpacing: '1px', textTransform: 'uppercase', cursor: 'pointer' }}
+                  >
+                    {salesLoading ? '...' : '↺ Atualizar'}
+                  </button>
+                </div>
                 {salesData.sales.length === 0 ? (
                   <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '24px', color: 'var(--text2)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '.9rem', marginBottom: '32px' }}>
                     Nenhuma venda registrada ainda.

@@ -130,6 +130,33 @@ export async function POST(req: Request) {
 
     if (estaCompleto) {
       await liberarAcessoCompra(sbUrl, sbKey, compra_id)
+    } else if (compra.tipo === 'dupla') {
+      if (novosSlots === 1) {
+        // Primeira pessoa usando o código: libera ela + o criador da sala
+        const criadorRes = await fetch(
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}&status_pagamento=eq.aprovado&select=user_id,resumos_selecionados`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+        )
+        const criadorParts = await criadorRes.json()
+        const amigoRes = await fetch(
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${user_id}&select=user_id,resumos_selecionados`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+        )
+        const amigoParts = await amigoRes.json()
+        const toLiberate = [
+          ...(Array.isArray(criadorParts) ? criadorParts : []),
+          ...(Array.isArray(amigoParts) ? amigoParts : []),
+        ]
+        await liberarAcessoParticipantes(sbUrl, sbKey, toLiberate)
+      } else {
+        // 2ª pessoa em diante: libera só ela imediatamente
+        const amigoRes = await fetch(
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${user_id}&select=user_id,resumos_selecionados`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+        )
+        const amigoParts = await amigoRes.json()
+        await liberarAcessoParticipantes(sbUrl, sbKey, Array.isArray(amigoParts) ? amigoParts : [])
+      }
     }
 
     return NextResponse.json({ ok: true })
@@ -139,21 +166,19 @@ export async function POST(req: Request) {
   }
 }
 
-async function liberarAcessoCompra(sbUrl: string, sbKey: string, compra_id: string) {
+async function liberarAcessoParticipantes(
+  sbUrl: string,
+  sbKey: string,
+  participantes: Array<{ user_id: string; resumos_selecionados?: string[] }>
+) {
   try {
-    const partRes = await fetch(
-      `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&status_pagamento=eq.aprovado&select=user_id,resumos_selecionados`,
-      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
-    )
-    const participantes = await partRes.json()
-    if (!Array.isArray(participantes)) return
+    const now = new Date()
+    const expiresAt = new Date(now.getTime() + 50 * 86400000).toISOString()
 
     for (const part of participantes) {
-      const resumos: string[] = Array.isArray(part.resumos_selecionados) ? part.resumos_selecionados : []
+      const resumos = [...new Set(Array.isArray(part.resumos_selecionados) ? part.resumos_selecionados : [])]
       if (resumos.length === 0) continue
 
-      const now = new Date()
-      const expiresAt = new Date(now.getTime() + 50 * 86400000).toISOString()
       const rows = resumos.map((resumo_id: string) => ({
         user_id: part.user_id,
         resumo_id,
@@ -172,6 +197,20 @@ async function liberarAcessoCompra(sbUrl: string, sbKey: string, compra_id: stri
         body: JSON.stringify(rows),
       })
     }
+  } catch (err) {
+    console.error('Erro ao liberar acesso:', err)
+  }
+}
+
+async function liberarAcessoCompra(sbUrl: string, sbKey: string, compra_id: string) {
+  try {
+    const partRes = await fetch(
+      `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&status_pagamento=eq.aprovado&select=user_id,resumos_selecionados`,
+      { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+    )
+    const participantes = await partRes.json()
+    if (!Array.isArray(participantes)) return
+    await liberarAcessoParticipantes(sbUrl, sbKey, participantes)
   } catch (err) {
     console.error('Erro ao liberar acesso:', err)
   }
