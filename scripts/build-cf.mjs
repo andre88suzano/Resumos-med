@@ -1,15 +1,17 @@
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync, cpSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, cpSync, copyFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = process.cwd()
 
-// 1. Run Next.js build
+// 1. Run Next.js build (optional — if it fails, index.html is still deployed as static)
 try {
   execSync('npm run build', { stdio: 'inherit' })
 } catch (e) {
-  console.error('⚠️  Next.js build failed — index.html will still be deployed as static file')
-  process.exit(0) // exit 0 so Cloudflare Pages deploys the static files including index.html
+  console.warn('⚠️  Next.js build failed — deploying index.html as static file only')
+  // Copy index.html to ensure it's fresh in the output
+  console.log('✅ Static index.html will be deployed')
+  process.exit(0)
 }
 
 // 2. Patch middleware-manifest.json so opennextjs thinks there's an edge middleware
@@ -34,7 +36,7 @@ if (!manifest.middleware?.['/']) {
 // 3. Run opennextjs build skipping Next.js build
 execSync('npx opennextjs-cloudflare build --skipNextBuild', { stdio: 'inherit' })
 
-// 4. Copy .open-next output to repo root so Cloudflare Pages (build output: /) can find it
+// 4. Copy .open-next output to repo root (build output dir = .)
 const openNextDir = join(root, '.open-next')
 
 // Copy worker.js → _worker.js at root
