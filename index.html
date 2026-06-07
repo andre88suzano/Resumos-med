@@ -2151,15 +2151,28 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-          <div>
-            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">ID dos resumos (opcional, separado por vírgula)</label>
-            <input id="oferta-resumos" type="text" placeholder="uuid1,uuid2,..." class="form-input" style="padding:8px 12px;font-size:13px;font-family:var(--font-mono);" />
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Resumos incluídos na oferta (opcional)</label>
+
+          <!-- Chips dos selecionados -->
+          <div id="oferta-resumos-chips" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;margin-bottom:8px;"></div>
+
+          <!-- Campo de busca -->
+          <div style="position:relative;">
+            <input id="oferta-resumos-busca" type="text" placeholder="🔍 Buscar resumo por nome ou matéria..." class="form-input"
+              style="padding:8px 12px;font-size:13px;width:100%;"
+              oninput="ofertaFiltrarResumos()" onfocus="ofertaAbrirDropdown()" />
+            <!-- Dropdown de resultados -->
+            <div id="oferta-resumos-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+            </div>
           </div>
-          <div>
-            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Referência interna (ex: nome do aluno)</label>
-            <input id="oferta-ref" type="text" placeholder="Ex: Ana Garcia — P1 promo" class="form-input" style="padding:8px 12px;font-size:14px;" />
-          </div>
+          <!-- IDs ocultos para a função de gerar link ler -->
+          <input id="oferta-resumos" type="hidden" value="" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Referência interna (ex: nome do aluno)</label>
+          <input id="oferta-ref" type="text" placeholder="Ex: Ana Garcia — P1 promo" class="form-input" style="padding:8px 12px;font-size:14px;" />
         </div>
 
         <button onclick="gerarLinkOferta()" style="width:100%;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
@@ -4150,6 +4163,83 @@ async function iniciarPagamentoTeste() {
     toast('Erro: ' + e.message, 'error');
   }
 }
+
+// ── SELETOR DE RESUMOS PARA OFERTA ───────────────────────
+let _ofertaResumosIds = []; // [{id, title, materia}]
+
+function ofertaAbrirDropdown() {
+  ofertaFiltrarResumos();
+  document.getElementById('oferta-resumos-dropdown').style.display = '';
+}
+
+function ofertaFecharDropdown() {
+  setTimeout(() => {
+    document.getElementById('oferta-resumos-dropdown').style.display = 'none';
+  }, 200);
+}
+
+function ofertaFiltrarResumos() {
+  const q = document.getElementById('oferta-resumos-busca').value.toLowerCase();
+  const dd = document.getElementById('oferta-resumos-dropdown');
+  const selecionados = new Set(_ofertaResumosIds.map(r => r.id));
+
+  const lista = (state.resumos || []).filter(r => {
+    if (selecionados.has(r.id)) return false; // já selecionado
+    if (!q) return true;
+    return (r.title || '').toLowerCase().includes(q) || (r.materia || '').toLowerCase().includes(q);
+  }).slice(0, 30);
+
+  if (!lista.length) {
+    dd.innerHTML = `<div style="padding:12px 14px;color:var(--text3);font-size:13px;">Nenhum resumo encontrado</div>`;
+    dd.style.display = '';
+    return;
+  }
+
+  dd.innerHTML = lista.map(r => `
+    <div onclick="ofertaSelecionarResumo('${r.id}','${(r.title||'').replace(/'/g,'\\\'')
+    }','${(r.materia||'').replace(/'/g,'\\\'')}','${r.semestre||''}')"
+      style="padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${r.title}</div>
+        <div style="font-size:11px;color:var(--text3);">${r.materia} · ${r.semestre}º sem</div>
+      </div>
+      <span style="font-size:11px;color:#10b981;font-weight:700;">+ Adicionar</span>
+    </div>`).join('');
+  dd.style.display = '';
+}
+
+function ofertaSelecionarResumo(id, title, materia, semestre) {
+  if (_ofertaResumosIds.find(r => r.id === id)) return;
+  _ofertaResumosIds.push({ id, title, materia, semestre });
+  ofertaRenderChips();
+  document.getElementById('oferta-resumos-busca').value = '';
+  document.getElementById('oferta-resumos-dropdown').style.display = 'none';
+}
+
+function ofertaRemoverResumo(id) {
+  _ofertaResumosIds = _ofertaResumosIds.filter(r => r.id !== id);
+  ofertaRenderChips();
+}
+
+function ofertaRenderChips() {
+  const container = document.getElementById('oferta-resumos-chips');
+  container.innerHTML = _ofertaResumosIds.map(r => `
+    <span style="display:inline-flex;align-items:center;gap:5px;background:#0d2b1a;border:1px solid #10b98150;border-radius:20px;padding:4px 10px;font-size:12px;color:#4ade80;">
+      📄 ${r.title}
+      <button onclick="ofertaRemoverResumo('${r.id}')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:13px;line-height:1;padding:0;margin-left:2px;">×</button>
+    </span>`).join('');
+  // Atualizar campo oculto
+  document.getElementById('oferta-resumos').value = _ofertaResumosIds.map(r => r.id).join(',');
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('#oferta-resumos-busca') && !e.target.closest('#oferta-resumos-dropdown')) {
+    const dd = document.getElementById('oferta-resumos-dropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
 
 // ── GERADOR DE LINK DE OFERTA PERSONALIZADA ───────────────
 async function gerarLinkOferta() {
