@@ -4285,8 +4285,8 @@ async function gerarLinkOferta() {
       resumos_selecionados: resumosIds,
     });
 
-    // external_reference codifica a compra e indica que é oferta personalizada
-    const external_reference = `${compra.id}:${state.user.id}:oferta`;
+    // external_reference sempre usa 'solo' — oferta nunca tem lógica de dupla
+    const external_reference = `${compra.id}:${state.user.id}:solo`;
 
     // Calcular unit_price conforme método
     const unitPrice = metodo === 'cartao'
