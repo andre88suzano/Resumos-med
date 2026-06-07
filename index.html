@@ -2735,7 +2735,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
 
           <div style="background:#1e0a3c;border-radius:8px;padding:8px 12px;font-size:12px;color:#a78bfa;font-weight:600;text-align:center;">
-            💜 Quanto mais amigos, mais economia para todo mundo!
+            💜 Compartilhe o código — qualquer pessoa paga o preço de grupo!
           </div>
 
         </div>
@@ -2921,12 +2921,12 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       </button>
     </div>
 
-    <!-- Opção Dupla -->
+    <!-- Opção Grupo -->
     <div id="mc-option-dupla" class="hidden" style="border:1px solid #7b2ff7;border-radius:var(--radius);padding:18px;background:linear-gradient(135deg,#0f0020,#130028);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div>
-          <div style="font-size:15px;font-weight:700;color:var(--text);">👯 Trazer Amigo</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px;">Vocês dois pagam menos — sala aberta por 48h</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">👥 Compra em Grupo</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">Compartilhe o código — qualquer pessoa pode entrar e pagar o preço reduzido por 48h</div>
         </div>
         <div id="mc-preco-dupla" style="font-size:20px;font-weight:800;color:#7b2ff7;">R$ -- <span style="font-size:12px;font-weight:400;">cada</span></div>
       </div>
@@ -2936,7 +2936,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <!-- Código + Link de convite -->
         <div style="background:#1a0030;padding:12px 14px;">
           <!-- Código curto (principal) -->
-          <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:6px;">🔑 CÓDIGO DA SALA — envie para seu amigo</div>
+          <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:6px;">🔑 CÓDIGO DA SALA — compartilhe com quem quiser</div>
           <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
             <div id="mc-sala-codigo" style="flex:1;background:#0d0018;border:2px solid #7b2ff7;border-radius:6px;padding:10px;font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#c4b5fd;text-align:center;letter-spacing:6px;"></div>
             <button onclick="copiarCodigoSala()" id="mc-copy-codigo-btn" style="flex-shrink:0;padding:10px 14px;background:#7b2ff7;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copiar</button>
@@ -2947,18 +2947,18 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div id="mc-sala-link" style="flex:1;background:#0d0018;border:1px solid rgba(123,47,247,0.3);border-radius:6px;padding:7px 10px;font-family:var(--font-mono);font-size:11px;color:#c4b5fd;word-break:break-all;"></div>
             <button onclick="copiarLinkSala()" style="flex-shrink:0;padding:7px 12px;background:#3d1a6e;border:none;border-radius:6px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;" id="mc-copy-btn">📋</button>
           </div>
-          <div style="font-size:11px;color:#7c6b8a;margin-top:6px;">Seu amigo usa o código ou o link para entrar e pagar a parte dele.</div>
+          <div style="font-size:11px;color:#7c6b8a;margin-top:6px;">Cada pessoa entra com o código e paga sua parte — acesso liberado imediatamente após o pagamento.</div>
         </div>
         <!-- Status da sala -->
         <div style="background:#130020;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
-          <div id="mc-sala-slots" style="font-size:12px;color:#a78bfa;">👤 Aguardando amigo...</div>
+          <div id="mc-sala-slots" style="font-size:12px;color:#a78bfa;">👤 Sala aberta — aguardando participantes...</div>
           <div style="font-size:11px;color:#6b5a7a;">⏱ Expira em: <span id="mc-sala-countdown" style="font-family:var(--font-mono);color:#7b2ff7;font-weight:700;">--:--:--</span></div>
         </div>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="btn btn-sm" id="mc-btn-sala" style="flex:1;background:#7b2ff7;color:#fff;border:none;" onclick="entrarSalaEspera()">
-          👯 Entrar na Sala de Espera
+          👥 Criar Sala de Grupo
         </button>
         <button class="btn btn-sm" id="mc-btn-pagar-dupla" class="hidden" style="flex:1;background:var(--green-dim);color:var(--green);border:1px solid var(--green);display:none;" onclick="iniciarPagamentoDupla()">
           💳 Pagar Minha Parte
@@ -2996,8 +2996,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
       <div>
-        <h2 class="modal-title">🔑 Entrar na Sala do Amigo</h2>
-        <p style="font-size:13px;color:var(--text3);margin-top:2px;">Digite o código que seu amigo te enviou</p>
+        <h2 class="modal-title">🔑 Entrar na Sala</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:2px;">Digite o código da sala para pagar o preço de grupo</p>
       </div>
       <button class="modal-close" onclick="closeModal('modal-entrar-codigo')">✕</button>
     </div>
@@ -6555,8 +6555,8 @@ function mostrarStatusSala(compra) {
   document.getElementById('mc-sala-link').textContent = link;
 
   const slotsText = compra.slots_preenchidos === 0
-    ? '👤 Aguardando 1 amigo...'
-    : `✅ ${compra.slots_preenchidos}/${compra.slots_total} participantes`;
+    ? '👤 Sala aberta — nenhum pagamento ainda'
+    : `✅ ${compra.slots_preenchidos} pessoa${compra.slots_preenchidos > 1 ? 's' : ''} já pagou`;
   document.getElementById('mc-sala-slots').textContent = slotsText;
 
   // Countdown da sala
@@ -6691,8 +6691,8 @@ async function verificarStatusCompra(compraId) {
     // Atualizar slots
     if (document.getElementById('mc-sala-slots')) {
       const slotsText = compra.slots_preenchidos === 0
-        ? '👤 Aguardando 1 amigo...'
-        : `✅ ${compra.slots_preenchidos}/${compra.slots_total} participantes`;
+        ? '👤 Sala aberta — nenhum pagamento ainda'
+        : `✅ ${compra.slots_preenchidos} pessoa${compra.slots_preenchidos > 1 ? 's' : ''} já pagou`;
       document.getElementById('mc-sala-slots').textContent = slotsText;
     }
 
