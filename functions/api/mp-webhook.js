@@ -176,9 +176,9 @@ export async function onRequest(context) {
       body: JSON.stringify({ slots_preenchidos: novosSlots }),
     });
 
-    if (isCriador) {
-      // Criador pagou — aguarda que um parceiro pague para liberar acesso
-      console.log(`Criador ${user_id} pagou. Acesso pendente até o primeiro parceiro pagar.`);
+    if (isCriador && compra.tipo === 'dupla') {
+      // Criador de sala DUPLA — aguarda primeiro parceiro pagar para liberar acesso
+      console.log(`Criador ${user_id} pagou (dupla). Acesso pendente até o primeiro parceiro pagar.`);
     } else {
       // Joiner pagou — libera acesso para ele imediatamente
       await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
