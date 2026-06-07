@@ -2118,6 +2118,65 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       <h1 class="section-title">💰 Financeiro</h1>
       <p class="section-sub" style="margin-bottom:16px;">Acompanhe as vendas e o desempenho financeiro.</p>
 
+      <!-- 🔗 GERADOR DE LINK PERSONALIZADO -->
+      <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:18px;">🔗</span>
+          <div>
+            <div style="font-weight:700;color:#10b981;font-size:14px;">Gerar Link de Oferta Personalizada</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Cria um link de pagamento privado para enviar diretamente ao aluno. Não aparece no catálogo.</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Descrição do produto</label>
+            <input id="oferta-desc" type="text" placeholder="Ex: Mini Resumo Biofísica" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Valor (R$) — preço PIX</label>
+            <input id="oferta-valor" type="number" value="15.00" min="1" step="0.01" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">E-mail do aluno</label>
+            <input id="oferta-email" type="email" placeholder="aluno@email.com" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Método</label>
+            <select id="oferta-metodo" class="form-input" style="padding:8px 12px;font-size:14px;">
+              <option value="ambos">PIX + Cartão</option>
+              <option value="pix">Só PIX</option>
+              <option value="cartao">Só Cartão</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">ID dos resumos (opcional, separado por vírgula)</label>
+            <input id="oferta-resumos" type="text" placeholder="uuid1,uuid2,..." class="form-input" style="padding:8px 12px;font-size:13px;font-family:var(--font-mono);" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Referência interna (ex: nome do aluno)</label>
+            <input id="oferta-ref" type="text" placeholder="Ex: Ana Garcia — P1 promo" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+        </div>
+
+        <button onclick="gerarLinkOferta()" style="width:100%;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
+          🔗 Gerar Link de Pagamento
+        </button>
+
+        <!-- Resultado -->
+        <div id="oferta-resultado" style="display:none;margin-top:14px;background:#0d1f17;border:1px solid #10b98150;border-radius:8px;padding:14px;">
+          <div style="font-size:11px;color:#10b981;font-weight:700;letter-spacing:.05em;margin-bottom:8px;">✅ LINK GERADO — envie no privado para o aluno</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="oferta-link-input" readonly class="form-input" style="flex:1;padding:8px 10px;font-size:12px;font-family:var(--font-mono);background:#061009;color:#4ade80;" />
+            <button onclick="copiarLinkOferta()" style="flex-shrink:0;padding:8px 14px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📋 Copiar</button>
+          </div>
+          <div id="oferta-resumo-info" style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5;"></div>
+        </div>
+      </div>
+
       <!-- 🧪 PAINEL DE TESTE (só admin) -->
       <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:18px 20px;margin-bottom:28px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
@@ -4090,6 +4149,108 @@ async function iniciarPagamentoTeste() {
   } catch(e) {
     toast('Erro: ' + e.message, 'error');
   }
+}
+
+// ── GERADOR DE LINK DE OFERTA PERSONALIZADA ───────────────
+async function gerarLinkOferta() {
+  if (!state.profile?.is_admin) { toast('Apenas admins.', 'error'); return; }
+
+  const desc   = document.getElementById('oferta-desc').value.trim();
+  const valor  = parseFloat(document.getElementById('oferta-valor').value) || 0;
+  const email  = document.getElementById('oferta-email').value.trim();
+  const metodo = document.getElementById('oferta-metodo').value; // 'pix','cartao','ambos'
+  const resumosRaw = document.getElementById('oferta-resumos').value.trim();
+  const ref    = document.getElementById('oferta-ref').value.trim() || desc;
+
+  if (!desc)  { toast('Informe uma descrição.', 'error'); return; }
+  if (!valor) { toast('Informe o valor.', 'error'); return; }
+
+  toast('⏳ Gerando link...', 'info');
+
+  try {
+    // Criar compra avulsa no banco para rastrear os resumos e o webhook
+    const codigo = 'OFERTA' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const resumosIds = resumosRaw ? resumosRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo,
+      tipo: 'solo',
+      status: 'aguardando',
+      slots_total: 1,
+      slots_preenchidos: 0,
+      preco_individual: valor,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias
+    });
+
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra no banco');
+
+    // Criar participante com os resumos já atribuídos (user_id = admin como placeholder)
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,      // será sobrescrito quando o aluno pagar (via external_ref)
+      email: email || state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: resumosIds,
+    });
+
+    // external_reference codifica a compra e indica que é oferta personalizada
+    const external_reference = `${compra.id}:${state.user.id}:oferta`;
+
+    // Calcular unit_price conforme método
+    const unitPrice = metodo === 'cartao'
+      ? Math.round((valor / 0.95) * 100) / 100
+      : valor;
+
+    // Determinar exclusões
+    const excludedMap = {
+      pix:    [{ id: 'credit_card' }, { id: 'debit_card' }, { id: 'ticket' }],
+      cartao: [{ id: 'bank_transfer' }],
+      ambos:  [],
+    };
+
+    const res = await fetch('/api/mp-create-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{ title: desc, quantity: 1, unit_price: unitPrice, currency_id: 'BRL' }],
+        payer_email: email || undefined,
+        external_reference,
+        notification_url: `${SITE_URL}/api/mp-webhook`,
+        metodo: metodo === 'ambos' ? undefined : metodo,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao gerar link');
+
+    // Exibir resultado
+    const link = data.init_point;
+    document.getElementById('oferta-link-input').value = link;
+    document.getElementById('oferta-resumo-info').innerHTML =
+      `📦 <strong>${desc}</strong> · R$ ${valor.toFixed(2).replace('.', ',')} (PIX)` +
+      (metodo === 'cartao' ? ` · R$ ${unitPrice.toFixed(2).replace('.', ',')} (cartão)` : '') +
+      (email ? ` · 📧 ${email}` : '') +
+      (resumosIds.length ? ` · ${resumosIds.length} resumo(s) vinculado(s)` : '') +
+      `<br>🔑 Ref interna: <span style="font-family:var(--font-mono);">${ref}</span> · Expira em 7 dias`;
+    document.getElementById('oferta-resultado').style.display = '';
+
+    toast('✅ Link gerado com sucesso!', 'success');
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+function copiarLinkOferta() {
+  const input = document.getElementById('oferta-link-input');
+  navigator.clipboard.writeText(input.value).then(() => {
+    toast('✅ Link copiado!', 'success');
+  }).catch(() => {
+    input.select();
+    document.execCommand('copy');
+    toast('✅ Link copiado!', 'success');
+  });
 }
 
 async function carregarVendas() {
