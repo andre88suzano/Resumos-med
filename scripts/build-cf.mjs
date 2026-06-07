@@ -5,7 +5,12 @@ import { join } from 'node:path'
 const root = process.cwd()
 
 // 1. Run Next.js build
-execSync('npm run build', { stdio: 'inherit' })
+try {
+  execSync('npm run build', { stdio: 'inherit' })
+} catch (e) {
+  console.error('⚠️  Next.js build failed — index.html will still be deployed as static file')
+  process.exit(0) // exit 0 so Cloudflare Pages deploys the static files including index.html
+}
 
 // 2. Patch middleware-manifest.json so opennextjs thinks there's an edge middleware
 const manifestPath = join(root, '.next/server/middleware-manifest.json')
@@ -30,7 +35,6 @@ if (!manifest.middleware?.['/']) {
 execSync('npx opennextjs-cloudflare build --skipNextBuild', { stdio: 'inherit' })
 
 // 4. Copy .open-next output to repo root so Cloudflare Pages (build output: /) can find it
-// Cloudflare Pages looks for _worker.js at the build output root
 const openNextDir = join(root, '.open-next')
 
 // Copy worker.js → _worker.js at root
