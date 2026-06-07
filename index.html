@@ -6498,13 +6498,14 @@ async function entrarSalaEspera() {
     const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
     mcState.compraId = compra.id;
 
-    // Registrar participante
+    // Registrar participante com os resumos já selecionados
+    const resumosDosCriador = mcState.plano?.resumosIds || mcState.resumosSelecionados?.map(r => r.id) || [];
     await SB.insert('compra_participantes', {
       compra_id: compra.id,
       user_id: state.user.id,
       email: state.user.email,
       status_pagamento: 'pendente',
-      resumos_selecionados: [],
+      resumos_selecionados: resumosDosCriador,
     });
 
     ocultarLoading();

@@ -150,36 +150,48 @@ export async function onRequest(context) {
       return new Response('OK', { status: 200 });
     }
 
+    const ePrimeiroPagamento = (compra.slots_preenchidos || 0) === 0;
     const novosSlots = (compra.slots_preenchidos || 0) + 1;
 
-    // 5. Atualizar slots_preenchidos — NUNCA fechar a sala (status permanece 'aguardando')
-    // para que novos participantes possam entrar a qualquer momento.
-    const compraUpdate = {
-      slots_preenchidos: novosSlots,
-    };
+    // 5. Atualizar slots_preenchidos — sala nunca fecha, fica aberta para novos participantes
+    await fetch(`${sbUrl}/rest/v1/compras_coletivas?id=eq.${compra_id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({ slots_preenchidos: novosSlots }),
+    });
 
-    const updateCompra = await fetch(
-      `${sbUrl}/rest/v1/compras_coletivas?id=eq.${compra_id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'apikey': sbKey,
-          'Authorization': `Bearer ${sbKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-        },
-        body: JSON.stringify(compraUpdate),
-      }
-    );
-
-    if (!updateCompra.ok) {
-      const err = await updateCompra.text();
-      console.error('Erro ao atualizar compra:', err);
-    }
-
-    // 6. Liberar acesso IMEDIATAMENTE para o participante que acabou de pagar
-    // (não espera os outros — cada um libera seu próprio acesso ao pagar)
+    // 6. Liberar acesso para quem pagou
     await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
+
+    // 7. Se for o 1º pagamento, liberar também para o criador da sala
+    // (criador não paga — acesso liberado quando a primeira pessoa usa o código)
+    if (ePrimeiroPagamento && compra.criador_user_id && compra.criador_user_id !== user_id) {
+      console.log(`1º pagamento — liberando acesso também para o criador: ${compra.criador_user_id}`);
+      // Marcar criador como aprovado
+      await fetch(
+        `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'apikey': sbKey,
+            'Authorization': `Bearer ${sbKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation',
+          },
+          body: JSON.stringify({
+            status_pagamento: 'aprovado',
+            pago_em: new Date().toISOString(),
+            mp_payment_id: `gratis_via_${String(paymentId)}`,
+          }),
+        }
+      );
+      await liberarAcessoParticipante(sbUrl, sbKey, compra_id, compra.criador_user_id);
+    }
 
     return new Response('OK', { status: 200 });
 
