@@ -2933,8 +2933,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
       <!-- Status sala -->
       <div id="mc-sala-status" style="display:none;margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid rgba(123,47,247,0.35);">
-        <!-- Código + Link de convite -->
-        <div style="background:#1a0030;padding:12px 14px;">
+        <!-- Código + Link de convite (visível só para o criador) -->
+        <div id="mc-sala-secao-codigo" style="background:#1a0030;padding:12px 14px;">
           <!-- Código curto (principal) -->
           <div style="font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.05em;margin-bottom:6px;">🔑 CÓDIGO DA SALA — compartilhe com quem quiser</div>
           <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;">
@@ -6016,6 +6016,7 @@ const SITE_URL = 'https://resumos-med.pages.dev';
 let mcState = {
   plano: null,
   compraId: null,
+  isJoiner: false, // true = entrou via código (não é criador)
   salaIntervalId: null,
   pollingIntervalId: null,
   scIntervalId: null,
@@ -6031,6 +6032,7 @@ function abrirModalCompra(plano) {
 
   mcState.plano = plano;
   mcState.compraId = null;
+  mcState.isJoiner = false;
   mcState.resumosSelecionados = [];
 
   // Atualizar descrição
@@ -6246,6 +6248,12 @@ async function mcContinuarParaPagamento() {
     );
   }
 
+  // Se entrou via código (isJoiner), paga direto sem mostrar a UI do criador
+  if (mcState.isJoiner && mcState.compraId) {
+    await iniciarPagamentoDupla();
+    return;
+  }
+
   document.getElementById('mc-step-selecao').style.display = 'none';
   document.getElementById('mc-step-pagamento').style.display = '';
 }
@@ -6385,8 +6393,7 @@ async function usarCodigoInline(tipo) {
     setTimeout(() => {
       abrirModalCompra(plano);
       mcState.compraId = compra.id;
-      mostrarStatusSala(compra);
-      iniciarPollingStatus(compra.id);
+      mcState.isJoiner = true; // entrou via código — mostra UI simplificada no step 2
       toast(`✅ Selecione os resumos e pague R$ ${precoFixo.preco_dupla.toFixed(2).replace('.',',')}!`, 'success');
     }, 150);
   } catch(e) {
@@ -6449,17 +6456,14 @@ async function entrarComCodigo() {
       _compraExistente: compra,
     };
 
-    // Abre o modal de compra normalmente (step 1: seleção de resumos)
+    // Abre o modal de compra (step 1: seleção de resumos)
     abrirModalCompra(plano);
 
     // Sobrescreve o compraId APÓS abrirModalCompra (que o resetava para null)
     mcState.compraId = compra.id;
+    mcState.isJoiner = true; // entrou via código — mostra UI simplificada no step 2
 
-    // Mostra o status da sala no step 2 (ainda oculto) para quando o usuário avançar
-    mostrarStatusSala(compra);
-    iniciarPollingStatus(compra.id);
-
-    toast(`✅ Sala encontrada! Selecione seus resumos e pague R$ ${compra.preco_dupla?.toFixed(2).replace('.',',')} para confirmar.`, 'success');
+    toast(`✅ Sala encontrada! Selecione seus resumos e pague R$ ${preco_dupla_fixo.toFixed(2).replace('.',',')} para confirmar.`, 'success');
   } catch(e) {
     toast('Erro: ' + e.message, 'error');
   } finally {
@@ -6543,12 +6547,18 @@ function copiarLinkSala() {
 }
 
 // ── MOSTRAR STATUS DA SALA ────────────────────────────────
-function mostrarStatusSala(compra) {
+// eCriador=true → mostra código/link para compartilhar (visão do criador)
+// eCriador=false → mostra só info de pagamento (visão de quem entrou com código)
+function mostrarStatusSala(compra, eCriador = true) {
   document.getElementById('mc-sala-status').style.display = 'block';
   document.getElementById('mc-btn-sala').style.display = 'none';
   document.getElementById('mc-btn-pagar-dupla').style.display = '';
 
-  // Mostrar código curto
+  // Seção de código/link: visível só para o criador
+  const secaoCodigo = document.getElementById('mc-sala-secao-codigo');
+  if (secaoCodigo) secaoCodigo.style.display = eCriador ? '' : 'none';
+
+  // Mostrar código curto (mesmo que escondido, preenche o campo)
   document.getElementById('mc-sala-codigo').textContent = compra.codigo || '——';
 
   // Gerar link de convite
