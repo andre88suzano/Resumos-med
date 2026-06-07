@@ -82,15 +82,26 @@ export async function onRequest(context) {
       return new Response('OK', { status: 200 });
     }
 
-    // Idempotência — verificar se este payment_id já foi processado
+    // Idempotência — verificar se este payment_id já foi processado E user_access já existe
     const checkRes = await fetch(
       `${sbUrl}/rest/v1/compra_participantes?mp_payment_id=eq.${String(paymentId)}&status_pagamento=eq.aprovado&select=user_id`,
       { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
     );
     const already = await checkRes.json();
     if (Array.isArray(already) && already.length > 0) {
-      console.log(`Pagamento ${paymentId} já processado — ignorando reenvio.`);
-      return new Response('OK', { status: 200 });
+      // Já aprovado — verificar se o user_access foi de fato inserido
+      const userId = already[0].user_id;
+      const accessCheck = await fetch(
+        `${sbUrl}/rest/v1/user_access?user_id=eq.${userId}&select=id&limit=1`,
+        { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+      );
+      const accessRows = await accessCheck.json();
+      if (Array.isArray(accessRows) && accessRows.length > 0) {
+        console.log(`Pagamento ${paymentId} já processado com acesso liberado — ignorando reenvio.`);
+        return new Response('OK', { status: 200 });
+      }
+      // user_access ainda vazio: continuar para liberar acesso
+      console.log(`Pagamento ${paymentId} aprovado mas sem user_access — continuando liberação.`);
     }
 
     // 2. Extrair external_reference
@@ -240,13 +251,13 @@ async function liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id) {
       expires_at: expiresAt,
     }));
 
-    const insertRes = await fetch(`${sbUrl}/rest/v1/user_access`, {
+    const insertRes = await fetch(`${sbUrl}/rest/v1/user_access?on_conflict=user_id,resumo_id`, {
       method: 'POST',
       headers: {
         'apikey': sbKey,
         'Authorization': `Bearer ${sbKey}`,
         'Content-Type': 'application/json',
-        'Prefer': 'resolution=ignore-duplicates,return=minimal',
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify(rows),
     });
