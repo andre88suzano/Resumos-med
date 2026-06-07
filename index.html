@@ -4070,11 +4070,11 @@ async function carregarVendas() {
     const revenue = d.revenue || {};
 
     document.getElementById('vend-semana-qtd').textContent = counts.weekly || 0;
-    document.getElementById('vend-semana-val').textContent = fmtVal(revenue.weekly || 0);
+    document.getElementById('vend-semana-val').textContent = fmtVal((revenue.weekly || 0) * 0.99);
     document.getElementById('vend-mes-qtd').textContent    = counts.monthly || 0;
-    document.getElementById('vend-mes-val').textContent    = fmtVal(revenue.monthly || 0);
+    document.getElementById('vend-mes-val').textContent    = fmtVal((revenue.monthly || 0) * 0.99);
     document.getElementById('vend-ano-qtd').textContent    = counts.yearly || 0;
-    document.getElementById('vend-ano-val').textContent    = fmtVal(revenue.yearly || 0);
+    document.getElementById('vend-ano-val').textContent    = fmtVal((revenue.yearly || 0) * 0.99);
     document.getElementById('vend-abandono-qtd').textContent = abandoned.length;
 
     // Tabela de vendas
