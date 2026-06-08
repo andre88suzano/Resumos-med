@@ -6522,8 +6522,10 @@ function mcRenderizarSelecaoResumos(plano) {
       // 3. Mesmo parcial (campo do banco — OBRIGATÓRIO, evita misturar P1 com P2)
       if ((r.parcial || '') !== (m.parcial || '')) return false;
 
-      // 4. Turma: se alguma tiver turma identificada, precisam ser iguais
-      if (turmaR && turmaM && turmaR !== turmaM) return false;
+      // 4. Turma: resumo sem turma só pareia com mini sem turma;
+      //    resumo com turma só pareia com mini da mesma turma (ou mini sem turma como fallback)
+      if (!turmaR && turmaM) return false;          // resumo genérico não pega mini de turma específica
+      if (turmaR && turmaM && turmaR !== turmaM) return false; // turmas diferentes
 
       return true;
     });
