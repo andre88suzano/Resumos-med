@@ -5130,12 +5130,47 @@ function openFolder(materia, sem) {
           <span style="font-size:11px;color:var(--text3);">${resumosDoParcial.length?Math.round(liberados/resumosDoParcial.length*100):0}%</span>
         </div>
       </div>`;
-  }).join('');
+  }).join('') + `
+      <div class="folder-card" onclick="openBancoQuestoes('${materia}',${sem})" style="--folder-color:#8b5cf6;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
+        <div class="folder-icon">🧠</div>
+        <div class="folder-name">Banco de Questões</div>
+        <div class="folder-meta" style="color:var(--text3);">Em breve</div>
+      </div>`;
 }
 
 function closeParciais() {
   document.getElementById('view-parciais').classList.add('hidden');
   document.getElementById('view-folders').classList.remove('hidden');
+}
+
+function openBancoQuestoes(materia, sem) {
+  document.getElementById('view-parciais').classList.add('hidden');
+  document.getElementById('view-folder-content').classList.remove('hidden');
+
+  const mIcon = MATERIA_ICONS[materia] || '📁';
+  const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
+  const semIcon  = SEMESTRE_ICONS[sem] || '📁';
+
+  document.getElementById('folder-icon-title').textContent = '🧠';
+  document.getElementById('folder-title').textContent = `${materia} — Banco de Questões`;
+  document.getElementById('folder-count').textContent = 'Em breve';
+  document.getElementById('folder-breadcrumb').innerHTML = `
+    <a onclick="closeSemestreContent()" style="cursor:pointer;">📁 Meus Resumos</a>
+    <span>›</span>
+    <a onclick="openSemestre(${sem})" style="cursor:pointer;">${semIcon} ${semLabel}</a>
+    <span>›</span>
+    <a onclick="openFolder('${materia}',${sem})" style="cursor:pointer;">${mIcon} ${materia}</a>
+    <span>›</span>
+    <span style="color:#8b5cf6;">🧠 Banco de Questões</span>`;
+
+  const grid = document.getElementById('folder-resumo-grid');
+  grid.innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+      <div style="font-size:52px;margin-bottom:16px;">🧠</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Banco de Questões</div>
+      <div style="font-size:14px;color:var(--text3);max-width:320px;margin:0 auto;">As questões de <strong style="color:var(--text);">${materia}</strong> estarão disponíveis em breve.</div>
+    </div>`;
 }
 
 // NÍVEL 4: resumos de um parcial
