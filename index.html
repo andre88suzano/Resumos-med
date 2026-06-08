@@ -3909,8 +3909,44 @@ async function deleteFeedback(id, event) {
 
 function openValoresModal() {
   openModal('modal-valores');
-  switchValoresTab('promo');
+  aplicarEstadoPromo();
   iniciarCountdownPromo();
+}
+
+// ── CONTROLE AUTOMÁTICO DA ABA PROMOÇÃO ──────────────────
+// 08/06/2026 00:00 → esconde promo, mostra "Em breve"
+// 09/06/2026 00:00 → (a definir pelo admin)
+function aplicarEstadoPromo() {
+  const agora = new Date();
+  const inicioEmBreve = new Date('2026-06-08T00:00:00-03:00'); // BRT
+  const fimEmBreve    = new Date('2026-06-09T00:00:00-03:00'); // BRT — ajustar quando definido
+
+  const tabPromo    = document.getElementById('vtab-promo');
+  const contentPromo = document.getElementById('vcontent-promo');
+
+  if (agora >= inicioEmBreve) {
+    // Troca label da aba para "Em breve"
+    tabPromo.innerHTML = '🕐 Em breve';
+    tabPromo.style.color = 'var(--text3)';
+    tabPromo.style.borderBottomColor = 'var(--text3)';
+    tabPromo.onclick = null;
+    tabPromo.style.cursor = 'default';
+    tabPromo.style.opacity = '0.55';
+
+    // Esconde conteúdo da promo e mostra mensagem
+    contentPromo.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="font-size:40px;margin-bottom:12px;">🕐</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Nova promoção em breve!</div>
+        <div style="font-size:13px;color:var(--text3);">Acompanhe nossas redes para não perder.</div>
+      </div>`;
+
+    // Vai para a aba Individual por padrão
+    switchValoresTab('individual');
+  } else {
+    // Promoção ativa — comportamento normal
+    switchValoresTab('promo');
+  }
 }
 
 function iniciarCountdownPromo() {
