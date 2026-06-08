@@ -3917,78 +3917,17 @@ function openValoresModal() {
 // 08/06 00:00 BRT → Em breve
 // 09/06 06:00 BRT → Promo Mini Resumo Imunologia P2 (R$10 PIX)
 // 09/06 14:00 BRT → Em breve
-// 21/06 10:00 BRT → Promo Exames Finais 2026
+// 08/06 → Promo Exames Finais 2026 (ativa já)
 // 29/06 00:00 BRT → Em breve
 function aplicarEstadoPromo() {
   const agora = new Date();
-  const T_EM_BREVE_1    = new Date('2026-06-08T00:00:00-03:00');
-  const T_PROMO_INICIO  = new Date('2026-06-09T06:00:00-03:00');
-  const T_PROMO_FIM     = new Date('2026-06-09T14:00:00-03:00');
-  const T_FINAIS_INICIO = new Date('2026-06-21T10:00:00-03:00');
+  const T_FINAIS_INICIO = new Date('2026-06-08T00:00:00-03:00'); // ativo agora
   const T_FINAIS_FIM    = new Date('2026-06-29T00:00:00-03:00');
 
   const tabPromo     = document.getElementById('vtab-promo');
   const contentPromo = document.getElementById('vcontent-promo');
 
-  if (agora >= T_PROMO_INICIO && agora < T_PROMO_FIM) {
-    // ── PROMO ATIVA: Mini Resumo Imunologia P2 ──────────
-    const precoPix  = 10.00;
-    const precoCard = Math.round((precoPix / 0.95) * 100) / 100;
-    const fmtBR = v => v.toFixed(2).replace('.', ',');
-
-    tabPromo.innerHTML = '🔥 Promoção';
-    tabPromo.style.color = '#e85d04';
-    tabPromo.style.borderBottomColor = '#e85d04';
-    tabPromo.style.cursor = 'pointer';
-    tabPromo.style.opacity = '1';
-    tabPromo.onclick = () => switchValoresTab('promo');
-
-    contentPromo.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <!-- Cabeçalho flash -->
-        <div style="background:linear-gradient(135deg,#1a0500,#2d0d00);border:1px solid #e85d0460;border-radius:12px;padding:16px 18px;text-align:center;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#e85d04;text-transform:uppercase;margin-bottom:4px;">⚡ Oferta Relâmpago — 8 horas</div>
-          <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;">Mini Resumo Parcial 2 · Imunologia</div>
-          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Material ultra-compacto para aquela última checada antes da prova</div>
-          <div style="font-size:28px;font-weight:900;color:#e85d04;">R$ ${fmtBR(precoPix)} <span style="font-size:14px;font-weight:400;color:var(--text3);">no PIX</span></div>
-          <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">ou R$ ${fmtBR(precoCard)} no cartão</div>
-          <!-- Countdown -->
-          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Encerra em:</div>
-          <div id="promo-flash-countdown" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#e85d04;letter-spacing:3px;">--:--:--</div>
-        </div>
-        <!-- Botões -->
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-primary" style="flex:1;background:#e85d04;border:none;font-weight:700;"
-            onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('pix')">
-            ⚡ PIX — R$ ${fmtBR(precoPix)}
-          </button>
-          <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;font-weight:700;"
-            onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('cartao')">
-            💳 Cartão — R$ ${fmtBR(precoCard)}
-          </button>
-        </div>
-      </div>`;
-
-    // Countdown até 14:00
-    if (window._flashCountdownInterval) clearInterval(window._flashCountdownInterval);
-    window._flashCountdownInterval = setInterval(() => {
-      const el = document.getElementById('promo-flash-countdown');
-      if (!el) { clearInterval(window._flashCountdownInterval); return; }
-      const diff = T_PROMO_FIM - new Date();
-      if (diff <= 0) {
-        clearInterval(window._flashCountdownInterval);
-        aplicarEstadoPromo(); // reaplica → volta para Em breve
-        return;
-      }
-      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      el.textContent = `${h}:${m}:${s}`;
-    }, 1000);
-
-    switchValoresTab('promo');
-
-  } else if (agora >= T_FINAIS_INICIO && agora < T_FINAIS_FIM) {
+  if (agora >= T_FINAIS_INICIO && agora < T_FINAIS_FIM) {
     // ── PROMO EXAMES FINAIS 2026 ─────────────────────────
     const fmtBR = v => v.toFixed(2).replace('.', ',');
     const cardPrice = v => Math.round((v / 0.95) * 100) / 100;
@@ -4109,117 +4048,21 @@ function aplicarEstadoPromo() {
 
     switchValoresTab('promo');
 
-  } else if (agora >= T_EM_BREVE_1) {
-    // ── EM BREVE ────────────────────────────────────────
-    const T_ADMIN_PREVIEW_FIM = new Date('2026-06-08T07:00:00Z'); // 04:00 BRT
-    const isAdmin = state.profile?.is_admin;
-    const showAdminPreview = isAdmin && agora < T_ADMIN_PREVIEW_FIM;
-
-    tabPromo.innerHTML = showAdminPreview ? '🔒 Preview Admin' : '🕐 Em breve';
-    tabPromo.style.color = showAdminPreview ? '#f59e0b' : 'var(--text3)';
-    tabPromo.style.borderBottomColor = showAdminPreview ? '#f59e0b' : 'var(--text3)';
-    tabPromo.onclick = showAdminPreview ? () => switchValoresTab('promo') : null;
-    tabPromo.style.cursor = showAdminPreview ? 'pointer' : 'default';
-    tabPromo.style.opacity = showAdminPreview ? '1' : '0.55';
-
-    if (showAdminPreview) {
-      const fmtBR = v => v.toFixed(2).replace('.', ',');
-      const cardPrice = v => Math.round((v / 0.95) * 100) / 100;
-      const P = {
-        soloResumos:   { pix: 58.41, orig: 64.90 },
-        soloCompleto:  { pix: 71.91, orig: 79.90 },
-        duplaResumos:  { pix: 55.17, orig: 64.90 },
-        duplaCompleto: { pix: 67.92, orig: 79.90 },
-      };
-      contentPromo.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <!-- Banner admin -->
-          <div style="background:#1c1400;border:1px solid #f59e0b60;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px;">🔒</span>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#f59e0b;">PREVIEW EXCLUSIVO ADMIN</div>
-              <div style="font-size:11px;color:var(--text3);">Visível só para você até 04:00 de hoje. Alunos veem "Em breve".</div>
-            </div>
-          </div>
-
-          <!-- PROMO 1: Relâmpago Imunologia -->
-          <div style="border:1px solid #e85d0450;border-radius:12px;overflow:hidden;">
-            <div style="background:#1a0500;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
-              <div style="font-size:12px;font-weight:700;color:#e85d04;">⚡ 09/06 · 06h–14h — Oferta Relâmpago</div>
-              <div style="font-size:10px;color:var(--text3);">8 horas apenas</div>
-            </div>
-            <div style="padding:14px;background:linear-gradient(135deg,#1a0500,#2d0d00);">
-              <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;">Mini Resumo Parcial 2 · Imunologia</div>
-              <div style="font-size:24px;font-weight:900;color:#e85d04;margin-bottom:2px;">R$ 10,00 <span style="font-size:12px;font-weight:400;color:var(--text3);">PIX</span></div>
-              <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">ou R$ ${fmtBR(cardPrice(10.00))} no cartão</div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-primary btn-sm" style="flex:1;background:#e85d04;border:none;" onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('pix')">⚡ PIX — R$ 10,00</button>
-                <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('cartao')">💳 Cartão — R$ ${fmtBR(cardPrice(10.00))}</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- PROMO 2: Exames Finais -->
-          <div style="border:1px solid #7c3aed50;border-radius:12px;overflow:hidden;">
-            <div style="background:linear-gradient(135deg,#0f0020,#1a0a35);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
-              <div style="font-size:12px;font-weight:700;color:#a78bfa;">📚 21/06 10h a 28/06 — Exames Finais 2026</div>
-              <span style="font-size:10px;font-weight:700;background:#4c1d95;color:#e2d9ff;padding:2px 8px;border-radius:20px;">10–15% off</span>
-            </div>
-            <div style="padding:12px;background:var(--bg2);display:flex;flex-direction:column;gap:8px;">
-              <!-- matérias -->
-              <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                ${['Fisiologia','Bioquímica','Genética','Imunologia','Biofísica','Microbiologia'].map(m =>
-                  `<span style="font-size:9px;background:#ffffff08;border:1px solid #ffffff15;color:#a78bfa;padding:2px 7px;border-radius:20px;">${m}</span>`
-                ).join('')}
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;">
-                  <div style="font-size:9px;color:var(--text3);margin-bottom:2px;">Individual · 10% off</div>
-                  <div style="font-size:11px;font-weight:700;color:var(--text);">📖 Só Resumos</div>
-                  <div style="font-size:9px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloResumos.orig)}</div>
-                  <div style="font-size:16px;font-weight:800;color:var(--text);">R$ ${fmtBR(P.soloResumos.pix)}</div>
-                  <div style="font-size:9px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
-                </div>
-                <div style="background:linear-gradient(160deg,#1a0a35,#0f0020);border:2px solid #7c3aed;border-radius:8px;padding:9px;position:relative;">
-                  <div style="position:absolute;top:-1px;right:6px;background:#7c3aed;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:0 0 6px 6px;">TOP</div>
-                  <div style="font-size:9px;color:#a78bfa80;margin-bottom:2px;">Individual · 10% off</div>
-                  <div style="font-size:11px;font-weight:700;color:#e2d9ff;">📖⚡ Resumos + Mini</div>
-                  <div style="font-size:9px;color:#a78bfa60;text-decoration:line-through;">R$ ${fmtBR(P.soloCompleto.orig)}</div>
-                  <div style="font-size:16px;font-weight:800;color:#a78bfa;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
-                  <div style="font-size:9px;color:#a78bfa80;">PIX · R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
-                </div>
-                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:9px;">
-                  <div style="font-size:9px;color:var(--text3);margin-bottom:2px;">Dupla · 15% off</div>
-                  <div style="font-size:11px;font-weight:700;color:var(--text);">📖 Dupla Resumos</div>
-                  <div style="font-size:9px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaResumos.orig)}/p</div>
-                  <div style="font-size:16px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
-                  <div style="font-size:9px;color:var(--text3);">/p PIX · R$ ${fmtBR(cardPrice(P.duplaResumos.pix))}</div>
-                </div>
-                <div style="background:linear-gradient(160deg,#021a10,#012510);border:2px solid #059669;border-radius:8px;padding:9px;position:relative;">
-                  <div style="position:absolute;top:-1px;right:6px;background:#059669;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:0 0 6px 6px;">💰</div>
-                  <div style="font-size:9px;color:#05966980;margin-bottom:2px;">Dupla Completa · 15% off</div>
-                  <div style="font-size:11px;font-weight:700;color:#d1fae5;">📖⚡ Dupla + Mini</div>
-                  <div style="font-size:9px;color:#05966960;text-decoration:line-through;">R$ ${fmtBR(P.duplaCompleto.orig)}/p</div>
-                  <div style="font-size:16px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
-                  <div style="font-size:9px;color:#05966980;">/p PIX · R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-      switchValoresTab('promo');
-    } else {
-      contentPromo.innerHTML = `
-        <div style="text-align:center;padding:40px 20px;">
-          <div style="font-size:40px;margin-bottom:12px;">🕐</div>
-          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Nova promoção em breve!</div>
-          <div style="font-size:13px;color:var(--text3);">Acompanhe nossas redes para não perder.</div>
-        </div>`;
-      switchValoresTab('individual');
-    }
   } else {
-    // ── PROMOÇÃO ORIGINAL ATIVA ─────────────────────────
-    switchValoresTab('promo');
+    // ── EM BREVE (pós 29/06) ──────────────────────────────
+    tabPromo.innerHTML = '🕐 Em breve';
+    tabPromo.style.color = 'var(--text3)';
+    tabPromo.style.borderBottomColor = 'var(--text3)';
+    tabPromo.onclick = null;
+    tabPromo.style.cursor = 'default';
+    tabPromo.style.opacity = '0.55';
+    contentPromo.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="font-size:40px;margin-bottom:12px;">🕐</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Nova promoção em breve!</div>
+        <div style="font-size:13px;color:var(--text3);">Acompanhe nossas redes para não perder.</div>
+      </div>`;
+    switchValoresTab('individual');
   }
 }
 
