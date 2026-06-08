@@ -4009,84 +4009,102 @@ function aplicarEstadoPromo() {
     tabPromo.onclick = () => switchValoresTab('promo');
 
     contentPromo.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <!-- Header -->
-        <div style="text-align:center;margin-bottom:4px;">
-          <div style="display:inline-block;background:#1a1a2e;color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px;border:1px solid #4c1d95;margin-bottom:10px;">📚 Exames Finais 2026</div>
-          <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:2px;">Resumos que aprovam</div>
-          <div style="font-size:13px;color:var(--text3);">6 resumos completos — escolha seu plano</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+
+        <!-- ── HERO ── -->
+        <div style="background:linear-gradient(135deg,#0f0020 0%,#1a0a35 60%,#0d1a30 100%);border-radius:14px;padding:20px 18px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,#7c3aed30,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1a2e;border:1px solid #4c1d95;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">📚</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#a78bfa;">Exames Finais 2026</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">Resumos que aprovam</div>
+          <div style="font-size:13px;color:#a78bfa80;margin-bottom:14px;">Acesso imediato após pagamento</div>
+          <!-- Incluídos -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${['Anatomia','Bioquímica','Fisiologia','Farmacologia','Imunologia','Histologia'].map(m =>
+              `<span style="font-size:11px;background:#ffffff10;border:1px solid #ffffff20;color:#e2d9ff;padding:3px 10px;border-radius:20px;">${m}</span>`
+            ).join('')}
+          </div>
         </div>
 
-        <!-- Cards individuais -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- ── INDIVIDUAL ── -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Individual · 10% off</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+
           <!-- Solo Resumos -->
-          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Individual</span>
-              <span style="font-size:10px;font-weight:600;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:20px;">10% off</span>
-            </div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Pacote Resumos Finais</div>
-            <div style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-bottom:2px;">de R$ ${fmtBR(P.soloResumos.orig)}</div>
-            <div style="font-size:22px;font-weight:800;color:var(--text);">R$ ${fmtBR(P.soloResumos.pix)}</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">no PIX · R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">⚡ PIX</button>
-              <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">💳 Cartão</button>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:0;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">📖 Só Resumos</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:8px;">6 resumos completos</div>
+            <div style="font-size:10px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloResumos.orig)}</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);line-height:1.1;">R$ ${fmtBR(P.soloResumos.pix)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">PIX</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
+            <div style="display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.soloResumos.orig - P.soloResumos.pix)}</div>
+            <div style="display:flex;gap:5px;margin-top:auto;">
+              <button class="btn btn-primary btn-sm" style="flex:1;font-size:10px;padding:6px 4px;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">⚡ PIX</button>
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">💳 Cartão</button>
             </div>
           </div>
-          <!-- Solo Completo -->
-          <div style="background:var(--bg2);border:2px solid #7c3aed;border-radius:12px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Completo</span>
-              <span style="font-size:10px;font-weight:600;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:20px;">10% off</span>
-            </div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Resumos + Mini Resumos</div>
-            <div style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-bottom:2px;">de R$ ${fmtBR(P.soloCompleto.orig)}</div>
-            <div style="font-size:22px;font-weight:800;color:#a78bfa;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">no PIX · R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-sm" style="flex:1;font-size:11px;background:#7c3aed;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">⚡ PIX</button>
-              <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">💳 Cartão</button>
+
+          <!-- Solo Completo (destaque) -->
+          <div style="background:linear-gradient(160deg,#1a0a35,#0f0020);border:2px solid #7c3aed;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:0;position:relative;">
+            <div style="position:absolute;top:-1px;right:10px;background:#7c3aed;color:#fff;font-size:9px;font-weight:800;padding:2px 9px;border-radius:0 0 8px 8px;letter-spacing:.05em;">MAIS COMPLETO</div>
+            <div style="font-size:12px;font-weight:700;color:#e2d9ff;margin-bottom:2px;">📖⚡ Resumos + Mini</div>
+            <div style="font-size:10px;color:#a78bfa80;margin-bottom:8px;">6 resumos + mini resumos</div>
+            <div style="font-size:10px;color:#a78bfa60;text-decoration:line-through;">R$ ${fmtBR(P.soloCompleto.orig)}</div>
+            <div style="font-size:24px;font-weight:800;color:#a78bfa;line-height:1.1;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
+            <div style="font-size:10px;color:#a78bfa80;margin-bottom:4px;">PIX</div>
+            <div style="font-size:10px;color:#a78bfa80;margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
+            <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.soloCompleto.orig - P.soloCompleto.pix)}</div>
+            <div style="display:flex;gap:5px;margin-top:auto;">
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#7c3aed;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">⚡ PIX</button>
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">💳 Cartão</button>
             </div>
           </div>
         </div>
 
-        <!-- Divisor dupla -->
-        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-          <div style="flex:1;height:1px;background:var(--border);"></div>
-          <span style="font-size:11px;color:var(--text3);font-weight:500;white-space:nowrap;">🔥 Compra em dupla — 15% off por pessoa</span>
-          <div style="flex:1;height:1px;background:var(--border);"></div>
+        <!-- ── DIVISOR DUPLA ── -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#05966960);"></div>
+          <div style="background:#021a10;border:1px solid #05966960;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:11px;">🤝</span>
+            <span style="font-size:10px;font-weight:700;color:#059669;white-space:nowrap;">Compra em dupla — 15% off por pessoa</span>
+          </div>
+          <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,#05966960);"></div>
         </div>
 
-        <!-- Cards dupla -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- ── DUPLA ── -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Dupla · 15% off por pessoa</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+
           <!-- Dupla Resumos -->
-          <div style="background:var(--bg2);border:2px solid #059669;border-radius:12px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Dupla</span>
-              <span style="font-size:10px;font-weight:600;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:20px;">15% off</span>
-            </div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Pacote Resumos — dupla</div>
-            <div style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-bottom:2px;">de R$ ${fmtBR(P.duplaResumos.orig)} cada</div>
-            <div style="font-size:22px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">/pessoa PIX · R$ ${fmtBR(cardPrice(P.duplaResumos.pix))} cartão</div>
-            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais · Dupla',preco_dupla:${P.duplaResumos.pix},preco_solo:${P.soloResumos.pix},tipo:'dupla'})">👯 Criar Sala</button>
+          <div style="background:var(--bg2);border:2px solid #059669;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:0;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">📖 Só Resumos</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:8px;">6 resumos · 2 acessos</div>
+            <div style="font-size:10px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaResumos.orig)}/pessoa</div>
+            <div style="font-size:24px;font-weight:800;color:#059669;line-height:1.1;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">/pessoa PIX</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.duplaResumos.pix))} cartão</div>
+            <div style="display:inline-block;background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.duplaResumos.orig - P.duplaResumos.pix)}/p</div>
+            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais · Dupla',preco_dupla:${P.duplaResumos.pix},preco_solo:${P.soloResumos.pix},tipo:'dupla'})">👯 Criar Sala Dupla</button>
           </div>
+
           <!-- Dupla Completa -->
-          <div style="background:var(--bg2);border:2px solid #059669;border-radius:12px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">Dupla Completa</span>
-              <span style="font-size:10px;font-weight:600;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:20px;">15% off</span>
-            </div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">Resumos + Mini — dupla</div>
-            <div style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-bottom:2px;">de R$ ${fmtBR(P.duplaCompleto.orig)} cada</div>
-            <div style="font-size:22px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">/pessoa PIX · R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))} cartão</div>
-            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais · Dupla',preco_dupla:${P.duplaCompleto.pix},preco_solo:${P.soloCompleto.pix},tipo:'dupla'})">👯 Criar Sala</button>
+          <div style="background:linear-gradient(160deg,#021a10,#012510);border:2px solid #059669;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:0;position:relative;">
+            <div style="position:absolute;top:-1px;right:10px;background:#059669;color:#fff;font-size:9px;font-weight:800;padding:2px 9px;border-radius:0 0 8px 8px;letter-spacing:.05em;">MELHOR CUSTO</div>
+            <div style="font-size:12px;font-weight:700;color:#d1fae5;margin-bottom:2px;">📖⚡ Resumos + Mini</div>
+            <div style="font-size:10px;color:#05966980;margin-bottom:8px;">6 resumos + mini · 2 acessos</div>
+            <div style="font-size:10px;color:#05966960;text-decoration:line-through;">R$ ${fmtBR(P.duplaCompleto.orig)}/pessoa</div>
+            <div style="font-size:24px;font-weight:800;color:#059669;line-height:1.1;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
+            <div style="font-size:10px;color:#05966980;margin-bottom:4px;">/pessoa PIX</div>
+            <div style="font-size:10px;color:#05966980;margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))} cartão</div>
+            <div style="display:inline-block;background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.duplaCompleto.orig - P.duplaCompleto.pix)}/p</div>
+            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais · Dupla',preco_dupla:${P.duplaCompleto.pix},preco_solo:${P.soloCompleto.pix},tipo:'dupla'})">👯 Criar Sala Dupla</button>
           </div>
         </div>
 
-        <p style="text-align:center;font-size:12px;color:var(--text3);margin:0;">Tem um amigo pra dividir? <strong style="color:#7c3aed;">Cada um paga menos — 15% de desconto na dupla.</strong></p>
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;padding-bottom:4px;">Pagamento via PIX com acesso imediato. <strong style="color:#7c3aed;">Dupla: cada um recebe seu próprio acesso.</strong></p>
       </div>`;
 
     switchValoresTab('promo');
@@ -4143,39 +4161,47 @@ function aplicarEstadoPromo() {
 
           <!-- PROMO 2: Exames Finais -->
           <div style="border:1px solid #7c3aed50;border-radius:12px;overflow:hidden;">
-            <div style="background:#0f0020;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="background:linear-gradient(135deg,#0f0020,#1a0a35);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
               <div style="font-size:12px;font-weight:700;color:#a78bfa;">📚 21/06 10h a 28/06 — Exames Finais 2026</div>
-              <div style="font-size:10px;color:var(--text3);">10–15% off</div>
+              <span style="font-size:10px;font-weight:700;background:#4c1d95;color:#e2d9ff;padding:2px 8px;border-radius:20px;">10–15% off</span>
             </div>
-            <div style="padding:14px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Individual · 10% off</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--text);">Pacote Resumos</div>
-                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloResumos.orig)}</div>
-                  <div style="font-size:18px;font-weight:800;color:var(--text);">R$ ${fmtBR(P.soloResumos.pix)}</div>
-                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
+            <div style="padding:12px;background:var(--bg2);display:flex;flex-direction:column;gap:8px;">
+              <!-- matérias -->
+              <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${['Anatomia','Bioquímica','Fisiologia','Farmacologia','Imunologia','Histologia'].map(m =>
+                  `<span style="font-size:9px;background:#ffffff08;border:1px solid #ffffff15;color:#a78bfa;padding:2px 7px;border-radius:20px;">${m}</span>`
+                ).join('')}
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;">
+                  <div style="font-size:9px;color:var(--text3);margin-bottom:2px;">Individual · 10% off</div>
+                  <div style="font-size:11px;font-weight:700;color:var(--text);">📖 Só Resumos</div>
+                  <div style="font-size:9px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloResumos.orig)}</div>
+                  <div style="font-size:16px;font-weight:800;color:var(--text);">R$ ${fmtBR(P.soloResumos.pix)}</div>
+                  <div style="font-size:9px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
                 </div>
-                <div style="background:var(--bg3);border:2px solid #7c3aed;border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Completo · 10% off</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--text);">Resumos + Mini</div>
-                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloCompleto.orig)}</div>
-                  <div style="font-size:18px;font-weight:800;color:#a78bfa;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
-                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
+                <div style="background:linear-gradient(160deg,#1a0a35,#0f0020);border:2px solid #7c3aed;border-radius:8px;padding:9px;position:relative;">
+                  <div style="position:absolute;top:-1px;right:6px;background:#7c3aed;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:0 0 6px 6px;">TOP</div>
+                  <div style="font-size:9px;color:#a78bfa80;margin-bottom:2px;">Individual · 10% off</div>
+                  <div style="font-size:11px;font-weight:700;color:#e2d9ff;">📖⚡ Resumos + Mini</div>
+                  <div style="font-size:9px;color:#a78bfa60;text-decoration:line-through;">R$ ${fmtBR(P.soloCompleto.orig)}</div>
+                  <div style="font-size:16px;font-weight:800;color:#a78bfa;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
+                  <div style="font-size:9px;color:#a78bfa80;">PIX · R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
                 </div>
-                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Dupla · 15% off</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--text);">Pacote — dupla</div>
-                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaResumos.orig)}/pessoa</div>
-                  <div style="font-size:18px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
-                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.duplaResumos.pix))} cartão</div>
+                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:9px;">
+                  <div style="font-size:9px;color:var(--text3);margin-bottom:2px;">Dupla · 15% off</div>
+                  <div style="font-size:11px;font-weight:700;color:var(--text);">📖 Dupla Resumos</div>
+                  <div style="font-size:9px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaResumos.orig)}/p</div>
+                  <div style="font-size:16px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
+                  <div style="font-size:9px;color:var(--text3);">/p PIX · R$ ${fmtBR(cardPrice(P.duplaResumos.pix))}</div>
                 </div>
-                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Dupla Completa · 15% off</div>
-                  <div style="font-size:12px;font-weight:700;color:var(--text);">Resumos+Mini dupla</div>
-                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaCompleto.orig)}/pessoa</div>
-                  <div style="font-size:18px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
-                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))} cartão</div>
+                <div style="background:linear-gradient(160deg,#021a10,#012510);border:2px solid #059669;border-radius:8px;padding:9px;position:relative;">
+                  <div style="position:absolute;top:-1px;right:6px;background:#059669;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:0 0 6px 6px;">💰</div>
+                  <div style="font-size:9px;color:#05966980;margin-bottom:2px;">Dupla Completa · 15% off</div>
+                  <div style="font-size:11px;font-weight:700;color:#d1fae5;">📖⚡ Dupla + Mini</div>
+                  <div style="font-size:9px;color:#05966960;text-decoration:line-through;">R$ ${fmtBR(P.duplaCompleto.orig)}/p</div>
+                  <div style="font-size:16px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
+                  <div style="font-size:9px;color:#05966980;">/p PIX · R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))}</div>
                 </div>
               </div>
             </div>
