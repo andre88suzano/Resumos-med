@@ -4093,21 +4093,104 @@ function aplicarEstadoPromo() {
 
   } else if (agora >= T_EM_BREVE_1) {
     // ── EM BREVE ────────────────────────────────────────
-    tabPromo.innerHTML = '🕐 Em breve';
-    tabPromo.style.color = 'var(--text3)';
-    tabPromo.style.borderBottomColor = 'var(--text3)';
-    tabPromo.onclick = null;
-    tabPromo.style.cursor = 'default';
-    tabPromo.style.opacity = '0.55';
+    const T_ADMIN_PREVIEW_FIM = new Date('2026-06-08T07:00:00Z'); // 04:00 BRT
+    const isAdmin = state.profile?.is_admin;
+    const showAdminPreview = isAdmin && agora < T_ADMIN_PREVIEW_FIM;
 
-    contentPromo.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;">
-        <div style="font-size:40px;margin-bottom:12px;">🕐</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Nova promoção em breve!</div>
-        <div style="font-size:13px;color:var(--text3);">Acompanhe nossas redes para não perder.</div>
-      </div>`;
+    tabPromo.innerHTML = showAdminPreview ? '🔒 Preview Admin' : '🕐 Em breve';
+    tabPromo.style.color = showAdminPreview ? '#f59e0b' : 'var(--text3)';
+    tabPromo.style.borderBottomColor = showAdminPreview ? '#f59e0b' : 'var(--text3)';
+    tabPromo.onclick = showAdminPreview ? () => switchValoresTab('promo') : null;
+    tabPromo.style.cursor = showAdminPreview ? 'pointer' : 'default';
+    tabPromo.style.opacity = showAdminPreview ? '1' : '0.55';
 
-    switchValoresTab('individual');
+    if (showAdminPreview) {
+      const fmtBR = v => v.toFixed(2).replace('.', ',');
+      const cardPrice = v => Math.round((v / 0.95) * 100) / 100;
+      const P = {
+        soloResumos:   { pix: 58.41, orig: 64.90 },
+        soloCompleto:  { pix: 71.91, orig: 79.90 },
+        duplaResumos:  { pix: 55.17, orig: 64.90 },
+        duplaCompleto: { pix: 67.92, orig: 79.90 },
+      };
+      contentPromo.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <!-- Banner admin -->
+          <div style="background:#1c1400;border:1px solid #f59e0b60;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🔒</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f59e0b;">PREVIEW EXCLUSIVO ADMIN</div>
+              <div style="font-size:11px;color:var(--text3);">Visível só para você até 04:00 de hoje. Alunos veem "Em breve".</div>
+            </div>
+          </div>
+
+          <!-- PROMO 1: Relâmpago Imunologia -->
+          <div style="border:1px solid #e85d0450;border-radius:12px;overflow:hidden;">
+            <div style="background:#1a0500;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:12px;font-weight:700;color:#e85d04;">⚡ 09/06 · 06h–14h — Oferta Relâmpago</div>
+              <div style="font-size:10px;color:var(--text3);">8 horas apenas</div>
+            </div>
+            <div style="padding:14px;background:linear-gradient(135deg,#1a0500,#2d0d00);">
+              <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;">Mini Resumo Parcial 2 · Imunologia</div>
+              <div style="font-size:24px;font-weight:900;color:#e85d04;margin-bottom:2px;">R$ 10,00 <span style="font-size:12px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">ou R$ ${fmtBR(cardPrice(10.00))} no cartão</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;background:#e85d04;border:none;" onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('pix')">⚡ PIX — R$ 10,00</button>
+                <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompraPromoImuno('cartao')">💳 Cartão — R$ ${fmtBR(cardPrice(10.00))}</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROMO 2: Exames Finais -->
+          <div style="border:1px solid #7c3aed50;border-radius:12px;overflow:hidden;">
+            <div style="background:#0f0020;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:12px;font-weight:700;color:#a78bfa;">📚 21/06 10h a 28/06 — Exames Finais 2026</div>
+              <div style="font-size:10px;color:var(--text3);">10–15% off</div>
+            </div>
+            <div style="padding:14px;background:var(--bg2);display:flex;flex-direction:column;gap:10px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Individual · 10% off</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--text);">Pacote Resumos</div>
+                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloResumos.orig)}</div>
+                  <div style="font-size:18px;font-weight:800;color:var(--text);">R$ ${fmtBR(P.soloResumos.pix)}</div>
+                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
+                </div>
+                <div style="background:var(--bg3);border:2px solid #7c3aed;border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Completo · 10% off</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--text);">Resumos + Mini</div>
+                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.soloCompleto.orig)}</div>
+                  <div style="font-size:18px;font-weight:800;color:#a78bfa;">R$ ${fmtBR(P.soloCompleto.pix)}</div>
+                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
+                </div>
+                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Dupla · 15% off</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--text);">Pacote — dupla</div>
+                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaResumos.orig)}/pessoa</div>
+                  <div style="font-size:18px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaResumos.pix)}</div>
+                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.duplaResumos.pix))} cartão</div>
+                </div>
+                <div style="background:var(--bg3);border:2px solid #059669;border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">Dupla Completa · 15% off</div>
+                  <div style="font-size:12px;font-weight:700;color:var(--text);">Resumos+Mini dupla</div>
+                  <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(P.duplaCompleto.orig)}/pessoa</div>
+                  <div style="font-size:18px;font-weight:800;color:#059669;">R$ ${fmtBR(P.duplaCompleto.pix)}</div>
+                  <div style="font-size:10px;color:var(--text3);">PIX · R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))} cartão</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      switchValoresTab('promo');
+    } else {
+      contentPromo.innerHTML = `
+        <div style="text-align:center;padding:40px 20px;">
+          <div style="font-size:40px;margin-bottom:12px;">🕐</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Nova promoção em breve!</div>
+          <div style="font-size:13px;color:var(--text3);">Acompanhe nossas redes para não perder.</div>
+        </div>`;
+      switchValoresTab('individual');
+    }
   } else {
     // ── PROMOÇÃO ORIGINAL ATIVA ─────────────────────────
     switchValoresTab('promo');
