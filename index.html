@@ -2798,6 +2798,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     <div style="display:flex;gap:0;padding:10px 16px 0;border-bottom:1px solid var(--border);overflow-x:auto;">
       <button class="valores-tab active" onclick="switchValoresTab('promo')" id="vtab-promo" style="color:#e85d04;border-bottom-color:#e85d04;font-weight:700;">🔥 Promoção</button>
       <button class="valores-tab" onclick="switchValoresTab('individual')" id="vtab-individual">📄 Individual</button>
+      <button class="valores-tab" onclick="switchValoresTab('questoes')" id="vtab-questoes">🧠 Questões</button>
       <button class="valores-tab" onclick="switchValoresTab('prova')" id="vtab-prova">📋 Por Prova</button>
       <button class="valores-tab" onclick="switchValoresTab('semestre')" id="vtab-semestre">🎓 Semestre</button>
     </div>
@@ -3059,6 +3060,68 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       </div>
 
       <!-- TAB: SEMESTRE -->
+      <!-- ── QUESTÕES ── -->
+      <div id="vcontent-questoes" class="hidden">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Acesso ao banco de questões com gabarito e explicações. Escolha o pacote pelo número de questões.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <!-- 20 Questões -->
+          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info">
+                <div class="valor-nome">🧠 20 Questões</div>
+                <div class="valor-desc">Banco com 20 questões com gabarito e explicação.</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;width:100%;">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo'})">⚡ PIX — R$ 5,00</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 5,25</button>
+            </div>
+          </div>
+
+          <!-- 40 Questões -->
+          <div class="valor-item" style="border-color:var(--accent);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info">
+                <div class="valor-nome">🧠🧠 40 Questões</div>
+                <div class="valor-desc">Banco com 40 questões com gabarito e explicação.</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;width:100%;">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo'})">⚡ PIX — R$ 10,00</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 10,50</button>
+            </div>
+          </div>
+
+          <!-- 60 Questões -->
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div class="valor-info">
+                <div class="valor-nome">🧠🧠🧠 60 Questões</div>
+                <div class="valor-desc">Banco completo com 60 questões com gabarito e explicação.</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="valor-preco" style="color:var(--teal);">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 15,75 cartão</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;width:100%;">
+              <button class="btn btn-primary btn-sm" style="flex:1;background:var(--teal);border-color:var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo'})">⚡ PIX — R$ 15,00</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 15,75</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <div id="vcontent-semestre" class="hidden">
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Acesso completo a todos os resumos do semestre.</p>
         <div style="display:flex;flex-direction:column;gap:12px;">
@@ -4270,7 +4333,7 @@ function iniciarCountdownPromo() {
 }
 
 function switchValoresTab(tab) {
-  ['promo','individual','prova','semestre'].forEach(t => {
+  ['promo','individual','questoes','prova','semestre'].forEach(t => {
     document.getElementById('vcontent-' + t).classList.toggle('hidden', t !== tab);
     const btn = document.getElementById('vtab-' + t);
     btn.classList.toggle('active', t === tab);
