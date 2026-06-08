@@ -1980,29 +1980,81 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
     <!-- ── PAGE: ADMIN RESUMOS ─────────────────────── -->
     <div class="page hidden" id="page-admin-resumos">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+
+      <!-- ── Cabeçalho da página ── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <div>
-          <h1 class="section-title" data-i18n="nav-manage-resumos">Gerenciar Resumos</h1>
-          <p class="section-sub" style="margin-bottom:0;" data-i18n="manage-resumos-sub">Adicione e edite resumos da plataforma.</p>
+          <h1 class="section-title" style="margin-bottom:2px;">Gerenciar Conteúdo</h1>
+          <p class="section-sub" style="margin-bottom:0;">Gerencie resumos e banco de questões da plataforma.</p>
         </div>
-        <button class="btn btn-primary" onclick="openAddResumo()" data-i18n="add-resumo">+ Adicionar Resumo</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" onclick="openAddResumo()">+ Adicionar Resumo</button>
+          <button class="btn btn-primary" style="background:#7c3aed;border-color:#7c3aed;" onclick="openAddQuestao()">+ Adicionar Questão</button>
+        </div>
       </div>
 
-      <div class="table-wrapper">
-        <table class="data-table" id="admin-resumos-table">
-          <thead>
-            <tr>
-              <th data-i18n="title">Título</th>
-              <th data-i18n="subject">Matéria</th>
-              <th data-i18n="semester">Semestre</th>
-              <th data-i18n="actions">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="admin-resumos-tbody">
-            <tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);"><div class="spinner" style="margin:auto;"></div></td></tr>
-          </tbody>
-        </table>
+      <!-- ── Seção Resumos (colapsável, fechada por padrão) ── -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div onclick="toggleSecaoAdmin('resumos')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;background:var(--bg2);user-select:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">📄</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">Resumos</div>
+              <div style="font-size:12px;color:var(--text3);" id="resumos-secao-count">—</div>
+            </div>
+          </div>
+          <span id="resumos-secao-arrow" style="font-size:18px;color:var(--text3);transition:transform .2s;">▶</span>
+        </div>
+        <div id="resumos-secao-body" style="display:none;">
+          <div class="table-wrapper" style="border-top:1px solid var(--border);">
+            <table class="data-table" id="admin-resumos-table">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Matéria</th>
+                  <th>Semestre</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-resumos-tbody">
+                <tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);"><div class="spinner" style="margin:auto;"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
+      <!-- ── Seção Questões (colapsável, fechada por padrão) ── -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div onclick="toggleSecaoAdmin('questoes')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;background:var(--bg2);user-select:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:18px;">🧠</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">Banco de Questões</div>
+              <div style="font-size:12px;color:var(--text3);" id="questoes-secao-count">—</div>
+            </div>
+          </div>
+          <span id="questoes-secao-arrow" style="font-size:18px;color:var(--text3);transition:transform .2s;">▶</span>
+        </div>
+        <div id="questoes-secao-body" style="display:none;">
+          <div class="table-wrapper" style="border-top:1px solid var(--border);">
+            <table class="data-table" id="admin-questoes-table">
+              <thead>
+                <tr>
+                  <th>Enunciado</th>
+                  <th>Matéria</th>
+                  <th>Semestre</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-questoes-tbody">
+                <tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);">Nenhuma questão cadastrada.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── PAGE: ADMIN ACCESS ──────────────────────── -->
@@ -2649,6 +2701,81 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <button class="btn btn-primary" id="btn-save-resumo" onclick="saveResumo()">
           <span data-i18n="save">Salvar</span>
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL QUESTÃO ═══════════ -->
+<div id="modal-questao" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-questao-title">Adicionar Questão</h2>
+      <button class="modal-close" onclick="closeModal('modal-questao')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Enunciado</label>
+        <textarea class="form-input" id="questao-form-enunciado" rows="3" placeholder="Ex: Qual é o principal mecanismo de ação da penicilina?"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Matéria</label>
+          <select class="form-input form-select" id="questao-form-materia">
+            <option>Imunologia</option>
+            <option>Microbiologia</option>
+            <option>Fisiologia</option>
+            <option>Bioquímica</option>
+            <option>Genética Médica</option>
+            <option>Biofísica</option>
+            <option>Histología I</option>
+            <option>Biología</option>
+            <option>Embriología</option>
+            <option>Anatomía I</option>
+            <option>Anatomía II</option>
+            <option>Histología II</option>
+            <option>Medicina Comunitaria</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Semestre</label>
+          <select class="form-input form-select" id="questao-form-semestre">
+            <option value="1">1º</option>
+            <option value="2">2º</option>
+            <option value="3" selected>3º</option>
+            <option value="4">4º</option>
+            <option value="5">5º</option>
+            <option value="6">6º</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parcial</label>
+          <select class="form-input form-select" id="questao-form-parcial">
+            <option value="Parcial 1">Parcial 1</option>
+            <option value="Parcial 2">Parcial 2</option>
+            <option value="Final">Final</option>
+          </select>
+        </div>
+      </div>
+      <!-- Alternativas -->
+      <div class="form-group">
+        <label class="form-label">Alternativas <span style="font-size:11px;color:var(--text3);">(marque a correta)</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="questao-alternativas">
+          ${['A','B','C','D','E'].map(l => `
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="radio" name="questao-correta" value="${l}" id="alt-radio-${l}" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-${l}" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">${l}</label>
+            <input class="form-input" id="questao-alt-${l}" placeholder="Alternativa ${l}..." style="flex:1;margin:0;">
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Explicação da resposta <span style="font-size:11px;color:var(--text3);">(opcional)</span></label>
+        <textarea class="form-input" id="questao-form-explicacao" rows="3" placeholder="Explique por que a alternativa correta está certa..."></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-questao')">Cancelar</button>
+        <button class="btn btn-primary" style="background:#7c3aed;border-color:#7c3aed;" id="btn-save-questao" onclick="saveQuestao()">Salvar Questão</button>
       </div>
     </div>
   </div>
@@ -3389,6 +3516,7 @@ const state = {
   profile: null,
   resumos: [],
   myAccess: [],
+  questoes: [],
   users: [],
   currentPage: 'dashboard',
   editingResumoId: null,
@@ -4231,7 +4359,7 @@ function initApp() {
 }
 
 async function loadAllData() {
-  await Promise.all([loadResumos(), loadMyAccess(), state.profile.is_admin ? loadUsers() : Promise.resolve()]);
+  await Promise.all([loadResumos(), loadMyAccess(), state.profile.is_admin ? loadUsers() : Promise.resolve(), state.profile.is_admin ? loadQuestoes() : Promise.resolve()]);
   renderCurrentPage();
   loadAtualizacoes(); // carrega atualizações em paralelo
 }
@@ -5340,19 +5468,6 @@ function confirmDeleteUser(id) {
 /* ─────────────────────────────────────────────────────────
    ADMIN: RESUMOS
 ───────────────────────────────────────────────────────── */
-function renderAdminResumosTable() {
-  const tbody = document.getElementById('admin-resumos-tbody');
-  if (!state.resumos.length) { tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);">${t('no-resumos-found')}</td></tr>`; return; }
-  tbody.innerHTML = state.resumos.map(r => `<tr>
-    <td><strong>${r.title}</strong></td>
-    <td><span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span></td>
-    <td>${r.semestre}º</td>
-    <td style="display:flex;gap:6px;">
-      <button class="btn btn-ghost btn-sm" onclick="openEditResumo('${r.id}')">${t('edit')}</button>
-      <button class="btn btn-danger btn-sm" onclick="confirmDeleteResumo('${r.id}')">🗑</button>
-    </td>
-  </tr>`).join('');
-}
 
 function openAddResumo() {
   state.editingResumoId = null;
@@ -5407,6 +5522,134 @@ function confirmDeleteResumo(id) {
   openConfirm(t('confirm-delete-title'), t('confirm-delete-resumo'), async () => {
     await SB.delete('resumos', `id=eq.${id}`);
     await loadResumos(); renderAdminResumosTable();
+  });
+}
+
+// ── Seções colapsáveis ──────────────────────────────────
+function toggleSecaoAdmin(secao) {
+  const body  = document.getElementById(`${secao}-secao-body`);
+  const arrow = document.getElementById(`${secao}-secao-arrow`);
+  const open  = body.style.display === 'none';
+  body.style.display  = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(90deg)' : '';
+}
+
+function atualizarCountSecao() {
+  const rCount = state.resumos ? state.resumos.length : 0;
+  const qCount = state.questoes ? state.questoes.length : 0;
+  const rEl = document.getElementById('resumos-secao-count');
+  const qEl = document.getElementById('questoes-secao-count');
+  if (rEl) rEl.textContent = `${rCount} resumo${rCount!==1?'s':''}`;
+  if (qEl) qEl.textContent = `${qCount} questão${qCount!==1?'s (total)':' (total)'}`;
+}
+
+// ── Questões ────────────────────────────────────────────
+function renderAdminResumosTable() {
+  atualizarCountSecao();
+  const tbody = document.getElementById('admin-resumos-tbody');
+  if (!tbody) return;
+  if (!state.resumos.length) { tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);">${t('no-resumos-found')}</td></tr>`; return; }
+  tbody.innerHTML = state.resumos.map(r => `<tr>
+    <td><strong>${r.title}</strong></td>
+    <td><span class="badge ${MATERIA_COLORS[r.materia]||'badge-gray'}">${r.materia}</span></td>
+    <td>${r.semestre}º</td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="openEditResumo('${r.id}')">${t('edit')}</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteResumo('${r.id}')">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function loadQuestoes() {
+  const { data } = await SB.select('questoes', 'select=*&order=created_at.desc');
+  state.questoes = Array.isArray(data) ? data : [];
+  renderAdminQuestoesTable();
+  atualizarCountSecao();
+}
+
+function renderAdminQuestoesTable() {
+  const tbody = document.getElementById('admin-questoes-tbody');
+  if (!tbody) return;
+  if (!state.questoes || !state.questoes.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:40px;color:var(--text3);">Nenhuma questão cadastrada.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.questoes.map(q => `<tr>
+    <td><strong>${(q.enunciado||'').substring(0,80)}${q.enunciado&&q.enunciado.length>80?'…':''}</strong></td>
+    <td><span class="badge ${MATERIA_COLORS[q.materia]||'badge-gray'}">${q.materia}</span></td>
+    <td>${q.semestre}º</td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="openEditQuestao('${q.id}')">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteQuestao('${q.id}')">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openAddQuestao() {
+  state.editingQuestaoId = null;
+  document.getElementById('modal-questao-title').textContent = 'Adicionar Questão';
+  document.getElementById('questao-form-enunciado').value = '';
+  document.getElementById('questao-form-explicacao').value = '';
+  document.getElementById('questao-form-materia').value = 'Imunologia';
+  document.getElementById('questao-form-semestre').value = '3';
+  document.getElementById('questao-form-parcial').value = 'Parcial 1';
+  ['A','B','C','D','E'].forEach(l => {
+    document.getElementById(`questao-alt-${l}`).value = '';
+    document.getElementById(`alt-radio-${l}`).checked = false;
+  });
+  openModal('modal-questao');
+}
+
+function openEditQuestao(id) {
+  const q = state.questoes.find(x => x.id === id);
+  if (!q) return;
+  state.editingQuestaoId = id;
+  document.getElementById('modal-questao-title').textContent = 'Editar Questão';
+  document.getElementById('questao-form-enunciado').value   = q.enunciado || '';
+  document.getElementById('questao-form-explicacao').value  = q.explicacao || '';
+  document.getElementById('questao-form-materia').value     = q.materia || 'Imunologia';
+  document.getElementById('questao-form-semestre').value    = String(q.semestre || 3);
+  document.getElementById('questao-form-parcial').value     = q.parcial || 'Parcial 1';
+  const alts = q.alternativas || {};
+  ['A','B','C','D','E'].forEach(l => {
+    document.getElementById(`questao-alt-${l}`).value = alts[l] || '';
+    document.getElementById(`alt-radio-${l}`).checked = q.resposta_correta === l;
+  });
+  openModal('modal-questao');
+}
+
+async function saveQuestao() {
+  const enunciado  = document.getElementById('questao-form-enunciado').value.trim();
+  const explicacao = document.getElementById('questao-form-explicacao').value.trim();
+  const materia    = document.getElementById('questao-form-materia').value;
+  const semestre   = parseInt(document.getElementById('questao-form-semestre').value);
+  const parcial    = document.getElementById('questao-form-parcial').value;
+  const correta    = document.querySelector('input[name="questao-correta"]:checked')?.value || null;
+  const alternativas = {};
+  ['A','B','C','D','E'].forEach(l => {
+    const v = document.getElementById(`questao-alt-${l}`).value.trim();
+    if (v) alternativas[l] = v;
+  });
+  if (!enunciado) { toast('Preencha o enunciado.', 'error'); return; }
+  setLoading('btn-save-questao', true);
+  try {
+    const payload = { enunciado, explicacao, materia, semestre, parcial, alternativas, resposta_correta: correta };
+    if (state.editingQuestaoId) {
+      await SB.update('questoes', payload, `id=eq.${state.editingQuestaoId}`);
+    } else {
+      await SB.insert('questoes', payload);
+    }
+    await loadQuestoes();
+    closeModal('modal-questao');
+    toast('Questão salva!', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+  finally { setLoading('btn-save-questao', false); }
+}
+
+function confirmDeleteQuestao(id) {
+  openConfirm('Excluir Questão', 'Tem certeza que deseja excluir esta questão?', async () => {
+    await SB.delete('questoes', `id=eq.${id}`);
+    await loadQuestoes();
   });
 }
 
