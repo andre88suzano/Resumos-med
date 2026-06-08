@@ -1573,7 +1573,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <span data-i18n="request-access">Solicitar Acesso</span>
         </button>
         <div class="auth-footer" data-i18n="pending-note">
-          Após o cadastro, aguarde a aprovação do administrador.
+          Acesso gratuito. Após o cadastro, faça login para entrar.
         </div>
       </div>
     </div>
@@ -3235,7 +3235,7 @@ const i18n = {
     'login':'Entrar','register':'Cadastrar','email':'E-mail','password':'Senha',
     'enter':'Entrar','no-account':'Não tem conta?','register-here':' Cadastre-se',
     'request-access':'Solicitar Acesso',
-    'pending-note':'Após o cadastro, aguarde a aprovação do administrador.',
+    'pending-note':'Acesso gratuito. Após o cadastro, faça login para entrar.',
     'full-name':'Nome completo','save':'Salvar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'Geral','nav-dashboard':'Início','nav-resumos':'Resumos',
     'nav-profile':'Meu Perfil','nav-admin':'Administração','nav-users':'Usuários',
@@ -3287,7 +3287,7 @@ const i18n = {
     'login':'Iniciar sesión','register':'Registrarse','email':'Correo','password':'Contraseña',
     'enter':'Entrar','no-account':'¿No tienes cuenta?','register-here':' Regístrate',
     'request-access':'Solicitar acceso',
-    'pending-note':'Tras el registro, espera la aprobación del administrador.',
+    'pending-note':'Acceso gratuito. Tras el registro, inicia sesión para entrar.',
     'full-name':'Nombre completo','save':'Guardar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'General','nav-dashboard':'Inicio','nav-resumos':'Resúmenes',
     'nav-profile':'Mi Perfil','nav-admin':'Administración','nav-users':'Usuarios',
@@ -3617,9 +3617,9 @@ async function doRegister() {
     state.authToken = data.access_token || state.sbKey;
     const uid = data.user?.id;
     if (uid) {
-      await SB.upsert('approved_users', { user_id: uid, email, name, is_admin: email===state.adminEmail, approved: email===state.adminEmail });
+      await SB.upsert('approved_users', { user_id: uid, email, name, is_admin: email===state.adminEmail, approved: true });
     }
-    toast(currentLang==='pt'?'Cadastro realizado! Aguarde aprovação.':'¡Registro exitoso! Espera aprobación.','success');
+    toast(currentLang==='pt'?'Cadastro realizado! Faça login para entrar.':'¡Registro exitoso! Inicia sesión para entrar.','success');
     switchAuthTab('login');
   } catch(e) { toast(e.message,'error'); }
   finally { setLoading('btn-register', false); }
@@ -4175,7 +4175,7 @@ async function loadUserProfile() {
 
   if (!profile) {
     // Create default profile
-    await SB.upsert('approved_users', { user_id: state.user.id, email: state.user.email, name: state.user.email.split('@')[0], is_admin: state.user.email===state.adminEmail, approved: state.user.email===state.adminEmail });
+    await SB.upsert('approved_users', { user_id: state.user.id, email: state.user.email, name: state.user.email.split('@')[0], is_admin: state.user.email===state.adminEmail, approved: true });
     await loadUserProfile(); return;
   }
 
