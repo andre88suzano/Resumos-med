@@ -7118,6 +7118,7 @@ function abrirModalCompra(plano) {
   mcState.isJoiner = false;
   mcState.resumosSelecionados = [];
   mcState.materiaQuestaoSelecionada = null;
+  mcState.parcialQuestaoSelecionada = null;
 
   // Atualizar descrição
   document.getElementById('mc-plano-desc').textContent = plano.nome;
@@ -7172,56 +7173,91 @@ function abrirModalCompra(plano) {
   verificarSalaExistente();
 }
 
-// ── SELEÇÃO DE QUESTÕES (matéria) ────────────────────────
-function mcRenderizarSelecaoQuestoes(plano) {
-  const lista     = document.getElementById('mc-resumos-lista');
-  const contador  = document.getElementById('mc-selecao-contador');
-  const btnCont   = document.getElementById('mc-btn-continuar');
+// ── SELEÇÃO DE QUESTÕES (matéria + prova) ────────────────
+async function mcRenderizarSelecaoQuestoes(plano) {
+  const lista    = document.getElementById('mc-resumos-lista');
+  const contador = document.getElementById('mc-selecao-contador');
+  const btnCont  = document.getElementById('mc-btn-continuar');
 
-  // Matérias disponíveis no banco de questões
-  const materias = ['Imunologia','Microbiologia','Fisiologia','Bioquímica','Genética Médica','Biofísica'];
-  let materiaSelecionada = null;
+  contador.textContent = 'Escolha a matéria e a prova';
+  btnCont.disabled     = true;
+  btnCont.textContent  = 'Continuar →';
+  lista.innerHTML      = '<div style="text-align:center;color:var(--text3);padding:24px;">Carregando disponibilidade...</div>';
 
-  contador.textContent  = 'Escolha a matéria';
-  btnCont.disabled      = true;
-  btnCont.textContent   = 'Continuar →';
+  // Busca combinações reais no banco
+  const { data } = await SB.select('questoes', 'select=materia,parcial');
+  const rows = Array.isArray(data) ? data : [];
 
-  lista.innerHTML = `
-    <div style="margin-bottom:8px;font-size:13px;color:var(--text3);">Selecione a matéria das questões:</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      ${materias.map(m => `
-        <div id="mc-q-${m.replace(/\s/g,'_')}" onclick="mcSelecionarMateriaQuestao('${m}')"
-          style="border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;cursor:pointer;
-                 display:flex;align-items:center;gap:10px;transition:var(--transition);"
-          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
-          <span style="font-size:20px;">${MATERIA_ICONS[m]||'📚'}</span>
-          <span style="font-weight:600;color:var(--text);">${m}</span>
-        </div>`).join('')}
-    </div>`;
+  if (!rows.length) {
+    lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;">Nenhum banco disponível no momento.</div>';
+    return;
+  }
+
+  // Agrupa: { parcial → Set<materia> }
+  const grupos = {};
+  rows.forEach(({ materia, parcial }) => {
+    const p = parcial || 'P1';
+    if (!grupos[p]) grupos[p] = new Set();
+    grupos[p].add(materia);
+  });
+
+  // Ordem de exibição
+  const ORDEM_PROVA = ['P1', 'P2', 'Final'];
+  const LABEL_PROVA = { P1: 'Parcial 1', P2: 'Parcial 2', Final: 'Final' };
+
+  let html = '<div style="display:flex;flex-direction:column;gap:16px;">';
+
+  ORDEM_PROVA.forEach(prova => {
+    if (!grupos[prova]) return;
+    const materias = [...grupos[prova]].sort();
+    html += `
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);
+                    text-transform:uppercase;margin-bottom:6px;padding-bottom:4px;
+                    border-bottom:1px solid var(--border);">${LABEL_PROVA[prova] || prova}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${materias.map(m => `
+            <div id="mc-q-${prova}-${m.replace(/[\s\/]/g,'_')}"
+              onclick="mcSelecionarMateriaQuestao('${m}','${prova}')"
+              style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;cursor:pointer;
+                     display:flex;align-items:center;gap:10px;transition:var(--transition);"
+              onmouseover="this.style.borderColor='var(--accent)'"
+              onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
+              <span style="font-size:18px;">${MATERIA_ICONS[m]||'📚'}</span>
+              <span style="font-weight:600;color:var(--text);font-size:14px;">${m}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  });
+
+  html += '</div>';
+  lista.innerHTML = html;
 }
 
-function mcSelecionarMateriaQuestao(materia) {
-  // Desmarca todos
-  ['Imunologia','Microbiologia','Fisiologia','Bioquímica','Genética Médica','Biofísica'].forEach(m => {
-    const el = document.getElementById('mc-q-' + m.replace(/\s/g,'_'));
-    if (!el) return;
+function mcSelecionarMateriaQuestao(materia, prova) {
+  // Desmarca todos os cards
+  document.querySelectorAll('[id^="mc-q-"]').forEach(el => {
     el.style.borderColor = 'var(--border)';
     el.style.background  = '';
     el.dataset.sel = '';
   });
-  // Marca selecionado
-  const sel = document.getElementById('mc-q-' + materia.replace(/\s/g,'_'));
+  // Marca o selecionado
+  const key = `mc-q-${prova}-${materia.replace(/[\s\/]/g,'_')}`;
+  const sel = document.getElementById(key);
   if (sel) {
     sel.style.borderColor = 'var(--accent)';
     sel.style.background  = 'var(--bg3)';
     sel.dataset.sel = '1';
   }
-  // Guarda seleção e habilita continuar
+  // Atualiza mcState
   mcState.materiaQuestaoSelecionada = materia;
-  mcState.plano.nome = `${mcState.plano._nomeBase} · ${materia}`;
+  mcState.parcialQuestaoSelecionada = prova;
+  const LABEL_PROVA = { P1: 'Parcial 1', P2: 'Parcial 2', Final: 'Final' };
+  const label = `${materia} · ${LABEL_PROVA[prova] || prova}`;
+  mcState.plano.nome = `${mcState.plano._nomeBase} · ${label}`;
   const btn = document.getElementById('mc-btn-continuar');
-  if (btn) { btn.disabled = false; btn.textContent = `Continuar com ${materia} →`; }
-  document.getElementById('mc-selecao-contador').textContent = materia + ' selecionada ✓';
+  if (btn) { btn.disabled = false; btn.textContent = `Continuar com ${label} →`; }
+  document.getElementById('mc-selecao-contador').textContent = label + ' ✓';
 }
 
 // ── SELEÇÃO DE RESUMOS ───────────────────────────────────
@@ -7390,9 +7426,9 @@ window._mcContarCombos = function() {
 };
 
 async function mcContinuarParaPagamento() {
-  // Fluxo de questões: matéria selecionada, sem resumos
+  // Fluxo de questões: matéria + prova selecionada, sem resumos
   if (mcState.plano.ehQuestoes) {
-    if (!mcState.materiaQuestaoSelecionada) return;
+    if (!mcState.materiaQuestaoSelecionada || !mcState.parcialQuestaoSelecionada) return;
     document.getElementById('mc-step-selecao').style.display = 'none';
     document.getElementById('mc-step-pagamento').style.display = '';
     return;
