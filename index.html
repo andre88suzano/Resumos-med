@@ -3638,6 +3638,7 @@ const state = {
   profile: null,
   resumos: [],
   myAccess: [],
+  myQuestoesAccess: [],
   questoes: [],
   users: [],
   currentPage: 'dashboard',
@@ -4543,9 +4544,14 @@ function initApp() {
 }
 
 async function loadAllData() {
-  await Promise.all([loadResumos(), loadMyAccess(), state.profile.is_admin ? loadUsers() : Promise.resolve(), state.profile.is_admin ? loadQuestoes() : Promise.resolve()]);
+  await Promise.all([loadResumos(), loadMyAccess(), loadMyQuestoesAccess(), state.profile.is_admin ? loadUsers() : Promise.resolve(), state.profile.is_admin ? loadQuestoes() : Promise.resolve()]);
   renderCurrentPage();
   loadAtualizacoes(); // carrega atualizações em paralelo
+}
+
+async function loadMyQuestoesAccess() {
+  const { data } = await SB.select('user_questoes_access', `user_id=eq.${state.user.id}&select=materia,semestre`);
+  state.myQuestoesAccess = Array.isArray(data) ? data : [];
 }
 
 async function loadResumos() {
@@ -5321,6 +5327,10 @@ async function openBancoQuestoes(materia, sem) {
   const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
   const semIcon  = SEMESTRE_ICONS[sem] || '📁';
 
+  // Verifica acesso (admin sempre tem; usuário precisa ter entrada em user_questoes_access)
+  const temAcesso = state.profile.is_admin ||
+    (state.myQuestoesAccess || []).some(a => a.materia === materia && a.semestre == sem);
+
   document.getElementById('folder-icon-title').textContent = '🧠';
   document.getElementById('folder-title').textContent = `${materia} — Banco de Questões`;
   document.getElementById('folder-count').textContent = 'Carregando…';
@@ -5334,6 +5344,19 @@ async function openBancoQuestoes(materia, sem) {
     <span style="color:#8b5cf6;">🧠 Banco de Questões</span>`;
 
   const grid = document.getElementById('folder-resumo-grid');
+
+  // Sem acesso — mostra bloqueio
+  if (!temAcesso) {
+    document.getElementById('folder-count').textContent = 'Bloqueado';
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+        <div style="font-size:52px;margin-bottom:16px;">🔒</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Acesso bloqueado</div>
+        <div style="font-size:14px;color:var(--text3);max-width:320px;margin:0 auto;">Você ainda não tem acesso ao Banco de Questões de <strong style="color:var(--text);">${materia}</strong>.<br><br>Entre em contato para adquirir.</div>
+      </div>`;
+    return;
+  }
+
   grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;"><div class="spinner" style="margin:auto;"></div></div>`;
 
   // Busca questões da matéria + semestre
@@ -5953,8 +5976,12 @@ async function loadAccessMatrix() {
 
   container.innerHTML = `<div style="text-align:center;padding:40px;"><div class="spinner spinner-lg" style="margin:auto;"></div></div>`;
 
-  const { data: accessData } = await SB.select('user_access', `user_id=eq.${uid}&select=resumo_id`);
+  const [{ data: accessData }, { data: questoesAccessData }] = await Promise.all([
+    SB.select('user_access', `user_id=eq.${uid}&select=resumo_id`),
+    SB.select('user_questoes_access', `user_id=eq.${uid}&select=materia,semestre`),
+  ]);
   const granted = Array.isArray(accessData) ? accessData.map(a => a.resumo_id) : [];
+  const grantedQuestoes = Array.isArray(questoesAccessData) ? questoesAccessData : [];
 
   // Group resumos by semester
   const bySem = {};
@@ -5991,7 +6018,49 @@ async function loadAccessMatrix() {
     </div>`;
   });
 
+  // ── Seção Banco de Questões ──────────────────────────────
+  const materiasQuestoes = [...new Set(state.questoes.map(q => q.materia + '|' + q.semestre))]
+    .map(k => { const [m, s] = k.split('|'); return { materia: m, semestre: parseInt(s) }; })
+    .sort((a, b) => a.semestre - b.semestre || a.materia.localeCompare(b.materia));
+
+  if (materiasQuestoes.length > 0) {
+    html += `<div class="semestre-header" onclick="toggleAccordion(this)" style="margin-top:16px;">
+      <div class="semestre-title">🧠 Banco de Questões <span class="badge badge-gray">${materiasQuestoes.length}</span></div>
+      <span class="semestre-chevron">▾</span>
+    </div>
+    <div class="semestre-body">
+      <table class="access-matrix">
+        <thead><tr><th>Matéria</th><th>Semestre</th><th>Status</th><th></th></tr></thead>
+        <tbody>${materiasQuestoes.map(({ materia, semestre }) => {
+          const hasQ = grantedQuestoes.some(a => a.materia === materia && a.semestre == semestre);
+          return `<tr>
+            <td><span class="badge ${MATERIA_COLORS[materia]||'badge-gray'}">${materia}</span></td>
+            <td>${semestre}º sem</td>
+            <td><span class="badge ${hasQ?'badge-green':'badge-red'}">${hasQ?'Liberado':'Bloqueado'}</span></td>
+            <td>
+              ${hasQ
+                ? `<button class="btn btn-ghost btn-sm" onclick="revokeQuestaoAccess('${uid}','${materia}',${semestre})">Revogar</button>`
+                : `<button class="btn btn-primary btn-sm" onclick="grantQuestaoAccess('${uid}','${materia}',${semestre})">Liberar</button>`}
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
   container.innerHTML = html;
+}
+
+async function grantQuestaoAccess(uid, materia, semestre) {
+  await SB.upsert('user_questoes_access', { user_id: uid, materia, semestre, granted_at: new Date().toISOString() });
+  toast('Acesso ao Banco de Questões liberado ✅', 'success');
+  await loadAccessMatrix();
+}
+
+async function revokeQuestaoAccess(uid, materia, semestre) {
+  await SB.delete('user_questoes_access', `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`);
+  toast('Acesso revogado', 'info');
+  await loadAccessMatrix();
 }
 
 async function grantAccess(uid, rid) {
