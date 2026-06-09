@@ -3015,26 +3015,26 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
 
-          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;opacity:0.5;pointer-events:none;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
+              <div class="valor-info"><div class="valor-nome">📖 Resumo Individual <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div></div>
               <div style="text-align:right;">
                 <div class="valor-preco">R$ 18,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 18,95 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual (Final)', preco:18.00, tipo:'solo' })">🛒 Comprar — R$ 18,00 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
           </div>
 
-          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
+          <div class="valor-item" style="border-color:var(--border);flex-direction:column;align-items:flex-start;gap:8px;opacity:0.5;pointer-events:none;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div></div>
+              <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div></div>
               <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--teal);">R$ 25,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div class="valor-preco">R$ 25,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 26,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo (Final)', preco:25.00, tipo:'solo' })">🛒 Comprar — R$ 25,00 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
           </div>
 
         </div>
@@ -3068,25 +3068,25 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
-          <div class="valor-item" style="flex-direction:column;gap:8px;">
+          <div class="valor-item" style="flex-direction:column;gap:8px;opacity:0.5;pointer-events:none;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
+              <div class="valor-nome">📚 Pacote Resumos (Finais) <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div>
               <div style="text-align:right;">
                 <div class="valor-preco">R$ 64,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 68,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Finais', preco:64.90, tipo:'solo' })">🛒 Comprar — R$ 64,90 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
           </div>
-          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
+          <div class="valor-item" style="border-color:var(--border);flex-direction:column;gap:8px;opacity:0.5;pointer-events:none;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
+              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais) <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div>
               <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--teal);">R$ 79,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div class="valor-preco">R$ 79,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 84,11 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Finais', preco:79.90, tipo:'solo' })">🛒 Comprar — R$ 79,90 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
           </div>
 
         </div>
