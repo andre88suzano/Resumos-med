@@ -3099,64 +3099,28 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <div style="display:flex;flex-direction:column;gap:12px;">
 
           <!-- 20 Questões -->
-          <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info">
-                <div class="valor-nome">🧠 20 Questões</div>
-                <div class="valor-desc">Banco com 20 questões com gabarito e explicação.</div>
-              </div>
-              <div style="text-align:right;">
-                <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-                <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
-              </div>
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">🧠 20 Questões</div>
+              <div class="valor-desc">Banco com 20 questões com gabarito e explicação.</div>
             </div>
-            <!-- Seletor de matéria -->
-            <div style="width:100%;">
-              <label style="font-size:11px;color:var(--text3);margin-bottom:4px;display:block;">Escolha a matéria:</label>
-              <select id="questoes-20-materia" class="form-input form-select" style="width:100%;font-size:13px;padding:7px 10px;margin-bottom:8px;" onchange="atualizarBotoesQuestoes(20)">
-                <option value="">— Selecione a matéria —</option>
-                <option>Imunologia</option>
-                <option>Microbiologia</option>
-                <option>Fisiologia</option>
-                <option>Bioquímica</option>
-                <option>Genética Médica</option>
-                <option>Biofísica</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;width:100%;">
-              <button id="btn-q20-pix" class="btn btn-primary btn-sm" style="flex:1;opacity:0.4;cursor:not-allowed;" disabled onclick="comprarQuestoes(20,5.00,'pix')">⚡ PIX — R$ 5,00</button>
-              <button id="btn-q20-cartao" class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;opacity:0.4;cursor:not-allowed;" disabled onclick="comprarQuestoes(20,5.00,'cartao')">💳 Cartão — R$ 5,25</button>
+            <div style="text-align:right;">
+              <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo'})">🛒 Comprar — R$ 5,00 no PIX</button>
             </div>
           </div>
 
           <!-- 40 Questões -->
-          <div class="valor-item" style="border-color:var(--accent);flex-direction:column;align-items:flex-start;gap:8px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info">
-                <div class="valor-nome">🧠🧠 40 Questões</div>
-                <div class="valor-desc">Banco com 40 questões com gabarito e explicação.</div>
-              </div>
-              <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-                <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
-              </div>
+          <div class="valor-item" style="border-color:var(--accent);">
+            <div class="valor-info">
+              <div class="valor-nome">🧠🧠 40 Questões</div>
+              <div class="valor-desc">Banco com 40 questões com gabarito e explicação.</div>
             </div>
-            <!-- Seletor de matéria -->
-            <div style="width:100%;">
-              <label style="font-size:11px;color:var(--text3);margin-bottom:4px;display:block;">Escolha a matéria:</label>
-              <select id="questoes-40-materia" class="form-input form-select" style="width:100%;font-size:13px;padding:7px 10px;margin-bottom:8px;" onchange="atualizarBotoesQuestoes(40)">
-                <option value="">— Selecione a matéria —</option>
-                <option>Imunologia</option>
-                <option>Microbiologia</option>
-                <option>Fisiologia</option>
-                <option>Bioquímica</option>
-                <option>Genética Médica</option>
-                <option>Biofísica</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;width:100%;">
-              <button id="btn-q40-pix" class="btn btn-primary btn-sm" style="flex:1;opacity:0.4;cursor:not-allowed;" disabled onclick="comprarQuestoes(40,10.00,'pix')">⚡ PIX — R$ 10,00</button>
-              <button id="btn-q40-cartao" class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;opacity:0.4;cursor:not-allowed;" disabled onclick="comprarQuestoes(40,10.00,'cartao')">💳 Cartão — R$ 10,50</button>
+            <div style="text-align:right;">
+              <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo'})">🛒 Comprar — R$ 10,00 no PIX</button>
             </div>
           </div>
 
