@@ -5237,15 +5237,31 @@ function openQuestao(id) {
   const q = (state._questoesBanco || []).find(x => x.id === id);
   if (!q) return;
 
-  // Reutiliza o viewer de resumos
-  showScreen('viewer');
+  // Configura título e badges (igual ao openResumo)
   document.getElementById('viewer-title').textContent = q.title;
-  document.getElementById('viewer-back-btn').onclick = () => { history.back ? history.back() : showScreen('app'); };
+  document.getElementById('viewer-badges').innerHTML = `
+    <span class="badge ${MATERIA_COLORS[q.materia]||'badge-gray'}">${q.materia}</span>
+    <span class="badge badge-gray">${q.semestre}º Semestre</span>
+    <span class="badge" style="background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;">🧠 Questão</span>`;
 
+  document.getElementById('viewer-breadcrumb').innerHTML = `
+    <a onclick="showPage('resumos')" style="cursor:pointer;">📁 Meus Resumos</a>
+    <span>›</span>
+    <a onclick="openSemestre(${q.semestre})" style="cursor:pointer;">${q.semestre}º Semestre</a>
+    <span>›</span>
+    <a onclick="openFolder('${q.materia}',${q.semestre})" style="cursor:pointer;">${q.materia}</a>
+    <span>›</span>
+    <a onclick="openBancoQuestoes('${q.materia}',${q.semestre})" style="cursor:pointer;">🧠 Banco de Questões</a>
+    <span>›</span>
+    <span style="color:var(--text);">${q.title}</span>`;
+
+  // Renderiza o HTML da questão num iframe isolado (igual ao openResumo)
   const iframe = document.getElementById('viewer-iframe');
   if (iframe._blobUrl) { URL.revokeObjectURL(iframe._blobUrl); iframe._blobUrl = null; }
-  const html = q.content.includes('<html') ? q.content
-    : `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;padding:16px;margin:0;background:#111827;color:#e5e7eb;}</style></head><body>${q.content}</body></html>`;
+
+  let html = q.content.includes('<html') ? q.content
+    : `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;padding:20px;margin:0;background:#111827;color:#e5e7eb;line-height:1.6;}</style></head><body>${q.content}</body></html>`;
+
   const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   iframe._blobUrl = url;
@@ -5254,8 +5270,11 @@ function openQuestao(id) {
     try {
       const h = iframe.contentDocument.documentElement.scrollHeight;
       iframe.style.height = Math.max(h, 400) + 'px';
-    } catch(_) {}
+    } catch(_) { iframe.style.height = '100vh'; }
   };
+
+  collapseSidebar();
+  showPage('viewer');
 }
 
 // NÍVEL 4: resumos de um parcial

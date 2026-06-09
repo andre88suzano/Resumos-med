@@ -112,6 +112,31 @@ ALTER TABLE checkout_attempts ENABLE ROW LEVEL SECURITY;
 -- Somente admins (via service role) leem/escrevem — nenhuma policy pública
 
 -- ============================================================
+-- BANCO DE QUESTÕES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS questoes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,         -- HTML interativo da questão
+  materia TEXT NOT NULL,         -- ex: "Imunologia"
+  semestre INTEGER NOT NULL,     -- ex: 1
+  parcial TEXT DEFAULT 'P1',     -- ex: "P1", "P2", "Final"
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE questoes ENABLE ROW LEVEL SECURITY;
+
+-- Qualquer usuário autenticado pode LER questões
+CREATE POLICY "Authenticated users can read questoes"
+  ON questoes FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- Somente admin insere/atualiza/deleta (via service role key no admin panel)
+-- Na prática o site usa a anon key com o JWT do usuário logado,
+-- então INSERT/UPDATE/DELETE só funciona com service role ou policy de admin.
+
+-- ============================================================
 -- Tornar você admin: substitua o email abaixo pelo seu
 -- Execute DEPOIS de criar sua conta no site
 -- ============================================================
