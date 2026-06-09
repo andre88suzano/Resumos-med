@@ -4163,15 +4163,51 @@ function openValoresModal() {
   iniciarCountdownPromo();
 }
 
-// Compra de questões com seletor de matéria
-function comprarQuestoes(qtd, preco, metodo) {
+// Compra de questões com seletor de matéria (fluxo direto, sem seleção de resumos)
+async function comprarQuestoes(qtd, preco, metodo) {
+  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+
   const selectId = `questoes-${qtd}-materia`;
   const sel = document.getElementById(selectId);
   const materia = sel ? sel.value : '';
   if (!materia) { toast('Selecione a matéria antes de continuar.', 'error'); return; }
-  const nome = `Banco de Questões — ${qtd} questões · ${materia}`;
+
   closeModal('modal-valores');
-  abrirModalCompra({ nome, preco, tipo: 'solo', metodo: metodo === 'cartao' ? 'cartao' : undefined });
+  mostrarLoading('Preparando pagamento...');
+  try {
+    const prefixo = 'Q' + qtd;
+    const codigo = prefixo + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo,
+      tipo: 'solo',
+      status: 'aguardando',
+      slots_total: 1,
+      slots_preenchidos: 0,
+      preco_individual: preco,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    });
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id,
+      user_id: state.user.id,
+      email: state.user.email,
+      status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+
+    // Guarda contexto para o admin identificar a compra
+    mcState.plano = { nome: `Banco de Questões — ${qtd} questões · ${materia}`, preco, tipo: 'solo' };
+    mcState.compraId = compra.id;
+    mcState.resumosSelecionados = [];
+
+    await iniciarPagamento(compra.id, 'solo', preco, metodo);
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
 }
 
 // ── CONTROLE AUTOMÁTICO DA ABA PROMOÇÃO ──────────────────
