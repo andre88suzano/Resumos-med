@@ -2831,7 +2831,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
     <div style="display:flex;gap:0;padding:10px 16px 0;border-bottom:1px solid var(--border);overflow-x:auto;">
       <button class="valores-tab active" onclick="switchValoresTab('promo')" id="vtab-promo" style="color:#e85d04;border-bottom-color:#e85d04;font-weight:700;">🔥 Promoção</button>
       <button class="valores-tab" onclick="switchValoresTab('individual')" id="vtab-individual">📄 Individual</button>
-      <button class="valores-tab" id="vtab-questoes" style="opacity:0.5;cursor:not-allowed;" onclick="toast('🔧 Banco de Questões em manutenção. Em breve!','info')" >🧠 Questões <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 5px;border-radius:10px;margin-left:3px;">manutenção</span></button>
+      <button class="valores-tab" onclick="switchValoresTab('questoes')" id="vtab-questoes">🧠 Questões</button>
       <button class="valores-tab" onclick="switchValoresTab('prova')" id="vtab-prova">📋 Por Prova</button>
       <button class="valores-tab" onclick="switchValoresTab('semestre')" id="vtab-semestre">🎓 Semestre</button>
     </div>
@@ -5808,8 +5808,15 @@ async function saveResumo() {
 
 function confirmDeleteResumo(id) {
   openConfirm(t('confirm-delete-title'), t('confirm-delete-resumo'), async () => {
-    await SB.delete('resumos', `id=eq.${id}`);
-    await loadResumos(); renderAdminResumosTable();
+    try {
+      const { ok, data } = await SB.delete('resumos', `id=eq.${id}`);
+      if (!ok) throw new Error(typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : data);
+      toast('Resumo excluído com sucesso.', 'success');
+      await loadResumos();
+      renderAdminResumosTable();
+    } catch (e) {
+      toast('Erro ao excluir: ' + e.message, 'error');
+    }
   });
 }
 
