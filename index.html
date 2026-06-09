@@ -3107,7 +3107,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div style="text-align:right;">
               <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
               <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
-              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo'})">🛒 Comprar — R$ 5,00 no PIX</button>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:20})">🛒 Comprar — R$ 5,00 no PIX</button>
             </div>
           </div>
 
@@ -3120,7 +3120,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div style="text-align:right;">
               <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
               <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
-              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo'})">🛒 Comprar — R$ 10,00 no PIX</button>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:40})">🛒 Comprar — R$ 10,00 no PIX</button>
             </div>
           </div>
 
@@ -7113,22 +7113,24 @@ function abrirModalCompra(plano) {
     return;
   }
 
-  mcState.plano = plano;
+  mcState.plano = { ...plano, _nomeBase: plano.nome };
   mcState.compraId = null;
   mcState.isJoiner = false;
   mcState.resumosSelecionados = [];
+  mcState.materiaQuestaoSelecionada = null;
 
   // Atualizar descrição
   document.getElementById('mc-plano-desc').textContent = plano.nome;
 
-  // Se skipSelecao, pula direto para pagamento
-  if (plano.skipSelecao) {
-    document.getElementById('mc-step-selecao').style.display = 'none';
-    document.getElementById('mc-step-pagamento').style.display = '';
+  // Mostrar step correto
+  if (plano.ehQuestoes) {
+    // Questões: mostra seletor de matéria (não resumos)
+    document.getElementById('mc-step-selecao').style.display = '';
+    document.getElementById('mc-step-pagamento').style.display = 'none';
+    mcRenderizarSelecaoQuestoes(plano);
   } else {
     document.getElementById('mc-step-selecao').style.display = '';
     document.getElementById('mc-step-pagamento').style.display = 'none';
-    // Renderizar lista de resumos disponíveis
     mcRenderizarSelecaoResumos(plano);
   }
 
@@ -7168,6 +7170,58 @@ function abrirModalCompra(plano) {
 
   // Verificar se existe sala ativa para este usuário
   verificarSalaExistente();
+}
+
+// ── SELEÇÃO DE QUESTÕES (matéria) ────────────────────────
+function mcRenderizarSelecaoQuestoes(plano) {
+  const lista     = document.getElementById('mc-resumos-lista');
+  const contador  = document.getElementById('mc-selecao-contador');
+  const btnCont   = document.getElementById('mc-btn-continuar');
+
+  // Matérias disponíveis no banco de questões
+  const materias = ['Imunologia','Microbiologia','Fisiologia','Bioquímica','Genética Médica','Biofísica'];
+  let materiaSelecionada = null;
+
+  contador.textContent  = 'Escolha a matéria';
+  btnCont.disabled      = true;
+  btnCont.textContent   = 'Continuar →';
+
+  lista.innerHTML = `
+    <div style="margin-bottom:8px;font-size:13px;color:var(--text3);">Selecione a matéria das questões:</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${materias.map(m => `
+        <div id="mc-q-${m.replace(/\s/g,'_')}" onclick="mcSelecionarMateriaQuestao('${m}')"
+          style="border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;cursor:pointer;
+                 display:flex;align-items:center;gap:10px;transition:var(--transition);"
+          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
+          <span style="font-size:20px;">${MATERIA_ICONS[m]||'📚'}</span>
+          <span style="font-weight:600;color:var(--text);">${m}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function mcSelecionarMateriaQuestao(materia) {
+  // Desmarca todos
+  ['Imunologia','Microbiologia','Fisiologia','Bioquímica','Genética Médica','Biofísica'].forEach(m => {
+    const el = document.getElementById('mc-q-' + m.replace(/\s/g,'_'));
+    if (!el) return;
+    el.style.borderColor = 'var(--border)';
+    el.style.background  = '';
+    el.dataset.sel = '';
+  });
+  // Marca selecionado
+  const sel = document.getElementById('mc-q-' + materia.replace(/\s/g,'_'));
+  if (sel) {
+    sel.style.borderColor = 'var(--accent)';
+    sel.style.background  = 'var(--bg3)';
+    sel.dataset.sel = '1';
+  }
+  // Guarda seleção e habilita continuar
+  mcState.materiaQuestaoSelecionada = materia;
+  mcState.plano.nome = `${mcState.plano._nomeBase} · ${materia}`;
+  const btn = document.getElementById('mc-btn-continuar');
+  if (btn) { btn.disabled = false; btn.textContent = `Continuar com ${materia} →`; }
+  document.getElementById('mc-selecao-contador').textContent = materia + ' selecionada ✓';
 }
 
 // ── SELEÇÃO DE RESUMOS ───────────────────────────────────
@@ -7336,6 +7390,13 @@ window._mcContarCombos = function() {
 };
 
 async function mcContinuarParaPagamento() {
+  // Fluxo de questões: matéria selecionada, sem resumos
+  if (mcState.plano.ehQuestoes) {
+    if (!mcState.materiaQuestaoSelecionada) return;
+    document.getElementById('mc-step-selecao').style.display = 'none';
+    document.getElementById('mc-step-pagamento').style.display = '';
+    return;
+  }
   if (!mcState.resumosSelecionados.length) return;
   const ids = mcState.resumosSelecionados.map(r => r.id);
   mcState.plano.resumosIds = ids;
