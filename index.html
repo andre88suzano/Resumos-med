@@ -5813,8 +5813,16 @@ async function saveResumo() {
 function confirmDeleteResumo(id) {
   openConfirm(t('confirm-delete-title'), t('confirm-delete-resumo'), async () => {
     try {
-      const { ok, data } = await SB.delete('resumos', `id=eq.${id}`);
-      if (!ok) throw new Error(typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : data);
+      const { ok, data, status } = await SB.delete('resumos', `id=eq.${id}`);
+      if (!ok) {
+        const msg = typeof data === 'object' ? (data?.message || data?.error || data?.code || JSON.stringify(data)) : String(data);
+        throw new Error(`[${status}] ${msg}`);
+      }
+      const deleted = Array.isArray(data) ? data.length : (data ? 1 : 0);
+      if (deleted === 0) {
+        toast(`Nenhuma linha deletada (status ${status}) — verifique RLS`, 'error');
+        return;
+      }
       toast('Resumo excluído com sucesso.', 'success');
       await loadResumos();
       renderAdminResumosTable();
