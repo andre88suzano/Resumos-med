@@ -5168,8 +5168,22 @@ function openFolder(materia, sem) {
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
         <div class="folder-icon">🧠</div>
         <div class="folder-name">Banco de Questões</div>
-        <div class="folder-meta" style="color:var(--text3);">Em breve</div>
+        <div class="folder-meta" style="color:var(--text3);" id="banco-questoes-meta-${materia}-${sem}">Carregando…</div>
       </div>`;
+
+  // Busca o count de questões de forma assíncrona e atualiza o card
+  SB.select('questoes', `materia=eq.${materia}&semestre=eq.${sem}&select=id`)
+    .then(({ data }) => {
+      const count = Array.isArray(data) ? data.length : 0;
+      const el = document.getElementById(`banco-questoes-meta-${materia}-${sem}`);
+      if (el) el.textContent = count > 0
+        ? `${count} questão${count !== 1 ? 'ões' : ''} disponív${count !== 1 ? 'eis' : 'el'}`
+        : 'Em breve';
+    })
+    .catch(() => {
+      const el = document.getElementById(`banco-questoes-meta-${materia}-${sem}`);
+      if (el) el.textContent = 'Em breve';
+    });
 }
 
 function closeParciais() {
