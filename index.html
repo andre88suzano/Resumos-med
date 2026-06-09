@@ -3110,9 +3110,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
               </div>
             </div>
+            <!-- Seletor de matéria -->
+            <div style="width:100%;">
+              <label style="font-size:11px;color:var(--text3);margin-bottom:4px;display:block;">Escolha a matéria:</label>
+              <select id="questoes-20-materia" class="form-input form-select" style="width:100%;font-size:13px;padding:7px 10px;margin-bottom:8px;">
+                <option value="">— Selecione a matéria —</option>
+                <option>Imunologia</option>
+                <option>Microbiologia</option>
+                <option>Fisiologia</option>
+                <option>Bioquímica</option>
+                <option>Genética Médica</option>
+                <option>Biofísica</option>
+              </select>
+            </div>
             <div style="display:flex;gap:8px;width:100%;">
-              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo'})">⚡ PIX — R$ 5,00</button>
-              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 5,25</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="comprarQuestoes(20,5.00,'pix')">⚡ PIX — R$ 5,00</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarQuestoes(20,5.00,'cartao')">💳 Cartão — R$ 5,25</button>
             </div>
           </div>
 
@@ -3128,9 +3141,22 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
               </div>
             </div>
+            <!-- Seletor de matéria -->
+            <div style="width:100%;">
+              <label style="font-size:11px;color:var(--text3);margin-bottom:4px;display:block;">Escolha a matéria:</label>
+              <select id="questoes-40-materia" class="form-input form-select" style="width:100%;font-size:13px;padding:7px 10px;margin-bottom:8px;">
+                <option value="">— Selecione a matéria —</option>
+                <option>Imunologia</option>
+                <option>Microbiologia</option>
+                <option>Fisiologia</option>
+                <option>Bioquímica</option>
+                <option>Genética Médica</option>
+                <option>Biofísica</option>
+              </select>
+            </div>
             <div style="display:flex;gap:8px;width:100%;">
-              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo'})">⚡ PIX — R$ 10,00</button>
-              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 10,50</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="comprarQuestoes(40,10.00,'pix')">⚡ PIX — R$ 10,00</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarQuestoes(40,10.00,'cartao')">💳 Cartão — R$ 10,50</button>
             </div>
           </div>
 
@@ -4137,16 +4163,26 @@ function openValoresModal() {
   iniciarCountdownPromo();
 }
 
+// Compra de questões com seletor de matéria
+function comprarQuestoes(qtd, preco, metodo) {
+  const selectId = `questoes-${qtd}-materia`;
+  const sel = document.getElementById(selectId);
+  const materia = sel ? sel.value : '';
+  if (!materia) { toast('Selecione a matéria antes de continuar.', 'error'); return; }
+  const nome = `Banco de Questões — ${qtd} questões · ${materia}`;
+  closeModal('modal-valores');
+  abrirModalCompra({ nome, preco, tipo: 'solo', metodo: metodo === 'cartao' ? 'cartao' : undefined });
+}
+
 // ── CONTROLE AUTOMÁTICO DA ABA PROMOÇÃO ──────────────────
-// 08/06 00:00 BRT → Em breve
-// 09/06 06:00 BRT → Promo Mini Resumo Imunologia P2 (R$10 PIX)
-// 09/06 14:00 BRT → Em breve
+// 09/06 → Promo Mini Resumo Fisiologia (R$10 PIX)
 // 21/06 10:00 BRT → Promo Exames Finais 2026
 // 29/06 00:00 BRT → Em breve
 function aplicarEstadoPromo() {
   const agora = new Date();
   const T_FINAIS_INICIO = new Date('2026-06-21T10:00:00-03:00');
   const T_FINAIS_FIM    = new Date('2026-06-29T00:00:00-03:00');
+  const T_FISIO_FIM     = new Date('2026-06-20T23:59:00-03:00');
 
   const tabPromo     = document.getElementById('vtab-promo');
   const contentPromo = document.getElementById('vcontent-promo');
@@ -4268,6 +4304,56 @@ function aplicarEstadoPromo() {
         </div>
 
         <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;padding-bottom:4px;">Pagamento via PIX com acesso imediato. <strong style="color:#7c3aed;">Dupla: cada um recebe seu próprio acesso.</strong></p>
+      </div>`;
+
+    switchValoresTab('promo');
+
+  } else if (agora < T_FISIO_FIM) {
+    // ── PROMO MINI RESUMO FISIOLOGIA ─────────────────────
+    tabPromo.innerHTML = '🔥 Promoção';
+    tabPromo.style.color = '#f0b429';
+    tabPromo.style.borderBottomColor = '#f0b429';
+    tabPromo.style.cursor = 'pointer';
+    tabPromo.style.opacity = '1';
+    tabPromo.onclick = () => switchValoresTab('promo');
+
+    contentPromo.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px;">
+
+        <!-- Hero -->
+        <div style="background:linear-gradient(135deg,#1c0f00 0%,#2d1800 60%,#0f1a0f 100%);border-radius:14px;padding:18px 16px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#f0b42940,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1200;border:1px solid #f0b42940;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">⚡</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;">Promo Relâmpago</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">Mini Resumo de Fisiologia</div>
+          <div style="font-size:13px;color:#f0b42980;margin-bottom:12px;">Acesso imediato após pagamento</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:11px;background:#f0b42915;border:1px solid #f0b42940;color:#fde68a;padding:3px 10px;border-radius:20px;">❤️ Fisiologia</span>
+            <span style="font-size:11px;background:#f0b42915;border:1px solid #f0b42940;color:#fde68a;padding:3px 10px;border-radius:20px;">⚡ Mini Resumo de Corredor</span>
+          </div>
+        </div>
+
+        <!-- Card de compra -->
+        <div style="background:var(--bg2);border:2px solid #f0b42960;border-radius:12px;padding:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">⚡ Mini Resumo · Fisiologia</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;">Resumo de corredor para revisão rápida</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:22px;font-weight:800;color:#f0b429;line-height:1;">R$ 10,00</div>
+              <div style="font-size:10px;color:var(--text3);">ou R$ 10,50 cartão</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1200;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Mini Resumo Fisiologia ⚡ Promo',preco:10.00,tipo:'solo'})">⚡ PIX — R$ 10,00</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Mini Resumo Fisiologia ⚡ Promo',preco:10.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 10,50</button>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Acesso imediato após confirmação do pagamento.</p>
       </div>`;
 
     switchValoresTab('promo');
