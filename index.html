@@ -7182,56 +7182,65 @@ async function mcRenderizarSelecaoQuestoes(plano) {
   contador.textContent = 'Escolha a matéria e a prova';
   btnCont.disabled     = true;
   btnCont.textContent  = 'Continuar →';
-  lista.innerHTML      = '<div style="text-align:center;color:var(--text3);padding:24px;">Carregando disponibilidade...</div>';
+  lista.style.display  = 'block';
+  lista.innerHTML      = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Carregando disponibilidade...</div>';
 
-  // Busca combinações reais no banco
-  const { data } = await SB.select('questoes', 'select=materia,parcial');
-  const rows = Array.isArray(data) ? data : [];
+  try {
+    // Busca combinações reais no banco
+    const { data, ok } = await SB.select('questoes', 'select=materia,parcial');
+    const rows = Array.isArray(data) ? data : [];
 
-  if (!rows.length) {
-    lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:24px;">Nenhum banco disponível no momento.</div>';
-    return;
+    if (!rows.length) {
+      lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco disponível no momento.</div>';
+      return;
+    }
+
+    // Agrupa: { parcial → Set<materia> }
+    const grupos = {};
+    rows.forEach(r => {
+      const p = (r.parcial) || 'P1';
+      const m = r.materia || '';
+      if (!m) return;
+      if (!grupos[p]) grupos[p] = new Set();
+      grupos[p].add(m);
+    });
+
+    // Ordem de exibição
+    const ORDEM_PROVA = ['P1', 'P2', 'Final'];
+    const LABEL_PROVA = { P1: '📋 Parcial 1', P2: '📋 Parcial 2', Final: '🏆 Final' };
+
+    let html = '<div>';
+
+    ORDEM_PROVA.forEach(prova => {
+      if (!grupos[prova] || !grupos[prova].size) return;
+      const materias = [...grupos[prova]].sort();
+      html += `<div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;
+                    letter-spacing:.07em;padding:4px 0 6px;border-bottom:1px solid var(--border);
+                    margin-bottom:8px;">${LABEL_PROVA[prova] || prova}</div>`;
+      materias.forEach(m => {
+        const key = prova + '__' + m.replace(/[^a-zA-Z0-9]/g,'_');
+        const icon = (typeof MATERIA_ICONS !== 'undefined' && MATERIA_ICONS[m]) ? MATERIA_ICONS[m] : '📚';
+        html += `<div id="mc-q-${key}"
+          onclick="mcSelecionarMateriaQuestao('${m.replace(/'/g,"\\'")}','${prova}')"
+          style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;
+                 cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:6px;
+                 transition:border-color .15s,background .15s;"
+          onmouseover="if(!this.dataset.sel)this.style.borderColor='var(--accent)'"
+          onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
+          <span style="font-size:18px;">${icon}</span>
+          <span style="font-weight:600;color:var(--text);font-size:14px;">${m}</span>
+        </div>`;
+      });
+      html += '</div>';
+    });
+
+    html += '</div>';
+    lista.innerHTML = html;
+
+  } catch(e) {
+    lista.innerHTML = `<div style="color:#f87171;padding:12px;font-size:13px;">Erro ao carregar: ${e.message}</div>`;
   }
-
-  // Agrupa: { parcial → Set<materia> }
-  const grupos = {};
-  rows.forEach(({ materia, parcial }) => {
-    const p = parcial || 'P1';
-    if (!grupos[p]) grupos[p] = new Set();
-    grupos[p].add(materia);
-  });
-
-  // Ordem de exibição
-  const ORDEM_PROVA = ['P1', 'P2', 'Final'];
-  const LABEL_PROVA = { P1: 'Parcial 1', P2: 'Parcial 2', Final: 'Final' };
-
-  let html = '<div style="display:flex;flex-direction:column;gap:16px;">';
-
-  ORDEM_PROVA.forEach(prova => {
-    if (!grupos[prova]) return;
-    const materias = [...grupos[prova]].sort();
-    html += `
-      <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);
-                    text-transform:uppercase;margin-bottom:6px;padding-bottom:4px;
-                    border-bottom:1px solid var(--border);">${LABEL_PROVA[prova] || prova}</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          ${materias.map(m => `
-            <div id="mc-q-${prova}-${m.replace(/[\s\/]/g,'_')}"
-              onclick="mcSelecionarMateriaQuestao('${m}','${prova}')"
-              style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;cursor:pointer;
-                     display:flex;align-items:center;gap:10px;transition:var(--transition);"
-              onmouseover="this.style.borderColor='var(--accent)'"
-              onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
-              <span style="font-size:18px;">${MATERIA_ICONS[m]||'📚'}</span>
-              <span style="font-weight:600;color:var(--text);font-size:14px;">${m}</span>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  });
-
-  html += '</div>';
-  lista.innerHTML = html;
 }
 
 function mcSelecionarMateriaQuestao(materia, prova) {
@@ -7242,7 +7251,7 @@ function mcSelecionarMateriaQuestao(materia, prova) {
     el.dataset.sel = '';
   });
   // Marca o selecionado
-  const key = `mc-q-${prova}-${materia.replace(/[\s\/]/g,'_')}`;
+  const key = `mc-q-${prova}__${materia.replace(/[^a-zA-Z0-9]/g,'_')}`;
   const sel = document.getElementById(key);
   if (sel) {
     sel.style.borderColor = 'var(--accent)';
