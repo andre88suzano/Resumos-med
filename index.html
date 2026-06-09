@@ -4163,51 +4163,16 @@ function openValoresModal() {
   iniciarCountdownPromo();
 }
 
-// Compra de questões com seletor de matéria (fluxo direto, sem seleção de resumos)
-async function comprarQuestoes(qtd, preco, metodo) {
-  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
-
+// Compra de questões — abre modal de compra direto no step de pagamento
+function comprarQuestoes(qtd, preco, metodo) {
   const selectId = `questoes-${qtd}-materia`;
   const sel = document.getElementById(selectId);
   const materia = sel ? sel.value : '';
   if (!materia) { toast('Selecione a matéria antes de continuar.', 'error'); return; }
 
+  const nome = `Banco de Questões — ${qtd} questões · ${materia}`;
   closeModal('modal-valores');
-  mostrarLoading('Preparando pagamento...');
-  try {
-    const prefixo = 'Q' + qtd;
-    const codigo = prefixo + Math.random().toString(36).substring(2, 6).toUpperCase();
-    const rCompra = await SB.insert('compras_coletivas', {
-      codigo,
-      tipo: 'solo',
-      status: 'aguardando',
-      slots_total: 1,
-      slots_preenchidos: 0,
-      preco_individual: preco,
-      criador_user_id: state.user.id,
-      expira_em: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-    });
-    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
-    if (!compra?.id) throw new Error('Falha ao criar compra');
-
-    await SB.insert('compra_participantes', {
-      compra_id: compra.id,
-      user_id: state.user.id,
-      email: state.user.email,
-      status_pagamento: 'pendente',
-      resumos_selecionados: [],
-    });
-
-    // Guarda contexto para o admin identificar a compra
-    mcState.plano = { nome: `Banco de Questões — ${qtd} questões · ${materia}`, preco, tipo: 'solo' };
-    mcState.compraId = compra.id;
-    mcState.resumosSelecionados = [];
-
-    await iniciarPagamento(compra.id, 'solo', preco, metodo);
-  } catch (e) {
-    ocultarLoading();
-    toast('Erro: ' + e.message, 'error');
-  }
+  abrirModalCompra({ nome, preco, tipo: 'solo', skipSelecao: true, metodo });
 }
 
 // ── CONTROLE AUTOMÁTICO DA ABA PROMOÇÃO ──────────────────
@@ -7076,12 +7041,16 @@ function abrirModalCompra(plano) {
   // Atualizar descrição
   document.getElementById('mc-plano-desc').textContent = plano.nome;
 
-  // Mostrar step de seleção primeiro
-  document.getElementById('mc-step-selecao').style.display = '';
-  document.getElementById('mc-step-pagamento').style.display = 'none';
-
-  // Renderizar lista de resumos disponíveis
-  mcRenderizarSelecaoResumos(plano);
+  // Se skipSelecao, pula direto para pagamento
+  if (plano.skipSelecao) {
+    document.getElementById('mc-step-selecao').style.display = 'none';
+    document.getElementById('mc-step-pagamento').style.display = '';
+  } else {
+    document.getElementById('mc-step-selecao').style.display = '';
+    document.getElementById('mc-step-pagamento').style.display = 'none';
+    // Renderizar lista de resumos disponíveis
+    mcRenderizarSelecaoResumos(plano);
+  }
 
   // Mostrar preço solo
   const precoSolo = plano.preco || plano.preco_solo || 0;
