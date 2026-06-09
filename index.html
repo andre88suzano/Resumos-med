@@ -7195,19 +7195,30 @@ async function mcRenderizarSelecaoQuestoes(plano) {
       return;
     }
 
-    // Agrupa: { parcial → Set<materia> }
+    // Normaliza parcial para chave padrão
+    const normalizarParcial = p => {
+      if (!p) return 'P1';
+      const s = String(p).trim().toLowerCase();
+      if (s === 'p1' || s.includes('parcial 1') || s.includes('parcial1') || s === '1') return 'P1';
+      if (s === 'p2' || s.includes('parcial 2') || s.includes('parcial2') || s === '2') return 'P2';
+      if (s === 'final' || s.includes('final')) return 'Final';
+      return p; // mantém o valor original se não reconhecer
+    };
+
+    // Agrupa: { parcial_normalizado → Set<materia> }
     const grupos = {};
     rows.forEach(r => {
-      const p = (r.parcial) || 'P1';
+      const p = normalizarParcial(r.parcial);
       const m = r.materia || '';
       if (!m) return;
       if (!grupos[p]) grupos[p] = new Set();
       grupos[p].add(m);
     });
 
-    // Ordem de exibição
-    const ORDEM_PROVA = ['P1', 'P2', 'Final'];
+    // Ordem de exibição (P1/P2/Final primeiro, depois outros valores)
+    const ORDEM_FIXA = ['P1', 'P2', 'Final'];
     const LABEL_PROVA = { P1: '📋 Parcial 1', P2: '📋 Parcial 2', Final: '🏆 Final' };
+    const ORDEM_PROVA = [...ORDEM_FIXA, ...Object.keys(grupos).filter(k => !ORDEM_FIXA.includes(k)).sort()];
 
     let html = '<div>';
 
@@ -7236,7 +7247,13 @@ async function mcRenderizarSelecaoQuestoes(plano) {
     });
 
     html += '</div>';
-    lista.innerHTML = html;
+
+    // Se não renderizou nada mesmo com dados, mostra o que tem no banco
+    if (Object.keys(grupos).length === 0) {
+      lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco disponível no momento.</div>';
+    } else {
+      lista.innerHTML = html;
+    }
 
   } catch(e) {
     lista.innerHTML = `<div style="color:#f87171;padding:12px;font-size:13px;">Erro ao carregar: ${e.message}</div>`;
