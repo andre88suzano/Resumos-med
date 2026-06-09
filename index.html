@@ -2708,15 +2708,15 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 
 <!-- ═══════════ MODAL QUESTÃO ═══════════ -->
 <div id="modal-questao" class="modal-backdrop hidden">
-  <div class="modal" style="max-width:640px;">
+  <div class="modal" style="max-width:680px;">
     <div class="modal-header">
       <h2 class="modal-title" id="modal-questao-title">Adicionar Questão</h2>
       <button class="modal-close" onclick="closeModal('modal-questao')">✕</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div class="form-group">
-        <label class="form-label">Enunciado</label>
-        <textarea class="form-input" id="questao-form-enunciado" rows="3" placeholder="Ex: Qual é o principal mecanismo de ação da penicilina?"></textarea>
+        <label class="form-label">Título <span style="font-size:11px;color:var(--text3);">(ex: Questão 1 — Imunidade Inata)</span></label>
+        <input class="form-input" id="questao-form-title" placeholder="Ex: Questão 1 — Mecanismo da Penicilina" />
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
         <div class="form-group">
@@ -2757,40 +2757,18 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </select>
         </div>
       </div>
-      <!-- Alternativas -->
       <div class="form-group">
-        <label class="form-label">Alternativas <span style="font-size:11px;color:var(--text3);">(marque a correta)</span></label>
-        <div style="display:flex;flex-direction:column;gap:8px;" id="questao-alternativas">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="A" id="alt-radio-A" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-A" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">A</label>
-            <input class="form-input" id="questao-alt-A" placeholder="Alternativa A..." style="flex:1;margin:0;">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="B" id="alt-radio-B" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-B" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">B</label>
-            <input class="form-input" id="questao-alt-B" placeholder="Alternativa B..." style="flex:1;margin:0;">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="C" id="alt-radio-C" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-C" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">C</label>
-            <input class="form-input" id="questao-alt-C" placeholder="Alternativa C..." style="flex:1;margin:0;">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="D" id="alt-radio-D" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-D" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">D</label>
-            <input class="form-input" id="questao-alt-D" placeholder="Alternativa D..." style="flex:1;margin:0;">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="E" id="alt-radio-E" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-E" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">E</label>
-            <input class="form-input" id="questao-alt-E" placeholder="Alternativa E..." style="flex:1;margin:0;">
-          </div>
-        </div>
+        <label class="form-label">Conteúdo HTML interativo</label>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Cole o HTML da questão interativa — alternativas clicáveis, gabarito, explicação, tudo dentro do HTML.</div>
+        <textarea class="form-input" id="questao-form-content" rows="12" placeholder="Cole aqui o HTML interativo da questão..." style="resize:vertical;font-family:var(--font-mono);font-size:12px;"></textarea>
       </div>
+      <!-- Preview -->
       <div class="form-group">
-        <label class="form-label">Explicação da resposta <span style="font-size:11px;color:var(--text3);">(opcional)</span></label>
-        <textarea class="form-input" id="questao-form-explicacao" rows="3" placeholder="Explique por que a alternativa correta está certa..."></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label class="form-label" style="margin:0;">Preview</label>
+          <button class="btn btn-ghost btn-sm" onclick="previewQuestao()">👁 Visualizar</button>
+        </div>
+        <div id="questao-preview-box" style="display:none;border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--bg3);max-height:300px;overflow-y:auto;"></div>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn btn-ghost" onclick="closeModal('modal-questao')">Cancelar</button>
@@ -5657,7 +5635,7 @@ function renderAdminQuestoesTable() {
     return;
   }
   tbody.innerHTML = state.questoes.map(q => `<tr>
-    <td><strong>${(q.enunciado||'').substring(0,80)}${q.enunciado&&q.enunciado.length>80?'…':''}</strong></td>
+    <td><strong>${(q.title||'').substring(0,80)}${q.title&&q.title.length>80?'…':''}</strong></td>
     <td><span class="badge ${MATERIA_COLORS[q.materia]||'badge-gray'}">${q.materia}</span></td>
     <td>${q.semestre}º</td>
     <td style="display:flex;gap:6px;">
@@ -5670,15 +5648,14 @@ function renderAdminQuestoesTable() {
 function openAddQuestao() {
   state.editingQuestaoId = null;
   document.getElementById('modal-questao-title').textContent = 'Adicionar Questão';
-  document.getElementById('questao-form-enunciado').value = '';
-  document.getElementById('questao-form-explicacao').value = '';
+  document.getElementById('questao-form-title').value = '';
+  document.getElementById('questao-form-content').value = '';
   document.getElementById('questao-form-materia').value = 'Imunologia';
   document.getElementById('questao-form-semestre').value = '3';
   document.getElementById('questao-form-parcial').value = 'Parcial 1';
-  ['A','B','C','D','E'].forEach(l => {
-    document.getElementById(`questao-alt-${l}`).value = '';
-    document.getElementById(`alt-radio-${l}`).checked = false;
-  });
+  const preview = document.getElementById('questao-preview-box');
+  preview.style.display = 'none';
+  preview.innerHTML = '';
   openModal('modal-questao');
 }
 
@@ -5687,35 +5664,34 @@ function openEditQuestao(id) {
   if (!q) return;
   state.editingQuestaoId = id;
   document.getElementById('modal-questao-title').textContent = 'Editar Questão';
-  document.getElementById('questao-form-enunciado').value   = q.enunciado || '';
-  document.getElementById('questao-form-explicacao').value  = q.explicacao || '';
-  document.getElementById('questao-form-materia').value     = q.materia || 'Imunologia';
-  document.getElementById('questao-form-semestre').value    = String(q.semestre || 3);
-  document.getElementById('questao-form-parcial').value     = q.parcial || 'Parcial 1';
-  const alts = q.alternativas || {};
-  ['A','B','C','D','E'].forEach(l => {
-    document.getElementById(`questao-alt-${l}`).value = alts[l] || '';
-    document.getElementById(`alt-radio-${l}`).checked = q.resposta_correta === l;
-  });
+  document.getElementById('questao-form-title').value   = q.title || '';
+  document.getElementById('questao-form-content').value = q.content || '';
+  document.getElementById('questao-form-materia').value = q.materia || 'Imunologia';
+  document.getElementById('questao-form-semestre').value = String(q.semestre || 3);
+  document.getElementById('questao-form-parcial').value  = q.parcial || 'Parcial 1';
+  const preview = document.getElementById('questao-preview-box');
+  preview.style.display = 'none';
+  preview.innerHTML = '';
   openModal('modal-questao');
 }
 
+function previewQuestao() {
+  const content = document.getElementById('questao-form-content').value;
+  const box = document.getElementById('questao-preview-box');
+  box.style.display = 'block';
+  box.innerHTML = content || '<em style="color:var(--text3)">Nenhum conteúdo para pré-visualizar.</em>';
+}
+
 async function saveQuestao() {
-  const enunciado  = document.getElementById('questao-form-enunciado').value.trim();
-  const explicacao = document.getElementById('questao-form-explicacao').value.trim();
-  const materia    = document.getElementById('questao-form-materia').value;
-  const semestre   = parseInt(document.getElementById('questao-form-semestre').value);
-  const parcial    = document.getElementById('questao-form-parcial').value;
-  const correta    = document.querySelector('input[name="questao-correta"]:checked')?.value || null;
-  const alternativas = {};
-  ['A','B','C','D','E'].forEach(l => {
-    const v = document.getElementById(`questao-alt-${l}`).value.trim();
-    if (v) alternativas[l] = v;
-  });
-  if (!enunciado) { toast('Preencha o enunciado.', 'error'); return; }
+  const title   = document.getElementById('questao-form-title').value.trim();
+  const content = document.getElementById('questao-form-content').value.trim();
+  const materia = document.getElementById('questao-form-materia').value;
+  const semestre = parseInt(document.getElementById('questao-form-semestre').value);
+  const parcial  = document.getElementById('questao-form-parcial').value;
+  if (!title || !content) { toast('Preencha o título e o conteúdo HTML.', 'error'); return; }
   setLoading('btn-save-questao', true);
   try {
-    const payload = { enunciado, explicacao, materia, semestre, parcial, alternativas, resposta_correta: correta };
+    const payload = { title, content, materia, semestre, parcial };
     if (state.editingQuestaoId) {
       await SB.update('questoes', payload, `id=eq.${state.editingQuestaoId}`);
     } else {
