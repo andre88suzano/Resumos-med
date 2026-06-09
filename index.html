@@ -5810,26 +5810,27 @@ async function saveResumo() {
   finally { setLoading('btn-save-resumo', false); }
 }
 
-function confirmDeleteResumo(id) {
-  openConfirm(t('confirm-delete-title'), t('confirm-delete-resumo'), async () => {
-    try {
-      const { ok, data, status } = await SB.delete('resumos', `id=eq.${id}`);
-      if (!ok) {
-        const msg = typeof data === 'object' ? (data?.message || data?.error || data?.code || JSON.stringify(data)) : String(data);
-        throw new Error(`[${status}] ${msg}`);
-      }
-      const deleted = Array.isArray(data) ? data.length : (data ? 1 : 0);
-      if (deleted === 0) {
-        toast(`Nenhuma linha deletada (status ${status}) — verifique RLS`, 'error');
-        return;
-      }
-      toast('Resumo excluído com sucesso.', 'success');
-      await loadResumos();
-      renderAdminResumosTable();
-    } catch (e) {
-      toast('Erro ao excluir: ' + e.message, 'error');
+async function confirmDeleteResumo(id) {
+  if (!window.confirm('Excluir este resumo? Esta ação não pode ser desfeita.')) return;
+  try {
+    const { ok, data, status } = await SB.delete('resumos', `id=eq.${id}`);
+    if (!ok) {
+      const msg = typeof data === 'object'
+        ? (data?.message || data?.error || data?.code || JSON.stringify(data))
+        : String(data);
+      throw new Error(`[${status}] ${msg}`);
     }
-  });
+    const deleted = Array.isArray(data) ? data.length : (data ? 1 : 0);
+    if (deleted === 0) {
+      toast(`Nenhuma linha deletada (status ${status}) — verifique permissões`, 'error');
+      return;
+    }
+    toast('Resumo excluído com sucesso ✅', 'success');
+    await loadResumos();
+    renderAdminResumosTable();
+  } catch (e) {
+    toast('Erro ao excluir: ' + e.message, 'error');
+  }
 }
 
 // ── Seções colapsáveis ──────────────────────────────────
