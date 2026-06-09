@@ -4164,16 +4164,43 @@ function openValoresModal() {
   iniciarCountdownPromo();
 }
 
-// Compra de questões — abre modal de compra direto no step de pagamento
-function comprarQuestoes(qtd, preco, metodo) {
-  const selectId = `questoes-${qtd}-materia`;
-  const sel = document.getElementById(selectId);
+// Compra de questões — fluxo direto para o Mercado Pago (igual promo Imunologia)
+async function comprarQuestoes(qtd, preco, metodo) {
+  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+
+  const sel = document.getElementById(`questoes-${qtd}-materia`);
   const materia = sel ? sel.value : '';
   if (!materia) { toast('Selecione a matéria antes de continuar.', 'error'); return; }
 
-  const nome = `Banco de Questões — ${qtd} questões · ${materia}`;
   closeModal('modal-valores');
-  abrirModalCompra({ nome, preco, tipo: 'solo', skipSelecao: true, metodo });
+  mostrarLoading('Preparando pagamento…');
+
+  try {
+    const codigo = 'Q' + qtd + Math.random().toString(36).substring(2,6).toUpperCase();
+    const { data: cData } = await SB.insert('compras_coletivas', {
+      codigo, tipo: 'solo', status: 'aguardando',
+      slots_total: 1, slots_preenchidos: 0,
+      preco_individual: preco,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24*3600*1000).toISOString(),
+    });
+    const compra = Array.isArray(cData) ? cData[0] : cData;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id, user_id: state.user.id,
+      email: state.user.email, status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+
+    mcState.plano = { nome: `Banco de Questões — ${qtd}q · ${materia}`, preco, tipo: 'solo' };
+    mcState.compraId = compra.id;
+
+    await iniciarPagamento(compra.id, 'solo', preco, metodo);
+  } catch(e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
 }
 
 // ── CONTROLE AUTOMÁTICO DA ABA PROMOÇÃO ──────────────────
