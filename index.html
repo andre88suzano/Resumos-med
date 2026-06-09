@@ -2761,12 +2761,31 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
       <div class="form-group">
         <label class="form-label">Alternativas <span style="font-size:11px;color:var(--text3);">(marque a correta)</span></label>
         <div style="display:flex;flex-direction:column;gap:8px;" id="questao-alternativas">
-          ${['A','B','C','D','E'].map(l => `
           <div style="display:flex;align-items:center;gap:8px;">
-            <input type="radio" name="questao-correta" value="${l}" id="alt-radio-${l}" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
-            <label for="alt-radio-${l}" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">${l}</label>
-            <input class="form-input" id="questao-alt-${l}" placeholder="Alternativa ${l}..." style="flex:1;margin:0;">
-          </div>`).join('')}
+            <input type="radio" name="questao-correta" value="A" id="alt-radio-A" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-A" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">A</label>
+            <input class="form-input" id="questao-alt-A" placeholder="Alternativa A..." style="flex:1;margin:0;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="radio" name="questao-correta" value="B" id="alt-radio-B" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-B" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">B</label>
+            <input class="form-input" id="questao-alt-B" placeholder="Alternativa B..." style="flex:1;margin:0;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="radio" name="questao-correta" value="C" id="alt-radio-C" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-C" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">C</label>
+            <input class="form-input" id="questao-alt-C" placeholder="Alternativa C..." style="flex:1;margin:0;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="radio" name="questao-correta" value="D" id="alt-radio-D" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-D" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">D</label>
+            <input class="form-input" id="questao-alt-D" placeholder="Alternativa D..." style="flex:1;margin:0;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="radio" name="questao-correta" value="E" id="alt-radio-E" style="accent-color:#3b82f6;width:16px;height:16px;cursor:pointer;">
+            <label for="alt-radio-E" style="font-weight:700;color:var(--text3);width:16px;cursor:pointer;">E</label>
+            <input class="form-input" id="questao-alt-E" placeholder="Alternativa E..." style="flex:1;margin:0;">
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -3101,21 +3120,21 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             </div>
           </div>
 
-          <!-- 60 Questões -->
-          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
+          <!-- 60 Questões — Em manutenção -->
+          <div class="valor-item" style="border-color:var(--border);flex-direction:column;align-items:flex-start;gap:8px;opacity:0.55;cursor:not-allowed;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-info">
-                <div class="valor-nome">🧠🧠🧠 60 Questões</div>
+                <div class="valor-nome" style="display:flex;align-items:center;gap:8px;">🧠🧠🧠 60 Questões <span style="font-size:10px;font-weight:700;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:2px 8px;border-radius:20px;">🔧 Em manutenção</span></div>
                 <div class="valor-desc">Banco completo com 60 questões com gabarito e explicação.</div>
               </div>
               <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--teal);">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div class="valor-preco" style="color:var(--text3);">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 15,75 cartão</div>
               </div>
             </div>
             <div style="display:flex;gap:8px;width:100%;">
-              <button class="btn btn-primary btn-sm" style="flex:1;background:var(--teal);border-color:var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo'})">⚡ PIX — R$ 15,00</button>
-              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo',metodo:'cartao'})">💳 Cartão — R$ 15,75</button>
+              <button class="btn btn-sm" style="flex:1;background:var(--border);color:var(--text3);border:none;cursor:not-allowed;" disabled>⚡ PIX — R$ 15,00</button>
+              <button class="btn btn-sm" style="flex:1;background:var(--border);color:var(--text3);border:none;cursor:not-allowed;" disabled>💳 Cartão — R$ 15,75</button>
             </div>
           </div>
 
