@@ -7215,23 +7215,24 @@ async function mcRenderizarSelecaoQuestoes(plano) {
       return p; // mantém o valor original se não reconhecer
     };
 
-    // Conta questões por (parcial, materia)
-    const contagem = {}; // "P1|Imunologia" → 15
+    // Conta questões por materia (total, ignorando parcial) para o badge
+    const totalPorMateria = {};
+    rows.forEach(r => {
+      const m = r.materia || '';
+      if (!m) return;
+      totalPorMateria[m] = (totalPorMateria[m] || 0) + 1;
+    });
+
+    // Agrupa por parcial → materia, filtrando matérias com total < qtdMin
+    const grupos = {};
     rows.forEach(r => {
       const p = normalizarParcial(r.parcial);
       const m = r.materia || '';
       if (!m) return;
-      const key = `${p}|${m}`;
-      contagem[key] = (contagem[key] || 0) + 1;
-    });
-
-    // Agrupa apenas combos com questões suficientes para o pacote
-    const grupos = {};
-    Object.entries(contagem).forEach(([key, count]) => {
-      if (qtdMin > 0 && count < qtdMin) return; // não tem questões suficientes
-      const [p, m] = key.split('|');
-      if (!grupos[p]) grupos[p] = [];
-      grupos[p].push({ materia: m, count });
+      const total = totalPorMateria[m] || 0;
+      if (qtdMin > 0 && total < qtdMin) return; // matéria não tem questões suficientes no total
+      if (!grupos[p]) grupos[p] = new Set();
+      grupos[p].add(m);
     });
 
     // Ordem de exibição (P1/P2/Final primeiro, depois outros valores)
@@ -7242,15 +7243,16 @@ async function mcRenderizarSelecaoQuestoes(plano) {
     let html = '<div>';
 
     ORDEM_PROVA.forEach(prova => {
-      if (!grupos[prova] || !grupos[prova].length) return;
-      const materias = grupos[prova].sort((a,b) => a.materia.localeCompare(b.materia));
+      if (!grupos[prova] || !grupos[prova].size) return;
+      const materias = [...grupos[prova]].sort();
       html += `<div style="margin-bottom:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;
                     letter-spacing:.07em;padding:4px 0 6px;border-bottom:1px solid var(--border);
                     margin-bottom:8px;">${LABEL_PROVA[prova] || prova}</div>`;
-      materias.forEach(({ materia: m, count }) => {
+      materias.forEach(m => {
         const key = prova + '__' + m.replace(/[^a-zA-Z0-9]/g,'_');
         const icon = (typeof MATERIA_ICONS !== 'undefined' && MATERIA_ICONS[m]) ? MATERIA_ICONS[m] : '📚';
+        const total = totalPorMateria[m] || 0;
         html += `<div id="mc-q-${key}"
           onclick="mcSelecionarMateriaQuestao('${m.replace(/'/g,"\\'")}','${prova}')"
           style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;
@@ -7260,7 +7262,7 @@ async function mcRenderizarSelecaoQuestoes(plano) {
           onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
           <span style="font-size:18px;">${icon}</span>
           <span style="font-weight:600;color:var(--text);font-size:14px;flex:1;">${m}</span>
-          <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;">${count} questões</span>
+          <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;">${total} questões</span>
         </div>`;
       });
       html += '</div>';
@@ -7268,7 +7270,7 @@ async function mcRenderizarSelecaoQuestoes(plano) {
 
     html += '</div>';
 
-    // Se não renderizou nada (nenhum combo tem questões suficientes)
+    // Se não renderizou nada
     if (Object.keys(grupos).length === 0) {
       lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco com ${qtdMin}+ questões disponível no momento.</div>`;
     } else {
