@@ -3124,21 +3124,19 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             </div>
           </div>
 
-          <!-- 60 Questões — Em manutenção -->
-          <div class="valor-item" style="border-color:var(--border);flex-direction:column;align-items:flex-start;gap:8px;opacity:0.55;cursor:not-allowed;">
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info">
-                <div class="valor-nome" style="display:flex;align-items:center;gap:8px;">🧠🧠🧠 60 Questões <span style="font-size:10px;font-weight:700;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:2px 8px;border-radius:20px;">🔧 Em manutenção</span></div>
-                <div class="valor-desc">Banco completo com 60 questões com gabarito e explicação.</div>
-              </div>
-              <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--text3);">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-                <div style="font-size:10px;color:var(--text3);">R$ 15,75 cartão</div>
-              </div>
+          <!-- 60 Questões -->
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">🧠🧠🧠 60 Questões</div>
+              <div class="valor-desc">Banco completo com 60 questões com gabarito e explicação.</div>
             </div>
-            <div style="display:flex;gap:8px;width:100%;">
-              <button class="btn btn-sm" style="flex:1;background:var(--border);color:var(--text3);border:none;cursor:not-allowed;" disabled>⚡ PIX — R$ 15,00</button>
-              <button class="btn btn-sm" style="flex:1;background:var(--border);color:var(--text3);border:none;cursor:not-allowed;" disabled>💳 Cartão — R$ 15,75</button>
+            <div style="text-align:right;">
+              <div class="valor-preco">R$ 15,00 PIX</div>
+              <div>R$ 15,75 cartão</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;"
+                onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:60})">
+                🛒 Comprar — R$ 15,00 no PIX
+              </button>
             </div>
           </div>
 
