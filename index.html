@@ -7195,44 +7195,51 @@ async function mcRenderizarSelecaoQuestoes(plano) {
   lista.innerHTML      = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Carregando disponibilidade...</div>';
 
   try {
-    // Busca todas as questões com materia+parcial para contar
-    const { data } = await SB.select('questoes', 'select=materia,parcial');
+    // Busca bancos de questões com title+materia+parcial
+    const { data } = await SB.select('questoes', 'select=id,title,materia,parcial');
     const rows = Array.isArray(data) ? data : [];
-    const qtdMin = plano.qtdQuestoes || 0; // mínimo necessário para o pacote
+    const qtdPacote = plano.qtdQuestoes || 0;
 
     if (!rows.length) {
       lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco disponível no momento.</div>';
       return;
     }
 
-    // Normaliza parcial para chave padrão
+    // Extrai quantidade do título (ex: "60 questões - parcial 2" → 60)
+    const qtdDoTitulo = title => {
+      const m = String(title || '').match(/(\d+)/);
+      return m ? parseInt(m[1]) : 0;
+    };
+
+    // Normaliza parcial
     const normalizarParcial = p => {
       if (!p) return 'P1';
       const s = String(p).trim().toLowerCase();
       if (s === 'p1' || s.includes('parcial 1') || s.includes('parcial1') || s === '1') return 'P1';
       if (s === 'p2' || s.includes('parcial 2') || s.includes('parcial2') || s === '2') return 'P2';
       if (s === 'final' || s.includes('final')) return 'Final';
-      return p; // mantém o valor original se não reconhecer
+      return p;
     };
 
-    // Conta questões por materia (total, ignorando parcial) para o badge
-    const totalPorMateria = {};
-    rows.forEach(r => {
-      const m = r.materia || '';
-      if (!m) return;
-      totalPorMateria[m] = (totalPorMateria[m] || 0) + 1;
-    });
+    // Filtra bancos cujo título indica a quantidade do pacote selecionado
+    // (ou mostra todos se qtdPacote não especificado)
+    const bancosCompativeis = qtdPacote > 0
+      ? rows.filter(r => qtdDoTitulo(r.title) === qtdPacote)
+      : rows;
 
-    // Agrupa por parcial → materia, filtrando matérias com total < qtdMin
-    const grupos = {};
-    rows.forEach(r => {
+    if (!bancosCompativeis.length) {
+      lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco de ${qtdPacote} questões disponível no momento.</div>`;
+      return;
+    }
+
+    // Agrupa por parcial → materia, guardando o id do banco
+    const grupos = {}; // parcial → Map<materia, id>
+    bancosCompativeis.forEach(r => {
       const p = normalizarParcial(r.parcial);
       const m = r.materia || '';
       if (!m) return;
-      const total = totalPorMateria[m] || 0;
-      if (qtdMin > 0 && total < qtdMin) return; // matéria não tem questões suficientes no total
-      if (!grupos[p]) grupos[p] = new Set();
-      grupos[p].add(m);
+      if (!grupos[p]) grupos[p] = new Map();
+      grupos[p].set(m, r.id);
     });
 
     // Ordem de exibição (P1/P2/Final primeiro, depois outros valores)
@@ -7244,17 +7251,17 @@ async function mcRenderizarSelecaoQuestoes(plano) {
 
     ORDEM_PROVA.forEach(prova => {
       if (!grupos[prova] || !grupos[prova].size) return;
-      const materias = [...grupos[prova]].sort();
+      const materias = [...grupos[prova].keys()].sort();
       html += `<div style="margin-bottom:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;
                     letter-spacing:.07em;padding:4px 0 6px;border-bottom:1px solid var(--border);
                     margin-bottom:8px;">${LABEL_PROVA[prova] || prova}</div>`;
       materias.forEach(m => {
+        const bancoId = grupos[prova].get(m);
         const key = prova + '__' + m.replace(/[^a-zA-Z0-9]/g,'_');
         const icon = (typeof MATERIA_ICONS !== 'undefined' && MATERIA_ICONS[m]) ? MATERIA_ICONS[m] : '📚';
-        const total = totalPorMateria[m] || 0;
         html += `<div id="mc-q-${key}"
-          onclick="mcSelecionarMateriaQuestao('${m.replace(/'/g,"\\'")}','${prova}')"
+          onclick="mcSelecionarMateriaQuestao('${m.replace(/'/g,"\\'")}','${prova}','${bancoId}')"
           style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;
                  cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:6px;
                  transition:border-color .15s,background .15s;"
@@ -7262,7 +7269,7 @@ async function mcRenderizarSelecaoQuestoes(plano) {
           onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
           <span style="font-size:18px;">${icon}</span>
           <span style="font-weight:600;color:var(--text);font-size:14px;flex:1;">${m}</span>
-          <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;">${total} questões</span>
+          <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;">${qtdPacote} questões</span>
         </div>`;
       });
       html += '</div>';
@@ -7282,7 +7289,7 @@ async function mcRenderizarSelecaoQuestoes(plano) {
   }
 }
 
-function mcSelecionarMateriaQuestao(materia, prova) {
+function mcSelecionarMateriaQuestao(materia, prova, bancoId) {
   // Desmarca todos os cards
   document.querySelectorAll('[id^="mc-q-"]').forEach(el => {
     el.style.borderColor = 'var(--border)';
@@ -7300,6 +7307,7 @@ function mcSelecionarMateriaQuestao(materia, prova) {
   // Atualiza mcState
   mcState.materiaQuestaoSelecionada = materia;
   mcState.parcialQuestaoSelecionada = prova;
+  mcState.bancoQuestaoId = bancoId || null;
   const LABEL_PROVA = { P1: 'Parcial 1', P2: 'Parcial 2', Final: 'Final' };
   const label = `${materia} · ${LABEL_PROVA[prova] || prova}`;
   mcState.plano.nome = `${mcState.plano._nomeBase} · ${label}`;
