@@ -5364,10 +5364,7 @@ async function openBancoQuestoes(materia, sem) {
   // Verifica acesso por banco individual (igual aos resumos)
   const myAccess = state.myQuestoesAccess || [];
   const temAcessoBanco = (q) => state.profile.is_admin ||
-    myAccess.some(a =>
-      (a.questao_id && a.questao_id === q.id) ||
-      (!a.questao_id && a.materia === materia && a.semestre == sem)
-    );
+    myAccess.some(a => a.questao_id === q.id);
 
   const desbloqueados = questoes.filter(temAcessoBanco).length;
   document.getElementById('folder-count').textContent =
@@ -6012,7 +6009,7 @@ async function loadAccessMatrix() {
 
   const [{ data: accessData }, { data: questoesAccessData }] = await Promise.all([
     SB.select('user_access', `user_id=eq.${uid}&select=resumo_id`),
-    SB.select('user_questoes_access', `user_id=eq.${uid}&select=materia,semestre`),
+    SB.select('user_questoes_access', `user_id=eq.${uid}&select=materia,semestre,questao_id`),
   ]);
   const granted = Array.isArray(accessData) ? accessData.map(a => a.resumo_id) : [];
   const grantedQuestoes = Array.isArray(questoesAccessData) ? questoesAccessData : [];
@@ -6066,10 +6063,7 @@ async function loadAccessMatrix() {
       <table class="access-matrix">
         <thead><tr><th>Matéria</th><th>Banco</th><th>Status</th><th></th></tr></thead>
         <tbody>${bancosQuestoes.map(banco => {
-          const hasQ = grantedQuestoes.some(a =>
-            (a.questao_id && a.questao_id === banco.id) ||
-            (!a.questao_id && a.materia === banco.materia && a.semestre == banco.semestre)
-          );
+          const hasQ = grantedQuestoes.some(a => a.questao_id === banco.id);
           // Extrai quantidade do título
           const qtdMatch = (banco.title || '').match(/(\d+)/);
           const qtdLabel = qtdMatch ? `${qtdMatch[1]}q` : banco.title;
