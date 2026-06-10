@@ -6039,28 +6039,37 @@ async function loadAccessMatrix() {
   });
 
   // ── Seção Banco de Questões ──────────────────────────────
-  const materiasQuestoes = [...new Set(state.questoes.map(q => q.materia + '|' + q.semestre))]
-    .map(k => { const [m, s] = k.split('|'); return { materia: m, semestre: parseInt(s) }; })
-    .sort((a, b) => a.semestre - b.semestre || a.materia.localeCompare(b.materia));
+  const bancosQuestoes = (state.questoes || [])
+    .slice()
+    .sort((a, b) => a.semestre - b.semestre || a.materia.localeCompare(b.materia) || (a.title||'').localeCompare(b.title||''));
 
-  if (materiasQuestoes.length > 0) {
+  if (bancosQuestoes.length > 0) {
     html += `<div class="semestre-header" onclick="toggleAccordion(this)" style="margin-top:16px;">
-      <div class="semestre-title">🧠 Banco de Questões <span class="badge badge-gray">${materiasQuestoes.length}</span></div>
+      <div class="semestre-title">🧠 Banco de Questões <span class="badge badge-gray">${bancosQuestoes.length}</span></div>
       <span class="semestre-chevron">▾</span>
     </div>
     <div class="semestre-body">
       <table class="access-matrix">
-        <thead><tr><th>Matéria</th><th>Semestre</th><th>Status</th><th></th></tr></thead>
-        <tbody>${materiasQuestoes.map(({ materia, semestre }) => {
-          const hasQ = grantedQuestoes.some(a => a.materia === materia && a.semestre == semestre);
+        <thead><tr><th>Matéria</th><th>Banco</th><th>Status</th><th></th></tr></thead>
+        <tbody>${bancosQuestoes.map(banco => {
+          const hasQ = grantedQuestoes.some(a =>
+            (a.questao_id && a.questao_id === banco.id) ||
+            (!a.questao_id && a.materia === banco.materia && a.semestre == banco.semestre)
+          );
+          // Extrai quantidade do título
+          const qtdMatch = (banco.title || '').match(/(\d+)/);
+          const qtdLabel = qtdMatch ? `${qtdMatch[1]}q` : banco.title;
+          const parcialLabel = banco.parcial || '';
           return `<tr>
-            <td><span class="badge ${MATERIA_COLORS[materia]||'badge-gray'}">${materia}</span></td>
-            <td>${semestre}º sem</td>
+            <td><span class="badge ${MATERIA_COLORS[banco.materia]||'badge-gray'}">${banco.materia}</span></td>
+            <td style="font-size:13px;color:var(--text2);">
+              <strong>${qtdLabel}</strong>${parcialLabel ? ` · ${parcialLabel}` : ''}
+            </td>
             <td><span class="badge ${hasQ?'badge-green':'badge-red'}">${hasQ?'Liberado':'Bloqueado'}</span></td>
             <td>
               ${hasQ
-                ? `<button class="btn btn-ghost btn-sm" onclick="revokeQuestaoAccess('${uid}','${materia}',${semestre})">Revogar</button>`
-                : `<button class="btn btn-primary btn-sm" onclick="grantQuestaoAccess('${uid}','${materia}',${semestre})">Liberar</button>`}
+                ? `<button class="btn btn-ghost btn-sm" onclick="revokeQuestaoAccess('${uid}','${banco.materia}',${banco.semestre},'${banco.id}')">Revogar</button>`
+                : `<button class="btn btn-primary btn-sm" onclick="grantQuestaoAccess('${uid}','${banco.materia}',${banco.semestre},'${banco.id}')">Liberar</button>`}
             </td>
           </tr>`;
         }).join('')}</tbody>
@@ -6071,14 +6080,19 @@ async function loadAccessMatrix() {
   container.innerHTML = html;
 }
 
-async function grantQuestaoAccess(uid, materia, semestre) {
-  await SB.upsert('user_questoes_access', { user_id: uid, materia, semestre, granted_at: new Date().toISOString() });
+async function grantQuestaoAccess(uid, materia, semestre, questaoId) {
+  const row = { user_id: uid, materia, semestre, granted_at: new Date().toISOString() };
+  if (questaoId) row.questao_id = questaoId;
+  await SB.upsert('user_questoes_access', row);
   toast('Acesso ao Banco de Questões liberado ✅', 'success');
   await loadAccessMatrix();
 }
 
-async function revokeQuestaoAccess(uid, materia, semestre) {
-  await SB.delete('user_questoes_access', `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`);
+async function revokeQuestaoAccess(uid, materia, semestre, questaoId) {
+  const filter = questaoId
+    ? `user_id=eq.${uid}&questao_id=eq.${questaoId}`
+    : `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`;
+  await SB.delete('user_questoes_access', filter);
   toast('Acesso revogado', 'info');
   await loadAccessMatrix();
 }
