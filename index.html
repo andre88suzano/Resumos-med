@@ -7195,9 +7195,10 @@ async function mcRenderizarSelecaoQuestoes(plano) {
   lista.innerHTML      = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Carregando disponibilidade...</div>';
 
   try {
-    // Busca combinações reais no banco
-    const { data, ok } = await SB.select('questoes', 'select=materia,parcial');
+    // Busca todas as questões com materia+parcial para contar
+    const { data } = await SB.select('questoes', 'select=materia,parcial');
     const rows = Array.isArray(data) ? data : [];
+    const qtdMin = plano.qtdQuestoes || 0; // mínimo necessário para o pacote
 
     if (!rows.length) {
       lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco disponível no momento.</div>';
@@ -7214,14 +7215,23 @@ async function mcRenderizarSelecaoQuestoes(plano) {
       return p; // mantém o valor original se não reconhecer
     };
 
-    // Agrupa: { parcial_normalizado → Set<materia> }
-    const grupos = {};
+    // Conta questões por (parcial, materia)
+    const contagem = {}; // "P1|Imunologia" → 15
     rows.forEach(r => {
       const p = normalizarParcial(r.parcial);
       const m = r.materia || '';
       if (!m) return;
-      if (!grupos[p]) grupos[p] = new Set();
-      grupos[p].add(m);
+      const key = `${p}|${m}`;
+      contagem[key] = (contagem[key] || 0) + 1;
+    });
+
+    // Agrupa apenas combos com questões suficientes para o pacote
+    const grupos = {};
+    Object.entries(contagem).forEach(([key, count]) => {
+      if (qtdMin > 0 && count < qtdMin) return; // não tem questões suficientes
+      const [p, m] = key.split('|');
+      if (!grupos[p]) grupos[p] = [];
+      grupos[p].push({ materia: m, count });
     });
 
     // Ordem de exibição (P1/P2/Final primeiro, depois outros valores)
@@ -7232,13 +7242,13 @@ async function mcRenderizarSelecaoQuestoes(plano) {
     let html = '<div>';
 
     ORDEM_PROVA.forEach(prova => {
-      if (!grupos[prova] || !grupos[prova].size) return;
-      const materias = [...grupos[prova]].sort();
+      if (!grupos[prova] || !grupos[prova].length) return;
+      const materias = grupos[prova].sort((a,b) => a.materia.localeCompare(b.materia));
       html += `<div style="margin-bottom:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;
                     letter-spacing:.07em;padding:4px 0 6px;border-bottom:1px solid var(--border);
                     margin-bottom:8px;">${LABEL_PROVA[prova] || prova}</div>`;
-      materias.forEach(m => {
+      materias.forEach(({ materia: m, count }) => {
         const key = prova + '__' + m.replace(/[^a-zA-Z0-9]/g,'_');
         const icon = (typeof MATERIA_ICONS !== 'undefined' && MATERIA_ICONS[m]) ? MATERIA_ICONS[m] : '📚';
         html += `<div id="mc-q-${key}"
@@ -7249,7 +7259,8 @@ async function mcRenderizarSelecaoQuestoes(plano) {
           onmouseover="if(!this.dataset.sel)this.style.borderColor='var(--accent)'"
           onmouseout="if(!this.dataset.sel)this.style.borderColor='var(--border)'">
           <span style="font-size:18px;">${icon}</span>
-          <span style="font-weight:600;color:var(--text);font-size:14px;">${m}</span>
+          <span style="font-weight:600;color:var(--text);font-size:14px;flex:1;">${m}</span>
+          <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;">${count} questões</span>
         </div>`;
       });
       html += '</div>';
@@ -7257,9 +7268,9 @@ async function mcRenderizarSelecaoQuestoes(plano) {
 
     html += '</div>';
 
-    // Se não renderizou nada mesmo com dados, mostra o que tem no banco
+    // Se não renderizou nada (nenhum combo tem questões suficientes)
     if (Object.keys(grupos).length === 0) {
-      lista.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco disponível no momento.</div>';
+      lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco com ${qtdMin}+ questões disponível no momento.</div>`;
     } else {
       lista.innerHTML = html;
     }
