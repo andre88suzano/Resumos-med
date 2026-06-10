@@ -6095,9 +6095,18 @@ async function loadAccessMatrix() {
 }
 
 async function grantQuestaoAccess(uid, materia, semestre, questaoId) {
+  // Primeiro tenta deletar entrada existente para evitar conflito de PK
+  if (questaoId) {
+    await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
+  }
   const row = { user_id: uid, materia, semestre, granted_at: new Date().toISOString() };
   if (questaoId) row.questao_id = questaoId;
-  await SB.upsert('user_questoes_access', row);
+  const { ok, data } = await SB.insert('user_questoes_access', row);
+  if (!ok) {
+    const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
+    toast('Erro ao liberar: ' + msg, 'error');
+    return;
+  }
   toast('Acesso ao Banco de Questões liberado ✅', 'success');
   await loadAccessMatrix();
 }
@@ -6106,7 +6115,12 @@ async function revokeQuestaoAccess(uid, materia, semestre, questaoId) {
   const filter = questaoId
     ? `user_id=eq.${uid}&questao_id=eq.${questaoId}`
     : `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`;
-  await SB.delete('user_questoes_access', filter);
+  const { ok, data } = await SB.delete('user_questoes_access', filter);
+  if (!ok) {
+    const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
+    toast('Erro ao revogar: ' + msg, 'error');
+    return;
+  }
   toast('Acesso revogado', 'info');
   await loadAccessMatrix();
 }
