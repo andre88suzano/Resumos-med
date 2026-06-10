@@ -6095,47 +6095,35 @@ async function loadAccessMatrix() {
 }
 
 async function grantQuestaoAccess(uid, materia, semestre, questaoId) {
-  // Primeiro tenta deletar entrada existente para evitar conflito de PK
-  if (questaoId) {
-    await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
-  }
-  const row = { user_id: uid, materia, semestre, granted_at: new Date().toISOString() };
-  if (questaoId) row.questao_id = questaoId;
-  const { ok, data } = await SB.insert('user_questoes_access', row);
+  if (!questaoId) { toast('Erro: banco sem ID', 'error'); return; }
+  // Deleta se já existe para evitar conflito
+  await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
+  const { ok, data } = await SB.insert('user_questoes_access', {
+    user_id: uid, materia, semestre, questao_id: questaoId,
+    granted_at: new Date().toISOString()
+  });
   if (!ok) {
     const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
     toast('Erro ao liberar: ' + msg, 'error');
     return;
   }
-  toast('Acesso ao Banco de Questões liberado ✅', 'success');
+  toast('Acesso liberado ✅', 'success');
   await loadAccessMatrix();
 }
 
 async function revokeQuestaoAccess(uid, materia, semestre, questaoId) {
-  let deleted = 0;
-
-  // Tenta por questao_id primeiro
-  if (questaoId) {
-    const r1 = await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
-    deleted = Array.isArray(r1.data) ? r1.data.length : (r1.ok ? 1 : 0);
+  if (!questaoId) { toast('Erro: banco sem ID', 'error'); return; }
+  const { ok, data } = await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
+  if (!ok) {
+    const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
+    toast('Erro ao revogar: ' + msg, 'error');
+    return;
   }
-
-  // Fallback: deleta por materia+semestre (linhas sem questao_id)
-  if (deleted === 0) {
-    const r2 = await SB.delete('user_questoes_access', `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`);
-    deleted = Array.isArray(r2.data) ? r2.data.length : (r2.ok ? 1 : 0);
-    if (!r2.ok) {
-      const msg = typeof r2.data === 'object' ? (r2.data?.message || r2.data?.error || JSON.stringify(r2.data)) : String(r2.data);
-      toast('Erro ao revogar: ' + msg, 'error');
-      return;
-    }
-  }
-
+  const deleted = Array.isArray(data) ? data.length : 1;
   if (deleted === 0) {
     toast('Nenhum acesso encontrado para revogar', 'error');
     return;
   }
-
   toast('Acesso revogado ✅', 'info');
   await loadAccessMatrix();
 }
