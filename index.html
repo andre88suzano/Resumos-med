@@ -6112,16 +6112,31 @@ async function grantQuestaoAccess(uid, materia, semestre, questaoId) {
 }
 
 async function revokeQuestaoAccess(uid, materia, semestre, questaoId) {
-  const filter = questaoId
-    ? `user_id=eq.${uid}&questao_id=eq.${questaoId}`
-    : `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`;
-  const { ok, data } = await SB.delete('user_questoes_access', filter);
-  if (!ok) {
-    const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
-    toast('Erro ao revogar: ' + msg, 'error');
+  let deleted = 0;
+
+  // Tenta por questao_id primeiro
+  if (questaoId) {
+    const r1 = await SB.delete('user_questoes_access', `user_id=eq.${uid}&questao_id=eq.${questaoId}`);
+    deleted = Array.isArray(r1.data) ? r1.data.length : (r1.ok ? 1 : 0);
+  }
+
+  // Fallback: deleta por materia+semestre (linhas sem questao_id)
+  if (deleted === 0) {
+    const r2 = await SB.delete('user_questoes_access', `user_id=eq.${uid}&materia=eq.${materia}&semestre=eq.${semestre}`);
+    deleted = Array.isArray(r2.data) ? r2.data.length : (r2.ok ? 1 : 0);
+    if (!r2.ok) {
+      const msg = typeof r2.data === 'object' ? (r2.data?.message || r2.data?.error || JSON.stringify(r2.data)) : String(r2.data);
+      toast('Erro ao revogar: ' + msg, 'error');
+      return;
+    }
+  }
+
+  if (deleted === 0) {
+    toast('Nenhum acesso encontrado para revogar', 'error');
     return;
   }
-  toast('Acesso revogado', 'info');
+
+  toast('Acesso revogado ✅', 'info');
   await loadAccessMatrix();
 }
 
