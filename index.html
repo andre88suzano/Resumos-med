@@ -4554,7 +4554,7 @@ async function loadAllData() {
 }
 
 async function loadMyQuestoesAccess() {
-  const { data } = await SB.select('user_questoes_access', `user_id=eq.${state.user.id}&select=materia,semestre`);
+  const { data } = await SB.select('user_questoes_access', `user_id=eq.${state.user.id}&select=materia,semestre,questao_id`);
   state.myQuestoesAccess = Array.isArray(data) ? data : [];
 }
 
@@ -5331,10 +5331,6 @@ async function openBancoQuestoes(materia, sem) {
   const semLabel = SEMESTRE_LABELS[sem] || `${sem}º Semestre`;
   const semIcon  = SEMESTRE_ICONS[sem] || '📁';
 
-  // Verifica acesso (admin sempre tem; usuário precisa ter entrada em user_questoes_access)
-  const temAcesso = state.profile.is_admin ||
-    (state.myQuestoesAccess || []).some(a => a.materia === materia && a.semestre == sem);
-
   document.getElementById('folder-icon-title').textContent = '🧠';
   document.getElementById('folder-title').textContent = `${materia} — Banco de Questões`;
   document.getElementById('folder-count').textContent = 'Carregando…';
@@ -5348,28 +5344,14 @@ async function openBancoQuestoes(materia, sem) {
     <span style="color:#8b5cf6;">🧠 Banco de Questões</span>`;
 
   const grid = document.getElementById('folder-resumo-grid');
-
-  // Sem acesso — mostra bloqueio
-  if (!temAcesso) {
-    document.getElementById('folder-count').textContent = 'Bloqueado';
-    grid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
-        <div style="font-size:52px;margin-bottom:16px;">🔒</div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Acesso bloqueado</div>
-        <div style="font-size:14px;color:var(--text3);max-width:320px;margin:0 auto;">Você ainda não tem acesso ao Banco de Questões de <strong style="color:var(--text);">${materia}</strong>.<br><br>Entre em contato para adquirir.</div>
-      </div>`;
-    return;
-  }
-
   grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;"><div class="spinner" style="margin:auto;"></div></div>`;
 
-  // Busca questões da matéria + semestre
+  // Busca todos os bancos da matéria + semestre
   const { data } = await SB.select('questoes', `materia=eq.${materia}&semestre=eq.${sem}&select=*&order=created_at.asc`);
   const questoes = Array.isArray(data) ? data : [];
 
-  document.getElementById('folder-count').textContent = `${questoes.length} questão${questoes.length !== 1 ? 'ões' : ''}`;
-
   if (!questoes.length) {
+    document.getElementById('folder-count').textContent = 'Em breve';
     grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
         <div style="font-size:52px;margin-bottom:16px;">🧠</div>
@@ -5379,21 +5361,53 @@ async function openBancoQuestoes(materia, sem) {
     return;
   }
 
-  grid.innerHTML = questoes.map(q => `
-    <div onclick="openQuestao('${q.id}')" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:var(--transition);"
-      onmouseover="this.style.borderColor='#8b5cf6'" onmouseout="this.style.borderColor='var(--border)'">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
-        <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.4;">${q.title}</div>
-        <span style="font-size:18px;flex-shrink:0;">🧠</span>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;">${q.parcial || ''}</span>
-        <span style="font-size:10px;background:var(--bg2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border);">${q.semestre}º sem</span>
-      </div>
-    </div>`).join('');
+  // Verifica acesso por banco individual (igual aos resumos)
+  const myAccess = state.myQuestoesAccess || [];
+  const temAcessoBanco = (q) => state.profile.is_admin ||
+    myAccess.some(a =>
+      (a.questao_id && a.questao_id === q.id) ||
+      (!a.questao_id && a.materia === materia && a.semestre == sem)
+    );
 
-  // Guarda contexto para o viewer
-  state._questoesBanco = questoes;
+  const desbloqueados = questoes.filter(temAcessoBanco).length;
+  document.getElementById('folder-count').textContent =
+    desbloqueados > 0 ? `${desbloqueados} banco${desbloqueados !== 1 ? 's' : ''} disponível${desbloqueados !== 1 ? 'is' : ''}` : 'Bloqueado';
+
+  grid.innerHTML = questoes.map(q => {
+    const acesso = temAcessoBanco(q);
+    const qtdMatch = (q.title || '').match(/(\d+)/);
+    const qtdLabel = qtdMatch ? `${qtdMatch[1]} questões` : q.title;
+    if (acesso) {
+      return `
+        <div onclick="openQuestao('${q.id}')" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:var(--transition);"
+          onmouseover="this.style.borderColor='#8b5cf6'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.4;">${q.title}</div>
+            <span style="font-size:18px;flex-shrink:0;">🧠</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;">${q.parcial || ''}</span>
+            <span style="font-size:10px;background:var(--bg2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border);">${qtdLabel}</span>
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;opacity:0.55;cursor:not-allowed;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.4;">🔒 ${q.title}</div>
+            <span style="font-size:18px;flex-shrink:0;">🔒</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;">${q.parcial || ''}</span>
+            <span style="font-size:10px;background:var(--bg2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border);">${qtdLabel}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;">Entre em contato para adquirir</div>
+        </div>`;
+    }
+  }).join('');
+
+  // Guarda contexto para o viewer (apenas os que têm acesso)
+  state._questoesBanco = questoes.filter(temAcessoBanco);
 }
 
 function openQuestao(id) {
