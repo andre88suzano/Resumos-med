@@ -5414,7 +5414,7 @@ function openFolder(materia, sem) {
       const count = Array.isArray(data) ? data.length : 0;
       const el = document.getElementById(`banco-questoes-meta-${materia}-${sem}`);
       if (el) el.textContent = count > 0
-        ? `${count} questão${count !== 1 ? 'ões' : ''} disponív${count !== 1 ? 'eis' : 'el'}`
+        ? `${count} quest${count !== 1 ? 'ões' : 'ão'} disponív${count !== 1 ? 'eis' : 'el'}`
         : 'Em breve';
     })
     .catch(() => {
