@@ -3657,11 +3657,13 @@ const SB = {
   async select(table, query='') {
     return this._req(`/rest/v1/${table}?${query}`,'GET');
   },
-  async insert(table, row) {
-    return this._req(`/rest/v1/${table}`,'POST', row);
+  async insert(table, row, opts={}) {
+    const h = opts.minimal ? { 'Prefer': 'return=minimal' } : {};
+    return this._req(`/rest/v1/${table}`,'POST', row, h);
   },
-  async update(table, row, match) {
-    return this._req(`/rest/v1/${table}?${match}`,'PATCH', row);
+  async update(table, row, match, opts={}) {
+    const h = opts.minimal ? { 'Prefer': 'return=minimal' } : {};
+    return this._req(`/rest/v1/${table}?${match}`,'PATCH', row, h);
   },
   async delete(table, match) {
     return this._req(`/rest/v1/${table}?${match}`,'DELETE');
@@ -3878,7 +3880,7 @@ async function loadAtualizacoes() {
   const cutoff7 = new Date();
   cutoff7.setDate(cutoff7.getDate() - 7);
   const { data } = await SB.select('resumos',
-    `materia=eq._update_&created_at=gte.${cutoff7.toISOString()}&order=created_at.desc`);
+    `materia=eq._update_&created_at=gte.${cutoff7.toISOString()}&order=created_at.desc&select=id,title,description,created_at`);
 
   const list = Array.isArray(data) ? data : [];
   renderAtualizacoes(list);
@@ -3987,9 +3989,14 @@ async function deleteAtualizacao(id) {
 let fbImageBase64 = null;
 
 async function loadFeedbacks() {
-  const { data } = await SB.select('resumos',
-    `materia=eq._feedback_&order=created_at.desc&select=*`);
-  const list = Array.isArray(data) ? data : [];
+  // Imagens dos depoimentos (content) vêm por function — não ficam expostas na API
+  let list = [];
+  try {
+    const resp = await fetch('/api/feedbacks', {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
+    if (resp.ok) list = (await resp.json()).feedbacks || [];
+  } catch (_) {}
   renderFeedbacks(list);
   const btn = document.getElementById('btn-add-feedback');
   if (btn) btn.style.display = state.profile?.is_admin ? '' : 'none';
@@ -4664,7 +4671,8 @@ async function loadMyQuestoesAccess() {
 }
 
 async function loadResumos() {
-  const { data } = await SB.select('resumos', 'materia=neq._update_&materia=neq._feedback_&select=*&order=created_at.desc');
+  // Listagem traz só metadados — o `content` é servido sob demanda por /api/resumo-content
+  const { data } = await SB.select('resumos', 'materia=neq._update_&materia=neq._feedback_&select=id,title,materia,semestre,parcial,description,created_at&order=created_at.desc');
   state.resumos = Array.isArray(data) ? data : [];
 }
 
@@ -5453,8 +5461,8 @@ async function openBancoQuestoes(materia, sem) {
   const grid = document.getElementById('folder-resumo-grid');
   grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;"><div class="spinner" style="margin:auto;"></div></div>`;
 
-  // Busca todos os bancos da matéria + semestre
-  const { data } = await SB.select('questoes', `materia=eq.${materia}&semestre=eq.${sem}&select=*&order=created_at.asc`);
+  // Busca todos os bancos da matéria + semestre (só metadados; o content vem por /api/questao-content)
+  const { data } = await SB.select('questoes', `materia=eq.${materia}&semestre=eq.${sem}&select=id,title,materia,semestre,parcial,created_at&order=created_at.asc`);
   const questoes = Array.isArray(data) ? data : [];
 
   if (!questoes.length) {
@@ -5514,7 +5522,7 @@ async function openBancoQuestoes(materia, sem) {
   state._questoesBanco = questoes.filter(temAcessoBanco);
 }
 
-function openQuestao(id) {
+async function openQuestao(id) {
   const q = (state._questoesBanco || []).find(x => x.id === id);
   if (!q) return;
 
@@ -5528,8 +5536,24 @@ function openQuestao(id) {
   const iframe = document.getElementById('questao-viewer-iframe');
   if (iframe._blobUrl) { URL.revokeObjectURL(iframe._blobUrl); iframe._blobUrl = null; }
 
-  const html = q.content.includes('<html') ? q.content
-    : `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;padding:20px;margin:0;background:#111827;color:#e5e7eb;line-height:1.6;font-size:15px;}</style></head><body>${q.content}</body></html>`;
+  // Conteúdo sob demanda — function autenticada confere o acesso (não vem na listagem)
+  let conteudo;
+  try {
+    const resp = await fetch(`/api/questao-content?id=${encodeURIComponent(id)}`, {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${resp.status}`);
+    }
+    conteudo = (await resp.json()).content || '';
+  } catch (e) {
+    toast('Erro ao carregar a questão: ' + e.message, 'error');
+    return;
+  }
+
+  const html = conteudo.includes('<html') ? conteudo
+    : `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;padding:20px;margin:0;background:#111827;color:#e5e7eb;line-height:1.6;font-size:15px;}</style></head><body>${conteudo}</body></html>`;
 
   const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
   const url  = URL.createObjectURL(blob);
@@ -5672,7 +5696,7 @@ function showAccessExpiredModal(resumoId) {
   setTimeout(() => openValoresModal(), 1200);
 }
 
-function openResumo(id) {
+async function openResumo(id) {
   const r = state.resumos.find(x => x.id === id);
   if (!r) return;
 
@@ -5754,8 +5778,25 @@ function openResumo(id) {
 }
 </style>`;
 
+  // Busca o conteúdo sob demanda — servido por function autenticada que confere
+  // o acesso. O content NÃO vem mais na listagem (não fica exposto na API).
+  let conteudo;
+  try {
+    const resp = await fetch(`/api/resumo-content?id=${encodeURIComponent(id)}`, {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${resp.status}`);
+    }
+    conteudo = (await resp.json()).content || '';
+  } catch (e) {
+    toast('Erro ao carregar o resumo: ' + e.message, 'error');
+    return;
+  }
+
   // Insere o fix antes do </head> ou no início do body
-  let html = r.content;
+  let html = conteudo;
   if (html.includes('</head>')) {
     html = html.replace('</head>', mobileFix + '</head>');
   } else {
@@ -5891,18 +5932,26 @@ function openAddResumo() {
   openModal('modal-resumo');
 }
 
-function openEditResumo(id) {
+async function openEditResumo(id) {
   const r = state.resumos.find(x => x.id === id);
   if (!r) return;
   state.editingResumoId = id;
   document.getElementById('modal-resumo-title').textContent = t('edit') + ': ' + r.title;
   document.getElementById('resumo-form-title').value   = r.title;
   document.getElementById('resumo-form-desc').value    = r.description || '';
-  document.getElementById('resumo-form-content').value = r.content;
+  document.getElementById('resumo-form-content').value = '';
   document.getElementById('resumo-form-materia').value = r.materia;
   document.getElementById('resumo-form-semestre').value= String(r.semestre);
   document.getElementById('resumo-form-parcial').value = r.parcial || 'Parcial 1';
   openModal('modal-resumo');
+  // Busca o content sob demanda (não vem na listagem)
+  try {
+    const resp = await fetch(`/api/resumo-content?id=${encodeURIComponent(id)}`, {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
+    if (resp.ok) document.getElementById('resumo-form-content').value = (await resp.json()).content || '';
+    else toast('Não foi possível carregar o conteúdo do resumo.', 'error');
+  } catch (e) { toast('Erro ao carregar resumo: ' + e.message, 'error'); }
 }
 
 async function saveResumo() {
@@ -5917,9 +5966,9 @@ async function saveResumo() {
   setLoading('btn-save-resumo', true);
   try {
     if (state.editingResumoId) {
-      await SB.update('resumos', {title,description:desc,content,materia,semestre,parcial}, `id=eq.${state.editingResumoId}`);
+      await SB.update('resumos', {title,description:desc,content,materia,semestre,parcial}, `id=eq.${state.editingResumoId}`, {minimal:true});
     } else {
-      await SB.insert('resumos', {title,description:desc,content,materia,semestre,parcial});
+      await SB.insert('resumos', {title,description:desc,content,materia,semestre,parcial}, {minimal:true});
     }
     await loadResumos();
     renderAdminResumosTable();
@@ -5988,7 +6037,8 @@ function renderAdminResumosTable() {
 }
 
 async function loadQuestoes() {
-  const { data } = await SB.select('questoes', 'select=*&order=created_at.desc');
+  // Só metadados — o content vem por /api/questao-content quando o admin edita/visualiza
+  const { data } = await SB.select('questoes', 'select=id,title,materia,semestre,parcial,created_at&order=created_at.desc');
   state.questoes = Array.isArray(data) ? data : [];
   renderAdminQuestoesTable();
   atualizarCountSecao();
@@ -6026,13 +6076,13 @@ function openAddQuestao() {
   openModal('modal-questao');
 }
 
-function openEditQuestao(id) {
+async function openEditQuestao(id) {
   const q = state.questoes.find(x => x.id === id);
   if (!q) return;
   state.editingQuestaoId = id;
   document.getElementById('modal-questao-title').textContent = 'Editar Questão';
   document.getElementById('questao-form-title').value   = q.title || '';
-  document.getElementById('questao-form-content').value = q.content || '';
+  document.getElementById('questao-form-content').value = '';
   document.getElementById('questao-form-materia').value = q.materia || 'Imunologia';
   document.getElementById('questao-form-semestre').value = String(q.semestre || 3);
   document.getElementById('questao-form-parcial').value  = q.parcial || 'Parcial 1';
@@ -6040,6 +6090,14 @@ function openEditQuestao(id) {
   preview.style.display = 'none';
   preview.innerHTML = '';
   openModal('modal-questao');
+  // Busca o content sob demanda (não vem na listagem)
+  try {
+    const resp = await fetch(`/api/questao-content?id=${encodeURIComponent(id)}`, {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
+    if (resp.ok) document.getElementById('questao-form-content').value = (await resp.json()).content || '';
+    else toast('Não foi possível carregar o conteúdo da questão.', 'error');
+  } catch (e) { toast('Erro ao carregar questão: ' + e.message, 'error'); }
 }
 
 function previewQuestao() {
@@ -6073,9 +6131,9 @@ async function saveQuestao() {
   try {
     const payload = { title, content, materia, semestre, parcial };
     if (state.editingQuestaoId) {
-      await SB.update('questoes', payload, `id=eq.${state.editingQuestaoId}`);
+      await SB.update('questoes', payload, `id=eq.${state.editingQuestaoId}`, {minimal:true});
     } else {
-      await SB.insert('questoes', payload);
+      await SB.insert('questoes', payload, {minimal:true});
     }
     await loadQuestoes();
     closeModal('modal-questao');
