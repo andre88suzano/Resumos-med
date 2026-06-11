@@ -16,9 +16,24 @@ function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Vary': 'Origin',
   };
+}
+
+// Valida o JWT do usuário logado contra o Supabase. Retorna o user ou null.
+async function getUser(request, env) {
+  const auth = request.headers.get('Authorization') || '';
+  const token = auth.replace(/^Bearer\s+/i, '').trim();
+  if (!token || !env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) return null;
+  try {
+    const res = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    const u = await res.json();
+    return u && u.id ? u : null;
+  } catch { return null; }
 }
 
 export async function onRequest(context) {
@@ -27,6 +42,14 @@ export async function onRequest(context) {
 
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  }
+
+  // Exige usuário autenticado — impede que terceiros gastem a cota do Groq
+  const user = await getUser(request, env);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Não autorizado' }), {
+      status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
+    });
   }
 
   const apiKey = env.GROQ_API_KEY;

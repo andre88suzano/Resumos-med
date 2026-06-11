@@ -43,6 +43,14 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Config error' }), { status: 500 })
   }
 
+  // Exige admin — antes este endpoint era público e vazava faturamento + e-mails de clientes
+  const admin = await getAdminUser(request, env)
+  if (!admin) {
+    return new Response(JSON.stringify({ error: 'Não autorizado' }), {
+      status: 403, headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const weekStart = getWeekStart()
   const monthStart = getMonthStart()
   const yearStart = getYearStart()
@@ -125,15 +133,27 @@ export async function onRequest(context) {
   })
 }
 
-function extractToken(cookie) {
-  // Supabase armazena o token em cookies sb-*-auth-token ou similar
-  const match = cookie.match(/sb-[^=]+-auth-token=([^;]+)/)
-  if (!match) return ''
+// Valida o JWT (header Authorization) e confirma is_admin no Supabase.
+// Retorna o user admin ou null.
+async function getAdminUser(request, env) {
+  const auth = request.headers.get('Authorization') || ''
+  const token = auth.replace(/^Bearer\s+/i, '').trim()
+  if (!token) return null
   try {
-    const decoded = decodeURIComponent(match[1])
-    const parsed = JSON.parse(decoded)
-    return Array.isArray(parsed) ? parsed[0] : (parsed.access_token ?? '')
+    const ures = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${token}` },
+    })
+    if (!ures.ok) return null
+    const u = await ures.json()
+    if (!u || !u.id) return null
+    const pres = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${u.id}&select=is_admin`,
+      { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
+    )
+    if (!pres.ok) return null
+    const rows = await pres.json()
+    return (Array.isArray(rows) && rows[0] && rows[0].is_admin === true) ? u : null
   } catch {
-    return ''
+    return null
   }
 }

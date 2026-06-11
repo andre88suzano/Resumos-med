@@ -18,9 +18,31 @@ function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Vary': 'Origin',
   };
+}
+
+// Valida o JWT e confirma que o usuário é admin (indexação de livros é tarefa de admin).
+async function getAdminUser(request, env) {
+  const auth = request.headers.get('Authorization') || '';
+  const token = auth.replace(/^Bearer\s+/i, '').trim();
+  if (!token || !env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) return null;
+  try {
+    const ures = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${token}` },
+    });
+    if (!ures.ok) return null;
+    const u = await ures.json();
+    if (!u || !u.id) return null;
+    const pres = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${u.id}&select=is_admin`,
+      { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
+    );
+    if (!pres.ok) return null;
+    const rows = await pres.json();
+    return (Array.isArray(rows) && rows[0] && rows[0].is_admin === true) ? u : null;
+  } catch { return null; }
 }
 
 function chunkText(text, chunkSize = 500, overlap = 50) {
@@ -83,6 +105,14 @@ export async function onRequest(context) {
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
+    });
+  }
+
+  // Exige admin — indexar livros não pode ser disparado por qualquer um
+  const admin = await getAdminUser(request, env);
+  if (!admin) {
+    return new Response(JSON.stringify({ error: 'Não autorizado' }), {
+      status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
     });
   }
 

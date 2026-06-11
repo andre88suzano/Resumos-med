@@ -4979,7 +4979,9 @@ async function carregarVendas() {
   const abandEl = document.getElementById('vend-abandonos-lista');
 
   try {
-    const res = await fetch('/api/admin/sales');
+    const res = await fetch('/api/admin/sales', {
+      headers: { 'Authorization': `Bearer ${state.authToken}` }
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const d = await res.json();
 
@@ -6672,7 +6674,7 @@ async function drSendMsg(text) {
   try {
     const ragRes = await fetch('/api/search-chunks', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
       body: JSON.stringify({ query: txt, limit: 4 })
     });
     if (ragRes.ok) {
@@ -6692,7 +6694,7 @@ async function drSendMsg(text) {
   try {
     const res = await fetch('/api/dr-ia', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022', max_tokens: 1000,
         system: `Você é o Dr. IA, tutor de medicina integrado ao site de resumos do André Luiz Miranda Suzano (UCP 3H). Matérias disponíveis: ${subjectCtx}. Responda em português do Brasil, de forma clara e didática. Use **negrito** para termos chave. Máximo 3 parágrafos curtos. Seja direto como um colega sênior. IMPORTANTE: sempre inicie cada resposta com "Dr(a). IA:".${ragContext}`,
@@ -6743,7 +6745,7 @@ async function drGenPlan() {
   try {
     const res = await fetch('/api/dr-ia', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022', max_tokens: 1200,
         messages: [{ role:'user', content:`Você é o Dr. IA, tutor de medicina (UCP 3H). Crie um plano de estudos em português:\n- Matérias: ${sub}\n- Dias até a prova: ${days} (${date})\n- Horas por dia: ${hrs}h\n- Nível: ${lvl}\nDia a dia com horários, emojis, dica motivacional. Seja prático.` }]
