@@ -5716,10 +5716,11 @@ function openResumo(id) {
   const mobileFix = `
 <style id="__med-mobile-fix__">
 @media (max-width: 820px) {
-  /* Empilha qualquer layout flex/grid em coluna */
+  /* Empilha qualquer layout flex em coluna (sem forçar display:
+     forçar display:block quebra painéis com toggle JS, ex.: tabs de
+     quiz/dicas que alternam display:none/block) */
   .layout, .app-layout, .page-layout, body > div {
     flex-direction: column !important;
-    display: block !important;
   }
   /* Esconde sidebars de navegação interna */
   .sidebar, .nav-sidebar, .left-panel, [class*="sidebar"], [id*="sidebar"] {
