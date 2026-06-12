@@ -182,6 +182,8 @@ export async function onRequest(context) {
     } else {
       // Joiner pagou — libera acesso para ele imediatamente
       await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
+      // Brinde de questões da promo (ex.: combo Micro → +40 questões)
+      await liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valor_pago);
 
       // Se o criador já pagou, libera acesso para ele também agora
       if (compra.criador_user_id) {
@@ -270,5 +272,70 @@ async function liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id) {
     }
   } catch (err) {
     console.error('Erro ao liberar acesso do participante:', err);
+  }
+}
+
+/**
+ * Brinde de QUESTÕES de promoções: libera bancos de questões extras quando o
+ * código da compra casa com um prefixo conhecido. O banco é FIXO aqui no
+ * servidor (não vem do cliente) — então o comprador não escolhe qual banco
+ * ganha. Só libera se o valor pago atingir o mínimo da promo.
+ *
+ * Para ATIVAR o brinde do combo de Microbiologia: preencha questao_id com o ID
+ * do banco de 40 questões de Micro depois de criá-lo no painel admin.
+ */
+const QUESTOES_BONUS = {
+  // prefixo do código da compra → bancos a liberar
+  'MICRO40': {
+    minValor: 19,
+    bancos: [
+      { questao_id: '', materia: 'Microbiologia', semestre: 3 }, // ← preencher o ID do banco de 40q
+    ],
+  },
+};
+
+async function liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valorPago) {
+  try {
+    const codigo = (compra && compra.codigo) || '';
+    let regra = null;
+    for (const prefixo in QUESTOES_BONUS) {
+      if (codigo.startsWith(prefixo)) { regra = QUESTOES_BONUS[prefixo]; break; }
+    }
+    if (!regra) return;
+    if (typeof valorPago === 'number' && valorPago < (regra.minValor || 0)) {
+      console.log(`Bônus de questões ignorado: valor ${valorPago} abaixo do mínimo.`);
+      return;
+    }
+    const bancos = (regra.bancos || []).filter(b => b.questao_id);
+    if (bancos.length === 0) {
+      console.log('Bônus de questões não configurado (sem questao_id).');
+      return;
+    }
+    const now = new Date().toISOString();
+    const rows = bancos.map(b => ({
+      user_id,
+      questao_id: b.questao_id,
+      materia: b.materia,
+      semestre: b.semestre,
+      granted_at: now,
+    }));
+    const res = await fetch(`${sbUrl}/rest/v1/user_questoes_access?on_conflict=user_id,questao_id`, {
+      method: 'POST',
+      headers: {
+        'apikey': sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify(rows),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Erro ao liberar questões bônus:', err);
+    } else {
+      console.log(`Questões bônus liberadas para ${user_id}: ${rows.length} banco(s).`);
+    }
+  } catch (err) {
+    console.error('Erro no bônus de questões:', err);
   }
 }
