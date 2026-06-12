@@ -1,0 +1,19 @@
+# Cloudflare Pages — regras de cache
+
+# HTML e tudo o mais: sempre revalida, então novos deploys aparecem ao recarregar
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Assets versionados do Next (nome com hash) podem cachear "para sempre"
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Imagens/ícones estáticos: cache de 1 dia (bom equilíbrio)
+/*.svg
+  Cache-Control: public, max-age=86400
+/*.jpg
+  Cache-Control: public, max-age=86400
+/*.png
+  Cache-Control: public, max-age=86400
+/favicon.ico
+  Cache-Control: public, max-age=86400
