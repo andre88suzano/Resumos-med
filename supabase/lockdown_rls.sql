@@ -47,9 +47,16 @@ alter table public.user_access           enable row level security;
 alter table public.user_questoes_access  enable row level security;
 
 -- 4. Esconde a coluna `content` de anon e authenticated -----
---    (service_role mantém acesso — é o que as functions usam)
-revoke select (content) on public.resumos  from anon, authenticated;
-revoke select (content) on public.questoes from anon, authenticated;
+--    IMPORTANTE: REVOKE SELECT(content) é no-op quando existe GRANT SELECT
+--    de tabela inteira. O correto é revogar o SELECT da tabela e conceder
+--    SELECT só nas colunas de metadados. (service_role mantém acesso total.)
+revoke select on public.resumos  from anon, authenticated;
+grant  select (id, title, materia, semestre, parcial, description, created_at)
+  on public.resumos to authenticated;
+
+revoke select on public.questoes from anon, authenticated;
+grant  select (id, title, materia, semestre, parcial, created_at)
+  on public.questoes to authenticated;
 
 -- 5. POLICIES -----------------------------------------------
 
