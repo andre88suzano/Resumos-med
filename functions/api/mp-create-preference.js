@@ -115,9 +115,9 @@ export async function onRequest(context) {
     external_reference: external_reference || '',
     notification_url: notification_url || '',
     back_urls: {
-      success: 'https://resumos-med.pages.dev/app.html?pagamento=sucesso',
-      failure: 'https://resumos-med.pages.dev/app.html?pagamento=falha',
-      pending: 'https://resumos-med.pages.dev/app.html?pagamento=pendente',
+      success: 'https://resumos-med.pages.dev/app?pagamento=sucesso',
+      failure: 'https://resumos-med.pages.dev/app?pagamento=falha',
+      pending: 'https://resumos-med.pages.dev/app?pagamento=pendente',
     },
     // auto_return: redireciona quando aprovado (cartão) ou após Pix confirmado
     auto_return: 'approved',

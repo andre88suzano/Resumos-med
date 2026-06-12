@@ -8020,7 +8020,7 @@ function mostrarStatusSala(compra, eCriador = true) {
   document.getElementById('mc-sala-codigo').textContent = compra.codigo || '——';
 
   // Gerar link de convite
-  const link = `${SITE_URL}/app.html?sala=${compra.id}`;
+  const link = `${SITE_URL}/app?sala=${compra.id}`;
   document.getElementById('mc-sala-link').textContent = link;
 
   const slotsText = compra.slots_preenchidos === 0
