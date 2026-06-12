@@ -36,7 +36,7 @@ async function getAdminUser(request, env) {
     const u = await ures.json();
     if (!u || !u.id) return null;
     const pres = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${u.id}&select=is_admin`,
+      `${env.SUPABASE_URL}/rest/v1/approved_users?user_id=eq.${u.id}&select=is_admin`,
       { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
     );
     if (!pres.ok) return null;

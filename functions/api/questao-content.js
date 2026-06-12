@@ -39,7 +39,7 @@ async function getUser(token, env) {
 async function isAdmin(userId, env) {
   try {
     const res = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=is_admin`,
+      `${env.SUPABASE_URL}/rest/v1/approved_users?user_id=eq.${userId}&select=is_admin`,
       { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` } }
     );
     if (!res.ok) return false;
