@@ -312,28 +312,30 @@ async function liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valorPago) {
       return;
     }
     const now = new Date().toISOString();
-    const rows = bancos.map(b => ({
-      user_id,
-      questao_id: b.questao_id,
-      materia: b.materia,
-      semestre: b.semestre,
-      granted_at: now,
-    }));
-    const res = await fetch(`${sbUrl}/rest/v1/user_questoes_access?on_conflict=user_id,questao_id`, {
-      method: 'POST',
-      headers: {
-        'apikey': sbKey,
-        'Authorization': `Bearer ${sbKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal',
-      },
-      body: JSON.stringify(rows),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('Erro ao liberar questões bônus:', err);
-    } else {
-      console.log(`Questões bônus liberadas para ${user_id}: ${rows.length} banco(s).`);
+    // delete-então-insert por banco (não depende de unique/PK específico)
+    for (const b of bancos) {
+      await fetch(
+        `${sbUrl}/rest/v1/user_questoes_access?user_id=eq.${user_id}&questao_id=eq.${b.questao_id}`,
+        { method: 'DELETE', headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+      );
+      const res = await fetch(`${sbUrl}/rest/v1/user_questoes_access`, {
+        method: 'POST',
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          user_id, questao_id: b.questao_id, materia: b.materia, semestre: b.semestre, granted_at: now,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Erro ao liberar questão bônus:', err);
+      } else {
+        console.log(`Questão bônus liberada para ${user_id}: banco ${b.questao_id}.`);
+      }
     }
   } catch (err) {
     console.error('Erro no bônus de questões:', err);
