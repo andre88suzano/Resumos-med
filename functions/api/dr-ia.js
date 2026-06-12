@@ -53,6 +53,44 @@ async function getUser(request, env) {
   } catch { return null; }
 }
 
+// ── MODO PREDITIVO ──────────────────────────────────────────
+// Cooldown por provedor: quando um provedor sinaliza que está quase sem tokens
+// (cabeçalhos x-ratelimit-remaining-*), ele é pulado nas próximas requisições
+// até o reset — ANTES de chegar a dar erro. Memória no nível do isolate
+// (best-effort, sem precisar de KV); reinicia se o isolate reciclar.
+const cooldowns = {}; // id -> timestamp (ms) até quando pular
+
+function emCooldown(id) {
+  return cooldowns[id] && cooldowns[id] > Date.now();
+}
+
+// Lê "7.66s" / "1m30s" / "45" → segundos (number) ou null
+function parseReset(v) {
+  if (!v) return null;
+  const m = String(v).match(/(?:(\d+)m)?(?:([\d.]+)s)?/);
+  if (m && (m[1] || m[2])) return (parseInt(m[1] || '0') * 60) + parseFloat(m[2] || '0');
+  const n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+
+// Após uma resposta OK, decide se o provedor deve entrar em cooldown.
+function avaliarCota(p, res, maxTokens) {
+  try {
+    const remTok = parseInt(res.headers.get('x-ratelimit-remaining-tokens') || '');
+    const remReq = parseInt(res.headers.get('x-ratelimit-remaining-requests') || '');
+    const baixoTok = !isNaN(remTok) && remTok < maxTokens * 1.5; // não dá pra outra resposta
+    const baixoReq = !isNaN(remReq) && remReq < 1;
+    if (baixoTok || baixoReq) {
+      const resetSeg = parseReset(
+        res.headers.get('x-ratelimit-reset-tokens') ||
+        res.headers.get('x-ratelimit-reset-requests')
+      );
+      const espera = Math.min(Math.max(resetSeg || 30, 5), 120) * 1000; // 5s–120s
+      cooldowns[p.id] = Date.now() + espera;
+    }
+  } catch (_) {}
+}
+
 // Monta a cadeia de provedores na ordem grátis → pago, pulando os sem chave.
 function buildChain(env) {
   const groqModel = env.GROQ_MODEL || 'llama-3.3-70b-versatile';
@@ -114,6 +152,8 @@ function buildChain(env) {
     });
   }
 
+  // id estável por provedor (nome + posição) para o cooldown
+  chain.forEach((p, i) => { p.id = `${p.name}#${i}`; });
   return chain;
 }
 
@@ -138,6 +178,7 @@ async function callProvider(p, messages, maxTokens) {
     const data = await res.json();
     const text = data?.choices?.[0]?.message?.content || '';
     if (!text) return { ok: false, retriable: true };
+    avaliarCota(p, res, maxTokens); // preditivo: pode pôr o provedor em cooldown
     return { ok: true, text };
   } catch (_) {
     // timeout / rede → próximo provedor
@@ -183,15 +224,21 @@ export async function onRequest(context) {
     });
   }
 
-  // Cascata: tenta cada provedor em ordem; primeiro sucesso vence.
-  for (const p of chain) {
+  // Passada 1: provedores fora de cooldown. Passada 2 (fallback): os em cooldown.
+  const ok = (text) => new Response(JSON.stringify({ content: [{ type: 'text', text }] }), {
+    status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
+  });
+
+  const disponiveis = chain.filter(p => !emCooldown(p.id));
+  for (const p of disponiveis) {
     const r = await callProvider(p, chatMessages, maxTokens);
-    if (r.ok) {
-      return new Response(JSON.stringify({ content: [{ type: 'text', text: r.text }] }), {
-        status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
-      });
-    }
-    // falhou → continua para o próximo sem expor erro
+    if (r.ok) return ok(r.text);
+  }
+  // Todos os disponíveis falharam — tenta os que estavam em cooldown
+  const emEspera = chain.filter(p => emCooldown(p.id));
+  for (const p of emEspera) {
+    const r = await callProvider(p, chatMessages, maxTokens);
+    if (r.ok) return ok(r.text);
   }
 
   // Todos falharam — resposta amigável, nunca um erro técnico cru.
