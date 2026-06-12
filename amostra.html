@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Amostra grátis — MedResúmenes</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{--bg:#0a0d14;--bg2:#0f1420;--border:#1e2d4a;--text:#e8eaf6;--text2:#90a4ae;--cyan:#4fc3f7;
+    --grad-pink:linear-gradient(135deg,#7c5cff,#e85d9c);--font-head:'Georgia',serif;--font:'Segoe UI',system-ui,sans-serif;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;flex-direction:column;}
+  .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+  .back{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;cursor:pointer;background:transparent;}
+  .back:hover{background:#16203a;}
+  .ttl{flex:1;min-width:0;}
+  .ttl .badge{display:inline-block;font-size:10px;letter-spacing:1px;color:#0ecfc8;border:1px solid #0ecfc855;padding:2px 8px;border-radius:10px;margin-bottom:2px;}
+  .ttl .name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cta{background:var(--grad-pink);color:#fff;padding:10px 20px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:none;white-space:nowrap;}
+  .cta:hover{opacity:.92;}
+  .body{flex:1;position:relative;}
+  iframe{width:100%;height:100%;border:none;display:block;background:#0a0e1a;}
+  .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px;}
+  .ribbon{text-align:center;font-size:12px;color:var(--text2);background:#0d1424;border-bottom:1px solid var(--border);padding:7px 12px;}
+  .ribbon a{color:var(--cyan);font-weight:600;}
+  @media(max-width:560px){.ttl .name{font-size:13px;}.cta{padding:9px 14px;font-size:13px;}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back" href="/">← Voltar</a>
+    <div class="ttl">
+      <div class="badge">AMOSTRA GRÁTIS · MICROBIOLOGIA</div>
+      <div class="name" id="ttl-name">Carregando amostra…</div>
+    </div>
+    <a class="cta" href="/app">Criar conta grátis →</a>
+  </div>
+  <div class="ribbon">Esta é só uma amostra. <a href="/app">Crie sua conta</a> para ver todos os resumos, questões e o Dr. IA.</div>
+  <div class="body">
+    <div class="loading" id="loading">Carregando amostra…</div>
+    <iframe id="frame" title="Amostra do resumo" style="display:none;"></iframe>
+  </div>
+
+<script>
+  // CSS responsivo injetado no resumo (mesmo do app) — empilha no celular sem quebrar toggles
+  var mobileFix = '<style>@media(max-width:820px){.layout,.app-layout,.page-layout,body>div{flex-direction:column!important;}'
+    + '.sidebar,.nav-sidebar,.left-panel,[class*="sidebar"],[id*="sidebar"]{display:none!important;}'
+    + '.main,.content,.main-content,[class*="main"],[class*="content"]{max-width:100%!important;width:100%!important;min-width:unset!important;padding:12px 10px!important;margin:0!important;}'
+    + '*,*::before,*::after{min-width:unset!important;max-width:100%!important;box-sizing:border-box!important;}'
+    + 'table{display:block!important;overflow-x:auto!important;width:100%!important;}'
+    + '[style*="grid-template-columns"],[class*="grid"],[class*="card-grid"]{grid-template-columns:1fr!important;display:grid!important;}'
+    + 'img{width:100%!important;height:auto!important;}body{overflow-x:hidden!important;}}<\/style>';
+
+  (async function(){
+    try{
+      var r = await fetch('/api/preview-resumo');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var d = await r.json();
+      document.getElementById('ttl-name').textContent = d.title || 'Amostra';
+      var html = d.content || '';
+      html = html.includes('</head>') ? html.replace('</head>', mobileFix+'</head>') : mobileFix+html;
+      var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      var frame = document.getElementById('frame');
+      frame.src = URL.createObjectURL(blob);
+      frame.onload = function(){ document.getElementById('loading').style.display='none'; frame.style.display='block'; };
+    }catch(e){
+      document.getElementById('loading').textContent = 'Não foi possível carregar a amostra. Tente novamente.';
+    }
+  })();
+</script>
+</body>
+</html>
