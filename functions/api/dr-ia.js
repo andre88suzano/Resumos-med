@@ -12,9 +12,14 @@
  *
  *   GROQ_API_KEY            (grátis)   + GROQ_API_KEY_2, GROQ_API_KEY_3 (chaves extras)
  *   GROQ_MODEL             (opcional, default llama-3.3-70b-versatile)
+ *   CEREBRAS_API_KEY        (grátis)   + CEREBRAS_MODEL (default llama-3.3-70b)
+ *   GEMINI_API_KEY          (grátis)   + GEMINI_MODEL   (default gemini-2.0-flash)
  *   OPENROUTER_API_KEY                 + OPENROUTER_FREE_MODEL (grátis)  e
  *                                        OPENROUTER_PAID_MODEL (pago, último recurso)
  *   OPENAI_API_KEY         (pago)      + OPENAI_MODEL (default gpt-4o-mini)
+ *
+ * Ordem da cascata: Groq → Cerebras → Gemini → OpenRouter(grátis) →
+ *                   OpenRouter(pago) → OpenAI. Provedor sem chave é pulado.
  *
  * Auth: SUPABASE_URL + SUPABASE_SERVICE_KEY (valida o usuário logado).
  */
@@ -62,7 +67,25 @@ function buildChain(env) {
     });
   }
 
-  // 2) OpenRouter — modelo grátis
+  // 2) Cerebras (grátis) — OpenAI-compatível
+  if (env.CEREBRAS_API_KEY) {
+    chain.push({
+      name: 'cerebras',
+      url: 'https://api.cerebras.ai/v1/chat/completions',
+      key: env.CEREBRAS_API_KEY, model: env.CEREBRAS_MODEL || 'llama-3.3-70b', headers: {},
+    });
+  }
+
+  // 3) Google Gemini (grátis) — endpoint OpenAI-compatível
+  if (env.GEMINI_API_KEY) {
+    chain.push({
+      name: 'gemini',
+      url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+      key: env.GEMINI_API_KEY, model: env.GEMINI_MODEL || 'gemini-2.0-flash', headers: {},
+    });
+  }
+
+  // 4) OpenRouter — modelo grátis
   if (env.OPENROUTER_API_KEY && env.OPENROUTER_FREE_MODEL) {
     chain.push({
       name: 'openrouter-free',
