@@ -4342,7 +4342,13 @@ function aplicarEstadoPromo() {
     contentPromo.innerHTML = `
       <div style="display:flex;flex-direction:column;gap:12px;">
 
-        <!-- Hero -->
+        <!-- Contagem regressiva (vale para os dois combos) -->
+        <div style="background:#0f1020;border:1px solid #334155;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:#cbd5e1;font-weight:600;">⏱ Promoções encerram segunda às 23:59:</span>
+          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#22c55e;">--:--:--</span>
+        </div>
+
+        <!-- ── COMBO MICROBIOLOGIA ── -->
         <div style="background:linear-gradient(135deg,#04140a 0%,#0a2417 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#22c55e40,transparent 70%);pointer-events:none;"></div>
           <div style="display:inline-flex;align-items:center;gap:6px;background:#04140a;border:1px solid #22c55e40;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
@@ -4352,11 +4358,6 @@ function aplicarEstadoPromo() {
           <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">Combo Microbiologia · 3H</div>
           <div style="font-size:13px;color:#86efac;margin-bottom:6px;">Resumo completo (Parcial 2-3H) + Mini resumo de revisão</div>
           <div style="font-size:12px;color:#bbf7d0;margin-bottom:12px;">Tudo o que cai na P2 de Micro: bactérias Gram-negativas, virulência, tratamento — completo e direto ao ponto.</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span style="font-size:11px;background:#22c55e15;border:1px solid #22c55e40;color:#bbf7d0;padding:3px 10px;border-radius:20px;">📘 Resumo completo</span>
-            <span style="font-size:11px;background:#22c55e15;border:1px solid #22c55e40;color:#bbf7d0;padding:3px 10px;border-radius:20px;">📋 Mini resumo de revisão</span>
-          </div>
-          <!-- Brinde -->
           <div style="background:#ffffff10;border:1px solid #22c55e60;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
             <span style="font-size:18px;">🎁</span>
             <div>
@@ -4365,14 +4366,6 @@ function aplicarEstadoPromo() {
             </div>
           </div>
         </div>
-
-        <!-- Contagem regressiva -->
-        <div style="background:#04140a;border:1px solid #22c55e40;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-size:12px;color:#22c55e;font-weight:600;">⏱ Encerra segunda às 23:59:</span>
-          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#22c55e;">--:--:--</span>
-        </div>
-
-        <!-- Card de compra -->
         <div style="background:var(--bg2);border:2px solid #22c55e60;border-radius:12px;padding:16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <div>
@@ -4391,7 +4384,43 @@ function aplicarEstadoPromo() {
           </div>
         </div>
 
-        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoção válida até segunda-feira às 23:59. Acesso imediato após pagamento.</p>
+        <!-- ── COMBO GENÉTICA ── -->
+        <div style="background:linear-gradient(135deg,#040a18 0%,#0a1430 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#3b82f640,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#040a18;border:1px solid #3b82f640;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">🧬</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#60a5fa;">Combo · Só até segunda</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">Combo Genética · 3H</div>
+          <div style="font-size:13px;color:#bfdbfe;margin-bottom:6px;">Resumo completo (Parcial 2-3H) + Mini resumo de revisão</div>
+          <div style="font-size:12px;color:#dbeafe;margin-bottom:12px;">Tudo o que cai na P2 de Genética — completo e direto ao ponto, do jeito que a prova cobra.</div>
+          <div style="background:#ffffff10;border:1px solid #3b82f660;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">🎁</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#bfdbfe;">Brinde da promo!</div>
+              <div style="font-size:11px;color:#dbeafe;">+40 questões de Genética — além das que já vêm no resumo</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:2px solid #3b82f660;border-radius:12px;padding:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">🧬 Combo Genética · 3H</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;">Acesso imediato após pagamento</div>
+              <div style="font-size:11px;color:#60a5fa;margin-top:4px;">🎁 + 40 questões de brinde</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:22px;font-weight:800;color:#60a5fa;line-height:1;">R$ 20,00</div>
+              <div style="font-size:10px;color:var(--text3);">ou R$ 21,00 cartão</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm" style="flex:1;background:#3b82f6;border-color:#3b82f6;color:#040a18;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompraPromoGenetica('pix')">⚡ PIX — R$ 20,00</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompraPromoGenetica('cartao')">💳 Cartão — R$ 21,00</button>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoções válidas até segunda-feira às 23:59. Acesso imediato após pagamento.</p>
       </div>`;
 
     switchValoresTab('promo');
@@ -4671,6 +4700,56 @@ async function abrirModalCompraPromoMicro(metodo) {
   try {
     // Prefixo MICRO40 → o webhook libera o banco de 40 questões de brinde
     const codigo = 'MICRO40' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo, tipo: 'solo', status: 'aguardando',
+      slots_total: 1, slots_preenchidos: 0,
+      preco_individual: PRECO_PIX,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id, user_id: state.user.id,
+      email: state.user.email, status_pagamento: 'pendente',
+      resumos_selecionados: RESUMOS,
+    });
+
+    await iniciarPagamento(compra.id, 'solo', PRECO_PIX, metodo);
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// Compra direta da promo combo de Genética 3H (+40 questões de brinde)
+async function abrirModalCompraPromoGenetica(metodo) {
+  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+
+  // Combo turma 3H: resumo completo + mini resumo de revisão
+  const RESUMO_COMPLETO = '3037b299-34cc-45fa-a775-c64357538edc'; // Parcial 2- 3H
+  const RESUMO_MINI     = '88a2bfb3-ec6f-4ecb-9a3e-b55316424d3a'; // Mini resumo parcial 2-3H
+  const RESUMOS = [RESUMO_COMPLETO, RESUMO_MINI];
+  const PRECO_PIX = 20.00;
+
+  mcState.plano = {
+    nome: 'Combo Genética 3H 🧬 Promo',
+    preco: PRECO_PIX,
+    preco_solo: PRECO_PIX,
+    tipo: 'solo',
+    resumosIds: RESUMOS,
+  };
+  mcState.compraId = null;
+  mcState.resumosSelecionados = [
+    { id: RESUMO_COMPLETO, titulo: 'Genética · Parcial 2-3H' },
+    { id: RESUMO_MINI, titulo: 'Mini resumo parcial 2-3H' },
+  ];
+
+  mostrarLoading('Preparando pagamento...');
+  try {
+    // Prefixo GEN40 → o webhook libera o banco de 40 questões de brinde
+    const codigo = 'GEN40' + Math.random().toString(36).substring(2, 6).toUpperCase();
     const rCompra = await SB.insert('compras_coletivas', {
       codigo, tipo: 'solo', status: 'aguardando',
       slots_total: 1, slots_preenchidos: 0,

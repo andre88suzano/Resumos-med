@@ -292,6 +292,12 @@ const QUESTOES_BONUS = {
       { questao_id: '0ba6d650-7303-4307-9931-e66da3c80621', materia: 'Microbiologia', semestre: 3 }, // banco 40q Micro P2
     ],
   },
+  'GEN40': {
+    minValor: 19,
+    bancos: [
+      { questao_id: '2b685bd6-657b-4c07-9936-a418ddf76a29', materia: 'Genética Médica', semestre: 3 }, // banco 40q Genética P2
+    ],
+  },
 };
 
 async function liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valorPago) {
