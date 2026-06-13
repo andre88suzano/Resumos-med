@@ -289,7 +289,7 @@ const QUESTOES_BONUS = {
   'MICRO40': {
     minValor: 19,
     bancos: [
-      { questao_id: '', materia: 'Microbiologia', semestre: 3 }, // ← preencher o ID do banco de 40q
+      { questao_id: '0ba6d650-7303-4307-9931-e66da3c80621', materia: 'Microbiologia', semestre: 3 }, // banco 40q Micro P2
     ],
   },
 };
