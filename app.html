@@ -3229,6 +3229,16 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </div>
         <div id="mc-preco-solo" style="font-size:20px;font-weight:800;color:var(--accent);">R$ --</div>
       </div>
+      <!-- Cupom de desconto (só na compra Solo) -->
+      <div style="margin:2px 0 12px;">
+        <div style="display:flex;gap:6px;">
+          <input id="mc-cupom-input" type="text" placeholder="🎟️ Cupom de desconto" autocomplete="off"
+            style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;text-transform:uppercase;"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();mcAplicarCupom();}">
+          <button id="mc-cupom-btn" class="btn btn-sm" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;" onclick="mcAplicarCupom()">Aplicar</button>
+        </div>
+        <div id="mc-cupom-status" style="font-size:12px;margin-top:6px;display:none;"></div>
+      </div>
       <div style="display:flex;gap:8px;margin-top:4px;">
         <button class="btn btn-primary" style="flex:1;" onclick="iniciarPagamentoSolo('pix')">
           ⚡ PIX — R$ <span class="mc-preco-pix-solo">--</span>
@@ -7594,6 +7604,82 @@ function mcAtualizarPrecoPagamento(precoSolo) {
   document.querySelectorAll('.mc-preco-card-solo').forEach(e => e.textContent = fmtBR(precoSoloCartao));
 }
 
+// ── CUPOM (só compra Solo · não acumula com desconto de volume) ──
+function mcCupomStatus(msg, tipo) {
+  const el = document.getElementById('mc-cupom-status');
+  if (!el) return;
+  el.style.color = tipo === 'ok' ? '#22c55e' : tipo === 'erro' ? '#ef4444' : 'var(--text3)';
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+// Limpa o campo/estado do cupom ao (re)entrar no passo de pagamento.
+function mcResetCupomUI() {
+  if (mcState.plano) delete mcState.plano.cupom_codigo;
+  const input = document.getElementById('mc-cupom-input');
+  const btn   = document.getElementById('mc-cupom-btn');
+  const st    = document.getElementById('mc-cupom-status');
+  if (input) { input.value = ''; input.disabled = false; }
+  if (btn)   { btn.textContent = 'Aplicar'; btn.onclick = mcAplicarCupom; btn.disabled = false; }
+  if (st)    { st.style.display = 'none'; st.textContent = ''; }
+}
+
+async function mcAplicarCupom() {
+  const input = document.getElementById('mc-cupom-input');
+  const btn   = document.getElementById('mc-cupom-btn');
+  const codigo = (input.value || '').trim().toUpperCase();
+  if (!codigo) { mcCupomStatus('Digite um código.', 'erro'); return; }
+
+  const subtotal   = Number(mcState.plano?.precoBase ?? mcState.plano?.preco ?? 0);
+  const precoAtual = Number(mcState.plano?.precoSemCupom ?? mcState.plano?.preco ?? 0);
+  if (!(subtotal > 0)) { mcCupomStatus('Selecione os itens primeiro.', 'erro'); return; }
+
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const res = await fetch('/api/cupom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo, subtotal, preco_atual: precoAtual }),
+    });
+    const d = await res.json();
+
+    if (!d.valido) { mcCupomStatus('❌ ' + (d.motivo || 'Cupom inválido.'), 'erro'); btn.disabled = false; btn.textContent = 'Aplicar'; return; }
+
+    const fmt = v => Number(v).toFixed(2).replace('.', ',');
+    if (d.aplicado) {
+      mcState.plano.cupom_codigo = codigo;
+      mcState.plano.preco = d.preco_final;
+      mcState.plano.preco_solo = d.preco_final;
+      mcAtualizarPrecoPagamento(d.preco_final);
+      mcCupomStatus(`✅ Cupom ${codigo} aplicado — você paga R$ ${fmt(d.preco_final)}`, 'ok');
+      input.disabled = true;
+      btn.textContent = 'Remover'; btn.onclick = () => mcRemoverCupom(false); btn.disabled = false;
+    } else {
+      // Válido, mas o desconto de volume já é melhor (não acumula).
+      mcCupomStatus('ℹ️ ' + (d.motivo || 'Seu desconto atual já é melhor que o cupom.'), 'info');
+      btn.disabled = false; btn.textContent = 'Aplicar';
+    }
+  } catch (e) {
+    mcCupomStatus('Erro ao validar o cupom. Tente de novo.', 'erro');
+    btn.disabled = false; btn.textContent = 'Aplicar';
+  }
+}
+
+function mcRemoverCupom(silent) {
+  const input = document.getElementById('mc-cupom-input');
+  const btn   = document.getElementById('mc-cupom-btn');
+  if (mcState.plano) {
+    delete mcState.plano.cupom_codigo;
+    const base = Number(mcState.plano.precoSemCupom ?? mcState.plano.preco ?? 0);
+    mcState.plano.preco = base;
+    mcState.plano.preco_solo = base;
+    mcAtualizarPrecoPagamento(base);
+  }
+  if (input) { input.disabled = false; if (!silent) input.value = ''; }
+  if (btn)   { btn.textContent = 'Aplicar'; btn.onclick = mcAplicarCupom; btn.disabled = false; }
+  if (!silent) { const s = document.getElementById('mc-cupom-status'); if (s) s.style.display = 'none'; }
+}
+
 function abrirModalCompra(plano) {
   if (!state.user) {
     toast('Faça login para comprar', 'error');
@@ -8005,8 +8091,17 @@ async function mcContinuarParaPagamento() {
     const c = mcCalcularCarrinho(ids.length, mcState.plano.precoUnitario);
     mcState.plano.preco = c.total;
     mcState.plano.preco_solo = c.total;
+    mcState.plano.precoBase = c.subtotal;   // sem nenhum desconto (base pro cupom)
+    mcState.plano.precoSemCupom = c.total;   // já com desconto de volume, sem cupom
     mcAtualizarPrecoPagamento(c.total);
+  } else {
+    // Planos de preço fixo (combos/pacotes): base = o próprio preço.
+    const base = Number(mcState.plano.preco_solo ?? mcState.plano.preco ?? 0);
+    mcState.plano.precoBase = base;
+    mcState.plano.precoSemCupom = base;
   }
+  // Sempre entra no pagamento com o cupom zerado (evita vazar cupom de seleção anterior).
+  mcResetCupomUI();
 
   // Salvar resumos selecionados no banco para o webhook usar na liberação
   if (mcState.compraId && state.user) {
@@ -8357,7 +8452,7 @@ async function iniciarPagamentoSolo(metodo = 'pix') {
   try {
     // Criar compra solo no banco
     const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const rCompra = await SB.insert('compras_coletivas', {
+    const compraData = {
       codigo,
       tipo: 'solo',
       status: 'aguardando',
@@ -8366,7 +8461,10 @@ async function iniciarPagamentoSolo(metodo = 'pix') {
       preco_individual: plano.preco || plano.preco_solo || 0,
       criador_user_id: state.user.id,
       expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    });
+    };
+    // Só inclui a coluna quando há cupom (mantém compat se o SQL ainda não rodou).
+    if (plano.cupom_codigo) compraData.cupom_codigo = plano.cupom_codigo;
+    const rCompra = await SB.insert('compras_coletivas', compraData);
 
     const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
     if (!compra?.id) throw new Error('Falha ao criar compra');

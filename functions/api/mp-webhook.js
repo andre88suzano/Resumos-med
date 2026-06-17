@@ -226,6 +226,8 @@ export async function onRequest(context) {
       await liberarAcessoParticipante(sbUrl, sbKey, compra_id, grantUserId);
       // Brinde de questões da promo (ex.: combo Micro → +40 questões)
       await liberarQuestoesBonus(sbUrl, sbKey, compra, grantUserId, valor_pago);
+      // Conta o uso do cupom (pro limite de "primeiros N alunos" funcionar)
+      if (compra.cupom_codigo) await incrementarUsoCupom(sbUrl, sbKey, compra.cupom_codigo);
 
       // Se o criador já pagou, libera acesso para ele também agora
       if (compra.criador_user_id) {
@@ -361,6 +363,32 @@ async function resolverUserIdPorEmail(sbUrl, sbKey, email) {
   } catch (err) {
     console.error('Erro ao resolver user_id por e-mail:', err);
     return null;
+  }
+}
+
+/**
+ * Incrementa o contador de usos de um cupom (read-then-write com service key).
+ * Roda só no pagamento aprovado, e o guard de idempotência no topo evita
+ * contar duas vezes em reenvios do mesmo pagamento.
+ */
+async function incrementarUsoCupom(sbUrl, sbKey, codigo) {
+  try {
+    const h = { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` };
+    const r = await fetch(
+      `${sbUrl}/rest/v1/cupons?codigo=eq.${encodeURIComponent(codigo)}&select=usos&limit=1`,
+      { headers: h }
+    );
+    const rows = r.ok ? await r.json() : [];
+    if (!Array.isArray(rows) || !rows[0]) return;
+    const atual = rows[0].usos || 0;
+    await fetch(`${sbUrl}/rest/v1/cupons?codigo=eq.${encodeURIComponent(codigo)}`, {
+      method: 'PATCH',
+      headers: { ...h, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usos: atual + 1 }),
+    });
+    console.log(`Cupom ${codigo}: uso registrado (${atual + 1}).`);
+  } catch (err) {
+    console.error('Erro ao incrementar uso do cupom:', err);
   }
 }
 
