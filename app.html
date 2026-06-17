@@ -2995,7 +2995,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 15,79 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, tipo:'solo' })">🛒 Comprar — R$ 15,00 no PIX</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, precoUnitario:15.00, tipo:'solo' })">🛒 Montar carrinho — R$ 15,00 / resumo</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
@@ -3613,6 +3613,8 @@ const state = {
   sbUrl: '',
   sbKey: '',
   adminEmail: '',
+  authToken: null,
+  refreshToken: null,
 };
 
 /* ─────────────────────────────────────────────────────────
@@ -3633,10 +3635,44 @@ const SB = {
     if (state.authToken && isAuth) h['Authorization'] = `Bearer ${state.authToken}`;
     const opts = { method, headers: h };
     if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(`${state.sbUrl}${path}`, opts);
+    let res = await fetch(`${state.sbUrl}${path}`, opts);
+
+    // Token expirado (JWT do Supabase dura ~1h): tenta renovar uma vez e repetir.
+    if (res.status === 401 && !isAuth && state.refreshToken && state.authToken) {
+      const refreshed = await this.refreshSession();
+      if (refreshed) {
+        h['Authorization'] = `Bearer ${state.authToken}`;
+        res = await fetch(`${state.sbUrl}${path}`, { method, headers: h, ...(body ? { body: JSON.stringify(body) } : {}) });
+      }
+    }
+
     const text = await res.text();
     let data; try { data = JSON.parse(text); } catch { data = text; }
     return { data, status: res.status, ok: res.ok };
+  },
+
+  // Renova o access_token usando o refresh_token. Atualiza state + localStorage.
+  // Usa uma promessa compartilhada para evitar várias renovações simultâneas.
+  refreshSession() {
+    if (this._refreshing) return this._refreshing;
+    if (!state.refreshToken) return Promise.resolve(false);
+    this._refreshing = (async () => {
+      try {
+        const res = await fetch(`${state.sbUrl}/auth/v1/token?grant_type=refresh_token`, {
+          method: 'POST',
+          headers: { 'apikey': state.sbKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: state.refreshToken }),
+        });
+        const d = await res.json();
+        if (!res.ok || !d.access_token) return false;
+        state.authToken    = d.access_token;
+        state.refreshToken = d.refresh_token || state.refreshToken;
+        saveSession();
+        return true;
+      } catch { return false; }
+      finally { this._refreshing = null; }
+    })();
+    return this._refreshing;
   },
 
   // AUTH
@@ -3715,6 +3751,16 @@ function genToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+// Persiste a sessão (inclui refresh_token para renovar o access_token quando expirar).
+function saveSession() {
+  if (!state.authToken || !state.user) return;
+  localStorage.setItem('med_session', JSON.stringify({
+    token: state.authToken,
+    refresh: state.refreshToken || null,
+    user: state.user,
+  }));
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
@@ -3730,6 +3776,7 @@ async function doLogin() {
       return;
     }
     state.authToken = data.access_token;
+    state.refreshToken = data.refresh_token || null;
     state.user = data.user;
 
     // Verificar bloqueio de dispositivo
@@ -3740,7 +3787,7 @@ async function doLogin() {
       if (profile && !profile.is_admin && profile.active_token) {
         const localToken = localStorage.getItem('med_device_token');
         if (localToken !== profile.active_token) {
-          window._pendingLoginData = { accessToken: data.access_token, user: data.user };
+          window._pendingLoginData = { accessToken: data.access_token, refreshToken: data.refresh_token || null, user: data.user };
           setLoading('btn-login', false);
           // Mostra painel direto na tela de login (sem modal separado)
           document.getElementById('btn-login').style.display = 'none';
@@ -3751,7 +3798,7 @@ async function doLogin() {
       await activateDevice(data.user.id);
     } catch(_) { /* ignora falhas */ }
 
-    localStorage.setItem('med_session', JSON.stringify({ token: data.access_token, user: data.user }));
+    saveSession();
     await loadUserProfile();
   } catch(e) { toast(currentLang==='pt'?'Erro ao entrar. Tente novamente.':'Error al entrar. Inténtalo de nuevo.','error'); console.error(e); }
   finally { setLoading('btn-login', false); }
@@ -3783,13 +3830,14 @@ function resetOutroDispositivoPanel() {
 
 async function confirmarEntrarAqui() {
   resetOutroDispositivoPanel();
-  const { accessToken, user } = window._pendingLoginData || {};
+  const { accessToken, refreshToken, user } = window._pendingLoginData || {};
   if (!accessToken || !user) return;
   window._pendingLoginData = null;
   state.authToken = accessToken;
+  state.refreshToken = refreshToken || null;
   state.user = user;
   await activateDevice(user.id);
-  localStorage.setItem('med_session', JSON.stringify({ token: accessToken, user }));
+  saveSession();
   await loadUserProfile();
 }
 
@@ -3800,7 +3848,7 @@ function cancelarEntrarAqui() {
   window._pendingLoginData = null;
 }
 
-function showForceLoginModal(accessToken, user) {
+function showForceLoginModal(accessToken, user, refreshToken=null) {
   const msg = currentLang === 'pt'
     ? 'Sua conta já está aberta em outro dispositivo. Deseja desconectá-lo e entrar aqui?'
     : 'Tu cuenta está abierta en otro dispositivo. ¿Deseas desconectarlo e ingresar aquí?';
@@ -3810,9 +3858,10 @@ function showForceLoginModal(accessToken, user) {
     msg,
     async () => {
       state.authToken = accessToken;
+      state.refreshToken = refreshToken || null;
       state.user = user;
       await activateDevice(user.id);
-      localStorage.setItem('med_session', JSON.stringify({ token: accessToken, user }));
+      saveSession();
       await loadUserProfile();
     }
   );
@@ -3850,7 +3899,7 @@ async function doLogout() {
     }
     await SB.signOut();
   } catch {}
-  state.user = null; state.profile = null; state.authToken = null; state.deviceToken = null;
+  state.user = null; state.profile = null; state.authToken = null; state.refreshToken = null; state.deviceToken = null;
   localStorage.removeItem('med_session');
   localStorage.removeItem('med_device_token');
   showScreen('auth');
@@ -4813,7 +4862,7 @@ async function loadUserProfile() {
   if (!profile.approved && !profile.is_admin) {
     showScreen('auth');
     toast(t('pending-approval'), 'info');
-    await SB.signOut(); state.authToken=null; localStorage.removeItem('med_session');
+    await SB.signOut(); state.authToken=null; state.refreshToken=null; localStorage.removeItem('med_session');
     return;
   }
 
@@ -6705,12 +6754,18 @@ async function init() {
   state.sbKey      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzYm9md2Nobmp2dHllbWFwamZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDk2NjcsImV4cCI6MjA5NTQ4NTY2N30.RULolCDG_Ijh6xdi6yvLht74MznwJwo9Wq2OaMpclvI';
   state.adminEmail = 'andremsuzano88@gmail.com';
 
+  // Renova o token a cada 45 min para manter a sessão viva com a aba aberta
+  // (o access_token do Supabase expira em ~1h).
+  setInterval(() => { if (state.refreshToken) SB.refreshSession(); }, 45 * 60 * 1000);
+
   // Try to restore session
   const sess = localStorage.getItem('med_session');
   if (sess) {
     try {
-      const { token, user } = JSON.parse(sess);
-      state.authToken = token; state.user = user;
+      const { token, refresh, user } = JSON.parse(sess);
+      state.authToken = token; state.refreshToken = refresh || null; state.user = user;
+      // Renova o access_token de imediato (o salvo pode já ter expirado).
+      if (state.refreshToken) await SB.refreshSession();
       const { data, ok } = await SB.select('approved_users', `user_id=eq.${user.id}&select=*`);
       if (ok && Array.isArray(data) && data[0]) {
         state.profile = data[0];
@@ -7518,6 +7573,27 @@ let mcState = {
 };
 
 // ── ABRIR MODAL DE COMPRA ─────────────────────────────────
+// ── CARRINHO: desconto de volume (resumos individuais) ───────
+// Faixas: 3+ resumos = 10% off · 5+ = 15% off. Preço base no PIX.
+function mcCalcularCarrinho(qtd, unitPix) {
+  const subtotal = qtd * unitPix;
+  let pct = 0;
+  if (qtd >= 5) pct = 15;
+  else if (qtd >= 3) pct = 10;
+  const total = Math.round(subtotal * (1 - pct / 100) * 100) / 100;
+  return { qtd, subtotal, pct, desconto: Math.round((subtotal - total) * 100) / 100, total };
+}
+
+// Atualiza os preços exibidos no passo de pagamento (PIX e cartão) a partir do total PIX.
+function mcAtualizarPrecoPagamento(precoSolo) {
+  const precoSoloCartao = Math.round((precoSolo / 0.95) * 100) / 100;
+  const fmtBR = v => Number(v).toFixed(2).replace('.', ',');
+  const el = document.getElementById('mc-preco-solo');
+  if (el) el.innerHTML = `R$ ${fmtBR(precoSolo)} <span style="font-size:11px;font-weight:400;color:var(--text3);">PIX · R$ ${fmtBR(precoSoloCartao)} cartão</span>`;
+  document.querySelectorAll('.mc-preco-pix-solo').forEach(e => e.textContent = fmtBR(precoSolo));
+  document.querySelectorAll('.mc-preco-card-solo').forEach(e => e.textContent = fmtBR(precoSoloCartao));
+}
+
 function abrirModalCompra(plano) {
   if (!state.user) {
     toast('Faça login para comprar', 'error');
@@ -7783,6 +7859,8 @@ function mcRenderizarSelecaoResumos(plano) {
   // caso contrário = resumo individual (só resumo normal)
   const nomeP = (plano.nome || '').toLowerCase();
   const ehComboPlano = nomeP.includes('combo') || nomeP.includes('mini');
+  // Modo carrinho: resumo individual com preço por item + desconto de volume.
+  const ehCarrinho = !ehComboPlano && plano.precoUnitario != null;
 
   let todosPares;
   if (ehComboPlano) {
@@ -7807,6 +7885,15 @@ function mcRenderizarSelecaoResumos(plano) {
         combosAtivos < qtdCombos ? `Selecione mais ${qtdCombos - combosAtivos} combo(s)` :
         combosAtivos > qtdCombos ? `Máximo ${qtdCombos} combos` :
         'Continuar para pagamento →';
+    } else if (ehCarrinho) {
+      const c = mcCalcularCarrinho(sel, plano.precoUnitario);
+      const fmtBR = v => Number(v).toFixed(2).replace('.', ',');
+      contador.innerHTML = sel === 0
+        ? 'Selecione os resumos que quer levar'
+        : `${sel} ${sel > 1 ? 'itens' : 'item'} · <strong style="color:var(--text);">R$ ${fmtBR(c.total)}</strong>` +
+          (c.pct ? ` <span style="color:#22c55e;font-weight:700;">−${c.pct}%</span> <span style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(c.subtotal)}</span>` : '');
+      btnContinuar.disabled = sel === 0;
+      btnContinuar.textContent = sel === 0 ? 'Selecione ao menos 1' : `Continuar — R$ ${fmtBR(c.total)} →`;
     } else {
       contador.textContent = `${sel} selecionados`;
       btnContinuar.disabled = sel === 0;
@@ -7822,7 +7909,11 @@ function mcRenderizarSelecaoResumos(plano) {
     grupos[mat].push(p);
   });
 
-  lista.innerHTML = Object.entries(grupos).map(([mat, pares]) => `
+  const dicaDesconto = ehCarrinho
+    ? `<div style="font-size:11px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5;">💡 Quanto mais resumos, mais barato: <strong style="color:#22c55e;">3+ = 10% off</strong> · <strong style="color:#22c55e;">5+ = 15% off</strong></div>`
+    : '';
+
+  lista.innerHTML = dicaDesconto + Object.entries(grupos).map(([mat, pares]) => `
     <div style="margin-bottom:10px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">${mat}</div>
       ${pares.map(p => {
@@ -7894,6 +7985,15 @@ async function mcContinuarParaPagamento() {
   if (!mcState.resumosSelecionados.length) return;
   const ids = mcState.resumosSelecionados.map(r => r.id);
   mcState.plano.resumosIds = ids;
+
+  // Carrinho individual: preço cobrado = qtd × unitário com desconto de volume.
+  const nomeC = (mcState.plano.nome || '').toLowerCase();
+  if (mcState.plano.precoUnitario != null && !nomeC.includes('combo') && !nomeC.includes('mini')) {
+    const c = mcCalcularCarrinho(ids.length, mcState.plano.precoUnitario);
+    mcState.plano.preco = c.total;
+    mcState.plano.preco_solo = c.total;
+    mcAtualizarPrecoPagamento(c.total);
+  }
 
   // Salvar resumos selecionados no banco para o webhook usar na liberação
   if (mcState.compraId && state.user) {
