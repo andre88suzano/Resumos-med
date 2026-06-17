@@ -137,9 +137,15 @@ export async function onRequest(context) {
       }
     );
 
+    let participanteEmail = '';
     if (!updateParticipante.ok) {
       const err = await updateParticipante.text();
       console.error('Erro ao atualizar participante:', err);
+    } else {
+      try {
+        const upd = await updateParticipante.json();
+        if (Array.isArray(upd) && upd[0]?.email) participanteEmail = upd[0].email;
+      } catch {}
     }
 
     // 4. Buscar estado atual da compra coletiva
@@ -159,6 +165,41 @@ export async function onRequest(context) {
     if (!compra) {
       console.error('Compra não encontrada:', compra_id);
       return new Response('OK', { status: 200 });
+    }
+
+    // Link de OFERTA personalizada: o participante foi criado com o user_id do
+    // ADMIN como placeholder e o external_reference também carrega o id do admin.
+    // O acesso precisa ir para a conta REAL do aluno, identificada pelo e-mail.
+    // Resolve o aluno e remapeia o participante antes de liberar o acesso.
+    let grantUserId = user_id;
+    if ((compra.codigo || '').startsWith('OFERTA')) {
+      // Tenta o e-mail do pagador (MP) e o e-mail do participante; escolhe o
+      // primeiro que apontar para uma conta real diferente do admin placeholder.
+      const candidatos = [payment?.payer?.email, participanteEmail].filter(Boolean);
+      let realId = null, alunoEmail = '';
+      for (const cand of candidatos) {
+        const id = await resolverUserIdPorEmail(sbUrl, sbKey, cand);
+        if (id && id !== user_id) { realId = id; alunoEmail = cand; break; }
+      }
+      if (realId && realId !== user_id) {
+        // Remapeia a linha do participante para o aluno real
+        await fetch(
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${user_id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'apikey': sbKey,
+              'Authorization': `Bearer ${sbKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: realId }),
+          }
+        );
+        grantUserId = realId;
+        console.log(`OFERTA ${compra.codigo}: acesso remapeado para o aluno ${alunoEmail} (${realId}).`);
+      } else if (!realId) {
+        console.error(`OFERTA ${compra.codigo}: nenhum aluno com conta encontrado para os e-mails [${candidatos.join(', ')}] — acesso NÃO liberado automaticamente.`);
+      }
     }
 
     const novosSlots = (compra.slots_preenchidos || 0) + 1;
@@ -181,9 +222,10 @@ export async function onRequest(context) {
       console.log(`Criador ${user_id} pagou (dupla). Acesso pendente até o primeiro parceiro pagar.`);
     } else {
       // Joiner pagou — libera acesso para ele imediatamente
-      await liberarAcessoParticipante(sbUrl, sbKey, compra_id, user_id);
+      // (grantUserId = aluno real em links de oferta; = próprio comprador no resto)
+      await liberarAcessoParticipante(sbUrl, sbKey, compra_id, grantUserId);
       // Brinde de questões da promo (ex.: combo Micro → +40 questões)
-      await liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valor_pago);
+      await liberarQuestoesBonus(sbUrl, sbKey, compra, grantUserId, valor_pago);
 
       // Se o criador já pagou, libera acesso para ele também agora
       if (compra.criador_user_id) {
@@ -299,6 +341,28 @@ const QUESTOES_BONUS = {
     ],
   },
 };
+
+/**
+ * Resolve o user_id real de um aluno a partir do e-mail (case-insensitive).
+ * Usado nos links de oferta personalizada, onde o participante foi criado com
+ * o id do admin como placeholder. Retorna null se não houver conta com o e-mail.
+ */
+async function resolverUserIdPorEmail(sbUrl, sbKey, email) {
+  try {
+    const e = String(email).trim();
+    if (!e) return null;
+    const res = await fetch(
+      `${sbUrl}/rest/v1/approved_users?email=ilike.${encodeURIComponent(e)}&select=user_id&limit=1`,
+      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return (Array.isArray(rows) && rows[0]?.user_id) ? rows[0].user_id : null;
+  } catch (err) {
+    console.error('Erro ao resolver user_id por e-mail:', err);
+    return null;
+  }
+}
 
 async function liberarQuestoesBonus(sbUrl, sbKey, compra, user_id, valorPago) {
   try {
