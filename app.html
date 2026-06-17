@@ -3012,7 +3012,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 21,05 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Comprar — R$ 20,00 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, precoUnitario:20.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 20,00 / combo</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
@@ -3028,15 +3028,15 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Final', preco:18.00, precoUnitario:18.00, tipo:'solo', filtroParcial:'final' })">🛒 Montar carrinho — R$ 18,00 / resumo</button>
           </div>
 
-          <div class="valor-item" style="border-color:var(--border);flex-direction:column;align-items:flex-start;gap:8px;opacity:0.5;pointer-events:none;">
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div></div>
+              <div class="valor-info"><div class="valor-nome">📖 + ⚡ Resumo + Mini Resumo</div></div>
               <div style="text-align:right;">
-                <div class="valor-preco">R$ 25,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div class="valor-preco" style="color:var(--teal);">R$ 25,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 26,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Final', preco:25.00, precoUnitario:25.00, tipo:'solo', filtroParcial:'final' })">🛒 Montar carrinho — R$ 25,00 / combo</button>
           </div>
 
         </div>
@@ -7909,6 +7909,7 @@ function mcRenderizarSelecaoResumos(plano) {
 
   mcState.resumosSelecionados = [];
   mcState.combosSelecionados = 0; // conta pares selecionados
+  mcState.cartQtd = 0;            // unidades precificadas no carrinho
 
   // Separar mini resumos dos resumos normais
   const miniResumos = todoResumos.filter(r => r.title.toLowerCase().includes('mini'));
@@ -7958,8 +7959,8 @@ function mcRenderizarSelecaoResumos(plano) {
   // caso contrário = resumo individual (só resumo normal)
   const nomeP = (plano.nome || '').toLowerCase();
   const ehComboPlano = nomeP.includes('combo') || nomeP.includes('mini');
-  // Modo carrinho: resumo individual com preço por item + desconto de volume.
-  const ehCarrinho = !ehComboPlano && plano.precoUnitario != null;
+  // Modo carrinho: preço por unidade (resumo OU combo) + desconto de volume.
+  const ehCarrinho = plano.precoUnitario != null;
 
   let todosPares;
   if (ehComboPlano) {
@@ -7985,14 +7986,19 @@ function mcRenderizarSelecaoResumos(plano) {
         combosAtivos > qtdCombos ? `Máximo ${qtdCombos} combos` :
         'Continuar para pagamento →';
     } else if (ehCarrinho) {
-      const c = mcCalcularCarrinho(sel, plano.precoUnitario);
+      // Unidades precificadas: combos (pares) ou resumos individuais.
+      const qtd = combosAtivos;
+      mcState.cartQtd = qtd;
+      const c = mcCalcularCarrinho(qtd, plano.precoUnitario);
       const fmtBR = v => Number(v).toFixed(2).replace('.', ',');
-      contador.innerHTML = sel === 0
-        ? 'Selecione os resumos que quer levar'
-        : `${sel} ${sel > 1 ? 'itens' : 'item'} · <strong style="color:var(--text);">R$ ${fmtBR(c.total)}</strong>` +
+      const un = ehComboPlano ? 'combo' : 'item';
+      const alvo = ehComboPlano ? 'combos' : 'resumos';
+      contador.innerHTML = qtd === 0
+        ? `Selecione os ${alvo} que quer levar`
+        : `${qtd} ${qtd > 1 ? un + 's' : un} · <strong style="color:var(--text);">R$ ${fmtBR(c.total)}</strong>` +
           (c.pct ? ` <span style="color:#22c55e;font-weight:700;">−${c.pct}%</span> <span style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(c.subtotal)}</span>` : '');
-      btnContinuar.disabled = sel === 0;
-      btnContinuar.textContent = sel === 0 ? 'Selecione ao menos 1' : `Continuar — R$ ${fmtBR(c.total)} →`;
+      btnContinuar.disabled = qtd === 0;
+      btnContinuar.textContent = qtd === 0 ? 'Selecione ao menos 1' : `Continuar — R$ ${fmtBR(c.total)} →`;
     } else {
       contador.textContent = `${sel} selecionados`;
       btnContinuar.disabled = sel === 0;
@@ -8009,7 +8015,7 @@ function mcRenderizarSelecaoResumos(plano) {
   });
 
   const dicaDesconto = ehCarrinho
-    ? `<div style="font-size:11px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5;">💡 Quanto mais resumos, mais barato: <strong style="color:#22c55e;">3+ = 10% off</strong> · <strong style="color:#22c55e;">5+ = 15% off</strong></div>`
+    ? `<div style="font-size:11px;color:var(--text2);background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.5;">💡 Quanto mais ${ehComboPlano ? 'combos' : 'resumos'}, mais barato: <strong style="color:#22c55e;">3+ = 10% off</strong> · <strong style="color:#22c55e;">5+ = 15% off</strong></div>`
     : '';
 
   lista.innerHTML = dicaDesconto + Object.entries(grupos).map(([mat, pares]) => `
@@ -8085,10 +8091,11 @@ async function mcContinuarParaPagamento() {
   const ids = mcState.resumosSelecionados.map(r => r.id);
   mcState.plano.resumosIds = ids;
 
-  // Carrinho individual: preço cobrado = qtd × unitário com desconto de volume.
-  const nomeC = (mcState.plano.nome || '').toLowerCase();
-  if (mcState.plano.precoUnitario != null && !nomeC.includes('combo') && !nomeC.includes('mini')) {
-    const c = mcCalcularCarrinho(ids.length, mcState.plano.precoUnitario);
+  // Carrinho: preço cobrado = qtd_unidades × unitário com desconto de volume.
+  // Unidades = combos (pares) ou resumos individuais — guardado em mcState.cartQtd.
+  if (mcState.plano.precoUnitario != null) {
+    const qtdUnidades = mcState.cartQtd || ids.length;
+    const c = mcCalcularCarrinho(qtdUnidades, mcState.plano.precoUnitario);
     mcState.plano.preco = c.total;
     mcState.plano.preco_solo = c.total;
     mcState.plano.precoBase = c.subtotal;   // sem nenhum desconto (base pro cupom)
