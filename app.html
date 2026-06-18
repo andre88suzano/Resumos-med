@@ -5403,9 +5403,16 @@ function renderMeusResumosDashboard() {
         prazoBadge = `<span style="font-size:10px;color:${cor};">⏰ ${dias}d</span>`;
       }
       const color = MATERIA_COLORS_MAP[r.materia] || 'badge-gray';
+      const ehMini = (r.title || '').toLowerCase().includes('mini');
+      const tipoBadge = ehMini
+        ? '<span class="badge badge-teal" style="font-size:10px;">⚡ Mini</span>'
+        : '<span class="badge badge-blue" style="font-size:10px;">📘 Completo</span>';
       return `<div onclick="openResumo('${r.id}')" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <span class="badge ${color}" style="font-size:10px;">${r.materia}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            ${tipoBadge}
+            <span class="badge ${color}" style="font-size:10px;">${r.materia}</span>
+          </div>
           ${prazoBadge}
         </div>
         <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${r.title}</div>
@@ -5754,6 +5761,7 @@ async function openBancoQuestoes(materia, sem) {
             <span style="font-size:18px;flex-shrink:0;">🧠</span>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;padding:2px 8px;border-radius:20px;font-weight:700;">📝 Questões</span>
             <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;">${q.parcial || ''}</span>
             <span style="font-size:10px;background:var(--bg2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border);">${qtdLabel}</span>
           </div>
@@ -5766,6 +5774,7 @@ async function openBancoQuestoes(materia, sem) {
             <span style="font-size:18px;flex-shrink:0;">🔒</span>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40;padding:2px 8px;border-radius:20px;font-weight:700;">📝 Questões</span>
             <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;">${q.parcial || ''}</span>
             <span style="font-size:10px;background:var(--bg2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border);">${qtdLabel}</span>
           </div>
@@ -5878,6 +5887,12 @@ function buildResumoCard(r) {
   const isExpired  = !isAdmin && accessInfo?.expired === true;
   const color = MATERIA_COLORS[r.materia] || 'badge-gray';
 
+  // Badge de TIPO de produto (📘 Completo azul · ⚡ Mini teal)
+  const ehMini = (r.title || '').toLowerCase().includes('mini');
+  const tipoBadge = ehMini
+    ? '<span class="badge badge-teal">⚡ Mini</span>'
+    : '<span class="badge badge-blue">📘 Completo</span>';
+
   // Badge de prazo
   let prazoBadge = '';
   if (isExpired) {
@@ -5916,6 +5931,7 @@ function buildResumoCard(r) {
   return `
     <div class="${cardClass}" onclick="${onclick}">
       <div class="resumo-materia">
+        ${tipoBadge}
         <span class="badge ${color}">${r.materia}</span>
         <span class="badge badge-gray">${r.semestre}º sem</span>
         ${prazoBadge}
