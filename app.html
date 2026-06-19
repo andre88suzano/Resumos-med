@@ -280,35 +280,32 @@
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
     overflow: hidden;
-    background: #000;
+    background: #0a1733;
   }
+  /* fundo azul marinho minimalista (gradiente navy + glows suaves) */
   .auth-bg {
-    position: absolute; inset: -10%;
-    background-image: url('neuron.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    animation: neuroPan 18s ease-in-out infinite alternate,
-               neuroGlow 6s ease-in-out infinite;
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 55% at 18% 12%, rgba(59,130,246,0.20), transparent 62%),
+      radial-gradient(ellipse 55% 50% at 88% 92%, rgba(37,99,235,0.18), transparent 62%),
+      linear-gradient(135deg, #081229 0%, #0d2147 50%, #0a1733 100%);
   }
-  @keyframes neuroPan {
-    0%   { transform: scale(1.12) translate(0%, 0%); }
-    25%  { transform: scale(1.18) translate(-3%, 2%); }
-    50%  { transform: scale(1.14) translate(3%, -2%); }
-    75%  { transform: scale(1.20) translate(-2%, -3%); }
-    100% { transform: scale(1.15) translate(2%, 3%); }
-  }
-  @keyframes neuroGlow {
-    0%,100% { filter: brightness(0.75) saturate(1.2); }
-    50%     { filter: brightness(0.95) saturate(1.6) hue-rotate(10deg); }
-  }
-  /* overlay escuro suave para o card ficar legível */
+  @keyframes ecgDraw { to { stroke-dashoffset: 0; } }
+  /* overlay suave para o card ficar legível */
   .auth-bg::after {
     content: '';
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(8,18,41,0.10) 0%, rgba(6,14,33,0.55) 100%);
   }
-  .auth-bg-svg { display: none; }
+  .auth-bg-svg {
+    display: block;
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+  .auth-ecg {
+    stroke-dasharray: 1700; stroke-dashoffset: 1700;
+    animation: ecgDraw 2.8s ease-out forwards;
+  }
 
   /* ─── AUTH SPARKLE ───────────────────────────────────── */
   .auth-sparkle {
@@ -1452,35 +1449,18 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
 ══════════════════════════════════════════════════════════ -->
 <div id="screen-auth" class="hidden">
 
-  <!-- Fundo neurônio -->
+  <!-- Fundo azul marinho: ECG + cruzes médicas -->
   <div class="auth-bg">
     <svg class="auth-bg-svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
-      <g opacity="0.13" stroke="#4fc3f7" stroke-width="1" fill="none">
-        <circle cx="200" cy="150" r="60"/><circle cx="200" cy="150" r="12" fill="#4fc3f7" stroke="none"/>
-        <circle cx="450" cy="80"  r="45"/><circle cx="450" cy="80"  r="9"  fill="#0ecfc8" stroke="none"/>
-        <circle cx="700" cy="200" r="70"/><circle cx="700" cy="200" r="14" fill="#4fc3f7" stroke="none"/>
-        <circle cx="950" cy="100" r="50"/><circle cx="950" cy="100" r="10" fill="#0ecfc8" stroke="none"/>
-        <circle cx="1100" cy="350" r="55"/><circle cx="1100" cy="350" r="11" fill="#4fc3f7" stroke="none"/>
-        <circle cx="150"  cy="500" r="65"/><circle cx="150"  cy="500" r="13" fill="#0ecfc8" stroke="none"/>
-        <circle cx="400"  cy="600" r="40"/><circle cx="400"  cy="600" r="8"  fill="#4fc3f7" stroke="none"/>
-        <circle cx="800"  cy="650" r="75"/><circle cx="800"  cy="650" r="15" fill="#0ecfc8" stroke="none"/>
-        <circle cx="1050" cy="580" r="45"/><circle cx="1050" cy="580" r="9"  fill="#4fc3f7" stroke="none"/>
-        <circle cx="600"  cy="400" r="50"/><circle cx="600"  cy="400" r="10" fill="#0ecfc8" stroke="none"/>
-        <line x1="200" y1="150" x2="450" y2="80"/>
-        <line x1="450" y1="80"  x2="700" y2="200"/>
-        <line x1="700" y1="200" x2="950" y2="100"/>
-        <line x1="950" y1="100" x2="1100" y2="350"/>
-        <line x1="200" y1="150" x2="150" y2="500"/>
-        <line x1="150" y1="500" x2="400" y2="600"/>
-        <line x1="400" y1="600" x2="800" y2="650"/>
-        <line x1="800" y1="650" x2="1050" y2="580"/>
-        <line x1="1050" y1="580" x2="1100" y2="350"/>
-        <line x1="700" y1="200" x2="600" y2="400"/>
-        <line x1="600" y1="400" x2="800" y2="650"/>
-        <line x1="600" y1="400" x2="400" y2="600"/>
-        <line x1="200" y1="150" x2="600" y2="400"/>
-        <line x1="450" y1="80"  x2="600" y2="400"/>
-      </g>
+      <defs>
+        <pattern id="medcross" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
+          <path d="M30 22v16 M22 30h16" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" opacity="0.10"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="1200" height="800" fill="url(#medcross)"/>
+      <path class="auth-ecg"
+            d="M-40 400 H300 L340 400 L370 300 L410 520 L450 380 L480 400 H720 L760 400 L790 312 L830 510 L870 372 L900 400 H1240"
+            fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.42"/>
     </svg>
   </div>
 
