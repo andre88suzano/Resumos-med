@@ -3141,6 +3141,73 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             </div>
           </div>
 
+          <!-- ── MICRO PRÁTICA (questões abertas) ── -->
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:10px;">🦠 Microbiologia Prática · questões abertas</div>
+
+          <!-- 30 questões -->
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">🦠 30 questões</div>
+              <div class="valor-desc">Questões abertas de Micro Prática · 3 bactérias.</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
+              <div style="display:flex;gap:5px;margin-top:8px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;" onclick="comprarMicroPratica(30,5.00,'pix')">⚡ PIX</button>
+                <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarMicroPratica(30,5.00,'cartao')">💳 Cartão</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 100 questões -->
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">🦠🦠 100 questões</div>
+              <div class="valor-desc">Questões abertas de Micro Prática · 10 bactérias.</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="valor-preco">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
+              <div style="display:flex;gap:5px;margin-top:8px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;" onclick="comprarMicroPratica(100,10.00,'pix')">⚡ PIX</button>
+                <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarMicroPratica(100,10.00,'cartao')">💳 Cartão</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 130 questões -->
+          <div class="valor-item">
+            <div class="valor-info">
+              <div class="valor-nome">🦠🦠🦠 130 questões</div>
+              <div class="valor-desc">Questões abertas de Micro Prática · 13 bactérias.</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="valor-preco">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 15,75 cartão</div>
+              <div style="display:flex;gap:5px;margin-top:8px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;" onclick="comprarMicroPratica(130,15.00,'pix')">⚡ PIX</button>
+                <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarMicroPratica(130,15.00,'cartao')">💳 Cartão</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 260 questões (completo) -->
+          <div class="valor-item" style="border-color:var(--accent);">
+            <div class="valor-info">
+              <div class="valor-nome">🦠🦠🦠🦠 260 questões <span style="font-size:9px;background:#22c55e20;color:#22c55e;border:1px solid #22c55e60;padding:1px 6px;border-radius:10px;margin-left:4px;">MELHOR CUSTO</span></div>
+              <div class="valor-desc">Banco completo · todas as 26 bactérias de Micro Prática.</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="valor-preco" style="color:var(--accent);">R$ 20,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 21,00 cartão</div>
+              <div style="display:flex;gap:5px;margin-top:8px;">
+                <button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;" onclick="comprarMicroPratica(260,20.00,'pix')">⚡ PIX</button>
+                <button class="btn btn-sm" style="flex:1;font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="comprarMicroPratica(260,20.00,'cartao')">💳 Cartão</button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -4331,6 +4398,39 @@ async function comprarQuestoes(qtd, preco, metodo) {
 
     await iniciarPagamento(compra.id, 'solo', preco, metodo);
   } catch(e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// Compra direta de Micro Prática (questões abertas de Microbiologia).
+// Prefixo MICROP<qtd> no código → o webhook libera o banco específico via
+// QUESTOES_BONUS. Não envolve resumos.
+async function comprarMicroPratica(qtd, preco, metodo) {
+  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+  mcState.plano = { nome: `Micro Prática — ${qtd} questões`, preco, preco_solo: preco, tipo: 'solo' };
+  mcState.compraId = null;
+  mcState.resumosSelecionados = [];
+  closeModal('modal-valores');
+  mostrarLoading('Preparando pagamento…');
+  try {
+    const codigo = 'MICROP' + qtd + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo, tipo: 'solo', status: 'aguardando',
+      slots_total: 1, slots_preenchidos: 0,
+      preco_individual: preco,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id, user_id: state.user.id,
+      email: state.user.email, status_pagamento: 'pendente',
+      resumos_selecionados: [],
+    });
+    await iniciarPagamento(compra.id, 'solo', preco, metodo);
+  } catch (e) {
     ocultarLoading();
     toast('Erro: ' + e.message, 'error');
   }

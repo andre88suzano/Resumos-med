@@ -361,6 +361,24 @@ const QUESTOES_BONUS = {
       { questao_id: '6651d36b-63ea-4893-98ef-56a364992439', materia: 'Biofísica',       semestre: 3 }, // 60q (rotulado Parcial 2)
     ],
   },
+  // Micro Prática (questões abertas) — compra avulsa pela aba Questões.
+  // Cada prefixo MICROP<qtd> libera o banco específico daquele pacote.
+  'MICROP30': {
+    minValor: 4,
+    bancos: [{ questao_id: '17a6d097-9095-4a83-aaab-d89bf706a853', materia: 'Microbiologia', semestre: 3 }], // 30q abertas
+  },
+  'MICROP100': {
+    minValor: 8,
+    bancos: [{ questao_id: '4a796080-620c-4702-8462-417d784e7940', materia: 'Microbiologia', semestre: 3 }], // 100q abertas
+  },
+  'MICROP130': {
+    minValor: 12,
+    bancos: [{ questao_id: '38e84027-b5f5-4071-bb07-4b1cd7a05d35', materia: 'Microbiologia', semestre: 3 }], // 130q abertas
+  },
+  'MICROP260': {
+    minValor: 16,
+    bancos: [{ questao_id: '55835acd-fff8-4428-8d5d-bf77370e4310', materia: 'Microbiologia', semestre: 3 }], // 260q abertas
+  },
 };
 
 /**
