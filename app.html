@@ -3891,7 +3891,12 @@ async function doLogout() {
   try {
     if (state.user) {
       // Limpa o token ativo para liberar outro dispositivo entrar
-      await SB.update('approved_users', { active_token: null }, `user_id=eq.${state.user.id}`);
+      // (via Function com service key — approved_users não tem UPDATE pro aluno)
+      await fetch('/api/device-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
+        body: JSON.stringify({ user_id: state.user.id, token: null }),
+      });
     }
     await SB.signOut();
   } catch {}
@@ -4864,8 +4869,8 @@ async function loadUserProfile(_retried) {
 
   state.profile = profile;
 
-  // Atualiza last_seen para contagem de usuários online
-  SB.update('approved_users', { last_seen: new Date().toISOString() }, `user_id=eq.${state.user.id}`);
+  // Atualiza last_seen para contagem de usuários online (fire-and-forget)
+  apiUpdateProfile({ last_seen: new Date().toISOString() });
 
   if (!profile.approved && !profile.is_admin) {
     showScreen('auth');
@@ -6593,11 +6598,21 @@ function toggleAccordion(header) {
 /* ─────────────────────────────────────────────────────────
    PROFILE
 ───────────────────────────────────────────────────────── */
+// Atualiza o PRÓPRIO perfil via Cloudflare Function (service key, bypassa RLS).
+// approved_users não tem policy de UPDATE pro aluno — a escrita vai pela Function.
+async function apiUpdateProfile(fields) {
+  return fetch('/api/update-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
+    body: JSON.stringify(fields),
+  });
+}
+
 async function updateProfile() {
   const name     = document.getElementById('profile-name-input').value.trim();
   const turma    = document.getElementById('profile-turma-select')?.value || '';
   const semestre = parseInt(document.getElementById('profile-semestre-select')?.value) || null;
-  await SB.update('approved_users', { name, turma, semestre_atual: semestre }, `user_id=eq.${state.user.id}`);
+  await apiUpdateProfile({ name, turma, semestre_atual: semestre });
   state.profile.name = name;
   state.profile.turma = turma;
   state.profile.semestre_atual = semestre;
@@ -6658,10 +6673,7 @@ async function confirmarTurmaSemestre() {
   if (!semestre) { toast('Selecione o semestre.', 'error'); return; }
 
   const agora = new Date().toISOString();
-  await SB.update('approved_users',
-    { turma, semestre_atual: semestre, semestre_confirmado_em: agora },
-    `user_id=eq.${state.user.id}`
-  );
+  await apiUpdateProfile({ turma, semestre_atual: semestre, semestre_confirmado_em: agora });
 
   // Atualizar estado local e campos do perfil
   state.profile.turma               = turma;
