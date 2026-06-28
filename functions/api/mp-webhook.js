@@ -232,13 +232,16 @@ export async function onRequest(context) {
       // Se o criador já pagou, libera acesso para ele também agora
       if (compra.criador_user_id) {
         const criadorRes = await fetch(
-          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}&status_pagamento=eq.aprovado&select=user_id`,
+          `${sbUrl}/rest/v1/compra_participantes?compra_id=eq.${compra_id}&user_id=eq.${compra.criador_user_id}&status_pagamento=eq.aprovado&select=user_id,valor_pago`,
           { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
         );
         const criadorData = await criadorRes.json();
         if (Array.isArray(criadorData) && criadorData.length > 0) {
           console.log(`Liberando acesso para o criador ${compra.criador_user_id}`);
           await liberarAcessoParticipante(sbUrl, sbKey, compra_id, compra.criador_user_id);
+          // Bônus de questões da promo também para o criador da dupla
+          // (idempotente: liberarQuestoesBonus faz delete-then-insert por banco).
+          await liberarQuestoesBonus(sbUrl, sbKey, compra, compra.criador_user_id, criadorData[0].valor_pago);
         }
       }
     }
@@ -340,6 +343,22 @@ const QUESTOES_BONUS = {
     minValor: 19,
     bancos: [
       { questao_id: '2b685bd6-657b-4c07-9936-a418ddf76a29', materia: 'Genética Médica', semestre: 3 }, // banco 40q Genética P2
+    ],
+  },
+  // Promo Exames Finais 2026 → quem compra o combo (solo ou dupla) ganha o
+  // banco de 60 questões (final, sem3) de CADA uma das 6 matérias. IDs fixos
+  // para NÃO liberar de graça os bancos de Parcial 2 (vendidos nos combos
+  // MICRO40/GEN40). Biofísica não tem banco "final" — o de 60q dela está
+  // rotulado como Parcial 2, por isso vem pelo ID e não por filtro de parcial.
+  'FINAISQ': {
+    minValor: 30,
+    bancos: [
+      { questao_id: '73db713a-7c5e-457d-ad97-a375eceb812b', materia: 'Fisiologia',      semestre: 3 }, // 60q final
+      { questao_id: '9449d7f9-f677-4cfe-aeab-79add1378317', materia: 'Bioquímica',      semestre: 3 }, // 60q final
+      { questao_id: 'ce42a8d8-eb3b-44bb-860b-cb2962e85fe9', materia: 'Genética Médica', semestre: 3 }, // 60q final
+      { questao_id: '4fcbb5bb-ac3b-4349-8334-f6eef91c62e7', materia: 'Imunologia',      semestre: 3 }, // 60q final
+      { questao_id: '102d20ea-94de-478b-b746-2ebff7140c73', materia: 'Microbiologia',   semestre: 3 }, // 60q final
+      { questao_id: '6651d36b-63ea-4893-98ef-56a364992439', materia: 'Biofísica',       semestre: 3 }, // 60q (rotulado Parcial 2)
     ],
   },
 };

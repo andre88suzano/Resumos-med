@@ -4422,8 +4422,8 @@ function aplicarEstadoPromo() {
             <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.soloResumos.pix))} cartão</div>
             <div style="display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.soloResumos.orig - P.soloResumos.pix)}</div>
             <div style="display:flex;gap:5px;margin-top:auto;">
-              <button class="btn btn-primary btn-sm" style="flex:1;font-size:10px;padding:6px 4px;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">⚡ PIX</button>
-              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo'})">💳 Cartão</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;font-size:10px;padding:6px 4px;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo',codigoPrefixo:'FINAISQ'})">⚡ PIX</button>
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais',preco:${P.soloResumos.pix},tipo:'solo',codigoPrefixo:'FINAISQ'})">💳 Cartão</button>
             </div>
           </div>
 
@@ -4438,8 +4438,8 @@ function aplicarEstadoPromo() {
             <div style="font-size:10px;color:#a78bfa80;margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.soloCompleto.pix))} cartão</div>
             <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.soloCompleto.orig - P.soloCompleto.pix)}</div>
             <div style="display:flex;gap:5px;margin-top:auto;">
-              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#7c3aed;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">⚡ PIX</button>
-              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo'})">💳 Cartão</button>
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#7c3aed;color:#fff;border:none;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo',codigoPrefixo:'FINAISQ'})">⚡ PIX</button>
+              <button class="btn btn-sm" style="flex:1;font-size:10px;padding:6px 4px;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais',preco:${P.soloCompleto.pix},tipo:'solo',codigoPrefixo:'FINAISQ'})">💳 Cartão</button>
             </div>
           </div>
         </div>
@@ -4467,7 +4467,7 @@ function aplicarEstadoPromo() {
             <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">/pessoa PIX</div>
             <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.duplaResumos.pix))} cartão</div>
             <div style="display:inline-block;background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.duplaResumos.orig - P.duplaResumos.pix)}/p</div>
-            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais · Dupla',preco_dupla:${P.duplaResumos.pix},preco_solo:${P.soloResumos.pix},tipo:'dupla'})">👯 Criar Sala Dupla</button>
+            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos Finais · Dupla',preco_dupla:${P.duplaResumos.pix},preco_solo:${P.soloResumos.pix},tipo:'dupla',codigoPrefixo:'FINAISQ'})">👯 Criar Sala Dupla</button>
           </div>
 
           <!-- Dupla Completa -->
@@ -4480,7 +4480,7 @@ function aplicarEstadoPromo() {
             <div style="font-size:10px;color:#05966980;margin-bottom:4px;">/pessoa PIX</div>
             <div style="font-size:10px;color:#05966980;margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(P.duplaCompleto.pix))} cartão</div>
             <div style="display:inline-block;background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:10px;align-self:flex-start;">economia R$ ${fmtBR(P.duplaCompleto.orig - P.duplaCompleto.pix)}/p</div>
-            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais · Dupla',preco_dupla:${P.duplaCompleto.pix},preco_solo:${P.soloCompleto.pix},tipo:'dupla'})">👯 Criar Sala Dupla</button>
+            <button class="btn btn-sm" style="width:100%;font-size:11px;background:#059669;color:#fff;border:none;margin-top:auto;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Pacote Resumos+Mini Finais · Dupla',preco_dupla:${P.duplaCompleto.pix},preco_solo:${P.soloCompleto.pix},tipo:'dupla',codigoPrefixo:'FINAISQ'})">👯 Criar Sala Dupla</button>
           </div>
         </div>
 
@@ -8507,10 +8507,11 @@ async function entrarSalaEspera() {
   mostrarLoading('Criando sala de espera...');
 
   try {
-    // Gerar código único
-    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const expiraEm = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
     const plano = mcState.plano;
+    // Gerar código único. Prefixo opcional (ex.: 'FINAISQ') faz o webhook
+    // liberar as questões bônus da promo automaticamente (criador + parceiro).
+    const codigo = (plano?.codigoPrefixo || '') + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const expiraEm = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
 
     // Criar compra coletiva
     const rCompra = await SB.insert('compras_coletivas', {
@@ -8617,8 +8618,9 @@ async function iniciarPagamentoSolo(metodo = 'pix') {
   mostrarLoading('Preparando pagamento...');
 
   try {
-    // Criar compra solo no banco
-    const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Criar compra solo no banco. Prefixo opcional (ex.: 'FINAISQ') faz o
+    // webhook reconhecer a promo e liberar as questões bônus automaticamente.
+    const codigo = (plano.codigoPrefixo || '') + Math.random().toString(36).substring(2, 8).toUpperCase();
     const compraData = {
       codigo,
       tipo: 'solo',
