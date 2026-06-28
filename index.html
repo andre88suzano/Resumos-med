@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MedResúmenes — Estude menos horas e do jeito certo</title>
 <meta name="description" content="Resumos completos do 1º ao 3º semestre de Medicina, feitos a partir das aulas, livros e slides dos seus professores — com questões comentadas e tutor de IA 24h."/>
+<script>
+  // Link de recuperação de senha pode cair na raiz (Site URL). Encaminha para
+  // o app (/app) preservando o token, onde está a tela de redefinir senha.
+  (function(){
+    try {
+      var h = location.hash || '', s = location.search || '';
+      var ehRecovery = h.indexOf('type=recovery') !== -1 || /[?&]type=recovery/.test(s) || /[?&]code=/.test(s);
+      if (ehRecovery && location.pathname.replace(/\/+$/,'') !== '/app') {
+        location.replace('/app' + s + h);
+      }
+    } catch(e){}
+  })();
+</script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root{
