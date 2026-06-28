@@ -1509,6 +1509,10 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           <span data-i18n="enter">Entrar</span>
         </button>
 
+        <div style="text-align:center;margin-top:10px;">
+          <span class="auth-link" style="font-size:13px;cursor:pointer;" onclick="pedirResetSenha()" data-i18n="forgot-pass">Esqueci minha senha</span>
+        </div>
+
         <!-- Painel de outro dispositivo (aparece no lugar do botão quando detectado) -->
         <div id="outro-dispositivo-panel" style="display:none;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.4);border-radius:12px;padding:16px;text-align:center;">
           <div style="font-size:22px;margin-bottom:8px;">⚠️</div>
@@ -1555,6 +1559,21 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <div class="auth-footer" data-i18n="pending-note">
           Acesso gratuito. Após o cadastro, faça login para entrar.
         </div>
+      </div>
+
+      <!-- NOVA SENHA (recuperação — aparece ao voltar pelo link do e-mail) -->
+      <div id="form-reset" class="auth-form hidden">
+        <div style="font-size:15px;font-weight:700;color:var(--text);text-align:center;margin-bottom:12px;" data-i18n="set-new-pass">Definir nova senha</div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="new-password">NOVA SENHA</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">☤</span>
+            <input class="auth-glass-input" id="reset-pass" type="password" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')salvarNovaSenha()" />
+          </div>
+        </div>
+        <button class="btn-auth-submit" id="btn-reset" onclick="salvarNovaSenha()">
+          <span data-i18n="save-new-pass">Salvar nova senha</span>
+        </button>
       </div>
     </div>
   </div>
@@ -3438,6 +3457,10 @@ const i18n = {
     'login':'Entrar','register':'Cadastrar','email':'E-mail','password':'Senha',
     'enter':'Entrar','no-account':'Não tem conta?','register-here':' Cadastre-se',
     'request-access':'Cadastre-se',
+    'forgot-pass':'Esqueci minha senha',
+    'set-new-pass':'Definir nova senha',
+    'new-password':'Nova senha',
+    'save-new-pass':'Salvar nova senha',
     'pending-note':'Acesso gratuito. Após o cadastro, faça login para entrar.',
     'full-name':'Nome completo','save':'Salvar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'Geral','nav-dashboard':'Início','nav-resumos':'Resumos',
@@ -3490,6 +3513,10 @@ const i18n = {
     'login':'Iniciar sesión','register':'Registrarse','email':'Correo','password':'Contraseña',
     'enter':'Entrar','no-account':'¿No tienes cuenta?','register-here':' Regístrate',
     'request-access':'Regístrate',
+    'forgot-pass':'Olvidé mi contraseña',
+    'set-new-pass':'Definir nueva contraseña',
+    'new-password':'Nueva contraseña',
+    'save-new-pass':'Guardar nueva contraseña',
     'pending-note':'Acceso gratuito. Tras el registro, inicia sesión para entrar.',
     'full-name':'Nombre completo','save':'Guardar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'General','nav-dashboard':'Inicio','nav-resumos':'Resúmenes',
@@ -3735,6 +3762,69 @@ function switchAuthTab(tab) {
   document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');
   document.getElementById('tab-register').classList.toggle('active', tab !== 'login');
+  // Sai do modo "nova senha" se estava nele
+  const reset = document.getElementById('form-reset');
+  if (reset) reset.classList.add('hidden');
+  const tabs = document.querySelector('.auth-tabs');
+  if (tabs) tabs.style.display = '';
+}
+
+// Envia o e-mail de redefinição de senha (Supabase /auth/v1/recover).
+async function pedirResetSenha() {
+  const email = (document.getElementById('login-email').value || '').trim();
+  if (!email) {
+    toast(currentLang==='pt' ? 'Digite seu e-mail no campo acima primeiro.' : 'Escribe tu correo arriba primero.', 'error');
+    document.getElementById('login-email').focus();
+    return;
+  }
+  try {
+    const redirectTo = location.origin + location.pathname; // volta pro próprio app
+    await SB._req(`/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`, 'POST', { email }, {});
+  } catch (_) { /* a Supabase responde 200 mesmo se o e-mail não existir */ }
+  // Mensagem neutra (não revela se o e-mail tem conta).
+  toast(currentLang==='pt'
+    ? '📧 Se este e-mail tiver conta, enviamos um link para redefinir a senha. Veja sua caixa de entrada e o spam.'
+    : '📧 Si este correo tiene cuenta, te enviamos un enlace para restablecer la contraseña. Revisa tu bandeja y el spam.', 'success');
+}
+
+// Mostra o formulário de nova senha (vindo do link de recuperação).
+function mostrarFormReset() {
+  document.getElementById('form-login').classList.add('hidden');
+  document.getElementById('form-register').classList.add('hidden');
+  document.getElementById('form-reset').classList.remove('hidden');
+  const tabs = document.querySelector('.auth-tabs');
+  if (tabs) tabs.style.display = 'none';
+}
+
+// Salva a nova senha usando o token de recuperação (do hash da URL).
+async function salvarNovaSenha() {
+  const pass = document.getElementById('reset-pass').value;
+  if (!pass || pass.length < 6) {
+    toast(currentLang==='pt' ? 'Senha muito curta (mín. 6).' : 'Contraseña muy corta (mín. 6).', 'error');
+    return;
+  }
+  if (!window._recoveryToken) {
+    toast(currentLang==='pt' ? 'Link expirado. Peça outro em "Esqueci minha senha".' : 'Enlace expirado. Pide otro.', 'error');
+    return;
+  }
+  setLoading('btn-reset', true);
+  try {
+    state.authToken = window._recoveryToken;
+    const { ok, data } = await SB.updateUser({ password: pass });
+    if (!ok) {
+      toast(data?.msg || (currentLang==='pt' ? 'Não foi possível salvar. O link pode ter expirado — peça outro.' : 'No se pudo guardar. El enlace puede haber expirado.'), 'error');
+      return;
+    }
+    window._recoveryToken = null;
+    state.authToken = null; // força um login limpo com a nova senha
+    document.getElementById('reset-pass').value = '';
+    switchAuthTab('login');
+    toast(currentLang==='pt' ? '✅ Senha alterada! Faça login com a nova senha.' : '✅ ¡Contraseña cambiada! Inicia sesión.', 'success');
+  } catch (_) {
+    toast(currentLang==='pt' ? 'Erro ao salvar. Tente novamente.' : 'Error al guardar.', 'error');
+  } finally {
+    setLoading('btn-reset', false);
+  }
 }
 
 function genToken() {
@@ -6799,6 +6889,21 @@ async function init() {
   state.sbUrl      = 'https://gsbofwchnjvtyemapjfm.supabase.co';
   state.sbKey      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzYm9md2Nobmp2dHllbWFwamZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDk2NjcsImV4cCI6MjA5NTQ4NTY2N30.RULolCDG_Ijh6xdi6yvLht74MznwJwo9Wq2OaMpclvI';
   state.adminEmail = 'andremsuzano88@gmail.com';
+
+  // Link de recuperação de senha: a Supabase redireciona com
+  // #access_token=...&type=recovery — mostra o form de nova senha.
+  if (location.hash && location.hash.includes('type=recovery')) {
+    const params = new URLSearchParams(location.hash.slice(1));
+    const at = params.get('access_token');
+    if (at) {
+      window._recoveryToken = at;
+      history.replaceState(null, '', location.pathname + location.search); // limpa o token da URL
+      document.getElementById('screen-loading').classList.add('hidden');
+      showScreen('auth');
+      mostrarFormReset();
+      return;
+    }
+  }
 
   // Renova o token a cada 45 min para manter a sessão viva com a aba aberta
   // (o access_token do Supabase expira em ~1h).
