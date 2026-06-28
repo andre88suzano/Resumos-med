@@ -1550,7 +1550,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
         </div>
         <button class="btn-auth-submit" id="btn-register" onclick="doRegister()">
-          <span data-i18n="request-access">Solicitar Acesso</span>
+          <span data-i18n="request-access">Cadastre-se</span>
         </button>
         <div class="auth-footer" data-i18n="pending-note">
           Acesso gratuito. Após o cadastro, faça login para entrar.
@@ -2965,7 +2965,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Compre resumos avulsos, sem compromisso.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2) <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;letter-spacing:0;text-transform:none;margin-left:4px;">🔒 indisponível</span></div>
 
           <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -2975,7 +2975,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 15,79 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:15.00, precoUnitario:15.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 15,00 / resumo</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
@@ -2992,7 +2992,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 21,05 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:20.00, precoUnitario:20.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 20,00 / combo</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
@@ -3027,7 +3027,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Pacote de todos os resumos de cada parcial.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2) <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;letter-spacing:0;text-transform:none;margin-left:4px;">🔒 indisponível</span></div>
           <div class="valor-item" style="flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 Pacote Resumos (Parcial)</div>
@@ -3036,7 +3036,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 57,79 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos Parcial', preco:54.90, tipo:'solo', filtroParcial:'parciais' })">🛒 Comprar — R$ 54,90 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
           </div>
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -3046,7 +3046,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 68,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Pacote Resumos+Mini Parcial', preco:64.90, tipo:'solo', filtroParcial:'parciais' })">🛒 Comprar — R$ 64,90 no PIX</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
@@ -3089,7 +3089,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div style="text-align:right;">
               <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
               <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
-              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 20 questões',preco:5.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:20})">🛒 Comprar — R$ 5,00 no PIX</button>
+              <button class="btn btn-sm" style="margin-top:8px;width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
             </div>
           </div>
 
@@ -3102,7 +3102,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <div style="text-align:right;">
               <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
               <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
-              <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 40 questões',preco:10.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:40})">🛒 Comprar — R$ 10,00 no PIX</button>
+              <button class="btn btn-sm" style="margin-top:8px;width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
             </div>
           </div>
 
@@ -3437,7 +3437,7 @@ const i18n = {
   pt: {
     'login':'Entrar','register':'Cadastrar','email':'E-mail','password':'Senha',
     'enter':'Entrar','no-account':'Não tem conta?','register-here':' Cadastre-se',
-    'request-access':'Solicitar Acesso',
+    'request-access':'Cadastre-se',
     'pending-note':'Acesso gratuito. Após o cadastro, faça login para entrar.',
     'full-name':'Nome completo','save':'Salvar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'Geral','nav-dashboard':'Início','nav-resumos':'Resumos',
@@ -3489,7 +3489,7 @@ const i18n = {
   es: {
     'login':'Iniciar sesión','register':'Registrarse','email':'Correo','password':'Contraseña',
     'enter':'Entrar','no-account':'¿No tienes cuenta?','register-here':' Regístrate',
-    'request-access':'Solicitar acceso',
+    'request-access':'Regístrate',
     'pending-note':'Acceso gratuito. Tras el registro, inicia sesión para entrar.',
     'full-name':'Nombre completo','save':'Guardar','cancel':'Cancelar','confirm':'Confirmar',
     'nav-general':'General','nav-dashboard':'Inicio','nav-resumos':'Resúmenes',
@@ -3869,11 +3869,17 @@ async function doRegister() {
   try {
     const { data, ok } = await SB.signUp(email, pass);
     if (!ok) { toast(data?.error_description || (currentLang==='pt'?'Erro ao cadastrar.':'Error al registrar.'),'error'); return; }
-    // Create profile row
-    state.authToken = data.access_token || state.sbKey;
-    const uid = data.user?.id;
-    if (uid) {
-      await SB.upsert('approved_users', { user_id: uid, email, name, is_admin: email===state.adminEmail, approved: true });
+    // Cria o perfil via Cloudflare Function (service key, bypassa RLS). Se o
+    // cadastro não retornou sessão (ex.: confirmação de e-mail), o perfil é
+    // criado no primeiro login — loadUserProfile também chama o endpoint.
+    if (data.access_token) {
+      try {
+        await fetch('/api/ensure-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.access_token}` },
+          body: JSON.stringify({ name }),
+        });
+      } catch (_) { /* perfil será criado no primeiro login */ }
     }
     toast(currentLang==='pt'?'Cadastro realizado! Faça login para entrar.':'¡Registro exitoso! Inicia sesión para entrar.','success');
     switchAuthTab('login');
@@ -4834,14 +4840,26 @@ function copyPixModal() {
 /* ─────────────────────────────────────────────────────────
    LOAD PROFILE & APP INIT
 ───────────────────────────────────────────────────────── */
-async function loadUserProfile() {
+async function loadUserProfile(_retried) {
   const { data } = await SB.select('approved_users', `user_id=eq.${state.user.id}&select=*`);
   const profile = Array.isArray(data) ? data[0] : null;
 
   if (!profile) {
-    // Create default profile
-    await SB.upsert('approved_users', { user_id: state.user.id, email: state.user.email, name: state.user.email.split('@')[0], is_admin: state.user.email===state.adminEmail, approved: true });
-    await loadUserProfile(); return;
+    if (_retried) {
+      // Já tentou criar e ainda não achou — evita o loop infinito de upsert/403.
+      toast(currentLang==='pt' ? 'Não foi possível carregar seu perfil. Tente novamente.' : 'No se pudo cargar tu perfil. Inténtalo de nuevo.', 'error');
+      showScreen('auth');
+      return;
+    }
+    // Cria o perfil via Cloudflare Function (service key, bypassa RLS).
+    try {
+      await fetch('/api/ensure-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
+        body: JSON.stringify({ name: (state.user.email || '').split('@')[0] }),
+      });
+    } catch (_) { /* tratado abaixo no retry */ }
+    return loadUserProfile(true);
   }
 
   state.profile = profile;
@@ -7783,12 +7801,14 @@ async function mcRenderizarSelecaoQuestoes(plano) {
 
     // Filtra bancos cujo título indica a quantidade do pacote selecionado
     // (ou mostra todos se qtdPacote não especificado)
-    const bancosCompativeis = qtdPacote > 0
+    // Loja travada em Exames Finais: só bancos de questões da prova FINAL.
+    const bancosCompativeis = (qtdPacote > 0
       ? rows.filter(r => qtdDoTitulo(r.title) === qtdPacote)
-      : rows;
+      : rows
+    ).filter(r => normalizarParcial(r.parcial) === 'Final');
 
     if (!bancosCompativeis.length) {
-      lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco de ${qtdPacote} questões disponível no momento.</div>`;
+      lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px 0;">Nenhum banco de ${qtdPacote} questões de exame final disponível no momento.</div>`;
       return;
     }
 
@@ -7888,18 +7908,11 @@ function mcRenderizarSelecaoResumos(plano) {
   // Sem filtro definido, mostra todos (compatível com pacotes/combos antigos).
   const ehFinal = r => String(r.parcial || '').toLowerCase().includes('final');
   const baseResumos = state.resumos || [];
-  const todoResumos = plano.filtroParcial === 'final'
-    ? baseResumos.filter(ehFinal)
-    : plano.filtroParcial === 'parciais'
-      ? baseResumos.filter(r => !ehFinal(r))
-      : baseResumos;
+  // Loja travada em Exames Finais: bloqueia a compra de QUALQUER resumo de
+  // parcial, independentemente do botão de origem (filtroParcial é ignorado).
+  const todoResumos = baseResumos.filter(ehFinal);
   if (!todoResumos.length) {
-    const msg = plano.filtroParcial === 'final'
-      ? 'Nenhum resumo de exame final disponível ainda.'
-      : plano.filtroParcial === 'parciais'
-        ? 'Nenhum resumo de parcial disponível ainda.'
-        : 'Nenhum resumo disponível.';
-    lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">${msg}</div>`;
+    lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">Nenhum resumo de exame final disponível ainda.</div>`;
     return;
   }
 
