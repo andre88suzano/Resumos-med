@@ -3868,7 +3868,17 @@ async function doRegister() {
   setLoading('btn-register', true);
   try {
     const { data, ok } = await SB.signUp(email, pass);
-    if (!ok) { toast(data?.error_description || (currentLang==='pt'?'Erro ao cadastrar.':'Error al registrar.'),'error'); return; }
+    if (!ok) {
+      // E-mail já cadastrado → não é erro: manda fazer login (perfil é criado lá).
+      if (data?.error_code === 'user_already_exists' || data?.msg === 'User already registered') {
+        toast(currentLang==='pt' ? 'Esse e-mail já tem conta. É só fazer login. 👇' : 'Ese correo ya tiene cuenta. Inicia sesión. 👇', 'info');
+        switchAuthTab('login');
+        const le = document.getElementById('login-email'); if (le) le.value = email;
+        return;
+      }
+      toast(data?.error_description || data?.msg || (currentLang==='pt'?'Erro ao cadastrar.':'Error al registrar.'),'error');
+      return;
+    }
     // Cria o perfil via Cloudflare Function (service key, bypassa RLS). Se o
     // cadastro não retornou sessão (ex.: confirmação de e-mail), o perfil é
     // criado no primeiro login — loadUserProfile também chama o endpoint.
