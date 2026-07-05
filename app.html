@@ -4514,8 +4514,8 @@ function aplicarEstadoPromo() {
           <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(PRECO_PIX))} no cartão</div>
           <div style="display:inline-block;background:#052e1c;color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:12px;">Só hoje por causa do jogo do Brasil 🇧🇷</div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1000;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Combo Resumos+Mini Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',quantidade:6,codigoPrefixo:'FINAISQ'})">⚡ PIX — R$ ${fmtBR(PRECO_PIX)}</button>
-            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Combo Resumos+Mini Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',quantidade:6,codigoPrefixo:'FINAISQ'})">💳 Cartão — R$ ${fmtBR(cardPrice(PRECO_PIX))}</button>
+            <button class="btn btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1000;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Combo Resumos+Mini Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',quantidade:6,codigoPrefixo:'FINAISQ',semestreFiltro:3})">⚡ PIX — R$ ${fmtBR(PRECO_PIX)}</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Combo Resumos+Mini Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',quantidade:6,codigoPrefixo:'FINAISQ',semestreFiltro:3})">💳 Cartão — R$ ${fmtBR(cardPrice(PRECO_PIX))}</button>
           </div>
         </div>
 
@@ -8387,7 +8387,8 @@ function mcRenderizarSelecaoResumos(plano) {
   const baseResumos = state.resumos || [];
   // Loja travada em Exames Finais: bloqueia a compra de QUALQUER resumo de
   // parcial, independentemente do botão de origem (filtroParcial é ignorado).
-  const todoResumos = baseResumos.filter(ehFinal);
+  // semestreFiltro (opcional): restringe a um semestre específico (ex.: promo Jogo do Brasil = só 3º semestre).
+  const todoResumos = baseResumos.filter(ehFinal).filter(r => !plano.semestreFiltro || r.semestre === plano.semestreFiltro);
   if (!todoResumos.length) {
     lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">Nenhum resumo de exame final disponível ainda.</div>`;
     return;
