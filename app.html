@@ -4449,6 +4449,13 @@ function aplicarEstadoPromo() {
   const T_BIOFISICA_INICIO = new Date('2026-06-11T07:00:00-03:00');
   const T_BIOFISICA_FIM    = new Date('2026-06-11T14:00:00-03:00');
 
+  // ── PROMO RELÂMPAGO "JOGO DO BRASIL" (só hoje 05/07) ──────────
+  // Tem prioridade sobre todas as outras (checada primeiro no if/else),
+  // então pausa Exames Finais/Fisiologia/Micro automaticamente por hoje.
+  // Volta tudo ao normal sozinho à meia-noite, sem precisar desligar nada.
+  const T_BRASIL_INICIO = new Date('2026-07-05T00:00:00-03:00');
+  const T_BRASIL_FIM    = new Date('2026-07-06T00:00:00-03:00');
+
   // ── PROMO COMBO MICROBIOLOGIA 3H (até segunda 15/06 23:59) ──
   // Vira true quando o banco de 40 questões de Micro estiver criado e o
   // webhook (QUESTOES_BONUS.MICRO40) estiver com o questao_id preenchido.
@@ -4459,7 +4466,65 @@ function aplicarEstadoPromo() {
   const tabPromo     = document.getElementById('vtab-promo');
   const contentPromo = document.getElementById('vcontent-promo');
 
-  if (agora >= T_FINAIS_INICIO && agora < T_FINAIS_FIM) {
+  if (agora >= T_BRASIL_INICIO && agora < T_BRASIL_FIM) {
+    // ── PROMO RELÂMPAGO JOGO DO BRASIL ────────────────────
+    const PRECO_ORIG = 58.41;
+    const PRECO_PIX  = 50.00;
+    const cardPrice  = v => Math.round((v / 0.95) * 100) / 100;
+    const fmtBR = v => v.toFixed(2).replace('.', ',');
+
+    tabPromo.innerHTML = '🇧🇷 Promoção';
+    tabPromo.style.color = '#f0b429';
+    tabPromo.style.borderBottomColor = '#f0b429';
+    tabPromo.style.cursor = 'pointer';
+    tabPromo.style.opacity = '1';
+    tabPromo.onclick = () => switchValoresTab('promo');
+
+    contentPromo.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:0;">
+
+        <div style="background:#0f1020;border:1px solid #f0b429;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:12px;color:#cbd5e1;font-weight:600;">⏱ Só hoje, acaba à meia-noite:</span>
+          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#f0b429;">--:--:--</span>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#021a10 0%,#052e1c 60%,#1a1000 100%);border-radius:14px;padding:20px 18px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,#f0b42940,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#052e1c;border:1px solid #f0b42960;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">🇧🇷</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;">Só hoje · Dia do jogo do Brasil</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">Enquanto o Brasil joga, você estuda ⚽</div>
+          <div style="font-size:13px;color:#a7f3d0;margin-bottom:14px;">Resumos de todas as matérias por preço único — válido só hoje</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${['Fisiologia','Bioquímica','Genética','Imunologia','Biofísica','Microbiologia'].map(m =>
+              `<span style="font-size:11px;background:#ffffff10;border:1px solid #ffffff20;color:#d1fae5;padding:3px 10px;border-radius:20px;">${m}</span>`
+            ).join('')}
+          </div>
+        </div>
+
+        <div style="background:var(--bg2);border:2px solid #f0b429;border-radius:12px;padding:16px;margin-bottom:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">📖 Resumos de todas as matérias</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">Escolha os resumos completos que quiser entre as 6 matérias</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
+            <span style="font-size:14px;color:var(--text3);text-decoration:line-through;">R$ ${fmtBR(PRECO_ORIG)}</span>
+            <span style="font-size:30px;font-weight:800;color:#f0b429;line-height:1;">R$ ${fmtBR(PRECO_PIX)}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">ou R$ ${fmtBR(cardPrice(PRECO_PIX))} no cartão</div>
+          <div style="display:inline-block;background:#052e1c;color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:12px;">Só hoje por causa do jogo do Brasil 🇧🇷</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1000;font-weight:700;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Resumos Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',codigoPrefixo:'FINAISQ'})">⚡ PIX — R$ ${fmtBR(PRECO_PIX)}</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="closeModal('modal-valores');abrirModalCompra({nome:'Resumos Jogo do Brasil 🇧🇷',preco:${PRECO_PIX},tipo:'solo',codigoPrefixo:'FINAISQ'})">💳 Cartão — R$ ${fmtBR(cardPrice(PRECO_PIX))}</button>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoção especial válida só hoje. As demais promoções voltam automaticamente amanhã. Acesso imediato após pagamento.</p>
+      </div>`;
+
+    switchValoresTab('promo');
+    iniciarCountdownPromo(T_BRASIL_FIM);
+
+  } else if (agora >= T_FINAIS_INICIO && agora < T_FINAIS_FIM) {
     // ── PROMO EXAMES FINAIS 2026 ─────────────────────────
     const fmtBR = v => v.toFixed(2).replace('.', ',');
     const cardPrice = v => Math.round((v / 0.95) * 100) / 100;
