@@ -4518,7 +4518,65 @@ function aplicarEstadoPromo() {
           </div>
         </div>
 
-        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoção especial válida só hoje. As demais promoções voltam automaticamente amanhã. Acesso imediato após pagamento.</p>
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;padding-bottom:4px;">Promoção especial válida só hoje. Acesso imediato após pagamento.</p>
+
+        <!-- ── DIVISOR COMBO FISIOLOGIA ── -->
+        <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
+          <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#f0b42960);"></div>
+          <div style="background:#1a1000;border:1px solid #f0b42960;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:11px;">❤️</span>
+            <span style="font-size:10px;font-weight:700;color:#f0b429;white-space:nowrap;">Só até segunda · Combo Fisiologia</span>
+          </div>
+          <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,#f0b42960);"></div>
+        </div>
+
+        <!-- ── COMBO FISIOLOGIA FINAL ── -->
+        <div style="background:linear-gradient(135deg,#1a1000 0%,#2a1c00 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#f0b42940,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1000;border:1px solid #f0b42940;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">🔥</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;">Só até segunda às 14h</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">❤️ Combo Fisiologia · Final</div>
+          <div style="font-size:13px;color:#fde68a;margin-bottom:14px;">Resumo completo + Mini resumo de revisão para o Exame Final</div>
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <span style="font-size:16px;color:#fca5a5cc;text-decoration:line-through;">R$ 25,00</span>
+            <span style="font-size:30px;font-weight:800;color:#f0b429;line-height:1;">R$ 20,00</span>
+            <span style="display:inline-block;background:#f0b42920;color:#f0b429;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">economia R$ 5,00</span>
+          </div>
+        </div>
+
+        <!-- Seleção de versão + compra -->
+        <div style="background:var(--bg2);border:2px solid #f0b42960;border-radius:12px;padding:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;">Escolha a versão do resumo:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="michele" checked>
+              <span style="font-size:13px;color:var(--text);">Final Fisio I — Michele <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="lisandro">
+              <span style="font-size:13px;color:var(--text);">Final — Lisandro <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="gabriel">
+              <span style="font-size:13px;color:var(--text);">Final — Gabriel <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:10px;">
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ 25,00</div>
+              <div style="font-size:22px;font-weight:800;color:#f0b429;line-height:1;">R$ 20,00</div>
+              <div style="font-size:10px;color:var(--text3);">ou R$ 21,00 cartão</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1000;font-weight:700;" onclick="const v=document.querySelector('input[name=fisio-versao]:checked').value;closeModal('modal-valores');abrirModalCompraPromoFisio('pix', v)">⚡ PIX — R$ 20,00</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=fisio-versao]:checked').value;closeModal('modal-valores');abrirModalCompraPromoFisio('cartao', v)">💳 Cartão — R$ 21,00</button>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoções válidas até segunda-feira às 14h. As demais promoções voltam automaticamente amanhã. Acesso imediato após pagamento.</p>
       </div>`;
 
     switchValoresTab('promo');
