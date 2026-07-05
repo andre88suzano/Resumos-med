@@ -4449,12 +4449,11 @@ function aplicarEstadoPromo() {
   const T_BIOFISICA_INICIO = new Date('2026-06-11T07:00:00-03:00');
   const T_BIOFISICA_FIM    = new Date('2026-06-11T14:00:00-03:00');
 
-  // ── PROMO RELÂMPAGO "JOGO DO BRASIL" (só hoje 05/07) ──────────
-  // Tem prioridade sobre todas as outras (checada primeiro no if/else),
-  // então pausa Exames Finais/Fisiologia/Micro automaticamente por hoje.
-  // Volta tudo ao normal sozinho à meia-noite, sem precisar desligar nada.
+  // ── PROMO RELÂMPAGO "JOGO DO BRASIL" (encerrada às 15:51 do dia 05/07) ──
+  // Encerrada mais cedo a pedido — volta a mostrar Exames Finais + Combo
+  // Fisiologia (bloco abaixo) em vez de esperar até a meia-noite.
   const T_BRASIL_INICIO = new Date('2026-07-05T00:00:00-03:00');
-  const T_BRASIL_FIM    = new Date('2026-07-06T00:00:00-03:00');
+  const T_BRASIL_FIM    = new Date('2026-07-05T15:51:00-03:00');
 
   // ── PROMO COMBO MICROBIOLOGIA 3H (até segunda 15/06 23:59) ──
   // Vira true quando o banco de 40 questões de Micro estiver criado e o
