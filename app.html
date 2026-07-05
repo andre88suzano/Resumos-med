@@ -4444,14 +4444,10 @@ async function comprarMicroPratica(qtd, preco, metodo) {
 function aplicarEstadoPromo() {
   const agora = new Date();
   const T_FINAIS_INICIO  = new Date('2026-06-21T10:00:00-03:00');
-  const T_FINAIS_FIM     = new Date('2026-07-02T00:00:00-03:00'); // ativa até o fim do dia 01/07
+  const T_FINAIS_FIM     = new Date('2026-07-06T14:00:00-03:00'); // reativada junto com a promo de Fisiologia — vai até segunda 06/07 14h
   const T_IMUNO_FIM      = new Date('2026-06-09T14:00:00-03:00');
   const T_BIOFISICA_INICIO = new Date('2026-06-11T07:00:00-03:00');
   const T_BIOFISICA_FIM    = new Date('2026-06-11T14:00:00-03:00');
-
-  // ── PROMO COMBO FISIOLOGIA FINAL (até segunda 06/07 14:00) ──
-  const T_FISIO_INICIO = new Date('2026-07-04T00:00:00-03:00');
-  const T_FISIO_FIM    = new Date('2026-07-06T14:00:00-03:00');
 
   // ── PROMO COMBO MICROBIOLOGIA 3H (até segunda 15/06 23:59) ──
   // Vira true quando o banco de 40 questões de Micro estiver criado e o
@@ -4485,6 +4481,12 @@ function aplicarEstadoPromo() {
 
     contentPromo.innerHTML = `
       <div style="display:flex;flex-direction:column;gap:0;">
+
+        <!-- Contagem regressiva (vale para as duas promos abaixo) -->
+        <div style="background:#0f1020;border:1px solid #334155;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:12px;color:#cbd5e1;font-weight:600;">⏱ Promoções encerram segunda às 14h:</span>
+          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#7c3aed;">--:--:--</span>
+        </div>
 
         <!-- ── HERO ── -->
         <div style="background:linear-gradient(135deg,#0f0020 0%,#1a0a35 60%,#0d1a30 100%);border-radius:14px;padding:20px 18px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
@@ -4589,30 +4591,19 @@ function aplicarEstadoPromo() {
         </div>
 
         <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;padding-bottom:4px;">Pagamento via PIX com acesso imediato. <strong style="color:#7c3aed;">Dupla: cada um recebe seu próprio acesso.</strong></p>
-      </div>`;
 
-    switchValoresTab('promo');
-
-  } else if (agora >= T_FISIO_INICIO && agora < T_FISIO_FIM) {
-    // ── PROMO COMBO FISIOLOGIA FINAL (até segunda 06/07 14:00) ────
-    tabPromo.innerHTML = '🔥 Promoção';
-    tabPromo.style.color = '#f0b429';
-    tabPromo.style.borderBottomColor = '#f0b429';
-    tabPromo.style.cursor = 'pointer';
-    tabPromo.style.opacity = '1';
-    tabPromo.onclick = () => switchValoresTab('promo');
-
-    contentPromo.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px;">
-
-        <!-- Contagem regressiva -->
-        <div style="background:#0f1020;border:1px solid #334155;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-size:12px;color:#cbd5e1;font-weight:600;">⏱ Promoção encerra segunda às 14h:</span>
-          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#f0b429;">--:--:--</span>
+        <!-- ── DIVISOR COMBO FISIOLOGIA ── -->
+        <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
+          <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#f0b42960);"></div>
+          <div style="background:#1a1000;border:1px solid #f0b42960;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:11px;">❤️</span>
+            <span style="font-size:10px;font-weight:700;color:#f0b429;white-space:nowrap;">Só até segunda · Combo Fisiologia</span>
+          </div>
+          <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,#f0b42960);"></div>
         </div>
 
-        <!-- Hero -->
-        <div style="background:linear-gradient(135deg,#1a1000 0%,#2a1c00 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;position:relative;overflow:hidden;">
+        <!-- ── COMBO FISIOLOGIA FINAL ── -->
+        <div style="background:linear-gradient(135deg,#1a1000 0%,#2a1c00 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;margin-bottom:14px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#f0b42940,transparent 70%);pointer-events:none;"></div>
           <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1000;border:1px solid #f0b42940;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
             <span style="font-size:11px;">🔥</span>
@@ -4657,11 +4648,11 @@ function aplicarEstadoPromo() {
           </div>
         </div>
 
-        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoção válida até segunda-feira às 14h. Acesso imediato após pagamento.</p>
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoções válidas até segunda-feira às 14h. Acesso imediato após pagamento.</p>
       </div>`;
 
     switchValoresTab('promo');
-    iniciarCountdownPromo(T_FISIO_FIM);
+    iniciarCountdownPromo(T_FINAIS_FIM);
 
   } else if (PROMO_MICRO_ATIVA && agora >= T_MICRO_INICIO && agora < T_MICRO_FIM) {
     // ── PROMO COMBO MICROBIOLOGIA 3H (até segunda 15/06 23:59) ─────
