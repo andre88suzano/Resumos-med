@@ -8467,7 +8467,9 @@ function mcRenderizarSelecaoResumos(plano) {
 
     if (qtdCombos) {
       contador.textContent = `${combosAtivos} / ${qtdCombos} combos selecionados`;
-      btnContinuar.disabled = combosAtivos === 0 || combosAtivos > qtdCombos;
+      // Exige exatamente qtdCombos selecionados — evita pagar sem completar
+      // a seleção e ficar com acesso liberado parcial.
+      btnContinuar.disabled = combosAtivos !== qtdCombos;
       btnContinuar.textContent = combosAtivos === 0 ? 'Selecione os combos' :
         combosAtivos < qtdCombos ? `Selecione mais ${qtdCombos - combosAtivos} combo(s)` :
         combosAtivos > qtdCombos ? `Máximo ${qtdCombos} combos` :
