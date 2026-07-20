@@ -339,6 +339,14 @@ const QUESTOES_BONUS = {
       { questao_id: '0ba6d650-7303-4307-9931-e66da3c80621', materia: 'Microbiologia', semestre: 3 }, // banco 40q Micro P2
     ],
   },
+  'MICRO20': {
+    minValor: 19,
+    // Combo Microbiologia P2 (+20 questões de fixação de brinde).
+    // Atualize questao_id para o ID do banco de 20q ao criá-lo no admin.
+    bancos: [
+      { questao_id: '0ba6d650-7303-4307-9931-e66da3c80621', materia: 'Microbiologia', semestre: 3 }, // banco 40q Micro P2 (temporário — trocar por banco 20q quando criado)
+    ],
+  },
   'GEN40': {
     minValor: 19,
     bancos: [
