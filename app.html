@@ -3069,25 +3069,45 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
-          <div class="valor-item" style="flex-direction:column;gap:8px;opacity:0.5;pointer-events:none;">
+          <div class="valor-item" style="flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-nome">📚 Pacote Resumos (Finais) <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div>
+              <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
               <div style="text-align:right;">
                 <div class="valor-preco">R$ 64,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 68,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
+            <div style="font-size:11px;color:var(--text3);">6 resumos completos — Fisiologia, Bioquímica, Genética Médica, Imunologia, Microbiologia e Biofísica.</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:2px;">Fisiologia — escolha a versão:</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="michele" checked> Michele</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="lisandro"> Lisandro</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="gabriel"> Gabriel</label>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="const v=document.querySelector('input[name=pacote-final-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('pix', false, v)">⚡ PIX — R$ 64,90</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=pacote-final-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('cartao', false, v)">💳 Cartão — R$ 68,32</button>
+            </div>
           </div>
-          <div class="valor-item" style="border-color:var(--border);flex-direction:column;gap:8px;opacity:0.5;pointer-events:none;">
+          <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais) <span style="font-size:10px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;margin-left:6px;">🔒 Em breve</span></div>
+              <div class="valor-nome">📚 + ⚡ Pacote Resumos + Mini Resumos (Finais)</div>
               <div style="text-align:right;">
-                <div class="valor-preco">R$ 79,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div class="valor-preco" style="color:var(--teal);">R$ 79,90 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
                 <div style="font-size:10px;color:var(--text3);">R$ 84,11 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Disponível em breve</button>
+            <div style="font-size:11px;color:var(--text3);">6 resumos completos + 6 mini resumos de revisão.</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:2px;">Fisiologia — escolha a versão:</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="michele" checked> Michele</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="lisandro"> Lisandro</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="gabriel"> Gabriel</label>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <button class="btn btn-sm" style="flex:1;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="const v=document.querySelector('input[name=pacote-final-completo-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('pix', true, v)">⚡ PIX — R$ 79,90</button>
+              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=pacote-final-completo-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('cartao', true, v)">💳 Cartão — R$ 84,11</button>
+            </div>
           </div>
 
         </div>
@@ -4449,6 +4469,10 @@ function aplicarEstadoPromo() {
   const T_BIOFISICA_INICIO = new Date('2026-06-11T07:00:00-03:00');
   const T_BIOFISICA_FIM    = new Date('2026-06-11T14:00:00-03:00');
 
+  // ── PROMO COMBO FISIOLOGIA · FINAL (de volta, semana toda — até segunda 13/07 14h) ──
+  const T_FISIO_INICIO = new Date('2026-07-07T00:00:00-03:00');
+  const T_FISIO_FIM    = new Date('2026-07-13T14:00:00-03:00');
+
   // ── PROMO RELÂMPAGO "JOGO DO BRASIL" (estendida até segunda 06/07 14h) ──
   // Tem prioridade sobre todas as outras (checada primeiro no if/else),
   // então pausa Exames Finais/Fisiologia/Micro automaticamente enquanto ativa.
@@ -4777,6 +4801,76 @@ function aplicarEstadoPromo() {
 
     switchValoresTab('promo');
     iniciarCountdownPromo(T_FINAIS_FIM);
+
+  } else if (agora >= T_FISIO_INICIO && agora < T_FISIO_FIM) {
+    // ── PROMO COMBO FISIOLOGIA · FINAL (semana 07/07 → 13/07 14h) ──
+    tabPromo.innerHTML = '❤️ Promoção';
+    tabPromo.style.color = '#f0b429';
+    tabPromo.style.borderBottomColor = '#f0b429';
+    tabPromo.style.cursor = 'pointer';
+    tabPromo.style.opacity = '1';
+    tabPromo.onclick = () => switchValoresTab('promo');
+
+    contentPromo.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px;">
+
+        <!-- Contagem regressiva -->
+        <div style="background:#1a1000;border:1px solid #f0b42960;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:#f0b429;font-weight:600;">⏱ Promoção encerra segunda às 14h:</span>
+          <span id="promo-countdown" style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:#f0b429;">--:--:--</span>
+        </div>
+
+        <!-- Hero -->
+        <div style="background:linear-gradient(135deg,#1a1000 0%,#2a1c00 60%,#0f1020 100%);border-radius:14px;padding:18px 16px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,#f0b42940,transparent 70%);pointer-events:none;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1000;border:1px solid #f0b42940;border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+            <span style="font-size:11px;">🔥</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;">Promo da semana</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;">❤️ Combo Fisiologia · Final</div>
+          <div style="font-size:13px;color:#fde68a;margin-bottom:14px;">Resumo completo + Mini resumo de revisão para o Exame Final</div>
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <span style="font-size:16px;color:#fca5a5cc;text-decoration:line-through;">R$ 25,00</span>
+            <span style="font-size:30px;font-weight:800;color:#f0b429;line-height:1;">R$ 20,00</span>
+            <span style="display:inline-block;background:#f0b42920;color:#f0b429;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">economia R$ 5,00</span>
+          </div>
+        </div>
+
+        <!-- Seleção de versão + compra -->
+        <div style="background:var(--bg2);border:2px solid #f0b42960;border-radius:12px;padding:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;">Escolha a versão do resumo:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="michele" checked>
+              <span style="font-size:13px;color:var(--text);">Final Fisio I — Michele <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="lisandro">
+              <span style="font-size:13px;color:var(--text);">Final — Lisandro <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;">
+              <input type="radio" name="fisio-versao" value="gabriel">
+              <span style="font-size:13px;color:var(--text);">Final — Gabriel <span style="color:var(--text3);">(+ mini resumo)</span></span>
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:10px;">
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">R$ 25,00</div>
+              <div style="font-size:22px;font-weight:800;color:#f0b429;line-height:1;">R$ 20,00</div>
+              <div style="font-size:10px;color:var(--text3);">ou R$ 21,00 cartão</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm" style="flex:1;background:#f0b429;border-color:#f0b429;color:#1a1000;font-weight:700;" onclick="const v=document.querySelector('input[name=fisio-versao]:checked').value;closeModal('modal-valores');abrirModalCompraPromoFisio('pix', v)">⚡ PIX — R$ 20,00</button>
+            <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=fisio-versao]:checked').value;closeModal('modal-valores');abrirModalCompraPromoFisio('cartao', v)">💳 Cartão — R$ 21,00</button>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin:0;">Promoção válida até segunda-feira às 14h. Acesso imediato após pagamento.</p>
+      </div>`;
+
+    switchValoresTab('promo');
+    iniciarCountdownPromo(T_FISIO_FIM);
 
   } else if (PROMO_MICRO_ATIVA && agora >= T_MICRO_INICIO && agora < T_MICRO_FIM) {
     // ── PROMO COMBO MICROBIOLOGIA 3H (até segunda 15/06 23:59) ─────
@@ -5244,6 +5338,65 @@ async function abrirModalCompraPromoFisio(metodo, versao) {
   mostrarLoading('Preparando pagamento...');
   try {
     const codigo = 'FISIOFINAL' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const rCompra = await SB.insert('compras_coletivas', {
+      codigo, tipo: 'solo', status: 'aguardando',
+      slots_total: 1, slots_preenchidos: 0,
+      preco_individual: PRECO_PIX,
+      criador_user_id: state.user.id,
+      expira_em: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+    const compra = Array.isArray(rCompra.data) ? rCompra.data[0] : rCompra.data;
+    if (!compra?.id) throw new Error('Falha ao criar compra');
+
+    await SB.insert('compra_participantes', {
+      compra_id: compra.id, user_id: state.user.id,
+      email: state.user.email, status_pagamento: 'pendente',
+      resumos_selecionados: RESUMOS,
+    });
+
+    await iniciarPagamento(compra.id, 'solo', PRECO_PIX, metodo);
+  } catch (e) {
+    ocultarLoading();
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// Pacote Resumos (Finais) — 6 resumos fixos (um por matéria de sem3), com
+// escolha de versão só em Fisiologia (Michele/Lisandro/Gabriel). `completo`
+// inclui também os 6 mini resumos de revisão.
+async function abrirModalCompraPacoteFinal(metodo, completo, versaoFisio, precoOverride) {
+  if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+
+  const FISIO_VERSOES = {
+    michele:  { resumo: 'a1a63868-fef9-49ed-bf77-8778d847a6be', mini: '14e6aff3-a36c-40dc-a26e-0dfb8a47e05a', titulo: 'Final Fisio I-Michele' },
+    lisandro: { resumo: '14334def-a4f6-462c-898c-f96e342adcec', mini: '19a4d42e-f869-4f3e-bda7-91daba98bec0', titulo: 'Final-Lisandro' },
+    gabriel:  { resumo: '72d0fae5-574f-4b6b-9624-d9742bf90a45', mini: '046f7c1d-91db-4882-a752-71599d1ce09c', titulo: 'Final-gabriel' },
+  };
+  const fisio = FISIO_VERSOES[versaoFisio] || FISIO_VERSOES.michele;
+
+  const MATERIAS = [
+    { materia: 'Fisiologia',      resumo: fisio.resumo,                                    mini: fisio.mini },
+    { materia: 'Bioquímica',      resumo: '12bc6481-cc2e-44bf-87d2-3e43538433cd',           mini: '6aa0efb1-5fdf-4cc1-b5d1-99c7b7ef5d0a' },
+    { materia: 'Genética Médica', resumo: '3719a573-058c-4bc9-8fe5-1b8566c4533e',           mini: '04a40169-1944-4891-a23f-f6aa1ba134b3' },
+    { materia: 'Imunologia',      resumo: '35b5dd78-0e9d-454e-9687-fc0901ca391a',           mini: '16e9f801-7566-45a2-af3c-4a3d62129c6b' },
+    { materia: 'Biofísica',       resumo: '0a7ab551-a9bc-4599-9905-9bd2d22483a5',           mini: '0a803bcf-a523-4027-832d-45c1c6008a8a' },
+    { materia: 'Microbiologia',   resumo: '1f4a37c4-6474-4151-b1cd-8ffc5d25f6cd',           mini: 'd88dc1eb-8bbd-42ab-be41-494ed01c7499' },
+  ];
+
+  const RESUMOS = completo ? MATERIAS.flatMap(m => [m.resumo, m.mini]) : MATERIAS.map(m => m.resumo);
+  const PRECO_PIX = completo ? 79.90 : 64.90;
+  const nome = completo ? 'Pacote Resumos + Mini (Finais)' : 'Pacote Resumos (Finais)';
+
+  mcState.plano = { nome, preco: PRECO_PIX, preco_solo: PRECO_PIX, tipo: 'solo', resumosIds: RESUMOS };
+  mcState.compraId = null;
+  mcState.resumosSelecionados = MATERIAS.flatMap(m => completo
+    ? [{ id: m.resumo, titulo: `${m.materia} · Final` }, { id: m.mini, titulo: `${m.materia} · Mini resumo` }]
+    : [{ id: m.resumo, titulo: `${m.materia} · Final` }]
+  );
+
+  mostrarLoading('Preparando pagamento...');
+  try {
+    const codigo = 'PACOTEFINAL' + Math.random().toString(36).substring(2, 6).toUpperCase();
     const rCompra = await SB.insert('compras_coletivas', {
       codigo, tipo: 'solo', status: 'aguardando',
       slots_total: 1, slots_preenchidos: 0,
@@ -5934,6 +6087,7 @@ const SEMESTRE_COLORS = { 1:'#a78bfa', 2:'#fb923c', 3:'#2d6ef7', 4:'#10b981', 5:
 const SEMESTRE_MATERIAS = {
   1: ['Histología I', 'Biología', 'Embriología', 'Anatomía I'],
   2: ['Anatomía II', 'Histología II', 'Medicina Comunitaria', 'Psicología en Salud'],
+  4: ['Fisiología II', 'Bioquímica II', 'Nutrición', 'Epidemiología', 'Microbiología II', 'Electrocardiograma'],
 };
 
 // NÍVEL 1: mostra pastas de semestres
@@ -5944,20 +6098,9 @@ function renderResumos() {
   document.getElementById('view-folder-content').classList.add('hidden');
 
   const semestresComResumos = [...new Set(state.resumos.map(r => r.semestre))].sort((a,b)=>a-b);
-  // Sempre mostra 1º, 2º e os semestres que têm resumos; 4º aparece como "Em breve"
-  const semestresVisiveis = [...new Set([1, 2, ...semestresComResumos])].sort((a,b)=>a-b);
+  // Sempre mostra 1º, 2º e 4º (matérias fixas) e os semestres que têm resumos
+  const semestresVisiveis = [...new Set([1, 2, 4, ...semestresComResumos])].sort((a,b)=>a-b);
   const grid = document.getElementById('semestre-grid');
-
-  // Calcular countdown até 01/ago/2026
-  function getCountdownAgosto() {
-    const target = new Date('2026-08-01T00:00:00');
-    const diff = target - new Date();
-    if (diff <= 0) return null;
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    return `${d}d ${h}h ${m}m`;
-  }
 
   grid.innerHTML = [
     ...semestresVisiveis.map(sem => {
@@ -6000,18 +6143,6 @@ function renderResumos() {
           </div>
         </div>`;
     }),
-    // Card fixo do 4º semestre com timer até agosto (só aparece se 4º não tem resumos ainda)
-    !semestresComResumos.includes(4) ? (() => {
-      const countdown = getCountdownAgosto();
-      return `
-        <div class="folder-card locked-folder" style="--folder-color:#10b981;cursor:default;opacity:.85;border-color:rgba(16,185,129,.3);">
-          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
-          <div class="folder-icon">📗</div>
-          <div class="folder-name">4º Semestre</div>
-          <div class="folder-meta" style="color:#10b981;">Em breve · Agosto 2026</div>
-          ${countdown ? `<div style="margin-top:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#10b981;font-weight:700;font-family:var(--font-mono);">⏳ ${countdown}</div>` : ''}
-        </div>`;
-    })() : '',
   ].join('');
 }
 
@@ -6277,10 +6408,18 @@ async function openQuestao(id) {
   const url  = URL.createObjectURL(blob);
   iframe._blobUrl = url;
   iframe.src = url;
+  if (iframe._resizeObserver) { iframe._resizeObserver.disconnect(); iframe._resizeObserver = null; }
   iframe.onload = () => {
     try {
-      const h = iframe.contentDocument.documentElement.scrollHeight;
-      iframe.style.height = Math.max(h, 300) + 'px';
+      const doc = iframe.contentDocument;
+      const resize = () => {
+        const h = doc.documentElement.scrollHeight;
+        iframe.style.height = Math.max(h, 300) + 'px';
+      };
+      resize();
+      const ro = new ResizeObserver(resize);
+      ro.observe(doc.documentElement);
+      iframe._resizeObserver = ro;
     } catch(_) { iframe.style.height = '70vh'; }
   };
 
@@ -6293,6 +6432,7 @@ function closeQuestaoViewer() {
   modal.classList.add('hidden');
   document.body.style.overflow = '';
   const iframe = document.getElementById('questao-viewer-iframe');
+  if (iframe._resizeObserver) { iframe._resizeObserver.disconnect(); iframe._resizeObserver = null; }
   if (iframe._blobUrl) { URL.revokeObjectURL(iframe._blobUrl); iframe._blobUrl = null; iframe.src = 'about:blank'; }
 }
 
@@ -6533,11 +6673,22 @@ async function openResumo(id) {
   iframe._blobUrl = url;
   iframe.src = url;
 
-  // Ajusta altura do iframe ao conteúdo quando carrega
+  // Ajusta altura do iframe ao conteúdo quando carrega, e mantém sincronizada
+  // depois — resumos com quiz interno (ex.: explicações que aparecem ao
+  // responder) crescem DEPOIS do load, e uma altura travada faz o iframe
+  // cortar/rolar por conta própria e desalinhar o scroll da página.
+  if (iframe._resizeObserver) { iframe._resizeObserver.disconnect(); iframe._resizeObserver = null; }
   iframe.onload = () => {
     try {
-      const h = iframe.contentDocument.documentElement.scrollHeight;
-      iframe.style.height = Math.max(h, 400) + 'px';
+      const doc = iframe.contentDocument;
+      const resize = () => {
+        const h = doc.documentElement.scrollHeight;
+        iframe.style.height = Math.max(h, 400) + 'px';
+      };
+      resize();
+      const ro = new ResizeObserver(resize);
+      ro.observe(doc.documentElement);
+      iframe._resizeObserver = ro;
     } catch(e) {
       iframe.style.height = '100vh';
     }
@@ -7314,6 +7465,10 @@ document.addEventListener('keydown', e => {
 // Libera blob URL ao sair do viewer
 function cleanupViewer() {
   const iframe = document.getElementById('viewer-iframe');
+  if (iframe && iframe._resizeObserver) {
+    iframe._resizeObserver.disconnect();
+    iframe._resizeObserver = null;
+  }
   if (iframe && iframe._blobUrl) {
     URL.revokeObjectURL(iframe._blobUrl);
     iframe._blobUrl = null;
