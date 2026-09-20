@@ -2996,17 +2996,17 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <p style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Compre resumos avulsos, sem compromisso.</p>
         <div style="display:flex;flex-direction:column;gap:10px;">
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2) <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;letter-spacing:0;text-transform:none;margin-left:4px;">🔒 indisponível</span></div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;margin-bottom:4px;">Parciais (P1 e P2)</div>
 
           <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-info"><div class="valor-nome">📖 Resumo Individual</div></div>
               <div style="text-align:right;">
-                <div class="valor-preco">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-                <div style="font-size:10px;color:var(--text3);">R$ 15,79 cartão</div>
+                <div class="valor-preco">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 10,53 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Individual', preco:10.00, precoUnitario:10.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 10,00 / resumo</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
@@ -3019,11 +3019,11 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 </div>
               </div>
               <div style="text-align:right;">
-                <div class="valor-preco" style="color:var(--teal);">R$ 20,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-                <div style="font-size:10px;color:var(--text3);">R$ 21,05 cartão</div>
+                <div class="valor-preco" style="color:var(--teal);">R$ 15,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+                <div style="font-size:10px;color:var(--text3);">R$ 15,79 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:15.00, precoUnitario:15.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 15,00 / combo</button>
           </div>
 
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
@@ -8552,12 +8552,20 @@ function mcRenderizarSelecaoResumos(plano) {
   // Sem filtro definido, mostra todos (compatível com pacotes/combos antigos).
   const ehFinal = r => String(r.parcial || '').toLowerCase().includes('final');
   const baseResumos = state.resumos || [];
-  // Loja travada em Exames Finais: bloqueia a compra de QUALQUER resumo de
-  // parcial, independentemente do botão de origem (filtroParcial é ignorado).
   // semestreFiltro (opcional): restringe a um semestre específico (ex.: promo Jogo do Brasil = só 3º semestre).
-  const todoResumos = baseResumos.filter(ehFinal).filter(r => !plano.semestreFiltro || r.semestre === plano.semestreFiltro);
+  const todoResumos = (plano.filtroParcial === 'final'
+    ? baseResumos.filter(ehFinal)
+    : plano.filtroParcial === 'parciais'
+      ? baseResumos.filter(r => !ehFinal(r))
+      : baseResumos
+  ).filter(r => !plano.semestreFiltro || r.semestre === plano.semestreFiltro);
   if (!todoResumos.length) {
-    lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">Nenhum resumo de exame final disponível ainda.</div>`;
+    const msg = plano.filtroParcial === 'final'
+      ? 'Nenhum resumo de exame final disponível ainda.'
+      : plano.filtroParcial === 'parciais'
+        ? 'Nenhum resumo de parcial disponível ainda.'
+        : 'Nenhum resumo disponível.';
+    lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">${msg}</div>`;
     return;
   }
 
