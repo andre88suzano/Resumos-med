@@ -87,6 +87,25 @@ create policy uqa_admin_write on public.user_questoes_access
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ============================================================
+-- 6. FIX (2026-09-22): faltava o GRANT de escrita ------------
+--    ENABLE ROW LEVEL SECURITY + POLICY não bastam: o role
+--    "authenticated" também precisa do GRANT de INSERT/UPDATE/
+--    DELETE na tabela em si — sem isso, TODA tentativa falha
+--    com "permission denied for table X" antes mesmo de a
+--    policy (admin-only) ser avaliada. Sintoma: admin não
+--    consegue excluir/editar/criar resumo ou questão, nem
+--    liberar/revogar acesso de aluno — sempre 403 "permission
+--    denied", mesmo sendo admin de verdade. Esse GRANT não
+--    reabre a falha de segurança: a policy "..._admin_write"
+--    continua restringindo quem de fato consegue mexer nas
+--    linhas — isso só libera o tipo de operação pro role tentar.
+-- ============================================================
+grant insert, update, delete on public.resumos              to authenticated;
+grant insert, update, delete on public.questoes              to authenticated;
+grant insert, update, delete on public.user_access           to authenticated;
+grant insert, update, delete on public.user_questoes_access  to authenticated;
+
+-- ============================================================
 -- VERIFICAÇÃO (opcional) — rode logado como ALUNO no site e confira:
 --   • abrir um resumo COMPRADO → funciona
 --   • abrir um NÃO comprado    → "Sem acesso"
