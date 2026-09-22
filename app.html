@@ -4411,7 +4411,8 @@ function renderCardNota(m) {
             <label class="form-label" style="margin:0;" title="Nota que você quer atingir nessa matéria — pode deixar 60 (média) ou mirar num promedio mais alto.">🎯 Meta</label>
             <input class="form-input" type="number" min="0" max="100" step="1" style="width:70px;padding:6px 8px;font-size:13px;"
               id="nota-${slug}-meta" value="${saved.meta ?? 60}"
-              oninput="atualizarResumoNota('${materiaEsc}',${especialAttr})">
+              oninput="atualizarResumoNota('${materiaEsc}',${especialAttr})"
+              onchange="salvarMetaAuto('${materiaEsc}')">
           </div>
           <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${especialAttr})">💾 Salvar</button>
         </div>
@@ -4543,6 +4544,26 @@ async function salvarNota(materia, especial) {
     toast(`Erro ao salvar: ${e.message}`, 'error');
   } finally {
     setLoading(`btn-salvar-${slug}`, false);
+  }
+}
+
+// Salva a meta sozinha assim que o campo perde o foco, sem exigir clique em "Salvar" —
+// evita perder a meta de quem só quer definir o objetivo antes de ter notas lançadas.
+async function salvarMetaAuto(materia) {
+  if (!state.user?.id) return;
+  const slug = notaSlug(materia);
+  const meta = parseFloat(document.getElementById(`nota-${slug}-meta`)?.value);
+  if (isNaN(meta)) return;
+  try {
+    const payload = { user_id: state.user.id, materia, meta, updated_at: new Date().toISOString() };
+    const { ok, data, status } = await SB.upsert('notas', payload);
+    if (!ok) throw new Error((data && (data.message || data.hint)) || `status ${status}`);
+    if (notasState.porMateria[materia]) notasState.porMateria[materia].meta = meta;
+    else notasState.porMateria[materia] = payload;
+    toast(`🎯 Meta de ${materia} salva (${meta})`, 'success');
+  } catch (e) {
+    console.error('Erro ao salvar meta:', e);
+    toast('Erro ao salvar a meta.', 'error');
   }
 }
 
