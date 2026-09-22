@@ -150,10 +150,12 @@ CREATE TABLE IF NOT EXISTS notas (
   meta NUMERIC(5,2) DEFAULT 60,    -- nota-alvo do aluno nessa matéria (padrão: média 60)
   parcial1 NUMERIC(5,2),
   parcial2 NUMERIC(5,2),
-  processo NUMERIC(5,2),           -- matérias normais
+  processo NUMERIC(5,2),           -- matérias normais: soma das linhas de processo_itens
+  processo_itens JSONB DEFAULT '[]', -- matérias normais: [{nome, pontos}, ...] lançado livremente pelo aluno
   processo_pratica1 NUMERIC(5,2),  -- Micro/Anatomia/Histologia
   processo_pratica2 NUMERIC(5,2),  -- Micro/Anatomia/Histologia
-  processo_resto NUMERIC(5,2),     -- Micro/Anatomia/Histologia
+  processo_resto NUMERIC(5,2),     -- Micro/Anatomia/Histologia: soma de processo_resto_itens
+  processo_resto_itens JSONB DEFAULT '[]', -- Micro/Anatomia/Histologia: [{nome, pontos}, ...]
   final_normal NUMERIC(5,2),       -- matérias normais
   final_teorica NUMERIC(5,2),      -- Micro/Anatomia/Histologia
   final_pratica NUMERIC(5,2),      -- Micro/Anatomia/Histologia

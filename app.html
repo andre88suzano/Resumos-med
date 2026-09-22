@@ -144,6 +144,19 @@
     cursor: pointer;
   }
 
+  /* ─── PROCESSO (linhas dinâmicas) ───────────────────── */
+  .processo-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .processo-linha { display: grid; grid-template-columns: 1fr 90px 32px; gap: 8px; align-items: center; }
+  .processo-nome, .processo-pontos { padding: 8px 10px; font-size: 13px; }
+  .processo-remove {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; transition: var(--transition);
+  }
+  .processo-remove:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+  .processo-total { font-size: 12px; color: var(--text3); font-weight: 600; }
+  .processo-total.processo-over { color: var(--red); }
+
   /* ─── CARDS ─────────────────────────────────────────── */
   .card {
     background: var(--card);
@@ -4326,16 +4339,48 @@ function renderNotasLista() {
   materias.forEach(m => atualizarResumoNota(m.materia, !!m.especial));
 }
 
+function processoItensIniciais(saved, key, legacyKey) {
+  if (Array.isArray(saved[key]) && saved[key].length) return saved[key];
+  if (saved[legacyKey] != null) return [{ nome: 'Processo (nota antiga)', pontos: saved[legacyKey] }];
+  return [];
+}
+
+function processoLinhaHtml(item) {
+  const nomeEsc = (item.nome || '').replace(/"/g, '&quot;');
+  return `
+    <div class="processo-linha">
+      <input type="text" class="form-input processo-nome" placeholder="Ex: Presença" value="${nomeEsc}" oninput="processoRecalc(this.closest('.processo-list'))">
+      <input type="number" class="form-input processo-pontos" placeholder="0" step="0.1" min="0" value="${item.pontos ?? ''}" oninput="processoRecalc(this.closest('.processo-list'))">
+      <button type="button" class="processo-remove" onclick="processoRemoveRow(this)" title="Remover linha">×</button>
+    </div>`;
+}
+
+function processoBlockHtml(slug, materiaEsc, especial, label, max, itens) {
+  const totalInicial = itens.reduce((s, i) => s + (Number(i.pontos) || 0), 0);
+  return `
+    <div class="form-group" style="grid-column:1/-1;">
+      <label class="form-label">${label} <span style="text-transform:none;font-weight:400;">(limite ${max} pts — adicione quantas linhas quiser)</span></label>
+      <div class="processo-list" id="processo-list-${slug}" data-max="${max}" data-total-id="processo-total-${slug}" data-materia="${materiaEsc}" data-especial="${especial}">
+        ${itens.map(processoLinhaHtml).join('')}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        <button type="button" class="btn btn-ghost btn-sm" data-target="processo-list-${slug}" onclick="processoAddRow(this)">+ Adicionar linha</button>
+        <span class="processo-total${totalInicial > max ? ' processo-over' : ''}" id="processo-total-${slug}">${totalInicial.toFixed(1)}/${max}</span>
+      </div>
+    </div>`;
+}
+
 function renderCardNota(m) {
   const slug = notaSlug(m.materia);
   const saved = notasState.porMateria[m.materia] || {};
   const materiaEsc = m.materia.replace(/'/g, "\\'");
+  const especialAttr = m.especial ? 'true' : 'false';
 
   const numInput = (id, label, max, val) => `
     <div class="form-group">
       <label class="form-label">${label} <span style="text-transform:none;font-weight:400;">(máx ${max})</span></label>
       <input class="form-input" type="number" min="0" max="${max}" step="0.1" id="${id}" value="${val ?? ''}" placeholder="0"
-        oninput="atualizarResumoNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">
+        oninput="atualizarResumoNota('${materiaEsc}',${especialAttr})">
     </div>`;
 
   const camposHtml = m.especial ? `
@@ -4344,15 +4389,15 @@ function renderCardNota(m) {
         ${numInput(`nota-${slug}-p2`, 'Parcial 2', 20, saved.parcial2)}
         ${numInput(`nota-${slug}-pr1`, 'Prática 1 (Processo)', 5, saved.processo_pratica1)}
         ${numInput(`nota-${slug}-pr2`, 'Prática 2 (Processo)', 5, saved.processo_pratica2)}
-        ${numInput(`nota-${slug}-presto`, 'Resto do Processo', 10, saved.processo_resto)}
         ${numInput(`nota-${slug}-ft`, 'Final — Teórica', 30, saved.final_teorica)}
         ${numInput(`nota-${slug}-fp`, 'Final — Prática', 10, saved.final_pratica)}
+        ${processoBlockHtml(slug, materiaEsc, especialAttr, 'Resto do Processo', 10, processoItensIniciais(saved, 'processo_resto_itens', 'processo_resto'))}
       </div>` : `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
         ${numInput(`nota-${slug}-p1`, 'Parcial 1', 20, saved.parcial1)}
         ${numInput(`nota-${slug}-p2`, 'Parcial 2', 20, saved.parcial2)}
-        ${numInput(`nota-${slug}-proc`, 'Processo', 20, saved.processo)}
         ${numInput(`nota-${slug}-final`, 'Final', 40, saved.final_normal)}
+        ${processoBlockHtml(slug, materiaEsc, especialAttr, 'Processo', 20, processoItensIniciais(saved, 'processo_itens', 'processo'))}
       </div>`;
 
   return `
@@ -4366,9 +4411,9 @@ function renderCardNota(m) {
             <label class="form-label" style="margin:0;" title="Nota que você quer atingir nessa matéria — pode deixar 60 (média) ou mirar num promedio mais alto.">🎯 Meta</label>
             <input class="form-input" type="number" min="0" max="100" step="1" style="width:70px;padding:6px 8px;font-size:13px;"
               id="nota-${slug}-meta" value="${saved.meta ?? 60}"
-              oninput="atualizarResumoNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">
+              oninput="atualizarResumoNota('${materiaEsc}',${especialAttr})">
           </div>
-          <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">💾 Salvar</button>
+          <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${especialAttr})">💾 Salvar</button>
         </div>
       </div>
       ${camposHtml}
@@ -4376,22 +4421,60 @@ function renderCardNota(m) {
     </div>`;
 }
 
+function processoLerLinhas(container) {
+  const linhas = [...container.querySelectorAll('.processo-linha')];
+  const itens = linhas.map(l => {
+    const n = parseFloat(l.querySelector('.processo-pontos').value);
+    return { nome: l.querySelector('.processo-nome').value.trim(), pontos: isNaN(n) ? null : n };
+  });
+  const preenchidos = itens.filter(i => i.pontos != null);
+  return { itens, valor: preenchidos.length ? preenchidos.reduce((s, i) => s + i.pontos, 0) : null };
+}
+
+function processoAddRow(btn) {
+  const container = document.getElementById(btn.dataset.target);
+  container.insertAdjacentHTML('beforeend', processoLinhaHtml({ nome: '', pontos: null }));
+  processoRecalc(container);
+}
+
+function processoRemoveRow(btn) {
+  const container = btn.closest('.processo-list');
+  btn.closest('.processo-linha').remove();
+  processoRecalc(container);
+}
+
+function processoRecalc(container) {
+  if (!container) return;
+  const max = Number(container.dataset.max);
+  const { valor } = processoLerLinhas(container);
+  const total = valor ?? 0;
+  const totalEl = document.getElementById(container.dataset.totalId);
+  if (totalEl) {
+    totalEl.textContent = `${total.toFixed(1)}/${max}`;
+    totalEl.classList.toggle('processo-over', total > max);
+  }
+  atualizarResumoNota(container.dataset.materia, container.dataset.especial === 'true');
+}
+
 function coletarValoresNota(materia, especial) {
   const slug = notaSlug(materia);
   const v = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n) ? null : n; };
   const meta = v(`nota-${slug}-meta`) ?? 60;
+  const proc = processoLerLinhas(document.getElementById(`processo-list-${slug}`));
   if (especial) {
     return {
       meta,
       parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
-      processo_pratica1: v(`nota-${slug}-pr1`), processo_pratica2: v(`nota-${slug}-pr2`), processo_resto: v(`nota-${slug}-presto`),
+      processo_pratica1: v(`nota-${slug}-pr1`), processo_pratica2: v(`nota-${slug}-pr2`),
+      processo_resto: proc.valor, processo_resto_itens: proc.itens,
       final_teorica: v(`nota-${slug}-ft`), final_pratica: v(`nota-${slug}-fp`),
     };
   }
   return {
     meta,
     parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
-    processo: v(`nota-${slug}-proc`), final_normal: v(`nota-${slug}-final`),
+    processo: proc.valor, processo_itens: proc.itens,
+    final_normal: v(`nota-${slug}-final`),
   };
 }
 
