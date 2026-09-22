@@ -145,7 +145,7 @@ CREATE POLICY "Authenticated users can read questoes"
 -- (10 pts), e a Final se divide em Teórica (30) + Prática (10).
 -- ============================================================
 CREATE TABLE IF NOT EXISTS notas (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   materia TEXT NOT NULL,
   parcial1 NUMERIC(5,2),
   parcial2 NUMERIC(5,2),
