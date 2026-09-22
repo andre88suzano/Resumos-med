@@ -3026,7 +3026,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo + Mini Resumo', preco:15.00, precoUnitario:15.00, tipo:'solo', filtroParcial:'parciais' })">🛒 Montar carrinho — R$ 15,00 / combo</button>
           </div>
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;letter-spacing:0;text-transform:none;margin-left:4px;">🔒 indisponível</span></div>
 
           <div class="valor-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -3036,7 +3036,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 18,95 cartão</div>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Resumo Final', preco:18.00, precoUnitario:18.00, tipo:'solo', filtroParcial:'final' })">🛒 Montar carrinho — R$ 18,00 / resumo</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível no momento</button>
           </div>
 
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;align-items:flex-start;gap:8px;">
@@ -3047,7 +3047,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
                 <div style="font-size:10px;color:var(--text3);">R$ 26,32 cartão</div>
               </div>
             </div>
-            <button class="btn btn-sm" style="width:100%;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="closeModal('modal-valores');abrirModalCompra({ nome:'Combo Final', preco:25.00, precoUnitario:25.00, tipo:'solo', filtroParcial:'final' })">🛒 Montar carrinho — R$ 25,00 / combo</button>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível no momento</button>
           </div>
 
         </div>
@@ -3080,7 +3080,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
             <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
           </div>
 
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:12px;margin-bottom:4px;">Exames Finais <span style="font-size:9px;background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b60;padding:1px 6px;border-radius:10px;letter-spacing:0;text-transform:none;margin-left:4px;">🔒 indisponível</span></div>
           <div class="valor-item" style="flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
               <div class="valor-nome">📚 Pacote Resumos (Finais)</div>
@@ -3090,16 +3090,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
               </div>
             </div>
             <div style="font-size:11px;color:var(--text3);">6 resumos completos — Fisiologia, Bioquímica, Genética Médica, Imunologia, Microbiologia e Biofísica.</div>
-            <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:2px;">Fisiologia — escolha a versão:</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="michele" checked> Michele</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="lisandro"> Lisandro</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-fisio" value="gabriel"> Gabriel</label>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="const v=document.querySelector('input[name=pacote-final-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('pix', false, v)">⚡ PIX — R$ 64,90</button>
-              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=pacote-final-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('cartao', false, v)">💳 Cartão — R$ 68,32</button>
-            </div>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível no momento</button>
           </div>
           <div class="valor-item" style="border-color:var(--teal);flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
@@ -3110,16 +3101,7 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
               </div>
             </div>
             <div style="font-size:11px;color:var(--text3);">6 resumos completos + 6 mini resumos de revisão.</div>
-            <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:2px;">Fisiologia — escolha a versão:</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="michele" checked> Michele</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="lisandro"> Lisandro</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;"><input type="radio" name="pacote-final-completo-fisio" value="gabriel"> Gabriel</label>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <button class="btn btn-sm" style="flex:1;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);" onclick="const v=document.querySelector('input[name=pacote-final-completo-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('pix', true, v)">⚡ PIX — R$ 79,90</button>
-              <button class="btn btn-sm" style="flex:1;background:#1e3a5f;color:#60a5fa;border:1px solid #3b82f6;" onclick="const v=document.querySelector('input[name=pacote-final-completo-fisio]:checked').value;closeModal('modal-valores');abrirModalCompraPacoteFinal('cartao', true, v)">💳 Cartão — R$ 84,11</button>
-            </div>
+            <button class="btn btn-sm" style="width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível no momento</button>
           </div>
 
         </div>
@@ -3138,8 +3120,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
               <div class="valor-desc">Banco com 20 questões com gabarito e explicação.</div>
             </div>
             <div style="text-align:right;">
-              <div class="valor-preco">R$ 5,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-              <div style="font-size:10px;color:var(--text3);">R$ 5,25 cartão</div>
+              <div class="valor-preco">R$ 1,50 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 1,58 cartão</div>
               <button class="btn btn-sm" style="margin-top:8px;width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
             </div>
           </div>
@@ -3151,8 +3133,8 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
               <div class="valor-desc">Banco com 40 questões com gabarito e explicação.</div>
             </div>
             <div style="text-align:right;">
-              <div class="valor-preco" style="color:var(--accent);">R$ 10,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
-              <div style="font-size:10px;color:var(--text3);">R$ 10,50 cartão</div>
+              <div class="valor-preco" style="color:var(--accent);">R$ 3,00 <span style="font-size:10px;font-weight:400;color:var(--text3);">PIX</span></div>
+              <div style="font-size:10px;color:var(--text3);">R$ 3,15 cartão</div>
               <button class="btn btn-sm" style="margin-top:8px;width:100%;background:var(--border);color:var(--text3);cursor:not-allowed;" disabled>🔒 Indisponível — só Exames Finais</button>
             </div>
           </div>
@@ -3164,11 +3146,11 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
               <div class="valor-desc">Banco completo com 60 questões com gabarito e explicação.</div>
             </div>
             <div style="text-align:right;">
-              <div class="valor-preco">R$ 15,00 PIX</div>
-              <div>R$ 15,75 cartão</div>
+              <div class="valor-preco">R$ 5,00 PIX</div>
+              <div>R$ 5,25 cartão</div>
               <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%;"
-                onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:15.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:60})">
-                🛒 Comprar — R$ 15,00 no PIX
+                onclick="closeModal('modal-valores');abrirModalCompra({nome:'Banco de Questões — 60 questões',preco:5.00,tipo:'solo',ehQuestoes:true,qtdQuestoes:60})">
+                🛒 Comprar — R$ 5,00 no PIX
               </button>
             </div>
           </div>
@@ -5378,6 +5360,8 @@ async function abrirModalCompraPromoFisio(metodo, versao) {
 // inclui também os 6 mini resumos de revisão.
 async function abrirModalCompraPacoteFinal(metodo, completo, versaoFisio, precoOverride) {
   if (!state.user) { toast('Faça login para comprar', 'error'); return; }
+  toast('🔒 Resumos de Exames Finais indisponíveis para compra no momento.', 'error');
+  return;
 
   const FISIO_VERSOES = {
     michele:  { resumo: 'a1a63868-fef9-49ed-bf77-8778d847a6be', mini: '14e6aff3-a36c-40dc-a26e-0dfb8a47e05a', titulo: 'Final Fisio I-Michele' },
@@ -8547,6 +8531,12 @@ function mcRenderizarSelecaoResumos(plano) {
   const btnContinuar = document.getElementById('mc-btn-continuar');
   const qtdCombos = plano.quantidade || null; // nº de combos permitidos
   const ehCombo = plano.nome && plano.nome.toLowerCase().includes('combo');
+
+  // Bloqueio temporário: venda de resumos de Exames Finais suspensa.
+  if (plano.filtroParcial === 'final') {
+    lista.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px;">🔒 Resumos de Exames Finais indisponíveis para compra no momento.</div>`;
+    return;
+  }
 
   // Filtro por tipo de prova: 'parciais' (Parcial 1/2) ou 'final'.
   // Sem filtro definido, mostra todos (compatível com pacotes/combos antigos).
