@@ -4382,32 +4382,42 @@ function coletarValoresNota(materia, especial) {
 }
 
 function calcularResumoNota(valores, especial) {
-  const p1Ok = valores.parcial1 != null, p2Ok = valores.parcial2 != null;
-  const processoOk = especial
-    ? (valores.processo_pratica1 != null && valores.processo_pratica2 != null && valores.processo_resto != null)
-    : (valores.processo != null);
-  const preFinalCompleto = p1Ok && p2Ok && processoOk;
+  // Componentes que valem antes da final, e a própria final — cada um com seu máximo.
+  const preFinal = especial
+    ? [['parcial1', 20], ['parcial2', 20], ['processo_pratica1', 5], ['processo_pratica2', 5], ['processo_resto', 10]]
+    : [['parcial1', 20], ['parcial2', 20], ['processo', 20]];
+  const final = especial
+    ? [['final_teorica', 30], ['final_pratica', 10]]
+    : [['final_normal', 40]];
+  const finalMaxTotal = 40;
 
-  const p1 = valores.parcial1 || 0, p2 = valores.parcial2 || 0;
-  const processoTotal = especial
-    ? (valores.processo_pratica1 || 0) + (valores.processo_pratica2 || 0) + (valores.processo_resto || 0)
-    : (valores.processo || 0);
-  const somaParcial = p1 + p2 + processoTotal;
-  const finalMax = 40;
-  const faltam = Math.max(0, NOTA_MINIMA - somaParcial);
-  const impossivel = faltam > finalMax;
+  const somar = lista => lista.reduce((acc, [key, max]) => {
+    const v = valores[key];
+    if (v != null) { acc.soma += v; acc.algumPreenchido = true; }
+    else { acc.maxRestante += max; acc.completo = false; }
+    return acc;
+  }, { soma: 0, maxRestante: 0, completo: true, algumPreenchido: false });
 
-  let finalLancada = null;
-  if (especial) {
-    if (valores.final_teorica != null || valores.final_pratica != null) {
-      finalLancada = (valores.final_teorica || 0) + (valores.final_pratica || 0);
-    }
-  } else if (valores.final_normal != null) {
-    finalLancada = valores.final_normal;
-  }
+  const pf = somar(preFinal);
+  const fn = somar(final);
 
-  const total = (preFinalCompleto && finalLancada != null) ? somaParcial + finalLancada : null;
-  return { preFinalCompleto, somaParcial, faltam, impossivel, total, aprovado: total != null ? total >= NOTA_MINIMA : null };
+  const pontosConfirmados = pf.soma + fn.soma;
+  const maxRestanteTotal = pf.maxRestante + fn.maxRestante;
+  const projecaoMaxima = pontosConfirmados + maxRestanteTotal;
+  const totalCompleto = pf.completo && fn.completo;
+  const faltamNaFinal = pf.completo ? Math.max(0, NOTA_MINIMA - pf.soma) : null;
+
+  return {
+    algumPreenchido: pf.algumPreenchido || fn.algumPreenchido,
+    preFinalCompleto: pf.completo,
+    somaPreFinal: pf.soma,
+    faltamNaFinal,
+    impossivelSoComFinal: faltamNaFinal != null ? faltamNaFinal > finalMaxTotal : null,
+    projecaoMaxima,
+    impossivel: projecaoMaxima < NOTA_MINIMA,
+    total: totalCompleto ? pontosConfirmados : null,
+    aprovado: totalCompleto ? pontosConfirmados >= NOTA_MINIMA : null,
+  };
 }
 
 function atualizarResumoNota(materia, especial) {
@@ -4415,16 +4425,20 @@ function atualizarResumoNota(materia, especial) {
   if (!el) return;
   const r = calcularResumoNota(coletarValoresNota(materia, especial), especial);
 
-  if (!r.preFinalCompleto) {
-    el.innerHTML = `📝 Preencha Parcial 1, Parcial 2 e Processo${especial ? ' (as 2 práticas + o resto)' : ''} pra ver quanto falta na final.`;
-  } else if (r.total != null) {
+  if (r.total != null) {
     el.innerHTML = r.aprovado
       ? `✅ <strong style="color:#22c55e;">Aprovado</strong> — total ${r.total.toFixed(1)}/100`
       : `❌ <strong style="color:#ef4444;">Reprovado</strong> — total ${r.total.toFixed(1)}/100 (mínimo ${NOTA_MINIMA})`;
-  } else if (r.impossivel) {
-    el.innerHTML = `⚠️ Com ${r.somaParcial.toFixed(1)} pts até agora, não dá mais pra bater ${NOTA_MINIMA} só com a final (máx 40).`;
+  } else if (r.preFinalCompleto) {
+    el.innerHTML = r.impossivelSoComFinal
+      ? `⚠️ Com ${r.somaPreFinal.toFixed(1)} pts até agora, não dá mais pra bater ${NOTA_MINIMA} só com a final (máx 40).`
+      : `📌 Você tem <strong>${r.somaPreFinal.toFixed(1)} pts</strong> até agora. Faltam <strong>${r.faltamNaFinal.toFixed(1)} pts</strong> na final (de até 40) pra bater a média (${NOTA_MINIMA}).`;
+  } else if (r.algumPreenchido) {
+    el.innerHTML = r.impossivel
+      ? `⚠️ Mesmo tirando nota máxima em tudo que falta, o máximo possível é ${r.projecaoMaxima.toFixed(1)}/100 — não dá mais pra bater ${NOTA_MINIMA}.`
+      : `📌 Notas confirmadas somam progresso pra até <strong>${r.projecaoMaxima.toFixed(1)} pts</strong> se acertar tudo o que falta. Continue lançando as próximas provas pra refinar o cálculo.`;
   } else {
-    el.innerHTML = `📌 Você tem <strong>${r.somaParcial.toFixed(1)} pts</strong> até agora. Faltam <strong>${r.faltam.toFixed(1)} pts</strong> na final (de até 40) pra bater a média (${NOTA_MINIMA}).`;
+    el.innerHTML = `📝 Lance suas notas conforme for fazendo as provas — o cálculo aparece aqui a partir da primeira.`;
   }
 }
 
