@@ -4382,41 +4382,27 @@ function coletarValoresNota(materia, especial) {
 }
 
 function calcularResumoNota(valores, especial) {
-  // Componentes que valem antes da final, e a própria final — cada um com seu máximo.
-  const preFinal = especial
-    ? [['parcial1', 20], ['parcial2', 20], ['processo_pratica1', 5], ['processo_pratica2', 5], ['processo_resto', 10]]
-    : [['parcial1', 20], ['parcial2', 20], ['processo', 20]];
-  const final = especial
-    ? [['final_teorica', 30], ['final_pratica', 10]]
-    : [['final_normal', 40]];
-  const finalMaxTotal = 40;
+  const componentes = especial
+    ? [['parcial1', 20], ['parcial2', 20], ['processo_pratica1', 5], ['processo_pratica2', 5], ['processo_resto', 10], ['final_teorica', 30], ['final_pratica', 10]]
+    : [['parcial1', 20], ['parcial2', 20], ['processo', 20], ['final_normal', 40]];
 
-  const somar = lista => lista.reduce((acc, [key, max]) => {
+  let pontosConfirmados = 0, maxRestante = 0, algumPreenchido = false, tudoPreenchido = true;
+  componentes.forEach(([key, max]) => {
     const v = valores[key];
-    if (v != null) { acc.soma += v; acc.algumPreenchido = true; }
-    else { acc.maxRestante += max; acc.completo = false; }
-    return acc;
-  }, { soma: 0, maxRestante: 0, completo: true, algumPreenchido: false });
+    if (v != null) { pontosConfirmados += v; algumPreenchido = true; }
+    else { maxRestante += max; tudoPreenchido = false; }
+  });
 
-  const pf = somar(preFinal);
-  const fn = somar(final);
-
-  const pontosConfirmados = pf.soma + fn.soma;
-  const maxRestanteTotal = pf.maxRestante + fn.maxRestante;
-  const projecaoMaxima = pontosConfirmados + maxRestanteTotal;
-  const totalCompleto = pf.completo && fn.completo;
-  const faltamNaFinal = pf.completo ? Math.max(0, NOTA_MINIMA - pf.soma) : null;
+  const projecaoMaxima = pontosConfirmados + maxRestante;
 
   return {
-    algumPreenchido: pf.algumPreenchido || fn.algumPreenchido,
-    preFinalCompleto: pf.completo,
-    somaPreFinal: pf.soma,
-    faltamNaFinal,
-    impossivelSoComFinal: faltamNaFinal != null ? faltamNaFinal > finalMaxTotal : null,
-    projecaoMaxima,
+    algumPreenchido,
+    pontosConfirmados,
+    faltamPara60: Math.max(0, NOTA_MINIMA - pontosConfirmados),
     impossivel: projecaoMaxima < NOTA_MINIMA,
-    total: totalCompleto ? pontosConfirmados : null,
-    aprovado: totalCompleto ? pontosConfirmados >= NOTA_MINIMA : null,
+    projecaoMaxima,
+    total: tudoPreenchido ? pontosConfirmados : null,
+    aprovado: tudoPreenchido ? pontosConfirmados >= NOTA_MINIMA : null,
   };
 }
 
@@ -4429,16 +4415,14 @@ function atualizarResumoNota(materia, especial) {
     el.innerHTML = r.aprovado
       ? `✅ <strong style="color:#22c55e;">Aprovado</strong> — total ${r.total.toFixed(1)}/100`
       : `❌ <strong style="color:#ef4444;">Reprovado</strong> — total ${r.total.toFixed(1)}/100 (mínimo ${NOTA_MINIMA})`;
-  } else if (r.preFinalCompleto) {
-    el.innerHTML = r.impossivelSoComFinal
-      ? `⚠️ Com ${r.somaPreFinal.toFixed(1)} pts até agora, não dá mais pra bater ${NOTA_MINIMA} só com a final (máx 40).`
-      : `📌 Você tem <strong>${r.somaPreFinal.toFixed(1)} pts</strong> até agora. Faltam <strong>${r.faltamNaFinal.toFixed(1)} pts</strong> na final (de até 40) pra bater a média (${NOTA_MINIMA}).`;
-  } else if (r.algumPreenchido) {
-    el.innerHTML = r.impossivel
-      ? `⚠️ Mesmo tirando nota máxima em tudo que falta, o máximo possível é ${r.projecaoMaxima.toFixed(1)}/100 — não dá mais pra bater ${NOTA_MINIMA}.`
-      : `📌 Notas confirmadas somam progresso pra até <strong>${r.projecaoMaxima.toFixed(1)} pts</strong> se acertar tudo o que falta. Continue lançando as próximas provas pra refinar o cálculo.`;
-  } else {
+  } else if (!r.algumPreenchido) {
     el.innerHTML = `📝 Lance suas notas conforme for fazendo as provas — o cálculo aparece aqui a partir da primeira.`;
+  } else if (r.impossivel) {
+    el.innerHTML = `⚠️ Mesmo tirando nota máxima em tudo que falta, o máximo possível é ${r.projecaoMaxima.toFixed(1)}/100 — não dá mais pra bater ${NOTA_MINIMA}.`;
+  } else if (r.faltamPara60 <= 0) {
+    el.innerHTML = `🎉 Você já tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados — já bateu a média (${NOTA_MINIMA})!`;
+  } else {
+    el.innerHTML = `📌 Você tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados. Faltam <strong>${r.faltamPara60.toFixed(1)} pts</strong> nas provas que restam pra chegar em ${NOTA_MINIMA}.`;
   }
 }
 
