@@ -147,6 +147,7 @@ CREATE POLICY "Authenticated users can read questoes"
 CREATE TABLE IF NOT EXISTS notas (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   materia TEXT NOT NULL,
+  meta NUMERIC(5,2) DEFAULT 60,    -- nota-alvo do aluno nessa matéria (padrão: média 60)
   parcial1 NUMERIC(5,2),
   parcial2 NUMERIC(5,2),
   processo NUMERIC(5,2),           -- matérias normais

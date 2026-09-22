@@ -4358,7 +4358,15 @@ function renderCardNota(m) {
         <div style="font-size:16px;font-weight:700;color:var(--text);">
           ${m.materia}${m.especial ? ' <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;margin-left:6px;font-weight:600;">com prática</span>' : ''}
         </div>
-        <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">💾 Salvar</button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label class="form-label" style="margin:0;" title="Nota que você quer atingir nessa matéria — pode deixar 60 (média) ou mirar num promedio mais alto.">🎯 Meta</label>
+            <input class="form-input" type="number" min="0" max="100" step="1" style="width:70px;padding:6px 8px;font-size:13px;"
+              id="nota-${slug}-meta" value="${saved.meta ?? 60}"
+              oninput="atualizarResumoNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">
+          </div>
+          <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">💾 Salvar</button>
+        </div>
       </div>
       ${camposHtml}
       <div id="resumo-${slug}" style="margin-top:14px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);"></div>
@@ -4368,14 +4376,17 @@ function renderCardNota(m) {
 function coletarValoresNota(materia, especial) {
   const slug = notaSlug(materia);
   const v = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n) ? null : n; };
+  const meta = v(`nota-${slug}-meta`) ?? 60;
   if (especial) {
     return {
+      meta,
       parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
       processo_pratica1: v(`nota-${slug}-pr1`), processo_pratica2: v(`nota-${slug}-pr2`), processo_resto: v(`nota-${slug}-presto`),
       final_teorica: v(`nota-${slug}-ft`), final_pratica: v(`nota-${slug}-fp`),
     };
   }
   return {
+    meta,
     parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
     processo: v(`nota-${slug}-proc`), final_normal: v(`nota-${slug}-final`),
   };
@@ -4385,6 +4396,7 @@ function calcularResumoNota(valores, especial) {
   const componentes = especial
     ? [['parcial1', 20], ['parcial2', 20], ['processo_pratica1', 5], ['processo_pratica2', 5], ['processo_resto', 10], ['final_teorica', 30], ['final_pratica', 10]]
     : [['parcial1', 20], ['parcial2', 20], ['processo', 20], ['final_normal', 40]];
+  const meta = (valores.meta != null && !isNaN(valores.meta)) ? valores.meta : NOTA_MINIMA;
 
   let pontosConfirmados = 0, maxRestante = 0, algumPreenchido = false, tudoPreenchido = true;
   componentes.forEach(([key, max]) => {
@@ -4396,13 +4408,14 @@ function calcularResumoNota(valores, especial) {
   const projecaoMaxima = pontosConfirmados + maxRestante;
 
   return {
+    meta,
     algumPreenchido,
     pontosConfirmados,
-    faltamPara60: Math.max(0, NOTA_MINIMA - pontosConfirmados),
-    impossivel: projecaoMaxima < NOTA_MINIMA,
+    faltamParaMeta: Math.max(0, meta - pontosConfirmados),
+    impossivel: projecaoMaxima < meta,
     projecaoMaxima,
     total: tudoPreenchido ? pontosConfirmados : null,
-    aprovado: tudoPreenchido ? pontosConfirmados >= NOTA_MINIMA : null,
+    aprovado: tudoPreenchido ? pontosConfirmados >= meta : null,
   };
 }
 
@@ -4413,16 +4426,16 @@ function atualizarResumoNota(materia, especial) {
 
   if (r.total != null) {
     el.innerHTML = r.aprovado
-      ? `✅ <strong style="color:#22c55e;">Aprovado</strong> — total ${r.total.toFixed(1)}/100`
-      : `❌ <strong style="color:#ef4444;">Reprovado</strong> — total ${r.total.toFixed(1)}/100 (mínimo ${NOTA_MINIMA})`;
+      ? `✅ <strong style="color:#22c55e;">Aprovado</strong> — total ${r.total.toFixed(1)}/100 (meta ${r.meta})`
+      : `❌ <strong style="color:#ef4444;">Reprovado</strong> — total ${r.total.toFixed(1)}/100 (meta ${r.meta})`;
   } else if (!r.algumPreenchido) {
     el.innerHTML = `📝 Lance suas notas conforme for fazendo as provas — o cálculo aparece aqui a partir da primeira.`;
   } else if (r.impossivel) {
-    el.innerHTML = `⚠️ Mesmo tirando nota máxima em tudo que falta, o máximo possível é ${r.projecaoMaxima.toFixed(1)}/100 — não dá mais pra bater ${NOTA_MINIMA}.`;
-  } else if (r.faltamPara60 <= 0) {
-    el.innerHTML = `🎉 Você já tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados — já bateu a média (${NOTA_MINIMA})!`;
+    el.innerHTML = `⚠️ Mesmo tirando nota máxima em tudo que falta, o máximo possível é ${r.projecaoMaxima.toFixed(1)}/100 — não dá mais pra bater ${r.meta}.`;
+  } else if (r.faltamParaMeta <= 0) {
+    el.innerHTML = `🎉 Você já tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados — já bateu a meta (${r.meta})!`;
   } else {
-    el.innerHTML = `📌 Você tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados. Faltam <strong>${r.faltamPara60.toFixed(1)} pts</strong> nas provas que restam pra chegar em ${NOTA_MINIMA}.`;
+    el.innerHTML = `📌 Você tem <strong>${r.pontosConfirmados.toFixed(1)} pts</strong> confirmados. Faltam <strong>${r.faltamParaMeta.toFixed(1)} pts</strong> nas provas que restam pra chegar em ${r.meta}.`;
   }
 }
 
