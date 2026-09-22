@@ -4446,13 +4446,18 @@ async function salvarNota(materia, especial) {
   const slug = notaSlug(materia);
   setLoading(`btn-salvar-${slug}`, true);
   try {
+    if (!state.user?.id) throw new Error('Você precisa estar logado.');
     const payload = { user_id: state.user.id, materia, updated_at: new Date().toISOString(), ...coletarValoresNota(materia, especial) };
-    const { ok } = await SB.upsert('notas', payload);
-    if (!ok) throw new Error('falha ao salvar');
+    const { ok, data, status } = await SB.upsert('notas', payload);
+    if (!ok) {
+      const msg = (data && (data.message || data.hint || data.error)) || `status ${status}`;
+      throw new Error(msg);
+    }
     notasState.porMateria[materia] = payload;
     toast(`Notas de ${materia} salvas!`, 'success');
   } catch (e) {
-    toast('Erro ao salvar notas.', 'error');
+    console.error('Erro ao salvar nota:', e);
+    toast(`Erro ao salvar: ${e.message}`, 'error');
   } finally {
     setLoading(`btn-salvar-${slug}`, false);
   }
