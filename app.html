@@ -2274,32 +2274,40 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </div>
       </div>
 
-      <!-- 🧪 PAINEL DE TESTE (só admin) -->
-      <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:18px 20px;margin-bottom:28px;">
+      <!-- 📝 VENDA FORA DO SITE (manual) -->
+      <div style="background:rgba(240,180,41,.07);border:1px solid rgba(240,180,41,.3);border-radius:12px;padding:18px 20px;margin-bottom:28px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span style="font-size:18px;">🧪</span>
+          <span style="font-size:18px;">📝</span>
           <div>
-            <div style="font-weight:700;color:#a855f7;font-size:14px;">Modo Teste — Mercado Pago Sandbox</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Simule um pagamento real sem cobrar ninguém. Use os cartões de teste do MP.</div>
+            <div style="font-weight:700;color:var(--gold);font-size:14px;">Registrar Venda Fora do Site</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Pra vendas fechadas fora do checkout (ex: encomenda combinada por WhatsApp) entrarem nas estatísticas abaixo.</div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
-            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Valor (R$)</label>
-            <input id="test-valor" type="number" value="1.00" min="0.01" step="0.01" class="form-input" style="padding:8px 12px;font-size:14px;" />
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Nome do cliente</label>
+            <input id="manual-nome" type="text" placeholder="Ex: João Silva" class="form-input" style="padding:8px 12px;font-size:14px;" />
           </div>
           <div>
-            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Descrição</label>
-            <input id="test-desc" type="text" value="Teste de Pagamento" class="form-input" style="padding:8px 12px;font-size:14px;" />
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">E-mail (opcional)</label>
+            <input id="manual-email" type="email" placeholder="cliente@email.com" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Valor (R$)</label>
+            <input id="manual-valor" type="number" min="0.01" step="0.01" placeholder="0,00" class="form-input" style="padding:8px 12px;font-size:14px;" />
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Data da venda</label>
+            <input id="manual-data" type="date" class="form-input" style="padding:8px 12px;font-size:14px;" />
           </div>
         </div>
-        <button onclick="iniciarPagamentoTeste()" style="width:100%;padding:10px;background:#7b2ff7;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
-          🧪 Iniciar Pagamento de Teste (Sandbox)
-        </button>
-        <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;">
-          <strong style="color:#a855f7;">Cartão de teste aprovado:</strong> 5031 7557 3453 0604 · CVV: 123 · Venc: 11/25 · Nome: APRO<br>
-          <strong style="color:#e57373;">Cartão recusado:</strong> Use nome: OTHE
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Descrição</label>
+          <input id="manual-desc" type="text" placeholder="Ex: Encomenda — Caso Clínico Fisiologia" class="form-input" style="padding:8px 12px;font-size:14px;" />
         </div>
+        <button onclick="registrarVendaManual()" id="btn-registrar-venda" style="width:100%;padding:11px;background:var(--gold);border:none;border-radius:8px;color:#1a1400;font-weight:700;font-size:13px;cursor:pointer;">
+          📝 Registrar Venda
+        </button>
       </div>
 
       <!-- Cards de resumo -->
@@ -5979,34 +5987,45 @@ function renderCurrentPage() {
 /* ─────────────────────────────────────────────────────────
    FINANCEIRO / VENDAS
 ───────────────────────────────────────────────────────── */
-async function iniciarPagamentoTeste() {
-  if (!state.profile?.is_admin) { toast('Apenas admins podem usar o modo teste.', 'error'); return; }
-  const valor = parseFloat(document.getElementById('test-valor').value) || 1.00;
-  const desc  = document.getElementById('test-desc').value.trim() || 'Teste de Pagamento';
+async function registrarVendaManual() {
+  if (!state.profile?.is_admin) { toast('Apenas admins podem registrar vendas.', 'error'); return; }
 
-  toast('🧪 Criando preferência de teste...', 'info');
+  const nome  = document.getElementById('manual-nome').value.trim();
+  const email = document.getElementById('manual-email').value.trim();
+  const valor = parseFloat(document.getElementById('manual-valor').value);
+  const desc  = document.getElementById('manual-desc').value.trim();
+  const data  = document.getElementById('manual-data').value;
 
+  if (!valor || valor <= 0) { toast('Informe um valor válido.', 'error'); return; }
+  if (!desc) { toast('Informe uma descrição pra essa venda.', 'error'); return; }
+
+  setLoading('btn-registrar-venda', true);
   try {
-    const res = await fetch('/api/mp-create-preference', {
+    const res = await fetch('/api/admin/manual-sale', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.authToken}` },
       body: JSON.stringify({
-        items: [{ title: desc, quantity: 1, unit_price: valor, currency_id: 'BRL' }],
-        payer_email: state.user.email,
-        external_reference: `teste:${state.user.id}:admin`,
-        notification_url: `${SITE_URL}/api/mp-webhook`,
-        test_mode: true,   // ← usa token sandbox
+        name: nome || null,
+        email: email || null,
+        amount: valor,
+        description: desc,
+        created_at: data ? new Date(`${data}T12:00:00`).toISOString() : undefined,
       }),
     });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || `Erro ${res.status}`);
 
-    const data = await res.json();
-    if (!res.ok || !data.init_point) throw new Error(data.error || 'Erro ao criar preferência');
-
-    // Abre o checkout sandbox numa nova aba para não perder o painel admin
-    window.open(data.sandbox_init_point || data.init_point, '_blank');
-    toast('✅ Checkout de teste aberto! Use o cartão: 5031 7557 3453 0604', 'success');
-  } catch(e) {
+    toast('✅ Venda registrada!', 'success');
+    document.getElementById('manual-nome').value = '';
+    document.getElementById('manual-email').value = '';
+    document.getElementById('manual-valor').value = '';
+    document.getElementById('manual-desc').value = '';
+    document.getElementById('manual-data').value = new Date().toISOString().slice(0, 10);
+    carregarVendas();
+  } catch (e) {
     toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading('btn-registrar-venda', false);
   }
 }
 
@@ -6193,6 +6212,9 @@ async function carregarVendas() {
   const fmtVal = v => `R$ ${Number(v).toFixed(2).replace('.', ',')}`;
   const listaEl = document.getElementById('vend-lista');
   const abandEl = document.getElementById('vend-abandonos-lista');
+
+  const dataInput = document.getElementById('manual-data');
+  if (dataInput && !dataInput.value) dataInput.value = new Date().toISOString().slice(0, 10);
 
   try {
     const res = await fetch('/api/admin/sales', {
