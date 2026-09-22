@@ -137,6 +137,36 @@ CREATE POLICY "Authenticated users can read questoes"
 -- então INSERT/UPDATE/DELETE só funciona com service role ou policy de admin.
 
 -- ============================================================
+-- CONTROLADOR DE NOTAS
+-- Cada aluno lança as próprias notas por matéria. Parcial 1 e 2
+-- valem 20 pts cada, Processo 20 pts, Final 40 pts (total 100).
+-- Microbiologia, Anatomia e Histologia (I e II) usam colunas
+-- extras: Processo se divide em 2 práticas (5 pts cada) + resto
+-- (10 pts), e a Final se divide em Teórica (30) + Prática (10).
+-- ============================================================
+CREATE TABLE IF NOT EXISTS notas (
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  materia TEXT NOT NULL,
+  parcial1 NUMERIC(5,2),
+  parcial2 NUMERIC(5,2),
+  processo NUMERIC(5,2),           -- matérias normais
+  processo_pratica1 NUMERIC(5,2),  -- Micro/Anatomia/Histologia
+  processo_pratica2 NUMERIC(5,2),  -- Micro/Anatomia/Histologia
+  processo_resto NUMERIC(5,2),     -- Micro/Anatomia/Histologia
+  final_normal NUMERIC(5,2),       -- matérias normais
+  final_teorica NUMERIC(5,2),      -- Micro/Anatomia/Histologia
+  final_pratica NUMERIC(5,2),      -- Micro/Anatomia/Histologia
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (user_id, materia)
+);
+
+ALTER TABLE notas ENABLE ROW LEVEL SECURITY;
+
+-- Cada aluno só lê e escreve as próprias notas (nunca as de outro aluno)
+CREATE POLICY "users_manage_own_notas" ON notas
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ============================================================
 -- Tornar você admin: substitua o email abaixo pelo seu
 -- Execute DEPOIS de criar sua conta no site
 -- ============================================================

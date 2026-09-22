@@ -1614,6 +1614,9 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         <a class="nav-item" onclick="showPage('feedbacks')">
           <span class="nav-icon">⭐</span> <span>Feedbacks</span>
         </a>
+        <a class="nav-item" onclick="showPage('notas')">
+          <span class="nav-icon">🧮</span> <span>Controlador de Notas</span>
+        </a>
         <a class="nav-item" onclick="showPage('meu-perfil')">
           <span class="nav-icon">👤</span> <span data-i18n="nav-profile">Meu Perfil</span>
         </a>
@@ -1865,6 +1868,18 @@ CREATE POLICY "Assinatura própria"            ON public.assinaturas_ia       FO
         </button>
       </div>
       <div id="feedbacks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+        <div class="empty-state"><div class="spinner" style="margin:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: CONTROLADOR DE NOTAS ────────────────── -->
+    <div class="page hidden" id="page-notas">
+      <h1 class="section-title">🧮 Controlador de Notas</h1>
+      <p class="section-sub">Lance suas notas e veja quanto falta pra bater a média (60) na final. Só você vê essas notas.</p>
+
+      <div style="display:flex;gap:0;padding-bottom:0;border-bottom:1px solid var(--border);overflow-x:auto;margin-bottom:24px;" id="notas-semestre-tabs"></div>
+
+      <div id="notas-lista" style="display:flex;flex-direction:column;gap:16px;">
         <div class="empty-state"><div class="spinner" style="margin:auto;"></div></div>
       </div>
     </div>
@@ -4219,6 +4234,216 @@ async function deleteAtualizacao(id) {
 ───────────────────────────────────────────────────────── */
 let fbImageBase64 = null;
 
+/* ─────────────────────────────────────────────────────────
+   CONTROLADOR DE NOTAS
+   Parciais 1 e 2 = 20 pts cada, Processo = 20 pts, Final = 40 pts.
+   Microbiologia, Anatomia e Histologia (I e II) têm regra diferente:
+   Processo se divide em 2 práticas (5 pts cada) + resto (10 pts),
+   e a Final se divide em Teórica (30 pts) + Prática (10 pts).
+───────────────────────────────────────────────────────── */
+const NOTA_MINIMA = 60;
+const CURRICULO_SEMESTRES = {
+  1: [
+    { materia: 'Anatomia 1', especial: true },
+    { materia: 'Histologia 1', especial: true },
+    { materia: 'Embriologia' },
+    { materia: 'Biologia' },
+    { materia: 'Lengua Castellana' },
+    { materia: 'Historia de la Medicina' },
+  ],
+  2: [
+    { materia: 'Anatomia 2', especial: true },
+    { materia: 'Histologia 2', especial: true },
+    { materia: 'Guaraní' },
+    { materia: 'Medicina Comunitaria' },
+    { materia: 'Bioestatística' },
+    { materia: 'Medicina dos Desastres' },
+    { materia: 'Psicología en la Salud' },
+  ],
+  3: [
+    { materia: 'Bioquímica 1' },
+    { materia: 'Fisiologia 1' },
+    { materia: 'Inmunología' },
+    { materia: 'Genética' },
+    { materia: 'Microbiologia 1', especial: true },
+    { materia: 'Inglés Instrumental' },
+    { materia: 'Biofísica' },
+  ],
+  4: [
+    { materia: 'Fisiologia 2' },
+    { materia: 'Microbiologia 2', especial: true },
+    { materia: 'Bioquímica 2' },
+    { materia: 'Bioética' },
+    { materia: 'Epidemiologia' },
+    { materia: 'Nutrición' },
+    { materia: 'Electrocardiograma' },
+  ],
+};
+
+let notasState = { semestre: 1, porMateria: {} };
+
+function notaSlug(materia) {
+  return materia.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+async function renderNotasPage() {
+  const semDisponivel = state.profile?.semestre_atual && CURRICULO_SEMESTRES[state.profile.semestre_atual];
+  notasState.semestre = semDisponivel ? state.profile.semestre_atual : (notasState.semestre || 1);
+
+  const tabsEl = document.getElementById('notas-semestre-tabs');
+  tabsEl.innerHTML = Object.keys(CURRICULO_SEMESTRES).map(sem => `
+    <button class="valores-tab${Number(sem) === notasState.semestre ? ' active' : ''}" onclick="mudarSemestreNotas(${sem})">${sem}º Semestre</button>
+  `).join('');
+
+  const lista = document.getElementById('notas-lista');
+  lista.innerHTML = `<div class="empty-state"><div class="spinner" style="margin:auto;"></div></div>`;
+
+  notasState.porMateria = {};
+  try {
+    const { data, ok } = await SB.select('notas', `user_id=eq.${state.user.id}`);
+    if (ok && Array.isArray(data)) data.forEach(row => { notasState.porMateria[row.materia] = row; });
+  } catch (_) {}
+
+  renderNotasLista();
+}
+
+function mudarSemestreNotas(sem) {
+  notasState.semestre = Number(sem);
+  document.querySelectorAll('#notas-semestre-tabs .valores-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.startsWith(`${sem}º`));
+  });
+  renderNotasLista();
+}
+
+function renderNotasLista() {
+  const lista = document.getElementById('notas-lista');
+  const materias = CURRICULO_SEMESTRES[notasState.semestre] || [];
+  lista.innerHTML = materias.map(m => renderCardNota(m)).join('');
+  materias.forEach(m => atualizarResumoNota(m.materia, !!m.especial));
+}
+
+function renderCardNota(m) {
+  const slug = notaSlug(m.materia);
+  const saved = notasState.porMateria[m.materia] || {};
+  const materiaEsc = m.materia.replace(/'/g, "\\'");
+
+  const numInput = (id, label, max, val) => `
+    <div class="form-group">
+      <label class="form-label">${label} <span style="text-transform:none;font-weight:400;">(máx ${max})</span></label>
+      <input class="form-input" type="number" min="0" max="${max}" step="0.1" id="${id}" value="${val ?? ''}" placeholder="0"
+        oninput="atualizarResumoNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">
+    </div>`;
+
+  const camposHtml = m.especial ? `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
+        ${numInput(`nota-${slug}-p1`, 'Parcial 1', 20, saved.parcial1)}
+        ${numInput(`nota-${slug}-p2`, 'Parcial 2', 20, saved.parcial2)}
+        ${numInput(`nota-${slug}-pr1`, 'Prática 1 (Processo)', 5, saved.processo_pratica1)}
+        ${numInput(`nota-${slug}-pr2`, 'Prática 2 (Processo)', 5, saved.processo_pratica2)}
+        ${numInput(`nota-${slug}-presto`, 'Resto do Processo', 10, saved.processo_resto)}
+        ${numInput(`nota-${slug}-ft`, 'Final — Teórica', 30, saved.final_teorica)}
+        ${numInput(`nota-${slug}-fp`, 'Final — Prática', 10, saved.final_pratica)}
+      </div>` : `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
+        ${numInput(`nota-${slug}-p1`, 'Parcial 1', 20, saved.parcial1)}
+        ${numInput(`nota-${slug}-p2`, 'Parcial 2', 20, saved.parcial2)}
+        ${numInput(`nota-${slug}-proc`, 'Processo', 20, saved.processo)}
+        ${numInput(`nota-${slug}-final`, 'Final', 40, saved.final_normal)}
+      </div>`;
+
+  return `
+    <div class="card" id="card-nota-${slug}">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+        <div style="font-size:16px;font-weight:700;color:var(--text);">
+          ${m.materia}${m.especial ? ' <span style="font-size:10px;background:#8b5cf620;color:#8b5cf6;border:1px solid #8b5cf640;padding:2px 8px;border-radius:20px;margin-left:6px;font-weight:600;">com prática</span>' : ''}
+        </div>
+        <button class="btn btn-primary" style="padding:6px 16px;font-size:13px;" id="btn-salvar-${slug}" onclick="salvarNota('${materiaEsc}',${m.especial ? 'true' : 'false'})">💾 Salvar</button>
+      </div>
+      ${camposHtml}
+      <div id="resumo-${slug}" style="margin-top:14px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);"></div>
+    </div>`;
+}
+
+function coletarValoresNota(materia, especial) {
+  const slug = notaSlug(materia);
+  const v = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n) ? null : n; };
+  if (especial) {
+    return {
+      parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
+      processo_pratica1: v(`nota-${slug}-pr1`), processo_pratica2: v(`nota-${slug}-pr2`), processo_resto: v(`nota-${slug}-presto`),
+      final_teorica: v(`nota-${slug}-ft`), final_pratica: v(`nota-${slug}-fp`),
+    };
+  }
+  return {
+    parcial1: v(`nota-${slug}-p1`), parcial2: v(`nota-${slug}-p2`),
+    processo: v(`nota-${slug}-proc`), final_normal: v(`nota-${slug}-final`),
+  };
+}
+
+function calcularResumoNota(valores, especial) {
+  const p1Ok = valores.parcial1 != null, p2Ok = valores.parcial2 != null;
+  const processoOk = especial
+    ? (valores.processo_pratica1 != null && valores.processo_pratica2 != null && valores.processo_resto != null)
+    : (valores.processo != null);
+  const preFinalCompleto = p1Ok && p2Ok && processoOk;
+
+  const p1 = valores.parcial1 || 0, p2 = valores.parcial2 || 0;
+  const processoTotal = especial
+    ? (valores.processo_pratica1 || 0) + (valores.processo_pratica2 || 0) + (valores.processo_resto || 0)
+    : (valores.processo || 0);
+  const somaParcial = p1 + p2 + processoTotal;
+  const finalMax = 40;
+  const faltam = Math.max(0, NOTA_MINIMA - somaParcial);
+  const impossivel = faltam > finalMax;
+
+  let finalLancada = null;
+  if (especial) {
+    if (valores.final_teorica != null || valores.final_pratica != null) {
+      finalLancada = (valores.final_teorica || 0) + (valores.final_pratica || 0);
+    }
+  } else if (valores.final_normal != null) {
+    finalLancada = valores.final_normal;
+  }
+
+  const total = (preFinalCompleto && finalLancada != null) ? somaParcial + finalLancada : null;
+  return { preFinalCompleto, somaParcial, faltam, impossivel, total, aprovado: total != null ? total >= NOTA_MINIMA : null };
+}
+
+function atualizarResumoNota(materia, especial) {
+  const el = document.getElementById(`resumo-${notaSlug(materia)}`);
+  if (!el) return;
+  const r = calcularResumoNota(coletarValoresNota(materia, especial), especial);
+
+  if (!r.preFinalCompleto) {
+    el.innerHTML = `📝 Preencha Parcial 1, Parcial 2 e Processo${especial ? ' (as 2 práticas + o resto)' : ''} pra ver quanto falta na final.`;
+  } else if (r.total != null) {
+    el.innerHTML = r.aprovado
+      ? `✅ <strong style="color:#22c55e;">Aprovado</strong> — total ${r.total.toFixed(1)}/100`
+      : `❌ <strong style="color:#ef4444;">Reprovado</strong> — total ${r.total.toFixed(1)}/100 (mínimo ${NOTA_MINIMA})`;
+  } else if (r.impossivel) {
+    el.innerHTML = `⚠️ Com ${r.somaParcial.toFixed(1)} pts até agora, não dá mais pra bater ${NOTA_MINIMA} só com a final (máx 40).`;
+  } else {
+    el.innerHTML = `📌 Você tem <strong>${r.somaParcial.toFixed(1)} pts</strong> até agora. Faltam <strong>${r.faltam.toFixed(1)} pts</strong> na final (de até 40) pra bater a média (${NOTA_MINIMA}).`;
+  }
+}
+
+async function salvarNota(materia, especial) {
+  const slug = notaSlug(materia);
+  setLoading(`btn-salvar-${slug}`, true);
+  try {
+    const payload = { user_id: state.user.id, materia, updated_at: new Date().toISOString(), ...coletarValoresNota(materia, especial) };
+    const { ok } = await SB.upsert('notas', payload);
+    if (!ok) throw new Error('falha ao salvar');
+    notasState.porMateria[materia] = payload;
+    toast(`Notas de ${materia} salvas!`, 'success');
+  } catch (e) {
+    toast('Erro ao salvar notas.', 'error');
+  } finally {
+    setLoading(`btn-salvar-${slug}`, false);
+  }
+}
+
 async function loadFeedbacks() {
   // Imagens dos depoimentos (content) vêm por function — não ficam expostas na API
   let list = [];
@@ -5602,6 +5827,7 @@ function showPage(name) {
   const titles = {
     'dashboard': t('nav-dashboard'), 'resumos': t('nav-resumos'),
     'feedbacks': '⭐ Feedbacks',
+    'notas': '🧮 Controlador de Notas',
     'viewer': '—', 'meu-perfil': t('nav-profile'),
     'admin-users': t('nav-users'), 'admin-resumos': t('nav-manage-resumos'),
     'admin-access': t('nav-access'), 'biblioteca-ia': '📚 Biblioteca IA',
@@ -5618,6 +5844,7 @@ function renderCurrentPage() {
     case 'dashboard':    renderDashboard(); break;
     case 'resumos':      renderResumos(); break;
     case 'feedbacks':    loadFeedbacks(); break;
+    case 'notas':        renderNotasPage(); break;
     case 'admin-users':  renderUsersTable(); break;
     case 'admin-resumos':renderAdminResumosTable(); break;
     case 'admin-access': renderAccessPage(); break;
