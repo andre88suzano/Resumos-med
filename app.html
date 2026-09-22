@@ -3785,7 +3785,7 @@ const SB = {
 
     const text = await res.text();
     let data; try { data = JSON.parse(text); } catch { data = text; }
-    return { data, status: res.status, ok: res.ok };
+    return { data, status: res.status, ok: res.ok, headers: res.headers };
   },
 
   // Renova o access_token usando o refresh_token. Atualiza state + localStorage.
@@ -3838,8 +3838,9 @@ const SB = {
     const h = opts.minimal ? { 'Prefer': 'return=minimal' } : {};
     return this._req(`/rest/v1/${table}?${match}`,'PATCH', row, h);
   },
-  async delete(table, match) {
-    return this._req(`/rest/v1/${table}?${match}`,'DELETE');
+  async delete(table, match, opts={}) {
+    const h = opts.minimal ? { 'Prefer': 'return=minimal,count=exact' } : {};
+    return this._req(`/rest/v1/${table}?${match}`,'DELETE', null, h);
   },
   async upsert(table, row) {
     return this._req(`/rest/v1/${table}`,'POST', row, { 'Prefer': 'resolution=merge-duplicates,return=representation' });
@@ -4142,7 +4143,7 @@ async function loadAtualizacoes() {
     const { data: old } = await SB.select('resumos',
       `materia=eq._update_&created_at=lt.${cutoff.toISOString()}&select=id`);
     if (Array.isArray(old)) {
-      for (const r of old) await SB.delete('resumos', `id=eq.${r.id}`);
+      for (const r of old) await SB.delete('resumos', `id=eq.${r.id}`, {minimal:true});
     }
   }
 
@@ -4244,7 +4245,7 @@ async function saveAtualizacao() {
 }
 
 async function deleteAtualizacao(id) {
-  await SB.delete('resumos', `id=eq.${id}`);
+  await SB.delete('resumos', `id=eq.${id}`, {minimal:true});
   toast('Removido.', 'info');
   await loadAtualizacoes();
 }
@@ -4711,7 +4712,7 @@ async function saveFeedback() {
 
 async function deleteFeedback(id, event) {
   event?.stopPropagation();
-  await SB.delete('resumos', `id=eq.${id}`);
+  await SB.delete('resumos', `id=eq.${id}`, {minimal:true});
   toast('Removido.','info');
   await loadFeedbacks();
 }
@@ -7225,14 +7226,15 @@ async function saveResumo() {
 async function confirmDeleteResumo(id) {
   if (!window.confirm('Excluir este resumo? Esta ação não pode ser desfeita.')) return;
   try {
-    const { ok, data, status } = await SB.delete('resumos', `id=eq.${id}`);
+    const { ok, data, status, headers } = await SB.delete('resumos', `id=eq.${id}`, {minimal:true});
     if (!ok) {
       const msg = typeof data === 'object'
         ? (data?.message || data?.error || data?.code || JSON.stringify(data))
         : String(data);
       throw new Error(`[${status}] ${msg}`);
     }
-    const deleted = Array.isArray(data) ? data.length : (data ? 1 : 0);
+    const range = headers?.get?.('content-range') || '';
+    const deleted = range.includes('/') ? parseInt(range.split('/')[1], 10) || 0 : 1;
     if (deleted === 0) {
       toast(`Nenhuma linha deletada (status ${status}) — verifique permissões`, 'error');
       return;
@@ -7388,7 +7390,12 @@ async function saveQuestao() {
 
 function confirmDeleteQuestao(id) {
   openConfirm('Excluir Questão', 'Tem certeza que deseja excluir esta questão?', async () => {
-    await SB.delete('questoes', `id=eq.${id}`);
+    const { ok, data, status } = await SB.delete('questoes', `id=eq.${id}`, {minimal:true});
+    if (!ok) {
+      const msg = typeof data === 'object' ? (data?.message || data?.error || JSON.stringify(data)) : String(data);
+      toast(`Erro ao excluir: [${status}] ${msg}`, 'error');
+      return;
+    }
     await loadQuestoes();
   });
 }
